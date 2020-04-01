@@ -129,28 +129,32 @@ public class SenlabCodec extends DeviceCodec {
 				addModelDesc(model);
 			}
 			measures.forEach(measure -> {
-				String fragment = measure.get("id").asText();
-				String series = "" + fragment.charAt(0);
-				String unit = "";
-				if (modelDescs.get(models.get(model)).get("measures").containsKey(measure.get("id").asText())) {
-					fragment = modelDescs.get(models.get(model)).get("measures").get(measure.get("id").asText())
-							.get("name");
-					series = "" + fragment.charAt(0);
-					unit = modelDescs.get(models.get(model)).get("measures").get(measure.get("id").asText())
-							.get("unit");
-					if (fragment.toLowerCase().contains("battery")) {
-						fragment = "c8y_Battery";
-						series = "level";
-						unit = "%";
-						mor.setLastUpdatedDateTime(null);
-						mor.setProperty("battery", new BigDecimal(measure.get("value").asDouble()));
-						c8yData.setMorToUpdate(mor);
+				if (measure.has("value") && measure.get("value") != null && measure.get("value").isBigDecimal()) {
+					String fragment = measure.get("id").asText();
+					String series = "" + fragment.charAt(0);
+					String unit = "";
+					if (modelDescs.get(models.get(model)).get("measures").containsKey(measure.get("id").asText())) {
+						fragment = modelDescs.get(models.get(model)).get("measures").get(measure.get("id").asText())
+								.get("name");
+						series = "" + fragment.charAt(0);
+						unit = modelDescs.get(models.get(model)).get("measures").get(measure.get("id").asText())
+								.get("unit");
+						if (fragment.toLowerCase().contains("battery")) {
+							fragment = "c8y_Battery";
+							series = "level";
+							unit = "%";
+							mor.setLastUpdatedDateTime(null);
+							mor.setProperty("battery", new BigDecimal(measure.get("value").asDouble()));
+							c8yData.setMorToUpdate(mor);
+						}
+					} else {
+						logger.error("Unknown measure: {}, will use id with no unit", measure.get("id"));
 					}
+					c8yData.addMeasurement(mor, fragment, series, unit, measure.get("value").decimalValue(),
+							new DateTime(measure.get("timestamp").asLong()));
 				} else {
-					logger.error("Unknown measure: {}, will use id with no unit", measure.get("id"));
+					logger.info("{} has no value or has an invalid value.", measure.get("id"));
 				}
-				c8yData.addMeasurement(mor, fragment, series, unit, new BigDecimal(measure.get("value").asDouble()),
-						new DateTime(measure.get("timestamp").asLong()));
 			});
 		} catch (HttpClientErrorException e) {
 			e.printStackTrace();
