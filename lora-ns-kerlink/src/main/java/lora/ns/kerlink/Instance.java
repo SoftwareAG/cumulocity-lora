@@ -131,4 +131,10 @@ public class Instance extends ALNSInstance {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public boolean deprovisionDevice(String deveui) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

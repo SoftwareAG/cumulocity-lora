@@ -1,5 +1,6 @@
 package lora.rest;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
 import lora.ns.LNSInstance;
 import lora.ns.LNSInstanceRepresentation;
+import lora.ns.LNSInstanceWizardStep;
 import lora.ns.LNSProxy;
 
 @RestController
@@ -59,6 +61,12 @@ public class LNSRestController {
 		return lnsProxy.provisionDevice(lnsInstanceId, deviceProvisioning);
 	}
 	
+	@DeleteMapping(value = "/{lnsInstanceId}/devices/{deveui}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> deprovisionDevice(@PathVariable String lnsInstanceId, @PathVariable String deveui) {
+		boolean result = lnsProxy.deprovisionDevice(lnsInstanceId, deveui);
+		return result ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+	}
+	
 	@GetMapping(value = "/lnsinstances", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Map<String, Map<String, LNSInstance>> getLnsInstances() {
 		return lnsProxy.getInstances();
@@ -75,8 +83,8 @@ public class LNSRestController {
 		return ResponseEntity.ok().build();
 	}
 	
-	@GetMapping(value = "/properties", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, Class<?>> getProperties() {
-		return lnsProxy.getPropertyDescriptions();
+	@GetMapping(value = "/wizard", produces = MediaType.APPLICATION_JSON_VALUE)
+	public LinkedList<LNSInstanceWizardStep> getWizard() {
+		return lnsProxy.getInstanceWizard();
 	}
 }

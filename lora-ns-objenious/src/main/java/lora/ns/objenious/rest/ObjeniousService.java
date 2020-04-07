@@ -17,6 +17,9 @@ public interface ObjeniousService {
 	@GET("devices/lora:{devEui}")
 	Call<Device> getDevice(@Path("devEui") String devEui);
 
+	@POST("devices/lora:{devEui}/deprovision")
+	Call<ObjectDeleted> deprovisionDevice(@Path("devEui") String devEui);
+
 	@POST("devices/lora:{devEui}/reactivate")
 	Call<Device> reactivateDevice(@Path("devEui") String devEui);
 	
@@ -37,4 +40,7 @@ public interface ObjeniousService {
 	
 	@GET("profiles/{id}")
 	Call<Profile> getProfile(@Path("id") Integer id);
+	
+	@GET("groups")
+	Call<List<Group>> getGroups();
 }

@@ -104,7 +104,17 @@ function fromHexString(hexString) {
  * @param {Uint8Array} bytes 
  */
 function toHexString(bytes) {
-    return bytes.reduce(function (str, byte) {
+	var str = '';
+	for (var i = 0; i < bytes.length; i++) {
+		var byte = bytes[i].toString(16);
+		if (byte.length === 1) {
+			byte = '0' + byte;
+		}
+		str += byte;
+	}
+    /*return bytes.reduce(function (str, byte) {
         return str + byte.toString(16).padStart(2, '0')
-    }, '');
+    }, '');*/
+	print(str);
+	return str;
 };

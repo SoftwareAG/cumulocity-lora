@@ -18,6 +18,7 @@ import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 
 import lora.codec.C8YData;
 import lora.codec.DeviceCodec;
+import lora.codec.DeviceOperation;
 import lora.codec.DownlinkData;
 
 @Component
@@ -234,6 +235,18 @@ public class AtimTM2DCodec extends DeviceCodec {
 	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public DownlinkData askDeviceConfig(String devEui) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Map<String, DeviceOperation> getAvailableOperations(String model) {
+		return new HashMap<String, DeviceOperation>();
 	}
 
 }

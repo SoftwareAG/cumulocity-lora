@@ -48,7 +48,7 @@
 							<name>${project.artifactId}</name>
 							<image>${project.artifactId}</image>
 							<encoding>UTF-8</encoding>
-							<skipMicroserviceUpload>true</skipMicroserviceUpload>
+							<skipMicroserviceUpload>false</skipMicroserviceUpload>
 						</configuration>
 					</execution>
 				</executions>

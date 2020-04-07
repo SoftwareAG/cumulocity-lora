@@ -2,7 +2,9 @@ package lora.codec.nke;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import lora.codec.C8YData;
 import lora.codec.DeviceCodec;
+import lora.codec.DeviceOperation;
 import lora.codec.DownlinkData;
 import lora.codec.nke.ZCLDecoder.Decoded;
 
@@ -108,6 +111,18 @@ public class NKECodec extends DeviceCodec {
 	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public DownlinkData askDeviceConfig(String devEui) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Map<String, DeviceOperation> getAvailableOperations(String model) {
+		return new HashMap<String, DeviceOperation>();
 	}
 
 }

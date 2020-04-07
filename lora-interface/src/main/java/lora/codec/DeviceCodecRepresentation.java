@@ -11,11 +11,10 @@ public class DeviceCodecRepresentation implements Component {
 	
 	public DeviceCodecRepresentation() {}
 	
-	public DeviceCodecRepresentation(DeviceCodec deviceCodec) {
+	public DeviceCodecRepresentation(Component deviceCodec) {
 		this.id = deviceCodec.getId();
 		this.name = deviceCodec.getName();
 		this.version = deviceCodec.getVersion();
-		this.url = deviceCodec.getUrl();
 	}
 
 	@Override

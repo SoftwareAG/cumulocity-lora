@@ -23,6 +23,7 @@ import lora.ns.objenious.rest.DownlinkCreate;
 import lora.ns.objenious.rest.DownlinkCreate.ValidUntilEnum;
 import lora.ns.objenious.rest.DownlinkCreateProtocolData;
 import lora.ns.objenious.rest.DownlinkResponse;
+import lora.ns.objenious.rest.Group;
 import lora.ns.objenious.rest.Headers;
 import lora.ns.objenious.rest.ObjeniousService;
 import lora.ns.objenious.rest.Profile;
@@ -136,6 +137,7 @@ public class Instance extends ALNSInstance {
 	@Override
 	public String processOperation(DownlinkData operation, OperationRepresentation c8yOperation) {
 		String result = null;
+		logger.info("Will send {} to Objenious.", operation.toString());
 		DownlinkCreateProtocolData protocolData = new DownlinkCreateProtocolData();
 		protocolData.setPort(operation.getFport());
 		DownlinkCreate downlinkCreate = new DownlinkCreate();
@@ -144,10 +146,11 @@ public class Instance extends ALNSInstance {
 		downlinkCreate.setValidUntil(ValidUntilEnum.NEXT_JOIN);
 		downlinkCreate.setConfirmed(true);
 
-		DownlinkResponse response;
 		try {
-			response = objeniousService.sendCommand(operation.getDevEui(), downlinkCreate).execute().body();
-			result = response.getCommandId().toString();
+			retrofit2.Response<DownlinkResponse> response = objeniousService.sendCommand(operation.getDevEui(), downlinkCreate).execute();
+			if (response.isSuccessful()) {
+				result = response.body().getCommandId().toString();
+			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -266,5 +269,28 @@ public class Instance extends ALNSInstance {
 	public void removeRoutings() {
 		removeRouting(this.getId() + "-uplink");
 		removeRouting(this.getId() + "-downlink");
+	}
+	
+	public List<Group> getGroups() {
+		List<Group> result = new ArrayList<Group>();
+		
+		try {
+			result = objeniousService.getGroups().execute().body();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+
+	@Override
+	public boolean deprovisionDevice(String deveui) {
+		boolean result = false;
+		try {
+			result = objeniousService.deprovisionDevice(deveui).execute().isSuccessful();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 }

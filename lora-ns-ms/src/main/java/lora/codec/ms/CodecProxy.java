@@ -1,8 +1,7 @@
 package lora.codec.ms;
 
-import java.util.List;
+import java.util.Map;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -13,15 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-
 import lora.codec.C8YData;
 import lora.codec.Decode;
-import lora.codec.DeviceCodec;
+import lora.codec.DeviceOperationParam;
 import lora.codec.DownlinkData;
 import lora.codec.Encode;
+import lora.common.Component;
 
-public class MSCodec extends DeviceCodec {
+public class CodecProxy implements Component {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -29,7 +27,7 @@ public class MSCodec extends DeviceCodec {
 
 	private String authentication;
 
-	public MSCodec(String id, String name, String version) {
+	public CodecProxy(String id, String name, String version) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -51,7 +49,6 @@ public class MSCodec extends DeviceCodec {
 		return version;
 	}
 
-	@Override
 	public DownlinkData encode(Encode data) {
 		DownlinkData result = null;
 		RestTemplate restTemplate = new RestTemplate();
@@ -59,7 +56,10 @@ public class MSCodec extends DeviceCodec {
 			HttpHeaders headers = new HttpHeaders();
 			headers.set("Authorization", authentication);
 			headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-			result = restTemplate.exchange(System.getenv("C8Y_BASEURL") +  "/service/lora-codec-" + id + "/encode", HttpMethod.POST, new HttpEntity<Encode>(data, headers), DownlinkData.class).getBody();
+			headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+			ResponseEntity<DownlinkData> response = restTemplate.exchange(System.getenv("C8Y_BASEURL") +  "/service/lora-codec-" + id + "/encode", HttpMethod.POST, new HttpEntity<Encode>(data, headers), DownlinkData.class);
+			logger.info("Answer of encoder is {} with content {}", response.getStatusCode(), response.getBody());
+			result = response.getBody();
 		} catch(HttpClientErrorException e) {
 			e.printStackTrace();
 			logger.error(e.getResponseBodyAsString());
@@ -71,7 +71,6 @@ public class MSCodec extends DeviceCodec {
 		this.authentication = authentication;
 	}
 
-	@Override
 	public void decode(Decode data) {
 		RestTemplate restTemplate = new RestTemplate();
 		try {
@@ -85,23 +84,21 @@ public class MSCodec extends DeviceCodec {
 			logger.error(e.getResponseBodyAsString());
 		}
 	}
-
-	@Override
-	public C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload) {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public Map<String, DeviceOperationParam> getAvailableOperations(String model) {
+		Map<String, DeviceOperationParam> result = null;
+		RestTemplate restTemplate = new RestTemplate();
+		try {
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", authentication);
+			headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+			ResponseEntity<Map> response = restTemplate.exchange(System.getenv("C8Y_BASEURL") + "/service/lora-codec-" + id + "/operations/" + model, HttpMethod.GET, new HttpEntity<String>("", headers), Map.class);
+			logger.info("Answer of decoder is {} with content {}", response.getStatusCode(), response.getBody());
+			result = response.getBody();
+		} catch(HttpClientErrorException e) {
+			e.printStackTrace();
+			logger.error(e.getResponseBodyAsString());
+		}
+		return result;
 	}
-
-	@Override
-	public List<String> getModels() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

@@ -1,6 +1,7 @@
 package lora.codec;
 
 import java.util.List;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -65,7 +66,9 @@ public abstract class DeviceCodec implements Component {
 		
 		if (encode.getOperation().startsWith("raw ")) {
 			String[] tokens = encode.getOperation().split(" ");
-			data = new DownlinkData(encode.getDevEui(), 1, tokens[1]);
+			data = new DownlinkData(encode.getDevEui(), Integer.parseInt(tokens[1]), tokens[2]);
+		} else if (encode.getOperation().equals("get config")) {
+			data = askDeviceConfig(encode.getDevEui());
 		} else {
 			data = encode(mor, encode.getModel(), encode.getOperation());
 			if (data != null) {
@@ -173,4 +176,6 @@ public abstract class DeviceCodec implements Component {
 	}
 	
 	public abstract List<String> getModels();
+	public abstract DownlinkData askDeviceConfig(String devEui);
+	public abstract Map<String, DeviceOperation> getAvailableOperations(String model);
 }

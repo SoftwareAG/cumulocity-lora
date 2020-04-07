@@ -17,4 +17,5 @@ public interface LNSInstance {
 	boolean provisionDevice(DeviceProvisioning deviceProvisioning);
 	void configureRoutings(String url, String tenant, String login, String password);
 	void removeRoutings();
+	boolean deprovisionDevice(String deveui);
 }

@@ -3,6 +3,7 @@ package lora.codec.adeunis;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,14 +20,22 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.google.common.collect.Lists;
 import com.google.common.io.BaseEncoding;
 
+import c8y.Configuration;
+import c8y.RequiredAvailability;
 import lora.codec.C8YData;
 import lora.codec.DeviceCodec;
+import lora.codec.DeviceOperation;
 import lora.codec.DownlinkData;
 
 @Component
 public class AdeunisCodec extends DeviceCodec {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
+	private Map<String, DeviceOperation> operations = new HashMap<String, DeviceOperation>();
+	{
+		operations.put("get config", new DeviceOperation("get config", "get config", null));
+	}
 
 	private ScriptEngine engine;
 	{
@@ -92,6 +101,20 @@ public class AdeunisCodec extends DeviceCodec {
 				String series = "H";
 				c8yData.addMeasurement(mor, "Humidity", series, unit, value, new DateTime());
 			}
+			if (result.containsKey("type")) {
+				String type = result.get("type").toString();
+				if (type.contains("configuration")) {
+					mor.set(new Configuration(payloadResult));
+					if (result.containsKey("calculatedSendingPeriod")) {
+						String unit = ((Map)result.get("calculatedSendingPeriod")).get("unit").toString();
+						double requiredAvailability = (double)((Map)result.get("calculatedSendingPeriod")).get("value");
+						if (unit.equals("s")) {
+							requiredAvailability = requiredAvailability / 60.0;
+						}
+						mor.set(new RequiredAvailability((int)requiredAvailability));
+					}
+				}
+			}
 		} catch (ScriptException e) {
 			e.printStackTrace();
 		}
@@ -115,17 +138,28 @@ public class AdeunisCodec extends DeviceCodec {
 
 	@Override
 	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
-		DownlinkData data = new DownlinkData();
+		/*DownlinkData data = new DownlinkData();
 		try {
 			engine.eval("encoder.setDeviceType('" + model + "');");
-			engine.eval("var result = encoder.encode('" + operation + ","+ mor.getId().getValue() +"');");
+			engine.eval("var result = encoder.encode('" + model + "', '" + operation + "');");
 			engine.eval("var payloadResult = JSON.stringify(result, null, 2);");
 			String result = (String)engine.get("payloadResult");
 			data.setPayload(result);
 		} catch (ScriptException e) {
 			e.printStackTrace();
 		}
-		return data;
+		return data;*/
+		return null;
+	}
+
+	@Override
+	public DownlinkData askDeviceConfig(String devEui) {
+		return new DownlinkData(devEui, 1, "01");
+	}
+
+	@Override
+	public Map<String, DeviceOperation> getAvailableOperations(String model) {
+		return operations;
 	}
 
 }

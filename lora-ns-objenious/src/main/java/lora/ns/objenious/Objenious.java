@@ -3,6 +3,7 @@ package lora.ns.objenious;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,9 @@ import c8y.Hardware;
 import lora.ns.DeviceData;
 import lora.ns.LNSInstance;
 import lora.ns.LNSInstanceRepresentation;
+import lora.ns.LNSInstanceWizardStep;
 import lora.ns.LNSProxy;
+import lora.ns.objenious.rest.Group;
 import lora.ns.objenious.rest.Profile;
 
 @Service
@@ -32,9 +35,10 @@ public class Objenious extends LNSProxy {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
+	LinkedList<LNSInstanceWizardStep> wizard = new LinkedList<LNSInstanceWizardStep>();
 	{
-		propertyDescriptions.put("apikey", String.class);
-		propertyDescriptions.put("groupId", Integer.class);
+		wizard.add(new InstanceWizardStep1());
+		wizard.add(new InstanceWizardStep2());
 	}
 
 	@Override
@@ -50,6 +54,7 @@ public class Objenious extends LNSProxy {
             double snr = rootNode.get("protocol_data").get("snr").asDouble();
             double noise = rootNode.get("protocol_data").get("noise").asDouble();
             double signal = rootNode.get("protocol_data").get("signal").asDouble();
+            double sf = rootNode.get("protocol_data").get("sf").asDouble();
             Double lat = rootNode.has("lat") ? rootNode.get("lat").asDouble() : null;
             Double lng = rootNode.has("lng") ? rootNode.get("lng").asDouble() : null;
             logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
@@ -81,6 +86,11 @@ public class Objenious extends LNSProxy {
     		mv.setValue(new BigDecimal(snr));
     		mv.setUnit("dB");
     		measurementValueMap.put("snr", mv);
+
+    		mv = new MeasurementValue();
+    		mv.setValue(new BigDecimal(sf));
+    		mv.setUnit("");
+    		measurementValueMap.put("sf", mv);
 
     		m.set(measurementValueMap, "c8y_SignalStrength");
     		m.setType("c8y_SignalStrength");
@@ -138,16 +148,16 @@ public class Objenious extends LNSProxy {
 			if (profileName.contains("senlab")) {
 				device.setProperty("codec", "senlab");
 				if (profileName.contains("pul")) {
-					hardware.setModel("SenlabM");
+					hardware.setModel("Senlab Meter");
 				}
 				if (profileName.contains("tor")) {
-					hardware.setModel("SenlabD");
+					hardware.setModel("Senlab Digital");
 				}
 				if (profileName.contains("thy")) {
-					hardware.setModel("SenlabH");
+					hardware.setModel("Senlab humidity");
 				}
 				if (profileName.contains("tem")) {
-					hardware.setModel("SenlabT");
+					hardware.setModel("Senlab temperature");
 				}
 			}
 			if (profileName.contains("adeunis")) {
@@ -192,11 +202,11 @@ public class Objenious extends LNSProxy {
             String commandId = rootNode.get("command_id") != null ? rootNode.get("command_id").asText() : null;
             if (commandId != null) {
 				operation = operations.get(commandId);
-	            String error = rootNode.asText("error");
+	            JsonNode error = rootNode.get("error");
 	            if (operation != null) {
 		            if (error != null) {
 		            	operation.setStatus(OperationStatus.FAILED.toString());
-		            	operation.setFailureReason(error);
+		            	operation.setFailureReason(error.asText());
 		            } else {
 		            	operation.setStatus(OperationStatus.SUCCESSFUL.toString());
 		            }
@@ -222,7 +232,7 @@ public class Objenious extends LNSProxy {
 
 	@Override
 	public String getName() {
-		return "Objenious";
+		return "Objenious (push mode)";
 	}
 
 	@Override
@@ -233,5 +243,14 @@ public class Objenious extends LNSProxy {
 	@Override
 	protected LNSInstance getInstance(LNSInstanceRepresentation instance) {
 		return new Instance(instance);
+	}
+	
+	public List<Group> getGroups(String apikey) {
+		return new Instance("", apikey, 0).getGroups();
+	}
+
+	@Override
+	public LinkedList<LNSInstanceWizardStep> getInstanceWizard() {
+		return wizard;
 	}
 }

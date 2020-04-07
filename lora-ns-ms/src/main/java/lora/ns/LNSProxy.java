@@ -2,9 +2,9 @@ package lora.ns;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -15,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.client.HttpClientErrorException;
@@ -31,13 +32,16 @@ import com.cumulocity.rest.representation.event.EventRepresentation;
 import com.cumulocity.rest.representation.identity.ExternalIDRepresentation;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
+import com.cumulocity.rest.representation.operation.OperationCollectionRepresentation;
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.cumulocity.sdk.client.Param;
 import com.cumulocity.sdk.client.QueryParam;
 import com.cumulocity.sdk.client.SDKException;
 import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
+import com.cumulocity.sdk.client.devicecontrol.OperationCollection;
 import com.cumulocity.sdk.client.devicecontrol.OperationFilter;
 import com.cumulocity.sdk.client.event.EventApi;
+import com.cumulocity.sdk.client.identity.ExternalIDCollection;
 import com.cumulocity.sdk.client.identity.IdentityApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.inventory.InventoryFilter;
@@ -46,11 +50,14 @@ import com.cumulocity.sdk.client.measurement.MeasurementApi;
 import com.cumulocity.sdk.client.notification.Subscriber;
 import com.cumulocity.sdk.client.notification.Subscription;
 import com.cumulocity.sdk.client.notification.SubscriptionListener;
+import com.cumulocity.sdk.client.option.TenantOptionApi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import c8y.Command;
+import c8y.Configuration;
 import c8y.Hardware;
 import c8y.IsDevice;
+import c8y.LpwanDevice;
 import c8y.Position;
 import c8y.SupportedOperations;
 import lora.codec.DeviceCodecRepresentation;
@@ -63,11 +70,6 @@ public abstract class LNSProxy implements Component {
 	private static final String LNS_PROXY_ID = "LoRa Network Server type ID";
 
 	private static final String LNS_PROXY_TYPE = "LoRa Network Server type";
-
-	protected Map<String, Class<?>> propertyDescriptions = new HashMap<String, Class<?>>();
-	{
-		propertyDescriptions.put("id", String.class);
-	}
 
 	@Autowired
 	protected InventoryApi inventoryApi;
@@ -89,6 +91,9 @@ public abstract class LNSProxy implements Component {
 	
 	@Autowired
 	private CodecManager codecManager;
+	
+	@Autowired
+	private TenantOptionApi tenantOptionApi;
 
 	public final String DEVEUI_TYPE = "LoRa devEUI";
 	
@@ -120,11 +125,11 @@ public abstract class LNSProxy implements Component {
 			public String getName() {
 				return "query";
 			}
-		}, "lnsId%20eq%20" + this.getId());
+		}, "lora_ns_LNSInstanceRepresentation.type%20eq%20" + this.getId());
 		for (ManagedObjectRepresentation mor : col.get(queryParam).allPages()) {
 			if (mor.get(LNSInstanceRepresentation.class) != null && mor.get(LNSInstanceRepresentation.class).getType().equals(this.getId())) {
 				logger.info("Subscribing to operations for device {}", mor.getName());
-				subscribe(mor.get("lnsInstanceId").toString(), subscriptionsService.getTenant(), mor);
+				subscribe(mor.get(LNSInstanceRepresentation.class).getProperties().getProperty("id"), subscriptionsService.getTenant(), mor);
 			}
 		}
 	}
@@ -237,6 +242,13 @@ public abstract class LNSProxy implements Component {
 				mor.set(new DeviceCodecRepresentation(codecManager.getCodec(mor.getProperty("codec").toString())));
 				inventoryApi.update(mor);
 			}
+			if (mor.get(LpwanDevice.class) == null || !mor.get(LpwanDevice.class).isProvisioned()) {
+				mor.set(new LpwanDevice().provisioned(true));
+				inventoryApi.update(mor);
+			}
+			if (mor.get(Configuration.class) == null) {
+				getDeviceConfig(mor);
+			}
 			codecManager.decode(mor, event);
 		} catch (SDKException e) {
 			logger.info("Error on upserting Device", e);
@@ -270,9 +282,20 @@ public abstract class LNSProxy implements Component {
 
 	public String getDeviceEui(GId id) {
 		String result = null;
-		Set<ID> extIds = inventoryApi.get(id).getExternalIds();
+		ExternalIDCollection extIds = identityApi.getExternalIdsOfGlobalId(id);
 		if (extIds != null) {
-			result = extIds.stream().filter(extId -> extId.getType().equals(DEVEUI_TYPE)).findFirst().get().getValue();
+			for (ExternalIDRepresentation extId : extIds.get().allPages()) {
+				if (extId.getType().equals(DEVEUI_TYPE)) {
+					result = extId.getExternalId();
+					logger.info("Device {} matches devEUI {}", id.toString(), result);
+					break;
+				}
+			}
+			if (result == null) {
+				logger.info("Device {} has no external Ids or does not exist in tenant {}.", id.toString(), subscriptionsService.getTenant());
+			}
+		} else {
+			logger.info("Device {} has no external Ids or does not exist in tenant {}.", id.toString(), subscriptionsService.getTenant());
 		}
 		return result;
 	}
@@ -281,11 +304,9 @@ public abstract class LNSProxy implements Component {
 
     private class OperationDispatcherSubscriptionListener implements SubscriptionListener<GId, OperationRepresentation> {
     	
-    	private String tenant;
+    	public OperationDispatcherSubscriptionListener(String tenant) {this.tenant = tenant;}
     	
-    	public OperationDispatcherSubscriptionListener(String tenant) {
-    		this.tenant = tenant;
-    	}
+    	private String tenant;
 
         @Override
         public void onError(Subscription<GId> sub, Throwable e) {
@@ -295,7 +316,9 @@ public abstract class LNSProxy implements Component {
         @Override
         public void onNotification(Subscription<GId> sub, OperationRepresentation operation) {
             try {
-                executePending(tenant, operation);
+            	subscriptionsService.runForTenant(tenant, () -> {
+            		executePending(operation);
+            	});
             } catch (SDKException e) {
                 logger.error("OperationDispatcher error!", e);
             }
@@ -314,15 +337,15 @@ public abstract class LNSProxy implements Component {
 		}
 	}
 	
-    private void executePending(String tenant, OperationRepresentation operation) {
-    	logger.info("Will execute operation {}", operation.toJSON());
+	@Async
+    private void executePending(OperationRepresentation operation) {
+		logger.info("Will execute operation {}", operation.toJSON());
     	if (getDeviceEui(operation.getDeviceId()) != null) {
-			subscriptionsService.runForTenant(tenant, () -> {
 					logger.info("Processing operation {}", operation);
 		       		DownlinkData encodedData = codecManager.encode(getDeviceEui(operation.getDeviceId()), operation);
-		       		if (encodedData != null) {
+		       		if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null) {
 				        operation.setStatus(OperationStatus.EXECUTING.toString());
-		       			String lnsInstanceId = inventoryApi.get(operation.getDeviceId()).get("lnsInstanceId").toString();
+		       			String lnsInstanceId = inventoryApi.get(operation.getDeviceId()).get(LNSInstanceRepresentation.class).getProperties().getProperty("id");
 		       			processOperation(lnsInstanceId, encodedData, operation);
 		       		} else {
 				        operation.setStatus(OperationStatus.FAILED.toString());
@@ -331,7 +354,6 @@ public abstract class LNSProxy implements Component {
 				        operation.set(command);
 		       		}
 		       		deviceControlApi.update(operation);
-			});
     	} else {
     		logger.info("Operation {} will be ignored", operation);
     	}
@@ -357,9 +379,37 @@ public abstract class LNSProxy implements Component {
 			ExternalIDRepresentation extId = findExternalId(deviceProvisioning.getDevEUI(), DEVEUI_TYPE);
 			if (extId == null) {
 				mor = createDevice(lnsInstanceId, deviceProvisioning.getName(), deviceProvisioning.getDevEUI());
+			} else {
+				mor = extId.getManagedObject();
+				mor.set(new Agent());
+				subscribe(lnsInstanceId, subscriptionsService.getTenant(), mor);
 			}
+			mor.setProperty("codec", deviceProvisioning.getDeviceModel());
+			mor.set(new LpwanDevice().provisioned(true));
+			mor.setLastUpdatedDateTime(null);
+			if (mor.getProperty("codec") == null) {
+				mor.setProperty("codec", deviceProvisioning.getDeviceModel());
+			}
+			inventoryApi.update(mor);
+			EventRepresentation event = new EventRepresentation();
+			event.setType("Device provisioned");
+			event.setText("Device has been provisioned");
+			event.setDateTime(new DateTime());
+			event.setSource(mor);
+			eventApi.create(event);
+			getDeviceConfig(mor);
 		}
 		return mor;
+	}
+	
+	private void getDeviceConfig(ManagedObjectRepresentation mor) {
+		if (codecManager.getAvailableOperations(mor) != null && codecManager.getAvailableOperations(mor).containsKey("get config")) {
+			OperationRepresentation operation = new OperationRepresentation();
+			Command command = new Command("get config");
+			operation.set(command);
+			operation.setDeviceId(mor.getId());
+			deviceControlApi.create(operation);
+		}
 	}
 
 	public List<EndDevice> getDevices(String lnsInstanceId) {
@@ -391,7 +441,12 @@ public abstract class LNSProxy implements Component {
 		instances.get(subscriptionsService.getTenant()).get(lnsInstanceId).configureRoutings(url, subscriptionsService.getTenant(), credentials.getUsername(), credentials.getPassword());
 	}
 	
+	//TODO should store LNS instance properties in tenant options to encrypt them
 	public ManagedObjectRepresentation addLNSInstance(LNSInstanceRepresentation instanceRepresentation ) {
+		/*OptionRepresentation option = new OptionRepresentation();
+		option.setCategory(LNS_INSTANCE_TYPE + "." + instanceRepresentation.getProperties().getProperty(("id")));
+		instanceRepresentation.getProperties();*/
+		
 		LNSInstance instance = getInstance(instanceRepresentation);
 		
 		if (!instances.containsKey(subscriptionsService.getTenant())) {
@@ -427,13 +482,18 @@ public abstract class LNSProxy implements Component {
 		}
 	}
     
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(initialDelay=10000, fixedDelay = 10000)
     private void processPendingOperations() {
     	subscriptionsService.runForEachTenant(() -> {
 	    	OperationFilter filter = new OperationFilter();
 	    	filter.byStatus(OperationStatus.PENDING);
-	    	for(OperationRepresentation o : deviceControlApi.getOperationsByFilter(filter).get()) {
-	    		executePending(subscriptionsService.getTenant(), o);
+	    	OperationCollectionRepresentation opCollectionRepresentation;
+	    	OperationCollection oc = deviceControlApi.getOperationsByFilter(filter);
+	    	for (opCollectionRepresentation = oc.get(); opCollectionRepresentation != null; opCollectionRepresentation = oc.getNextPage(opCollectionRepresentation)) {
+	    	    for (OperationRepresentation op : opCollectionRepresentation.getOperations()) {
+	    	        System.out.println(op.getStatus());
+	    	        executePending(op);
+	    	    }
 	    	}
     	});
     }
@@ -453,9 +513,7 @@ public abstract class LNSProxy implements Component {
 		}
 	}
 
-	public Map<String, Class<?>> getPropertyDescriptions() {
-		return propertyDescriptions;
-	}
+	public abstract LinkedList<LNSInstanceWizardStep> getInstanceWizard();
 	
 	public ManagedObjectRepresentation getDevice(String devEui) {
 		ManagedObjectRepresentation result = null;
@@ -463,6 +521,23 @@ public abstract class LNSProxy implements Component {
 		if (extId != null) {
 			result = inventoryApi.get(extId.getManagedObject().getId());
 			result.setLastUpdatedDateTime(null);
+		}
+		return result;
+	}
+
+	public boolean deprovisionDevice(String lnsInstanceId, String deveui) {
+		boolean result = false;
+		if (instances.get(subscriptionsService.getTenant()).get(lnsInstanceId).deprovisionDevice(deveui)) {
+			ExternalIDRepresentation extId = findExternalId(deveui, DEVEUI_TYPE);
+			if (extId != null) {
+				ManagedObjectRepresentation mor = inventoryApi.get(extId.getManagedObject().getId());
+				mor.removeProperty("c8y_RequiredInterval");
+				mor.set(new LpwanDevice().provisioned(false));
+				mor.setLastUpdatedDateTime(null);
+				inventoryApi.update(mor);
+				//inventoryApi.delete(extId.getManagedObject().getId());
+			}
+			result = true;
 		}
 		return result;
 	}

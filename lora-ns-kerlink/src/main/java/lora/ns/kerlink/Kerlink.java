@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,11 @@ import com.google.common.io.BaseEncoding;
 import lora.ns.DeviceData;
 import lora.ns.LNSInstance;
 import lora.ns.LNSInstanceRepresentation;
+import lora.ns.LNSInstanceWizardInitialStep;
+import lora.ns.LNSInstanceWizardStep;
 import lora.ns.LNSProxy;
+import lora.ns.PropertyDescription;
+import lora.ns.PropertyDescription.PropertyType;
 
 @Service
 public class Kerlink extends LNSProxy {
@@ -35,11 +40,19 @@ public class Kerlink extends LNSProxy {
 //		instances.get("t198098409").put("accorinvest", new Instance("https://wmcintegration.wanesy.com/gms/application", "Cumulocity", "cumulocity"));
 //	}
 	
-	{
-		propertyDescriptions.put("baseUrl", String.class);
-		propertyDescriptions.put("username", String.class);
-		propertyDescriptions.put("password", String.class);
+	private class WizardStep extends LNSInstanceWizardInitialStep {
+		{
+			propertyDescriptions.add(new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.STRING));
+			propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.STRING));
+			propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.STRING));
+		}
 	}
+	
+	LinkedList<LNSInstanceWizardStep> wizard = new LinkedList<LNSInstanceWizardStep>();
+	{
+		wizard.add(new WizardStep());
+	}
+	
 	
 	private Map<String, String> statusMap = new HashMap<>();
 	{
@@ -139,5 +152,10 @@ public class Kerlink extends LNSProxy {
 	@Override
 	protected LNSInstance getInstance(LNSInstanceRepresentation instance) {
 		return new Instance(instance);
+	}
+
+	@Override
+	public LinkedList<LNSInstanceWizardStep> getInstanceWizard() {
+		return wizard;
 	}
 }

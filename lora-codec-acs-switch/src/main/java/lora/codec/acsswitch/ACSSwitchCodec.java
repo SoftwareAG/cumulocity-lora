@@ -3,6 +3,7 @@ package lora.codec.acsswitch;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +16,12 @@ import org.springframework.stereotype.Component;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.google.common.io.BaseEncoding;
 
+import c8y.Configuration;
+import c8y.RequiredAvailability;
 import lora.codec.C8YData;
 import lora.codec.DeviceCodec;
+import lora.codec.DeviceOperation;
+import lora.codec.DeviceOperationParam;
 import lora.codec.DownlinkData;
 
 @Component
@@ -262,7 +267,13 @@ public class ACSSwitchCodec extends DeviceCodec {
 			int numberOfRegisters = buffer.get();
 			for (int i=0;i<numberOfRegisters;i++) {
 				PARAMETER parameter = PARAMETER.BY_VALUE.get(buffer.get());
-				c8yData.addEvent(mor, "Parameter reading", parameter.label + ": " + parameter.getValue(buffer), null, DateTime.now());
+				int value = parameter.getValue(buffer);
+				c8yData.addEvent(mor, "Parameter reading", parameter.label + ": " + value, null, DateTime.now());
+				if (parameter == PARAMETER.PRESENCE_PERIOD) {
+					mor.set(new RequiredAvailability(value * 4 / 60));
+				}
+				mor.set(new Configuration(BaseEncoding.base16().encode(payload)));
+				c8yData.setMorToUpdate(mor);
 			}
 			break;
 		}
@@ -271,7 +282,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 
 	@Override
 	public String getId() {
-		return "acsswitch";
+		return "acs-switch";
 	}
 
 	@Override
@@ -294,6 +305,26 @@ public class ACSSwitchCodec extends DeviceCodec {
 	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public DownlinkData askDeviceConfig(String devEui) {
+		return new DownlinkData(devEui, 1, "02010102");
+	}
+
+	@Override
+	public Map<String, DeviceOperation> getAvailableOperations(String model) {
+		Map<String, DeviceOperation> result = new HashMap<String, DeviceOperation>();
+		
+		result.put("get config", new DeviceOperation("get config", "get config", null));
+		
+		for(PARAMETER param: PARAMETER.values()) {
+			List<DeviceOperationParam> params = new ArrayList<DeviceOperationParam>();
+			params.add(new DeviceOperationParam(param.toString(), param.label, DeviceOperationParam.ParamType.INTEGER, null));
+			result.put(param.toString(), new DeviceOperation(param.toString(), param.label, params));
+		}
+		
+		return result;
 	}
 
 }

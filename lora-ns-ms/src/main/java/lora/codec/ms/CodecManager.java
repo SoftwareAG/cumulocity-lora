@@ -26,9 +26,11 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import c8y.Command;
+import c8y.Hardware;
 import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceCodecRepresentation;
+import lora.codec.DeviceOperationParam;
 import lora.codec.DownlinkData;
 import lora.codec.Encode;
 import lora.ns.DeviceData;
@@ -50,7 +52,7 @@ public class CodecManager {
 
 	final private Logger logger = LoggerFactory.getLogger(getClass());
 
-	private Map<String, MSCodec> codecInstances = new HashMap<>();
+	private Map<String, CodecProxy> codecInstances = new HashMap<>();
 
 	@EventListener
 	private void updateCodecsList(MicroserviceSubscriptionAddedEvent event) {
@@ -60,7 +62,7 @@ public class CodecManager {
 			DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
 			if (codec != null) {
 				logger.info("Adding to codec list: {} {}", codec.getName(), codec.getVersion());
-				codecInstances.put(codec.getId(), new MSCodec(codec.getId(), codec.getName(), codec.getVersion()));
+				codecInstances.put(codec.getId(), new CodecProxy(codec.getId(), codec.getName(), codec.getVersion()));
 			}
 		}
 	}
@@ -78,15 +80,15 @@ public class CodecManager {
 		return extId;
 	}
 
-	public MSCodec getCodec(String id) {
-		MSCodec result = codecInstances.get(id);
+	public CodecProxy getCodec(String id) {
+		CodecProxy result = codecInstances.get(id);
 		if (result == null) {
 			ExternalIDRepresentation extId = findExternalId(id, DeviceCodec.CODEC_ID);
 			if (extId != null) {
 				ManagedObjectRepresentation mor = inventoryApi.get(extId.getManagedObject().getId());
 				DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
 				if (codec != null) {
-					result = new MSCodec(id, codec.getName(), codec.getVersion());
+					result = new CodecProxy(id, codec.getName(), codec.getVersion());
 					codecInstances.put(id, result);
 				}
 			}
@@ -103,8 +105,8 @@ public class CodecManager {
 		eventRepresentation.setProperty("payload", Hex.encodeHexString(event.getPayload()));
 		logger.info("Device details: {}", mor.toJSON());
 		if (mor.hasProperty("codec")) {
-			logger.info("Codec {} will be used with device {}", mor.getProperty("codec"), event.getDevEui());
-			MSCodec codec = getCodec(mor.getProperty("codec").toString());
+			logger.info("Codec {} will be used with device {} for decoding payload {} on port {}", mor.getProperty("codec"), event.getDevEui(), event.getPayload(), event.getfPort());
+			CodecProxy codec = getCodec(mor.getProperty("codec").toString());
 			if (codec != null) {
 				String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get().toCumulocityCredentials().getAuthenticationString();
 				codec.setAuthentication(authentication);
@@ -125,14 +127,44 @@ public class CodecManager {
 		DownlinkData result = null;
 		ManagedObjectRepresentation mor = inventoryApi.get(operation.getDeviceId());
 		if (mor.hasProperty("codec")) {
-			result = codecInstances.get(mor.getProperty("codec")).encode(new Encode(devEui, operation.get(Command.class).getText()));
+			logger.info("Codec {} will be used with device {} for encoding operation {}", mor.getProperty("codec"), devEui, operation.toJSON());
+			CodecProxy codec = getCodec(mor.getProperty("codec").toString());
+			if (codec != null) {
+				String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get().toCumulocityCredentials().getAuthenticationString();
+				codec.setAuthentication(authentication);
+				result = codec.encode(new Encode(devEui, operation.get(Command.class).getText()));
+				if (result != null) {
+					logger.info("Result of command \"{}\" is payload {}", operation.get(Command.class).getText(), result.getPayload());
+				} else {
+					logger.info("Result of command \"{}\" is empty", operation.get(Command.class).getText());
+				}
+			} else {
+				logger.error("Codec {} does not exist.", mor.getProperty("codec"));
+			}
 		} else {
         	logger.info("Device has no codec information. Operation will be processed when Codec will be provided.");
 		}
 		return result;
 	}
 	
-	public Map<String, MSCodec> getCodecs() {
+	public Map<String, DeviceOperationParam> getAvailableOperations(ManagedObjectRepresentation mor) {
+		Map<String, DeviceOperationParam> result = null;
+		if (mor.hasProperty("codec")) {
+			CodecProxy codec = getCodec(mor.getProperty("codec").toString());
+			if (codec != null) {
+				String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get().toCumulocityCredentials().getAuthenticationString();
+				codec.setAuthentication(authentication);
+				String model = null;
+				if (mor.get(Hardware.class) != null) {
+					model = mor.get(Hardware.class).getModel();
+				}
+				result = codec.getAvailableOperations(model);
+			}
+		}		
+		return result;
+	}
+	
+	public Map<String, CodecProxy> getCodecs() {
 		return codecInstances;
 	}
 }

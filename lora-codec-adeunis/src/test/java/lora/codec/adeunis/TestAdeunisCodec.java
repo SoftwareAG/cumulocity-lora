@@ -45,4 +45,46 @@ public class TestAdeunisCodec {
 	public void testGetModels() {
 		assertTrue(new AdeunisCodec().getModels().contains("comfort"));
 	}
+	
+	@Test
+	public void testGetConfig() {
+		ScriptEngine engine;
+		ScriptEngineManager manager = new ScriptEngineManager();
+		engine = manager.getEngineByName("nashorn");
+		try {
+			engine.eval(new InputStreamReader(getClass().getResourceAsStream("/buffer-custom-shim.js")));
+			engine.eval(new InputStreamReader(getClass().getResourceAsStream("/lib.js")));
+			engine.eval("var decoder = new codec.Decoder();");
+			engine.eval("decoder.setDeviceType('comfort');");
+			engine.eval("var result = decoder.decode('10A090010003000301020A');");
+			engine.eval("var payloadResult = JSON.stringify(result, null, 2);");
+			String payloadResult = engine.get("payloadResult").toString();
+			logger.info(payloadResult);
+			Map result = (Map)engine.get("result");
+			assertTrue(result.containsKey("calculatedSendingPeriod"));
+			assertEquals(4644.0, (double)((Map)result.get("calculatedSendingPeriod")).get("value"));
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testSetConfig() {
+		ScriptEngine engine;
+		ScriptEngineManager manager = new ScriptEngineManager();
+		engine = manager.getEngineByName("nashorn");
+		try {
+			engine.eval(new InputStreamReader(getClass().getResourceAsStream("/buffer-custom-shim.js")));
+			engine.eval(new InputStreamReader(getClass().getResourceAsStream("/lib.js")));
+			engine.eval("var encoder = new codec.Encoder();");
+			engine.eval("var result = encoder.getSupported();");
+			engine.eval("var payloadResult = JSON.stringify(result, null, 2);");
+			String payloadResult = engine.get("payloadResult").toString();
+			logger.info(payloadResult);
+			Map result = (Map)engine.get("result");
+			assertTrue(((Map)result.get("0")).containsKey("deviceType"));
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+	}
 }

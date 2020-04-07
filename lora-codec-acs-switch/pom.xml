@@ -10,7 +10,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>lora-codec-acsswitch</artifactId>
+	<artifactId>lora-codec-acs-switch</artifactId>
 
 	<dependencies>
 		<dependency>
