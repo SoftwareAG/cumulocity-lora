@@ -62,6 +62,7 @@ public class SenlabCodec extends DeviceCodec {
 
 	@Override
 	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
+		assert models.containsValue(model);
 		DownlinkData data = new DownlinkData();
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root;

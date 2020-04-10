@@ -48,7 +48,6 @@ import com.cumulocity.sdk.client.inventory.InventoryFilter;
 import com.cumulocity.sdk.client.inventory.ManagedObject;
 import com.cumulocity.sdk.client.inventory.ManagedObjectCollection;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
-import com.cumulocity.sdk.client.notification.Subscriber;
 import com.cumulocity.sdk.client.notification.Subscription;
 import com.cumulocity.sdk.client.notification.SubscriptionListener;
 import com.cumulocity.sdk.client.option.TenantOptionApi;
@@ -114,29 +113,10 @@ public abstract class LNSProxy implements Component {
 	
 	@EventListener
 	private void init(MicroserviceSubscriptionAddedEvent event) {
-		//subscribeToDeviceOperations();
 		getAllLNSInstances(event);
 		registerLNSProxy();
 	}
 
-	/*private void subscribeToDeviceOperations() {
-		logger.info("Looking for devices in tenant {} for LNS {}", subscriptionsService.getTenant(), this.getId());
-		InventoryFilter filter = new InventoryFilter().byFragmentType(LNSInstanceRepresentation.class).byFragmentType(IsDevice.class);
-		ManagedObjectCollection col = inventoryApi.getManagedObjectsByFilter(filter);
-		QueryParam queryParam = new QueryParam(new Param() {
-			@Override
-			public String getName() {
-				return "query";
-			}
-		}, "lora_ns_LNSInstanceRepresentation.type%20eq%20" + this.getId());
-		for (ManagedObjectRepresentation mor : col.get(queryParam).allPages()) {
-			if (mor.get(LNSInstanceRepresentation.class) != null && mor.get(LNSInstanceRepresentation.class).getType().equals(this.getId())) {
-				logger.info("Subscribing to operations for device {}", mor.getName());
-				subscribe(mor.get(LNSInstanceRepresentation.class).getProperties().getProperty("id"), subscriptionsService.getTenant(), mor);
-			}
-		}
-	}*/
-	
 	private void getAllLNSInstances(MicroserviceSubscriptionAddedEvent event) {
 		logger.info("Looking for LNS Instances in tenant {}", subscriptionsService.getTenant());
 		InventoryFilter filter = new InventoryFilter().byType(LNS_INSTANCE_TYPE);
@@ -284,17 +264,12 @@ public abstract class LNSProxy implements Component {
 		supportedOperations.add("c8y_Command");
 		mor.setLastUpdatedDateTime(null);
 		mor.set(supportedOperations);
-		//mor.set(new Agent());
-		//mor.set(new LNSInstanceRepresentation(instances.get(subscriptionsService.getTenant()).get(lnsInstanceId), this.getId()));
-		//mor.set(new LNSProxyRepresentation(this));
-		//mor.set(new DeviceCodecRepresentation(codecManager.getCodec(mor.getProperty("codec").toString())));
 		mor = inventoryApi.create(mor);
 		extId = new ExternalIDRepresentation();
 		extId.setExternalId(devEUI);
 		extId.setType(DEVEUI_TYPE);
 		extId.setManagedObject(mor);
 		identityApi.create(extId);
-		//subscribe(lnsInstanceId, subscriptionsService.getTenant(), mor);
 		return mor;
 	}
 
@@ -318,8 +293,6 @@ public abstract class LNSProxy implements Component {
 		return result;
 	}
     
-    //private Map<String, Map<String, Subscriber<GId, OperationRepresentation>>> subscribers = new HashMap<>();
-
     private class OperationDispatcherSubscriptionListener implements SubscriptionListener<GId, OperationRepresentation> {
     	
     	public OperationDispatcherSubscriptionListener(String tenant) {this.tenant = tenant;}
@@ -377,16 +350,6 @@ public abstract class LNSProxy implements Component {
     	}
     }
 
-	/*public void subscribe(String lnsInstanceId, String tenant, ManagedObjectRepresentation mor) {
-		if (!subscribers.containsKey(tenant)) {
-			subscribers.put(tenant, new HashMap<>());
-		}
-		if (!subscribers.get(tenant).containsKey(lnsInstanceId)) {
-			subscribers.get(tenant).put(lnsInstanceId, deviceControlApi.getNotificationsSubscriber());
-		}
-		subscribers.get(tenant).get(lnsInstanceId).subscribe(mor.getId(), new OperationDispatcherSubscriptionListener(tenant));
-	}*/
-
 	public abstract DeviceData extractLNSInfo(String eventString, String lnsInstanceId);
 
 	protected abstract OperationRepresentation getOperation(String eventString);
@@ -400,7 +363,6 @@ public abstract class LNSProxy implements Component {
 			} else {
 				mor = extId.getManagedObject();
 				mor.set(new Agent());
-				//subscribe(lnsInstanceId, subscriptionsService.getTenant(), mor);
 			}
 			mor.setProperty("codec", deviceProvisioning.getDeviceModel());
 			mor.set(new LpwanDevice().provisioned(true));
@@ -461,10 +423,6 @@ public abstract class LNSProxy implements Component {
 	
 	//TODO should store LNS instance properties in tenant options to encrypt them
 	public ManagedObjectRepresentation addLNSInstance(LNSInstanceRepresentation instanceRepresentation ) {
-		/*OptionRepresentation option = new OptionRepresentation();
-		option.setCategory(LNS_INSTANCE_TYPE + "." + instanceRepresentation.getProperties().getProperty(("id")));
-		instanceRepresentation.getProperties();*/
-		
 		LNSInstance instance = getInstance(instanceRepresentation);
 		
 		if (!instances.containsKey(subscriptionsService.getTenant())) {
@@ -556,7 +514,6 @@ public abstract class LNSProxy implements Component {
 				mor.set(new LpwanDevice().provisioned(false));
 				mor.setLastUpdatedDateTime(null);
 				inventoryApi.update(mor);
-				//inventoryApi.delete(extId.getManagedObject().getId());
 			}
 			result = true;
 		}

@@ -132,7 +132,8 @@ public class CodecManager {
 			if (codec != null) {
 				String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get().toCumulocityCredentials().getAuthenticationString();
 				codec.setAuthentication(authentication);
-				result = codec.encode(new Encode(devEui, operation.get(Command.class).getText()));
+				Hardware hardware = mor.get(Hardware.class);
+				result = codec.encode(new Encode(devEui, operation.get(Command.class).getText(), hardware != null ? hardware.getModel() : null));
 				if (result != null) {
 					logger.info("Result of command \"{}\" is payload {}", operation.get(Command.class).getText(), result.getPayload());
 				} else {

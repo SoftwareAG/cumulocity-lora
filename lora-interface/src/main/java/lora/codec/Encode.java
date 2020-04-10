@@ -8,10 +8,11 @@ public class Encode {
 	public Encode() {
 	}
 
-	public Encode(String devEui, String operation) {
+	public Encode(String devEui, String operation, String model) {
 		super();
 		this.devEui = devEui;
 		this.operation = operation;
+		this.model = model;
 	}
 	
 	public void setDevEui(String devEui) {
