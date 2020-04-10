@@ -169,6 +169,7 @@ public abstract class DeviceCodec implements Component {
 		ManagedObjectRepresentation mor = getDevice(data.getDeveui());
 		byte[] payload = BaseEncoding.base16().decode(data.getPayload().toUpperCase());
 		C8YData c8yData = decode(mor, data.getModel(), data.getfPort(), new DateTime(data.getUpdateTime()), payload);
+		logger.info("Processing payload {} from port {} for device {}", data.getPayload(), data.getfPort(), data.getDeveui());
 		processData(c8yData);
 	}
 	public String getUrl() {

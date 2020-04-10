@@ -1,7 +1,8 @@
 package lora.codec.adeunis;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.InputStreamReader;
 import java.util.Map;
@@ -10,9 +11,17 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.cumulocity.model.measurement.MeasurementValue;
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
+import com.google.common.io.BaseEncoding;
+
+import lora.codec.C8YData;
 
 public class TestAdeunisCodec {
 	
@@ -86,5 +95,17 @@ public class TestAdeunisCodec {
 		} catch (ScriptException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void testPulse() {
+		AdeunisCodec codec = new AdeunisCodec();
+		C8YData data = codec.decode(new ManagedObjectRepresentation(), "pulse", 1, new DateTime(), BaseEncoding.base16().decode("462000014B0B00000000"));
+		
+		assertTrue(data.getMeasurements().size() == 1);
+		
+		MeasurementRepresentation m = data.getMeasurements().get(0);
+		assertNotNull(m);
+		assertEquals(84747.0, ((Map<String, MeasurementValue>)m.get("Pulse")).get("Channel A").getValue().doubleValue());
 	}
 }

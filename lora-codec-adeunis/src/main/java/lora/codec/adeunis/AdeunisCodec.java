@@ -101,18 +101,37 @@ public class AdeunisCodec extends DeviceCodec {
 				String series = "H";
 				c8yData.addMeasurement(mor, "Humidity", series, unit, value, new DateTime());
 			}
+			if (result.containsKey("counterValues")) {
+				Object channelA = ((Map)result.get("counterValues")).get("0");
+				Object channelB = ((Map)result.get("counterValues")).get("1");
+				BigDecimal valueA = channelA != null && channelA instanceof Double ? BigDecimal.valueOf((double)channelA) : null;
+				BigDecimal valueB = channelB != null && channelB instanceof Double ? BigDecimal.valueOf((double)channelB) : null;
+				c8yData.addMeasurement(mor, "Pulse", new String[] {"Channel A", "Channel B"}, new String[] {"", ""}, new BigDecimal[] {valueA, valueB}, new DateTime());
+			}
 			if (result.containsKey("type")) {
 				String type = result.get("type").toString();
 				if (type.contains("configuration")) {
+					logger.info("Configuration frame detected");
 					mor.set(new Configuration(payloadResult));
 					if (result.containsKey("calculatedSendingPeriod")) {
 						String unit = ((Map)result.get("calculatedSendingPeriod")).get("unit").toString();
 						double requiredAvailability = (double)((Map)result.get("calculatedSendingPeriod")).get("value");
 						if (unit.equals("s")) {
 							requiredAvailability = requiredAvailability / 60.0;
+							logger.info("Required interval will be set to {}", requiredAvailability);
 						}
 						mor.set(new RequiredAvailability((int)requiredAvailability));
 					}
+					if (result.containsKey("transmissionPeriod")) {
+						String unit = ((Map)result.get("transmissionPeriod")).get("unit").toString();
+						double requiredAvailability = (double)((Map)result.get("transmissionPeriod")).get("value");
+						if (unit.equals("s")) {
+							requiredAvailability = requiredAvailability / 60.0;
+							logger.info("Required interval will be set to {}", requiredAvailability);
+						}
+						mor.set(new RequiredAvailability((int)requiredAvailability));
+					}
+					c8yData.setMorToUpdate(mor);
 				}
 			}
 		} catch (ScriptException e) {
@@ -149,7 +168,7 @@ public class AdeunisCodec extends DeviceCodec {
 			e.printStackTrace();
 		}
 		return data;*/
-		return null;
+		return operation.contains("get config") ? askDeviceConfig(null) : null;
 	}
 
 	@Override

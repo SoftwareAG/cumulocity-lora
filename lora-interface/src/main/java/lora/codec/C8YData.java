@@ -64,10 +64,10 @@ public class C8YData {
 	
 	public void addMeasurement(ManagedObjectRepresentation mor, String fragment, String[] serieses, String[] units, BigDecimal[] values, DateTime time) {
 		MeasurementRepresentation m = new MeasurementRepresentation();
-		MeasurementValue mv = new MeasurementValue();
 		Map<String, MeasurementValue> measurementValueMap = new HashMap<>();
 		int i = 0;
 		for(String series: serieses) {
+			MeasurementValue mv = new MeasurementValue();
 			mv.setValue(values[i]);
 			mv.setUnit(units[i]);
 			measurementValueMap.put(series, mv);

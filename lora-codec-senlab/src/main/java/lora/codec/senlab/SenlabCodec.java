@@ -72,11 +72,13 @@ public class SenlabCodec extends DeviceCodec {
 			senlabOp = "{\"id\":\"" + command + "\", \"parameters\": [";
 			JsonNode params = root.get(command);
 			Iterator<String> paramNames = params.fieldNames();
-			String paramName = paramNames.next();
-			senlabOp += "{\"id\":\"" + paramName + "\", \"value\": \"" + params.get(paramName).asText() + "\"}";
-			while(paramNames.hasNext()) {
-				paramName = paramNames.next();
-				senlabOp += ",{\"id\":\"" + paramName + "\", \"value\": \"" + params.get(paramName).asText() + "\"}";
+			if (paramNames != null && paramNames.hasNext()) {
+				String paramName = paramNames.next();
+				senlabOp += "{\"id\":\"" + paramName + "\", \"value\": \"" + params.get(paramName).asText() + "\"}";
+				while(paramNames.hasNext()) {
+					paramName = paramNames.next();
+					senlabOp += ",{\"id\":\"" + paramName + "\", \"value\": \"" + params.get(paramName).asText() + "\"}";
+				}
 			}
 			senlabOp += "]}";
 		} catch (IOException e1) {

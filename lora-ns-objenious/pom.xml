@@ -18,11 +18,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>me.xdrop</groupId>
-			<artifactId>fuzzywuzzy</artifactId>
-			<version>1.2.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>5.1.0</version>
