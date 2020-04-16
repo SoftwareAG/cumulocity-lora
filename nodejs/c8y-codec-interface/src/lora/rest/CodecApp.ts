@@ -1,0 +1,37 @@
+import express, { Request, Response, NextFunction } from "express";
+import * as bodyParser from "body-parser";
+import { DeviceCodec, Decode, Encode, MicroserviceSubscriptionService } from "../..";
+
+export class CodecApp {
+  app: express.Application = express();
+  PORT = process.env.PORT || 80;
+  subscriptionService: MicroserviceSubscriptionService = new MicroserviceSubscriptionService();
+
+  constructor(codec: DeviceCodec) {
+    this.app.use(bodyParser.json());
+    this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.post("/decode", (req: Request, res: Response, next: express.NextFunction) => {
+      console.log(req.body);
+      let decode: Decode = req.body;
+      console.log(decode);
+      res.json(codec.decode(this.subscriptionService.getClient(req), decode));
+    })
+    
+    this.app.post("/encode", (req: Request, res: Response, next: express.NextFunction) => {
+      let encode: Encode = req.body;
+      res.json(codec.encode(this.subscriptionService.getClient(req), encode));
+    })
+    
+    this.app.get("/models", (req: Request, res: Response, next: express.NextFunction) => {
+      res.json(codec.getModels());
+    })
+    
+    this.app.get("/operations/:model", (req: Request, res: Response, next: express.NextFunction) => {
+      res.json(Array.from(codec.getAvailableOperations(req.params.model)).reduce((obj, [key, value]) => {
+        obj[key] = value;
+        return obj;
+      }, {}));
+    })
+    this.app.listen(this.PORT, () => console.log(`Now listening on port ${this.PORT}!`));
+  }
+}
