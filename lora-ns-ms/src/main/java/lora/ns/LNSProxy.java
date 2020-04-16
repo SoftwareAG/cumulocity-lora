@@ -465,7 +465,7 @@ public abstract class LNSProxy implements Component {
     private void processPendingOperations() {
     	subscriptionsService.runForEachTenant(() -> {
 	    	OperationFilter filter = new OperationFilter();
-	    	filter.byStatus(OperationStatus.PENDING);
+	    	filter.byStatus(OperationStatus.PENDING).byAgent(agent.getId().getValue());
 	    	OperationCollectionRepresentation opCollectionRepresentation;
 	    	OperationCollection oc = deviceControlApi.getOperationsByFilter(filter);
 	    	for (opCollectionRepresentation = oc.get(); opCollectionRepresentation != null; opCollectionRepresentation = oc.getNextPage(opCollectionRepresentation)) {

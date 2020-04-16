@@ -51,7 +51,7 @@ public abstract class DeviceCodec implements Component {
 
 	final protected Logger logger = LoggerFactory.getLogger(getClass());
 	
-	protected final String DEVEUI_TYPE = "LoRa devEUI";
+	public static final String DEVEUI_TYPE = "LoRa devEUI";
 	public static final String CODEC_TYPE = "Device Codec";
 	public static final String CODEC_ID = "Codec ID";
 	
@@ -171,9 +171,6 @@ public abstract class DeviceCodec implements Component {
 		C8YData c8yData = decode(mor, data.getModel(), data.getfPort(), new DateTime(data.getUpdateTime()), payload);
 		logger.info("Processing payload {} from port {} for device {}", data.getPayload(), data.getfPort(), data.getDeveui());
 		processData(c8yData);
-	}
-	public String getUrl() {
-		return System.getenv("C8Y_BASEURL") + "/service/lora-codec-" + this.getId();
 	}
 	
 	public abstract List<String> getModels();
