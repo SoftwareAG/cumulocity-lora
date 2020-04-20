@@ -1,5 +1,6 @@
 package lora.codec.acsswitch;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -13,7 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
 import c8y.Configuration;
@@ -80,7 +84,8 @@ public class ACSSwitchCodec extends DeviceCodec {
 		ALARM_STILL_ACTIVE_V1((byte)0x41),
 		NEW_ALARM_V2((byte)0x60),
 		ALARM_STILL_ACTIVE_V2((byte)0x61),
-		PARAMETER_READING((byte)0x82);
+		PARAMETER_READING((byte)0x82),
+		WRITE_PARAMETER_ANSWER((byte)0x83);
 		
 		static final Map<Byte, FRAME> BY_VALUE = new HashMap<>();
 		
@@ -243,6 +248,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 		C8YData c8yData = new C8YData();
 		ByteBuffer buffer = ByteBuffer.wrap(payload).order(ByteOrder.BIG_ENDIAN);
 		FRAME frame = FRAME.BY_VALUE.get(buffer.get());
+		int numberOfRegisters = 0;
 		logger.info("Received frame {}", frame);
 		switch(frame) {
 		case PRESENCE_V1:
@@ -264,7 +270,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 			alarmStillActiveFrameV2(buffer, mor, c8yData);
 			break;
 		case PARAMETER_READING:
-			int numberOfRegisters = buffer.get();
+			numberOfRegisters = buffer.get();
 			for (int i=0;i<numberOfRegisters;i++) {
 				PARAMETER parameter = PARAMETER.BY_VALUE.get(buffer.get());
 				int value = parameter.getValue(buffer);
@@ -276,6 +282,18 @@ public class ACSSwitchCodec extends DeviceCodec {
 				c8yData.setMorToUpdate(mor);
 			}
 			break;
+		case WRITE_PARAMETER_ANSWER:
+			numberOfRegisters = buffer.get();
+			for (int i=0;i<numberOfRegisters;i++) {
+				byte param = buffer.get();
+				if (param == (byte)0xff) {
+					c8yData.addAlarm(mor, "Parameter writing result", "error", CumulocitySeverities.WARNING, DateTime.now());
+				} else {
+					PARAMETER parameter = PARAMETER.BY_VALUE.get(param);
+					String value = parameter.getValue(buffer) == 0 ? "SUCCESS" : "ERROR";
+					c8yData.addEvent(mor, "Parameter writing result", parameter.label + ": " + value, null, DateTime.now());
+				}
+			}
 		}
 		return c8yData;
 	}
@@ -303,8 +321,23 @@ public class ACSSwitchCodec extends DeviceCodec {
 
 	@Override
 	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
-		// TODO Auto-generated method stub
-		return null;
+		if (operation.contains("get config")) {
+			return askDeviceConfig(null);
+		}
+		DownlinkData data = new DownlinkData();
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode root;
+		try {
+			root = mapper.readTree(operation);
+			String command = root.fieldNames().next();
+			PARAMETER param = PARAMETER.valueOf(command);
+			JsonNode params = root.get(command);
+			data.setPayload("0301" + param.buildPayload(params.get(command).asInt()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		data.setFport(1);
+		return data;
 	}
 
 	@Override
@@ -320,8 +353,8 @@ public class ACSSwitchCodec extends DeviceCodec {
 		
 		for(PARAMETER param: PARAMETER.values()) {
 			List<DeviceOperationParam> params = new ArrayList<DeviceOperationParam>();
-			params.add(new DeviceOperationParam(param.toString(), param.label, DeviceOperationParam.ParamType.INTEGER, null));
-			result.put(param.toString(), new DeviceOperation(param.toString(), param.label, params));
+			params.add(new DeviceOperationParam(param.name(), param.label, DeviceOperationParam.ParamType.INTEGER, null));
+			result.put(param.name(), new DeviceOperation(param.name(), param.label, params));
 		}
 		
 		return result;

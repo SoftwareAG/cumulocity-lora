@@ -95,7 +95,7 @@ public abstract class LNSProxy implements Component {
 	@Autowired
 	private TenantOptionApi tenantOptionApi;
 	
-	private ManagedObjectRepresentation agent;
+	private Map<String, ManagedObjectRepresentation> agents = new HashMap<String, ManagedObjectRepresentation>();
 	
 	public final String DEVEUI_TYPE = "LoRa devEUI";
 	
@@ -141,6 +141,7 @@ public abstract class LNSProxy implements Component {
 	
 	private void registerLNSProxy() {
 		ExternalIDRepresentation id = findExternalId(this.getId(), LNS_PROXY_ID);
+		ManagedObjectRepresentation agent = null;
 		if (id == null) {
 			agent = new ManagedObjectRepresentation();
 			agent.set(new LNSProxyRepresentation(this));
@@ -166,6 +167,7 @@ public abstract class LNSProxy implements Component {
 			}
 			inventoryApi.update(agent);
 		}
+		agents.put(subscriptionsService.getTenant(), agent);
 		deviceControlApi.getNotificationsSubscriber().subscribe(agent.getId(), new OperationDispatcherSubscriptionListener(subscriptionsService.getTenant()));
 	}
 
@@ -241,12 +243,12 @@ public abstract class LNSProxy implements Component {
 				mor.set(new LpwanDevice().provisioned(true));
 				inventoryApi.update(mor);
 			}
+			ManagedObject agentApi = inventoryApi.getManagedObjectApi(agents.get(subscriptionsService.getTenant()).getId());
+			try {agentApi.getChildDevice(mor.getId());}
+			catch (Exception e) {agentApi.addChildDevice(mor.getId());}
 			if (mor.get(Configuration.class) == null) {
 				getDeviceConfig(mor);
 			}
-			ManagedObject agentApi = inventoryApi.getManagedObjectApi(agent.getId());
-			try {agentApi.getChildDevice(mor.getId());}
-			catch (Exception e) {agentApi.addChildDevice(mor.getId());}
 			codecManager.decode(mor, event);
 		} catch (SDKException e) {
 			logger.info("Error on upserting Device", e);
@@ -265,6 +267,8 @@ public abstract class LNSProxy implements Component {
 		mor.setLastUpdatedDateTime(null);
 		mor.set(supportedOperations);
 		mor = inventoryApi.create(mor);
+		ManagedObject agentApi = inventoryApi.getManagedObjectApi(agents.get(subscriptionsService.getTenant()).getId());
+		agentApi.addChildDevice(mor.getId());
 		extId = new ExternalIDRepresentation();
 		extId.setExternalId(devEUI);
 		extId.setType(DEVEUI_TYPE);
@@ -465,14 +469,16 @@ public abstract class LNSProxy implements Component {
     private void processPendingOperations() {
     	subscriptionsService.runForEachTenant(() -> {
 	    	OperationFilter filter = new OperationFilter();
-	    	filter.byStatus(OperationStatus.PENDING).byAgent(agent.getId().getValue());
+	    	filter.byStatus(OperationStatus.PENDING).byAgent(agents.get(subscriptionsService.getTenant()).getId().getValue());
 	    	OperationCollectionRepresentation opCollectionRepresentation;
 	    	OperationCollection oc = deviceControlApi.getOperationsByFilter(filter);
-	    	for (opCollectionRepresentation = oc.get(); opCollectionRepresentation != null; opCollectionRepresentation = oc.getNextPage(opCollectionRepresentation)) {
-	    	    for (OperationRepresentation op : opCollectionRepresentation.getOperations()) {
-	    	        System.out.println(op.getStatus());
-	    	        executePending(op);
-	    	    }
+	    	if (oc != null) {
+		    	for (opCollectionRepresentation = oc.get(); opCollectionRepresentation != null; opCollectionRepresentation = oc.getNextPage(opCollectionRepresentation)) {
+		    	    for (OperationRepresentation op : opCollectionRepresentation.getOperations()) {
+		    	        System.out.println(op.getStatus());
+		    	        executePending(op);
+		    	    }
+		    	}
 	    	}
     	});
     }

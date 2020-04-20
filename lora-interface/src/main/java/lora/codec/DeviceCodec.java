@@ -67,7 +67,7 @@ public abstract class DeviceCodec implements Component {
 		if (encode.getOperation().startsWith("raw ")) {
 			String[] tokens = encode.getOperation().split(" ");
 			data = new DownlinkData(encode.getDevEui(), Integer.parseInt(tokens[1]), tokens[2]);
-		} else if (encode.getOperation().equals("get config")) {
+		} else if (encode.getOperation().contains("get config")) {
 			data = askDeviceConfig(encode.getDevEui());
 		} else {
 			data = encode(mor, encode.getModel(), encode.getOperation());

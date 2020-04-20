@@ -25,6 +25,7 @@
 		<module>lora-codec-acs-switch</module>
 		<module>lora-ns-kerlink</module>
 		<module>lora-ns-objenious</module>
+		<module>lora-ns-cloudgate</module>
 	</modules>
   
 	<properties>
