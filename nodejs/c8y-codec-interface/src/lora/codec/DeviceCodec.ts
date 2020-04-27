@@ -23,9 +23,9 @@ export abstract class DeviceCodec implements Component {
 
     async decode(client: Client, decode: Decode) {
         console.log("decode: " + decode);
-        let mor: IManagedObject = await this.getDevice(client, decode.devEui);
-        let c8yData: C8YData = this._decode(mor, decode.model, decode.fport, decode.time, decode.payload);
-        console.log(`Processing payload ${decode.payload} from port ${decode.fport} for device ${decode.devEui}`);
+        let mor: IManagedObject = await this.getDevice(client, decode.deveui);
+        let c8yData: C8YData = this._decode(mor, decode.model, decode.fPort, decode.time, decode.payload);
+        console.log(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`);
         this.processData(client, c8yData);
     }
 

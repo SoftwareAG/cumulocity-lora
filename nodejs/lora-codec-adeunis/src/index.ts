@@ -39,7 +39,7 @@ class AdeunisCodec extends DeviceCodec {
         console.log(result);
         if (result.temperatures) {
             result.temperatures.forEach(t => {
-                c8yData.addMeasurement(mo, "Temperatures", t.name, t.unit, t.values[0], new Date());
+                c8yData.addMeasurement(mo, "Temperatures", t.name, t.unit, t.value, new Date());
             })
         }
         if (result.temperature) {

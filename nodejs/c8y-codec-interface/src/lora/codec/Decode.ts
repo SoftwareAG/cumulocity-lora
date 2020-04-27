@@ -1,6 +1,6 @@
 export class Decode {
-    devEui: string;
-    fport: number;
+    deveui: string;
+    fPort: number;
     payload: string;
     time: Date;
     model: string;
