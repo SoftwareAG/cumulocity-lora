@@ -27,7 +27,6 @@ import lora.ns.LNSInstance;
 import lora.ns.LNSInstanceRepresentation;
 import lora.ns.LNSInstanceWizardStep;
 import lora.ns.LNSProxy;
-import lora.ns.objenious.rest.Group;
 import lora.ns.objenious.rest.Profile;
 
 @Service
@@ -243,10 +242,6 @@ public class Objenious extends LNSProxy {
 	@Override
 	protected LNSInstance getInstance(LNSInstanceRepresentation instance) {
 		return new Instance(instance);
-	}
-	
-	public List<Group> getGroups(String apikey) {
-		return new Instance("", apikey, 0).getGroups();
 	}
 
 	@Override
