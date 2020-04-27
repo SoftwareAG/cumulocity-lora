@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.io.BaseEncoding;
 
-import io.kaitai.struct.ByteBufferKaitaiStream;
-
 public class TestACSSwitchCodec {
 
 	@Test
@@ -48,10 +46,23 @@ public class TestACSSwitchCodec {
 	}
 	
 	@Test
-	void testKaitai() {
-		byte[] payload = BaseEncoding.base16().decode("421332b955030000004c6300000000101430".toUpperCase());
-		AcsSwitch acsSwitch = new AcsSwitch(new ByteBufferKaitaiStream(payload));
-		assertEquals(AcsSwitch.PresenceV1.class, acsSwitch.body().getClass(), "Wrong temperature");
-		assertEquals(new Double(20.1875), ((AcsSwitch.PresenceV1)acsSwitch.body()).temperature(), "Wrong temperature");
+	void receiveTwoParameters2() {
+		byte[] payload = BaseEncoding.base16().decode("82020102003c020201f0".toUpperCase());
+		ByteBuffer buffer = ByteBuffer.wrap(payload).order(ByteOrder.BIG_ENDIAN);
+		ACSSwitchCodec.FRAME frame = ACSSwitchCodec.FRAME.BY_VALUE.get(buffer.get());
+		assertEquals(ACSSwitchCodec.FRAME.PARAMETER_READING, frame, "Wrong frame");
+		int numberOfRegisters = buffer.get();
+
+		assertEquals(2, numberOfRegisters, "Wrong number of parameters");
+		ACSSwitchCodec.PARAMETER parameter = ACSSwitchCodec.PARAMETER.BY_VALUE.get(buffer.get());
+		assertEquals(ACSSwitchCodec.PARAMETER.PRESENCE_PERIOD, parameter, "Wrong parameter");
+		int value = parameter.getValue(buffer);
+		assertEquals(60, value, "Wrong value");
+
+		parameter = ACSSwitchCodec.PARAMETER.BY_VALUE.get(buffer.get());
+		assertEquals(ACSSwitchCodec.PARAMETER.PRESENCE_RANDOM_DELAY, parameter, "Wrong parameter");
+		parameter.getValues(buffer);
+		assertEquals(1, parameter.values[0].value, "Wrong value for min");
+		assertEquals(240, parameter.values[1].value, "Wrong value for max");
 	}
 }
