@@ -99,6 +99,10 @@ public class C8YData {
         
         events.add(eventRepresentation);
     }
+	
+	public void addEvent(ManagedObjectRepresentation mor, EventRepresentation locationUpdate) {
+		events.add(locationUpdate);
+	}
 
 	public void addAlarm(ManagedObjectRepresentation mor, String alarmType, String alarmText, CumulocitySeverities severity, DateTime dateTime) {
         AlarmRepresentation alarmRepresentation = new AlarmRepresentation();
