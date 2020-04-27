@@ -16,7 +16,7 @@
   "dependencies": {
     "@adeunis/codecs": "^1.3.2",
     "@c8y/client": "^1005.7.10",
-    "c8y-codec-interface": "^1.0.1"
+    "c8y-codec-interface": "^1.0.3"
   },
   "devDependencies": {
     "@types/node": "^13.11.1",
