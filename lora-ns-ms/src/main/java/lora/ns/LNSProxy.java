@@ -198,9 +198,8 @@ public abstract class LNSProxy implements Component {
 			ManagedObjectRepresentation mor = getDevice(event.getDevEui());
 			if (mor == null) {
 				mor = createDevice(lnsInstanceId, event.getDeviceName(), event.getDevEui());
-			} else {
-				mor.setLastUpdatedDateTime(null);
 			}
+			mor.setLastUpdatedDateTime(null);
 			if (event.getModel() == null && mor.get(Hardware.class) != null) {
 				event.setModel(mor.get(Hardware.class).getModel());
 			}
