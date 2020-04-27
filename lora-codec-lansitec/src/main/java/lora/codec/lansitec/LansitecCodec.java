@@ -222,21 +222,25 @@ public class LansitecCodec extends DeviceCodec {
 			public void process(ManagedObjectRepresentation mor, Beacon beacon, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
 				byte move = buffer.get();
 				buffer.getInt();
-				short major = buffer.getShort();
-				short minor = buffer.getShort();
-				byte rssi = buffer.get();
-				c8yData.addEvent(mor, "BLE coordinate", String.format("MOVE: %d\nMAJOR: %04X\nMINOR: %04X\nRSSI: %d", move, major, minor, rssi), null, updateTime);
-				Beacon newBeacon = new Beacon(String.format("%04X", major), String.format("%04X", minor), rssi);
-				if (beacon != null) {
-					if (beacon.getMajor().equals(newBeacon.getMajor()) && beacon.getMinor().equals(newBeacon.getMinor()) || newBeacon.getRssi() > beacon.getRssi()) {
+				while (buffer.hasRemaining()) {
+					short major = buffer.getShort();
+					short minor = buffer.getShort();
+					byte rssi = buffer.get();
+					c8yData.addEvent(mor, "BLE coordinate", String.format("MOVE: %d\nMAJOR: %04X\nMINOR: %04X\nRSSI: %d", move, major, minor, rssi), null, updateTime);
+					Beacon newBeacon = new Beacon(String.format("%04X", major), String.format("%04X", minor), rssi);
+					if (beacon != null) {
+						if (beacon.getMajor().equals(newBeacon.getMajor()) && beacon.getMinor().equals(newBeacon.getMinor()) || newBeacon.getRssi() > beacon.getRssi()) {
+							mor.set(newBeacon);
+							c8yData.setMorToUpdate(mor);
+							c8yData.addEvent(mor, "Nearest beacon changed: ", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", newBeacon.getMajor(), newBeacon.getMinor(), newBeacon.getRssi()), null, updateTime);
+							beacon = newBeacon;
+						}
+					} else {
 						mor.set(newBeacon);
 						c8yData.setMorToUpdate(mor);
 						c8yData.addEvent(mor, "Nearest beacon changed: ", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", newBeacon.getMajor(), newBeacon.getMinor(), newBeacon.getRssi()), null, updateTime);
+						beacon = newBeacon;
 					}
-				} else {
-					mor.set(newBeacon);
-					c8yData.setMorToUpdate(mor);
-					c8yData.addEvent(mor, "Nearest beacon changed: ", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", newBeacon.getMajor(), newBeacon.getMinor(), newBeacon.getRssi()), null, updateTime);
 				}
 			}
 		},
