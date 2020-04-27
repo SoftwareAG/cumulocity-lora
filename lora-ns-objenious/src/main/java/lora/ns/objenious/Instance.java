@@ -68,13 +68,6 @@ public class Instance extends ALNSInstance {
 		}
 
 	}
-
-	public Instance(String id, String apikey, Integer groupId) {
-		super(id);
-		properties.setProperty("apikey", apikey);
-		properties.setProperty("groupId", groupId.toString());
-		setProperties(properties);
-	}
 	
 	public Instance(LNSInstanceRepresentation instance) {
 		super(instance);
