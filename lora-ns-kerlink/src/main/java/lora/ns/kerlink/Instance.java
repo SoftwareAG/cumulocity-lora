@@ -9,45 +9,82 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lora.codec.DownlinkData;
 import lora.ns.ALNSInstance;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
 import lora.ns.LNSInstanceRepresentation;
+import lora.ns.kerlink.dto.ClusterDto;
+import lora.ns.kerlink.dto.CustomerDto;
 import lora.ns.kerlink.dto.EndDeviceDto;
 import lora.ns.kerlink.dto.JwtDto;
 import lora.ns.kerlink.dto.PaginatedDto;
+import lora.ns.kerlink.dto.PushConfigurationDto;
+import lora.ns.kerlink.dto.PushConfigurationDto.PushConfigurationMSgDetailLevel;
+import lora.ns.kerlink.dto.PushConfigurationDto.PushConfigurationType;
+import lora.ns.kerlink.dto.PushConfigurationHeaderDto;
+import lora.ns.kerlink.dto.UserDto;
 
 public class Instance extends ALNSInstance {
 	
+	private static final String CLUSTER_ID = "clusterId";
+	private static final String PASSWORD = "password";
+	private static final String USERNAME = "username";
+	private static final String BASE_URL = "baseUrl";
 	private JwtDto jwt = null;
+	private Integer customerId = null;
+	private String clusterId;
+	private String username;
+	private String password;
+	private String baseUrl;
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	public Instance(String id, String baseUrl, String username, String password) {
-		super(id);
-		properties.setProperty("baseUrl", baseUrl);
-		properties.setProperty("username", username);
-		properties.setProperty("password", password);
-		setProperties(properties);
-	}
-	
 	public Instance(LNSInstanceRepresentation instance) {
 		super(instance);
+		this.clusterId = properties.getProperty(CLUSTER_ID);
+		this.baseUrl = properties.getProperty(BASE_URL);
+		this.username = properties.getProperty(USERNAME);
+		this.password = properties.getProperty(PASSWORD);
+		logger.info("baseUrl: {}", baseUrl);
 	}
 	
 	private void login() {
 		RestTemplate restTemplate = new RestTemplate();
-		String request = String.format("{\"login\":\"%s\", \"password\":\"%s\"}", properties.getProperty("username"), properties.getProperty("password"));
+		String request = String.format("{\"login\":\"%s\", \"password\":\"%s\"}", username, password);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		jwt = restTemplate.postForObject(properties.getProperty("baseUrl") + "/login", new HttpEntity<String>(request, headers), JwtDto.class);
+		jwt = restTemplate.postForObject(baseUrl + "/login", new HttpEntity<String>(request, headers), JwtDto.class);
+		logger.info("Received token: {} {}", jwt.getTokenType(), jwt.getToken());
+		headers = new HttpHeaders();
+		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
+//		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(properties.getProperty("baseUrl") + "/users")
+//		        .queryParam("search", "{\"operand\":\"login\",\"operation\":\"EQ\",\"values\":[\"" + properties.getProperty("username") + "\"]}");
+//		logger.info("Will call GET {}", builder.toUriString());
+//		ResponseEntity<PaginatedDto<UserDto>> users = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<UserDto>>(){});
+		ResponseEntity<PaginatedDto<UserDto>> users = restTemplate.exchange(baseUrl + "/users", HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<UserDto>>(){});
+		if (users.getStatusCode() == HttpStatus.OK) {
+			for (UserDto user: users.getBody().getList()) {
+				logger.info("Testing user {}", user.getLogin());
+				if (user.getLogin().equals(username)) {
+					customerId = user.getCustomer().getId();
+					logger.info("Customer Id: {}", customerId);
+				}
+			}
+			//customerId = users.getBody().getList().iterator().next().getCustomer().getId();
+		}
 	}
 
 	public List<EndDevice> getDevices() {
@@ -58,7 +95,7 @@ public class Instance extends ALNSInstance {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
 		RestTemplate restTemplate = new RestTemplate();
-		PaginatedDto<EndDeviceDto> endDevicesDto = restTemplate.exchange(properties.getProperty("baseUrl") + "/endDevices", HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>(){}).getBody();
+		PaginatedDto<EndDeviceDto> endDevicesDto = restTemplate.exchange(baseUrl + "/endDevices", HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>(){}).getBody();
 		for (EndDeviceDto endDeviceDto : endDevicesDto.getList()) {
 			endDevices.add(new EndDevice(endDeviceDto.getDevEui(), endDeviceDto.getName(), endDeviceDto.getClassType(), endDeviceDto.getDevAddr(), endDeviceDto.getCluster().getName()));
 		}
@@ -83,10 +120,14 @@ public class Instance extends ALNSInstance {
 		logger.info("Request: {}", request);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
-		headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		List<MediaType> mediaTypes = new ArrayList<MediaType>();
+		mediaTypes.add(MediaType.APPLICATION_JSON);
+		headers.setAccept(mediaTypes);
 		RestTemplate restTemplate = new RestTemplate();
 		try {
-			result = restTemplate.exchange(properties.getProperty("baseUrl") + "/dataDown", HttpMethod.POST, new HttpEntity<String>(request, headers), String.class).getHeaders().getLocation().getPath();
+			logger.info("Will send data to {}", baseUrl + "/dataDown");
+			result = restTemplate.exchange(baseUrl + "/dataDown", HttpMethod.POST, new HttpEntity<String>(request, headers), String.class).getHeaders().getLocation().getPath();
 			result = result.substring(result.lastIndexOf('/') + 1);
 			logger.info("Operation id: {}", result);
 		} catch(HttpClientErrorException e) {
@@ -104,7 +145,8 @@ public class Instance extends ALNSInstance {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
 		RestTemplate restTemplate = new RestTemplate();
-		EndDeviceDto endDeviceDto = restTemplate.exchange(properties.getProperty("baseUrl") + "/endDevices/" + devEui, HttpMethod.GET, new HttpEntity<String>("", headers), EndDeviceDto.class).getBody();
+		logger.info("Will get device info on URL: {}", baseUrl + "/endDevices/" + devEui);
+		EndDeviceDto endDeviceDto = restTemplate.exchange(baseUrl + "/endDevices/" + devEui, HttpMethod.GET, new HttpEntity<String>("", headers), EndDeviceDto.class).getBody();
 		return new EndDevice(devEui, endDeviceDto.getName(), endDeviceDto.getClassType(), endDeviceDto.getDevAddr(), endDeviceDto.getCluster().getName());
 	}
 
@@ -122,19 +164,123 @@ public class Instance extends ALNSInstance {
 
 	@Override
 	public void configureRoutings(String url, String tenant, String login, String password) {
-		// TODO Auto-generated method stub
-		
+		if (jwt == null || jwt.isExpired()) {
+			login();
+		}
+		PushConfigurationDto currentPushConfigurationDto = null;
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
+		RestTemplate restTemplate = new RestTemplate();
+		PaginatedDto<PushConfigurationDto> pushConfigurationDtos = restTemplate.exchange(baseUrl + "/pushConfigurations", HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<PushConfigurationDto>>(){}).getBody();
+		for (PushConfigurationDto pushConfigurationDto : pushConfigurationDtos.getList()) {
+			if (pushConfigurationDto.getName().equals(this.getId())) {
+				currentPushConfigurationDto = pushConfigurationDto;
+			}
+		}
+		Integer configId = null;
+//		if (currentPushConfigurationDto != null) {
+//			configId = currentPushConfigurationDto.getId();
+//			logger.info("Found existing push configuration {} with id {} and will update it.", currentPushConfigurationDto.getName(), currentPushConfigurationDto.getId());
+//			currentPushConfigurationDto.setUrl(url);
+//			currentPushConfigurationDto.setUser(tenant+"/"+login);
+//			currentPushConfigurationDto.setPassword(password);
+//			currentPushConfigurationDto.setHttpDataDownEventRoute("/downlink");
+//			currentPushConfigurationDto.setHttpDataUpRoute("/uplink");
+//			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+//			List<MediaType> mediaTypes = new ArrayList<MediaType>();
+//			mediaTypes.add(MediaType.APPLICATION_JSON);
+//			headers.setAccept(mediaTypes);
+//			ObjectMapper mapper = new ObjectMapper();
+//			MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+//			try {
+//				String dto = mapper.writeValueAsString(currentPushConfigurationDto);
+//				logger.info("dto = {}", dto);
+//				map.add("dto", dto);
+//			} catch (JsonProcessingException e) {
+//				e.printStackTrace();
+//			}
+//			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+//			ResponseEntity<String> result = restTemplate.exchange(properties.getProperty("baseUrl") + "/pushConfigurations/" + currentPushConfigurationDto.getId(), HttpMethod.POST, request, String.class);
+//			if (result.getStatusCode() != HttpStatus.NO_CONTENT) {
+//				logger.error("Something was wrong while updating the push config: {}", result.getBody());
+//				configId = null;
+//			}
+		if (currentPushConfigurationDto == null) {
+			currentPushConfigurationDto = new PushConfigurationDto(new CustomerDto(customerId), this.getId(), PushConfigurationType.HTTP, PushConfigurationMSgDetailLevel.NETWORK, new PushConfigurationHeaderDto[] {new PushConfigurationHeaderDto("Content-Type", "application/json")}, "/downlink", "/uplink", url, tenant+"/"+login, password);
+			logger.info("Will create a new push configuration: {}", currentPushConfigurationDto.toString());
+			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+			List<MediaType> mediaTypes = new ArrayList<MediaType>();
+			mediaTypes.add(MediaType.APPLICATION_JSON);
+			headers.setAccept(mediaTypes);
+			ObjectMapper mapper = new ObjectMapper();
+			MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+			try {
+				String dto = mapper.writeValueAsString(currentPushConfigurationDto);
+				logger.info("dto = {}", dto);
+				map.add("dto", dto);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+			ResponseEntity<String> result = restTemplate.exchange(baseUrl + "/pushConfigurations", HttpMethod.POST, request, String.class);
+			if (result.getStatusCode() == HttpStatus.CREATED) {
+				String[] tokens = result.getHeaders().getLocation().getPath().split("/");
+				configId = Integer.parseInt(tokens[tokens.length-1]);
+			} else {
+				logger.error("Something was wrong while creating the push config: {}", result.getBody());
+			}
+		}
+		if (configId != null) {
+			headers = new HttpHeaders();
+			headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
+			ClusterDto cluster = restTemplate.exchange(baseUrl + "/clusters/" + clusterId, HttpMethod.GET, new HttpEntity<String>("", headers), ClusterDto.class).getBody();
+			cluster.setPushConfiguration(currentPushConfigurationDto);
+			cluster.setGeolocEnabled(true);
+			cluster.setHexa(true);
+			cluster.setPushEnabled(true);
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			ResponseEntity<String> response = restTemplate.exchange(baseUrl + "/clusters/" + clusterId, HttpMethod.PATCH, new HttpEntity<ClusterDto>(cluster, headers), String.class);
+			if (response.getStatusCode() != HttpStatus.NO_CONTENT) {
+				logger.error("Something was wrong while updating the cluster: {}", response.getBody());
+			}
+		}
 	}
 
 	@Override
 	public void removeRoutings() {
-		// TODO Auto-generated method stub
-		
+		if (jwt == null || jwt.isExpired()) {
+			login();
+		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
+		RestTemplate restTemplate = new RestTemplate();
+		PaginatedDto<PushConfigurationDto> pushConfigurationDtos = restTemplate.exchange(baseUrl + "/pushConfigurations", HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<PushConfigurationDto>>(){}).getBody();
+		for (PushConfigurationDto pushConfigurationDto : pushConfigurationDtos.getList()) {
+			if (pushConfigurationDto.getName().equals(this.getId())) {
+				restTemplate.exchange(baseUrl + "/pushConfigurations/" + pushConfigurationDto.getId(), HttpMethod.DELETE, new HttpEntity<String>("", headers), String.class);
+			}
+		}
 	}
 
 	@Override
 	public boolean deprovisionDevice(String deveui) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public List<ClusterDto> getClusters() {
+		List<ClusterDto> result = new ArrayList<ClusterDto>();
+		if (jwt == null || jwt.isExpired()) {
+			login();
+		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
+		RestTemplate restTemplate = new RestTemplate();
+		PaginatedDto<ClusterDto> clusterDtos = restTemplate.exchange(baseUrl + "/clusters", HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<ClusterDto>>(){}).getBody();
+		for (ClusterDto clusterDto : clusterDtos.getList()) {
+			result.add(clusterDto);
+		}
+		
+		return result;
 	}
 }

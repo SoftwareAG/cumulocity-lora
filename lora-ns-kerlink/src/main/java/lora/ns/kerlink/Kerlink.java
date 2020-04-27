@@ -34,23 +34,34 @@ import lora.ns.PropertyDescription.PropertyType;
 public class Kerlink extends LNSProxy {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-//	
-//	{
-//		instances.put("t198098409", new HashMap<>());
-//		instances.get("t198098409").put("accorinvest", new Instance("https://wmcintegration.wanesy.com/gms/application", "Cumulocity", "cumulocity"));
-//	}
 	
-	private class WizardStep extends LNSInstanceWizardInitialStep {
-		{
-			propertyDescriptions.add(new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.STRING));
-			propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.STRING));
-			propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.STRING));
-		}
-	}
+	private 
 	
 	LinkedList<LNSInstanceWizardStep> wizard = new LinkedList<LNSInstanceWizardStep>();
 	{
-		wizard.add(new WizardStep());
+		wizard.add(new LNSInstanceWizardInitialStep() {
+			{
+				propertyDescriptions.add(new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.STRING));
+				propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.STRING));
+				propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD));
+			}
+		});
+		wizard.add(new LNSInstanceWizardStep() {
+			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
+			{
+				propertyDescriptions.add(new PropertyDescription("clusterId", "Cluster", true, null, "/clusters", null, null, null, null, null, PropertyType.LIST));
+			}
+
+			@Override
+			public String getName() {
+				return "Select a cluster";
+			}
+
+			@Override
+			public LinkedList<PropertyDescription> getPropertyDescriptions() {
+				return propertyDescriptions;
+			}
+		});
 	}
 	
 	
