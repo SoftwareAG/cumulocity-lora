@@ -33,19 +33,36 @@ public class ACSSwitchCodec extends DeviceCodec {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
+	public static class ParamValue {
+		public int offset;
+		public int length;
+		public String name;
+		public int value;
+		public ParamValue(int offset, int length, String name, int value) {
+			super();
+			this.offset = offset;
+			this.length = length;
+			this.name = name;
+			this.value = value;
+		}
+	}
+	
 	enum PARAMETER {
-		PRESENCE_PERIOD("Presence period", (byte)0x01, (byte)0x02),
-		PRESENCE_AND_ALARM_TYPE("Presence and alarm type", (byte)0x0D, (byte)0x01),
-		ALARM_CONFIGURATION("Alarm configuration", (byte)0x13, (byte)0x01);
+		PRESENCE_PERIOD("Presence period", (byte)0x01, (byte)0x02, null),
+		PRESENCE_AND_ALARM_TYPE("Presence and alarm type", (byte)0x0D, (byte)0x01, null),
+		ALARM_CONFIGURATION("Alarm configuration", (byte)0x13, (byte)0x01, null),
+		PRESENCE_RANDOM_DELAY("Presence random delay", (byte)0x02, (byte)0x02, new ParamValue[]{new ParamValue(8,8,"min",1), new ParamValue(0,8,"max",60)});
 		
 		public String label;
 		public byte code;
 		public byte length;
+		public ParamValue[] values;
 
-		private PARAMETER(String label, byte code, byte length) {
+		private PARAMETER(String label, byte code, byte length, ParamValue[] values) {
 			this.label = label;
 			this.code = code;
 			this.length = length;
+			this.values = values;
 		}
 
 		static final Map<Byte, PARAMETER> BY_VALUE = new HashMap<>();
@@ -61,19 +78,34 @@ public class ACSSwitchCodec extends DeviceCodec {
 			payload[0] = code;
 			payload[1] = length;
 			for (int i = 0; i < length; i++) {
-				payload[2 + i] = (byte)(value);
+				payload[1 + length - i] = (byte)(value);
 				value >>= 8;
 			}
 			return BaseEncoding.base16().encode(payload);
+		}
+		
+		public String buildPayload() {
+			int value = 0;
+			for (ParamValue v: values) {
+				value |= (v.value & ((1 << v.length) - 1)) << v.offset;
+			}
+			return buildPayload(value);
 		}
 		
 		public int getValue(ByteBuffer buffer) {
 			byte length = buffer.get();
 			int value = 0;
 			for (int i = 0; i < length; i++) {
-				value = (value << 8) + buffer.get(); 
+				value = (value << 8) | (buffer.get() & 0xff);
 			}
 			return value;
+		}
+		
+		public void getValues(ByteBuffer buffer) {
+			int value = getValue(buffer);
+			for (ParamValue v: values) {
+				v.value = (value >> v.offset) & ((1 << v.length) - 1);
+			}
 		}
 	}
 	
@@ -271,14 +303,30 @@ public class ACSSwitchCodec extends DeviceCodec {
 			break;
 		case PARAMETER_READING:
 			numberOfRegisters = buffer.get();
+			RequiredAvailability ra = new RequiredAvailability(0);
 			for (int i=0;i<numberOfRegisters;i++) {
 				PARAMETER parameter = PARAMETER.BY_VALUE.get(buffer.get());
-				int value = parameter.getValue(buffer);
-				c8yData.addEvent(mor, "Parameter reading", parameter.label + ": " + value, null, DateTime.now());
-				if (parameter == PARAMETER.PRESENCE_PERIOD) {
-					mor.set(new RequiredAvailability(value * 4 / 60));
+				if (parameter.values == null) {
+					int value = parameter.getValue(buffer);
+					c8yData.addEvent(mor, "Parameter reading", parameter.label + ": " + value, null, DateTime.now());
+					if (parameter == PARAMETER.PRESENCE_PERIOD) {
+						ra.setResponseInterval(ra.getResponseInterval() + value * 4 / 60);
+					}
+					mor.set(new Configuration(BaseEncoding.base16().encode(payload)));
+				} else {
+					parameter.getValues(buffer);
+					String values = "";
+					for (ParamValue v: parameter.values) {
+						values += parameter.label + "." + v.name + ": " + v.value + "\n";
+						if (parameter == PARAMETER.PRESENCE_RANDOM_DELAY && v.name.equals("max")) {
+							ra.setResponseInterval(ra.getResponseInterval() + v.value / 60);
+						}
+					}
+					c8yData.addEvent(mor, "Parameter reading", values, null, DateTime.now());
 				}
-				mor.set(new Configuration(BaseEncoding.base16().encode(payload)));
+			}
+			if (ra.getResponseInterval() > 0) {
+				mor.set(ra);
 				c8yData.setMorToUpdate(mor);
 			}
 			break;
@@ -332,7 +380,14 @@ public class ACSSwitchCodec extends DeviceCodec {
 			String command = root.fieldNames().next();
 			PARAMETER param = PARAMETER.valueOf(command);
 			JsonNode params = root.get(command);
-			data.setPayload("0301" + param.buildPayload(params.get(command).asInt()));
+			if (param.values == null) {
+				data.setPayload("0301" + param.buildPayload(params.get(command).asInt()));
+			} else {
+				for (ParamValue v: param.values) {
+					v.value = params.get(v.name).asInt();
+				}
+				data.setPayload("0301" + param.buildPayload());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -342,7 +397,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 
 	@Override
 	public DownlinkData askDeviceConfig(String devEui) {
-		return new DownlinkData(devEui, 1, "02010102");
+		return new DownlinkData(devEui, 1, "020201020202");
 	}
 
 	@Override
@@ -353,7 +408,13 @@ public class ACSSwitchCodec extends DeviceCodec {
 		
 		for(PARAMETER param: PARAMETER.values()) {
 			List<DeviceOperationParam> params = new ArrayList<DeviceOperationParam>();
-			params.add(new DeviceOperationParam(param.name(), param.label, DeviceOperationParam.ParamType.INTEGER, null));
+			if (param.values == null) {
+				params.add(new DeviceOperationParam(param.name(), param.label, DeviceOperationParam.ParamType.INTEGER, null));
+			} else {
+				for (ParamValue value: param.values) {
+					params.add(new DeviceOperationParam(value.name, value.name, DeviceOperationParam.ParamType.INTEGER, null));
+				}
+			}
 			result.put(param.name(), new DeviceOperation(param.name(), param.label, params));
 		}
 		
