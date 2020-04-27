@@ -5,13 +5,6 @@ import java.util.Properties;
 public abstract class ALNSInstance implements LNSInstance {
 
 	protected Properties properties = new Properties();
-	
-	protected ALNSInstance(String id) {
-		if (properties == null) {
-			properties = new Properties();
-		}
-		properties.setProperty("id", id);
-	}
 
 	protected ALNSInstance(LNSInstanceRepresentation instance) {
 		setProperties(instance.getProperties());
