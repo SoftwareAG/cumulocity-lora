@@ -15,7 +15,7 @@ public class PropertyDescription {
 	private String regExp;
 	
 	public enum PropertyType {
-		STRING, INTEGER, NUMBER, DATETIME, BOOLEAN, LIST;
+		STRING, PASSWORD, INTEGER, NUMBER, DATETIME, BOOLEAN, LIST;
 	}
 	
 	private PropertyType type;
