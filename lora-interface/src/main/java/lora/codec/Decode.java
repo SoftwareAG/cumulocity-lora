@@ -74,4 +74,11 @@ public class Decode {
 	public void setUpdateTime(Long updateTime) {
 		this.updateTime = updateTime;
 	}
+
+
+	@Override
+	public String toString() {
+		return "Decode [deveui=" + deveui + ", fPort=" + fPort + ", payload=" + payload + ", updateTime=" + updateTime
+				+ ", model=" + model + "]";
+	}
 }
