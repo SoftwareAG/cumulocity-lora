@@ -232,13 +232,13 @@ public class LansitecCodec extends DeviceCodec {
 						if (beacon.getMajor().equals(newBeacon.getMajor()) && beacon.getMinor().equals(newBeacon.getMinor()) || newBeacon.getRssi() > beacon.getRssi()) {
 							mor.set(newBeacon);
 							c8yData.setMorToUpdate(mor);
-							c8yData.addEvent(mor, "Nearest beacon changed: ", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", newBeacon.getMajor(), newBeacon.getMinor(), newBeacon.getRssi()), null, updateTime);
+							c8yData.addEvent(mor, "Nearest beacon changed", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", newBeacon.getMajor(), newBeacon.getMinor(), newBeacon.getRssi()), null, updateTime);
 							beacon = newBeacon;
 						}
 					} else {
 						mor.set(newBeacon);
 						c8yData.setMorToUpdate(mor);
-						c8yData.addEvent(mor, "Nearest beacon changed: ", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", newBeacon.getMajor(), newBeacon.getMinor(), newBeacon.getRssi()), null, updateTime);
+						c8yData.addEvent(mor, "Nearest beacon changed", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", newBeacon.getMajor(), newBeacon.getMinor(), newBeacon.getRssi()), null, updateTime);
 						beacon = newBeacon;
 					}
 				}
