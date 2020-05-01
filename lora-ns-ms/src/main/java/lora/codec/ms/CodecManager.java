@@ -3,20 +3,6 @@ package lora.codec.ms;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
-import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
-import com.cumulocity.model.ID;
-import com.cumulocity.rest.representation.event.EventRepresentation;
-import com.cumulocity.rest.representation.identity.ExternalIDRepresentation;
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-import com.cumulocity.rest.representation.operation.OperationRepresentation;
-import com.cumulocity.sdk.client.SDKException;
-import com.cumulocity.sdk.client.event.EventApi;
-import com.cumulocity.sdk.client.identity.IdentityApi;
-import com.cumulocity.sdk.client.inventory.InventoryApi;
-import com.cumulocity.sdk.client.inventory.InventoryFilter;
-import com.cumulocity.sdk.client.inventory.ManagedObjectCollection;
-
 import org.apache.commons.codec.binary.Hex;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -24,6 +10,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+
+import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
+import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
+import com.cumulocity.model.ID;
+import com.cumulocity.model.event.CumulocitySeverities;
+import com.cumulocity.rest.representation.alarm.AlarmRepresentation;
+import com.cumulocity.rest.representation.event.EventRepresentation;
+import com.cumulocity.rest.representation.identity.ExternalIDRepresentation;
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.cumulocity.rest.representation.operation.OperationRepresentation;
+import com.cumulocity.sdk.client.SDKException;
+import com.cumulocity.sdk.client.alarm.AlarmApi;
+import com.cumulocity.sdk.client.event.EventApi;
+import com.cumulocity.sdk.client.identity.IdentityApi;
+import com.cumulocity.sdk.client.inventory.InventoryApi;
+import com.cumulocity.sdk.client.inventory.InventoryFilter;
+import com.cumulocity.sdk.client.inventory.ManagedObjectCollection;
 
 import c8y.Command;
 import c8y.Hardware;
@@ -33,6 +36,7 @@ import lora.codec.DeviceCodecRepresentation;
 import lora.codec.DeviceOperationParam;
 import lora.codec.DownlinkData;
 import lora.codec.Encode;
+import lora.codec.Result;
 import lora.ns.DeviceData;
 
 @Service
@@ -46,11 +50,17 @@ public class CodecManager {
 
 	@Autowired
 	private IdentityApi identityApi;
+	
+	@Autowired
+	private AlarmApi alarmApi;
 
     @Autowired
     private MicroserviceSubscriptionsService subscriptionsService;
 
 	final private Logger logger = LoggerFactory.getLogger(getClass());
+	
+	final private static String LORA_DEVICE_COMMAND_ERROR = "LoRa device command error";
+	final private static String LORA_DEVICE_PAYLOAD_ERROR = "LoRa device payload decoding error";
 
 	private Map<String, CodecProxy> codecInstances = new HashMap<>();
 
@@ -110,8 +120,19 @@ public class CodecManager {
 			if (codec != null) {
 				String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get().toCumulocityCredentials().getAuthenticationString();
 				codec.setAuthentication(authentication);
-				codec.decode(new Decode(event));
-				eventRepresentation.setProperty("processed", true);
+				Result<String> result = codec.decode(new Decode(event));
+				if (result.isSuccess()) {
+					eventRepresentation.setProperty("processed", true);
+				} else {
+					eventRepresentation.setProperty("processed", false);
+					AlarmRepresentation alarm = new AlarmRepresentation();
+					alarm.setSource(mor);
+					alarm.setType(LORA_DEVICE_PAYLOAD_ERROR);
+					alarm.setText(result.getMessage());
+					alarm.setDateTime(new DateTime());
+					alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
+					alarmApi.create(alarm);
+				}
 			} else {
 				eventRepresentation.setProperty("processed", false);
 				logger.error("Codec {} does not exist.", mor.getProperty("codec"));
@@ -124,7 +145,7 @@ public class CodecManager {
 	}
 	
 	public DownlinkData encode(String devEui, OperationRepresentation operation) {
-		DownlinkData result = null;
+		DownlinkData data = null;
 		ManagedObjectRepresentation mor = inventoryApi.get(operation.getDeviceId());
 		if (mor.hasProperty("codec")) {
 			logger.info("Codec {} will be used with device {} for encoding operation {}", mor.getProperty("codec"), devEui, operation.toJSON());
@@ -133,11 +154,22 @@ public class CodecManager {
 				String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get().toCumulocityCredentials().getAuthenticationString();
 				codec.setAuthentication(authentication);
 				Hardware hardware = mor.get(Hardware.class);
-				result = codec.encode(new Encode(devEui, operation.get(Command.class).getText(), hardware != null ? hardware.getModel() : null));
-				if (result != null) {
-					logger.info("Result of command \"{}\" is payload {}", operation.get(Command.class).getText(), result.getPayload());
+				Result<DownlinkData> result = codec.encode(new Encode(devEui, operation.get(Command.class).getText(), hardware != null ? hardware.getModel() : null));
+				if (result.isSuccess()) {
+					if (result.getResponse() != null) {
+						logger.info("Result of command \"{}\" is payload {}", operation.get(Command.class).getText(), result.getResponse().getPayload());
+					} else {
+						logger.info("Result of command \"{}\" is empty", operation.get(Command.class).getText());
+					}
+					data = result.getResponse();
 				} else {
-					logger.info("Result of command \"{}\" is empty", operation.get(Command.class).getText());
+					AlarmRepresentation alarm = new AlarmRepresentation();
+					alarm.setSource(mor);
+					alarm.setType(LORA_DEVICE_COMMAND_ERROR);
+					alarm.setText(result.getMessage());
+					alarm.setDateTime(new DateTime());
+					alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
+					alarmApi.create(alarm);
 				}
 			} else {
 				logger.error("Codec {} does not exist.", mor.getProperty("codec"));
@@ -145,7 +177,7 @@ public class CodecManager {
 		} else {
         	logger.info("Device has no codec information. Operation will be processed when Codec will be provided.");
 		}
-		return result;
+		return data;
 	}
 	
 	public Map<String, DeviceOperationParam> getAvailableOperations(ManagedObjectRepresentation mor) {
