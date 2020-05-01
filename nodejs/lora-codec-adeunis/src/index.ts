@@ -39,17 +39,17 @@ class AdeunisCodec extends DeviceCodec {
         console.log(result);
         if (result.temperatures) {
             result.temperatures.forEach(t => {
-                c8yData.addMeasurement(mo, "Temperatures", t.name, t.unit, t.value, new Date());
+                c8yData.addMeasurement(mo, "Temperatures", t.name, t.unit, t.value, time);
             })
         }
         if (result.temperature) {
-            c8yData.addMeasurement(mo, "c8y_TemperatureMeasurement", "T", result.temperature.unit, result.temperature.values[0], new Date());
+            c8yData.addMeasurement(mo, "c8y_TemperatureMeasurement", "T", result.temperature.unit, result.temperature.values[0], time);
         }
         if (result.humidity) {
-            c8yData.addMeasurement(mo, "Humidity", "H", result.humidity.unit, result.humidity.values[0], new Date());
+            c8yData.addMeasurement(mo, "Humidity", "H", result.humidity.unit, result.humidity.values[0], time);
         }
         if (result.counterValues) {
-            c8yData.addMeasurements(mo, "Pulse", ["Channel A", "Channel B"], ["", ""], [result.counterValues[0], result.counterValues[1]], new Date());
+            c8yData.addMeasurements(mo, "Pulse", ["Channel A", "Channel B"], ["", ""], [result.counterValues[0], result.counterValues[1]], time);
         }
         if (result.type && result.type.includes("configuration")) {
             mo["c8y_Configuration"] = JSON.stringify(result);

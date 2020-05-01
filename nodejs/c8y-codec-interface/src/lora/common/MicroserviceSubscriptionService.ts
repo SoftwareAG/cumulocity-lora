@@ -24,22 +24,24 @@ export class MicroserviceSubscriptionService extends EventEmitter {
             let allUsers = await result.json();
             let newUsers: Map<string, { tenant: string, name: string, password: string }> = new Map<string, { tenant: string, name: string, password: string }>();
             let newClients: Map<string, Client> = new Map<string, Client>();
-            allUsers.users.forEach(user => {
-                if (!(Array.from(this.clients.keys()).includes(user.tenant))) {
-                    const auth = new BasicAuth({
-                        user: user.name,
-                        password: user.password,
-                        tenant: user.tenant
-                    });
-                    let client: Client = new Client(auth, this.baseUrl);
-                    newClients.set(user.tenant, client);
-
-                    this.emit('newMicroserviceSubscription', client);
-                    newUsers.set(user.tenant, user);
-                } else {
-                    newClients.set(user.tenant, this.clients.get(user.tenant));
-                }
-            });
+            if (allUsers) {
+                allUsers.users.forEach(user => {
+                    if (!(Array.from(this.clients.keys()).includes(user.tenant))) {
+                        const auth = new BasicAuth({
+                            user: user.name,
+                            password: user.password,
+                            tenant: user.tenant
+                        });
+                        let client: Client = new Client(auth, this.baseUrl);
+                        newClients.set(user.tenant, client);
+    
+                        this.emit('newMicroserviceSubscription', client);
+                        newUsers.set(user.tenant, user);
+                    } else {
+                        newClients.set(user.tenant, this.clients.get(user.tenant));
+                    }
+                });
+            }
             this.clients = newClients;
         }).catch(e => {
             console.log(e);

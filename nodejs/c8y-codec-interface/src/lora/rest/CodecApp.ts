@@ -10,16 +10,14 @@ export class CodecApp {
   constructor(codec: DeviceCodec) {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
-    this.app.post("/decode", (req: Request, res: Response, next: express.NextFunction) => {
-      console.log(req.body);
+    this.app.post("/decode", async (req: Request, res: Response, next: express.NextFunction) => {
       let decode: Decode = req.body;
-      console.log(decode);
-      res.json(codec.decode(this.subscriptionService.getClient(req), decode));
+      res.json(await codec.decode(this.subscriptionService.getClient(req), decode));
     })
     
-    this.app.post("/encode", (req: Request, res: Response, next: express.NextFunction) => {
+    this.app.post("/encode", async (req: Request, res: Response, next: express.NextFunction) => {
       let encode: Encode = req.body;
-      res.json(codec.encode(this.subscriptionService.getClient(req), encode));
+      res.json(await codec.encode(this.subscriptionService.getClient(req), encode));
     })
     
     this.app.get("/models", (req: Request, res: Response, next: express.NextFunction) => {

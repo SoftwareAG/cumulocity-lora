@@ -6,6 +6,7 @@ import { MicroserviceSubscriptionService } from '../common/MicroserviceSubscript
 import { Decode } from './Decode';
 import { Encode } from './Encode';
 import { DeviceOperation } from './DeviceOperation';
+import { Result } from './Result';
 
 export abstract class DeviceCodec implements Component {
     abstract getId(): string;
@@ -21,38 +22,52 @@ export abstract class DeviceCodec implements Component {
     abstract askDeviceConfig(devEui: string): DownlinkData;
     abstract getAvailableOperations(model: string): Map<string, DeviceOperation>;
 
-    async decode(client: Client, decode: Decode) {
-        console.log("decode: " + decode);
-        let mor: IManagedObject = await this.getDevice(client, decode.deveui);
-        let c8yData: C8YData = this._decode(mor, decode.model, decode.fPort, decode.time, decode.payload);
-        console.log(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`);
-        this.processData(client, c8yData);
+    async decode(client: Client, decode: Decode): Promise<Result<string>> {
+        let result: Result<string>;
+        try {
+            console.log(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`);
+            let mor: IManagedObject = await this.getDevice(client, decode.deveui);
+            let c8yData: C8YData = this._decode(mor, decode.model, decode.fPort, decode.time, decode.payload);
+            this.processData(client, c8yData);
+            result = {success: true, message: `Successfully processed payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`, response: "OK"};
+        } catch(e) {
+            result = {success: false, message: e.message, response: null};
+        }
+        return result;
     }
 
-    async encode(client: Client, encode: Encode): Promise<DownlinkData> {
-        let data: DownlinkData = null;
-        let mor: IManagedObject = await this.getDevice(client, encode.devEui);
+    async encode(client: Client, encode: Encode): Promise<Result<DownlinkData>> {
+        let result: Result<DownlinkData>;
+        try {
+            let data: DownlinkData = null;
+            let mor: IManagedObject = await this.getDevice(client, encode.devEui);
 
-        console.log(`Processing operation ${encode.operation} for device ${encode.devEui}`);
+            console.log(`Processing operation ${encode.operation} for device ${encode.devEui}`);
 
-        if (encode.operation.startsWith("raw ")) {
-            let tokens: string[] = encode.operation.split(" ");
-            data = {
-                devEui: encode.devEui,
-                fport: parseInt(tokens[1]),
-                payload: tokens[2]
-            };
-        } else if (encode.operation === "get config") {
-            data = this.askDeviceConfig(encode.devEui);
-        } else {
-            data = this._encode(mor, encode.model, encode.operation);
-            if (data) {
-                data.devEui = encode.devEui;
+            if (encode.operation.startsWith("raw ")) {
+                let tokens: string[] = encode.operation.split(" ");
+                data = {
+                    devEui: encode.devEui,
+                    fport: parseInt(tokens[1]),
+                    payload: tokens[2]
+                };
+            } else if (encode.operation.includes("get config")) {
+                data = this.askDeviceConfig(encode.devEui);
+            } else {
+                data = this._encode(mor, encode.model, encode.operation);
+                if (data) {
+                    data.devEui = encode.devEui;
+                }
             }
+            console.log(`Will send to LNS ${data.payload} on port ${data.fport}`);
+            result = {success: true, message: `Successfully processed ${encode.operation} for device ${encode.devEui}`, response: data};
+        } catch(e) {
+            result = {success: false, message: e.message, response: null};
         }
-        console.log(`Will send to LNS ${data}`);
 
-        return data;
+        console.log(result);
+
+        return result;
     }
 
     constructor(subscriptionService: MicroserviceSubscriptionService) {
