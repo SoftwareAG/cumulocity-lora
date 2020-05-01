@@ -23,14 +23,12 @@ import com.google.common.io.BaseEncoding;
 
 import c8y.Hardware;
 import lora.ns.DeviceData;
-import lora.ns.LNSInstance;
-import lora.ns.LNSInstanceRepresentation;
 import lora.ns.LNSInstanceWizardStep;
 import lora.ns.LNSProxy;
 import lora.ns.objenious.rest.Profile;
 
 @Service
-public class Objenious extends LNSProxy {
+public class Objenious extends LNSProxy<Instance> {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -237,11 +235,6 @@ public class Objenious extends LNSProxy {
 	@Override
 	public String getVersion() {
 		return "1.0";
-	}
-
-	@Override
-	protected LNSInstance getInstance(LNSInstanceRepresentation instance) {
-		return new Instance(instance);
 	}
 
 	@Override
