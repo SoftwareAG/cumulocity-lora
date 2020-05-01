@@ -363,8 +363,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 
 	@Override
 	public List<String> getModels() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<String>();
 	}
 
 	@Override
