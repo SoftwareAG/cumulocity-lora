@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +18,7 @@ import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DownlinkData;
 import lora.codec.Encode;
+import lora.codec.Result;
 
 @RestController
 public class CodecRestController {
@@ -29,15 +29,15 @@ public class CodecRestController {
     final Logger logger = LoggerFactory.getLogger(CodecRestController.class);
 
     @PostMapping(value = "/encode", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DownlinkData> encode(@RequestBody Encode encode) {
-        return ResponseEntity.ok(deviceCodec.encode(encode));
+    public Result<DownlinkData> encode(@RequestBody Encode encode) {
+    	logger.info("Will encode {} with codec {}", encode.getOperation(), deviceCodec.getName());
+        return deviceCodec.encode(encode);
     }
 
     @PostMapping(value = "/decode", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> decode(@RequestBody Decode decode) {
+    public Result<String> decode(@RequestBody Decode decode) {
     	logger.info("Will decode {} with codec {}", decode.getPayload(), deviceCodec.getName());
-        deviceCodec.decode(decode);
-        return ResponseEntity.ok().build();
+        return deviceCodec.decode(decode);
     }
     
     @GetMapping(value = "/models", produces = MediaType.APPLICATION_JSON_VALUE)
