@@ -22,8 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
 import lora.ns.DeviceData;
-import lora.ns.LNSInstance;
-import lora.ns.LNSInstanceRepresentation;
 import lora.ns.LNSInstanceWizardInitialStep;
 import lora.ns.LNSInstanceWizardStep;
 import lora.ns.LNSProxy;
@@ -31,7 +29,7 @@ import lora.ns.PropertyDescription;
 import lora.ns.PropertyDescription.PropertyType;
 
 @Service
-public class Kerlink extends LNSProxy {
+public class Kerlink extends LNSProxy<Instance> {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -158,11 +156,6 @@ public class Kerlink extends LNSProxy {
 	@Override
 	public String getVersion() {
 		return "3.1";
-	}
-
-	@Override
-	protected LNSInstance getInstance(LNSInstanceRepresentation instance) {
-		return new Instance(instance);
 	}
 
 	@Override
