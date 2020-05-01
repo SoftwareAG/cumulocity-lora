@@ -14,7 +14,6 @@
 		<module>lora-codec-ms</module>
 		<module>lora-ns-ms</module>
 		<module>lora-codec-cayennelpp</module>
-		<module>lora-codec-adeunis</module>
 		<module>lora-codec-nke</module>
 		<module>lora-codec-pyrescom-classair</module>
 		<module>lora-codec-senlab</module>
