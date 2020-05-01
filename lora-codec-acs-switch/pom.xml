@@ -24,11 +24,6 @@
 			<version>5.1.0</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.jruby</groupId>
-			<artifactId>jruby-complete</artifactId>
-			<version>9.2.9.0</version>
-		</dependency>
 	</dependencies>
 
 	<build>
