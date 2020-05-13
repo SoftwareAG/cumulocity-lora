@@ -9,6 +9,8 @@ import lora.codec.DownlinkData;
 
 public interface LNSInstance {
 	String getId();
+	String getType();
+	String getName();
 	List<EndDevice> getDevices();
 	void setProperties(Properties properties);
 	Properties getProperties();

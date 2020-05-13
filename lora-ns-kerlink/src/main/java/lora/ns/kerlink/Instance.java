@@ -2,6 +2,7 @@ package lora.ns.kerlink;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +27,6 @@ import lora.codec.DownlinkData;
 import lora.ns.ALNSInstance;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
-import lora.ns.LNSInstanceRepresentation;
 import lora.ns.kerlink.dto.ClusterDto;
 import lora.ns.kerlink.dto.CustomerDto;
 import lora.ns.kerlink.dto.EndDeviceDto;
@@ -52,13 +53,12 @@ public class Instance extends ALNSInstance {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	public Instance(LNSInstanceRepresentation instance) {
+	public Instance(Properties properties) {
+		super(properties);
+	}
+	
+	public Instance(ManagedObjectRepresentation instance) {
 		super(instance);
-		this.clusterId = properties.getProperty(CLUSTER_ID);
-		this.baseUrl = properties.getProperty(BASE_URL);
-		this.username = properties.getProperty(USERNAME);
-		this.password = properties.getProperty(PASSWORD);
-		logger.info("baseUrl: {}", baseUrl);
 	}
 	
 	private void login() {
@@ -158,8 +158,11 @@ public class Instance extends ALNSInstance {
 
 	@Override
 	protected void init() {
-		// TODO Auto-generated method stub
-		
+		this.clusterId = properties.getProperty(CLUSTER_ID);
+		this.baseUrl = properties.getProperty(BASE_URL);
+		this.username = properties.getProperty(USERNAME);
+		this.password = properties.getProperty(PASSWORD);
+		logger.info("baseUrl: {}", baseUrl);
 	}
 
 	@Override
@@ -167,13 +170,14 @@ public class Instance extends ALNSInstance {
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
+		String routingName = tenant + "-" + this.getId();
 		PushConfigurationDto currentPushConfigurationDto = null;
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
 		RestTemplate restTemplate = new RestTemplate();
 		PaginatedDto<PushConfigurationDto> pushConfigurationDtos = restTemplate.exchange(baseUrl + "/pushConfigurations", HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<PushConfigurationDto>>(){}).getBody();
 		for (PushConfigurationDto pushConfigurationDto : pushConfigurationDtos.getList()) {
-			if (pushConfigurationDto.getName().equals(this.getId())) {
+			if (pushConfigurationDto.getName().equals(routingName)) {
 				currentPushConfigurationDto = pushConfigurationDto;
 			}
 		}
@@ -206,7 +210,7 @@ public class Instance extends ALNSInstance {
 //				configId = null;
 //			}
 		if (currentPushConfigurationDto == null) {
-			currentPushConfigurationDto = new PushConfigurationDto(new CustomerDto(customerId), this.getId(), PushConfigurationType.HTTP, PushConfigurationMSgDetailLevel.NETWORK, new PushConfigurationHeaderDto[] {new PushConfigurationHeaderDto("Content-Type", "application/json")}, "/downlink", "/uplink", url, tenant+"/"+login, password);
+			currentPushConfigurationDto = new PushConfigurationDto(new CustomerDto(customerId), routingName, PushConfigurationType.HTTP, PushConfigurationMSgDetailLevel.NETWORK, new PushConfigurationHeaderDto[] {new PushConfigurationHeaderDto("Content-Type", "application/json")}, "/downlink", "/uplink", url, tenant+"/"+login, password);
 			logger.info("Will create a new push configuration: {}", currentPushConfigurationDto.toString());
 			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 			List<MediaType> mediaTypes = new ArrayList<MediaType>();

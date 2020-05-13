@@ -31,7 +31,7 @@ import lora.ns.LNSProxy;
 public class LNSRestController {
 
 	@Autowired
-	private LNSProxy lnsProxy;
+	private LNSProxy<?> lnsProxy;
 
 	final Logger logger = LoggerFactory.getLogger(LNSRestController.class);
 

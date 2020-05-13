@@ -21,5 +21,8 @@
     "ROLE_MEASUREMENT_ADMIN"
   ],
   "roles":[
-  ]
+  ],
+  "resources": {
+  	"memory": "1024M"
+  }
 }

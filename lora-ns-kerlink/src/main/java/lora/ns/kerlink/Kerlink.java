@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
 import lora.ns.DeviceData;
-import lora.ns.LNSInstanceWizardInitialStep;
 import lora.ns.LNSInstanceWizardStep;
 import lora.ns.LNSProxy;
 import lora.ns.PropertyDescription;
@@ -37,11 +36,22 @@ public class Kerlink extends LNSProxy<Instance> {
 	
 	LinkedList<LNSInstanceWizardStep> wizard = new LinkedList<LNSInstanceWizardStep>();
 	{
-		wizard.add(new LNSInstanceWizardInitialStep() {
+		wizard.add(new LNSInstanceWizardStep() {
+			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 			{
 				propertyDescriptions.add(new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.STRING));
 				propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.STRING));
 				propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD));
+			}
+
+			@Override
+			public String getName() {
+				return "Configure LNS access";
+			}
+
+			@Override
+			public LinkedList<PropertyDescription> getPropertyDescriptions() {
+				return propertyDescriptions;
 			}
 		});
 		wizard.add(new LNSInstanceWizardStep() {

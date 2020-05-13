@@ -4,19 +4,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
 
 import lora.codec.DownlinkData;
 import lora.ns.ALNSInstance;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
-import lora.ns.LNSInstanceRepresentation;
 import lora.ns.objenious.rest.Device;
 import lora.ns.objenious.rest.DeviceCreate;
 import lora.ns.objenious.rest.DownlinkCreate;
@@ -69,7 +70,11 @@ public class Instance extends ALNSInstance {
 
 	}
 	
-	public Instance(LNSInstanceRepresentation instance) {
+	public Instance(Properties properties) {
+		super(properties);
+	}
+	
+	public Instance(ManagedObjectRepresentation instance) {
 		super(instance);
 	}
 
@@ -236,8 +241,8 @@ public class Instance extends ALNSInstance {
 	@Override
 	public void configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
-		configureRouting(url + "/downlink", tenant, login, password, this.getId() + "-downlink", MessageTypeEnum.DOWNLINK);
-		configureRouting(url + "/uplink", tenant, login, password, this.getId() + "-uplink", MessageTypeEnum.UPLINK);
+		configureRouting(url + "/downlink", tenant, login, password, tenant + "-" + this.getId() + "-downlink", MessageTypeEnum.DOWNLINK);
+		configureRouting(url + "/uplink", tenant, login, password, tenant + "-" + this.getId() + "-uplink", MessageTypeEnum.UPLINK);
 	}
 	
 	private void removeRouting(String name) {

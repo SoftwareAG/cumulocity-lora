@@ -6,7 +6,6 @@ public class LoraCommand {
 	public LoraCommand() {}
 	
 	public LoraCommand(String id) {
-		super();
 		this.id = id;
 	}
 

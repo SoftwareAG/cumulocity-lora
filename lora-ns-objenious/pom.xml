@@ -20,7 +20,6 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.1.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -30,7 +29,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot-dependencies.version}</version>
 				<executions>
 					<execution>
 						<goals>
