@@ -117,7 +117,7 @@ public class LansitecCodec extends DeviceCodec {
 	enum TYPE {
 		REGISTER((byte) 0x10) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, Beacon beacon, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
 				String adr = (type & 8) != 0 ? "ON" : "OFF";
 				MODE mode = MODE.BY_MODE.get((byte) (type & 0x7));
 				byte smode = buffer.get();
@@ -144,7 +144,7 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		HEARTBEAT((byte) 0x20) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, Beacon beacon, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
 				long vol = buffer.get();
 				long rssi = -buffer.get();
 				long snr = buffer.getShort();
@@ -164,7 +164,7 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		PERIODICAL_POSITION((byte) 0x30) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, Beacon beacon, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
 				float lng = buffer.getFloat();
 				float lat = buffer.getFloat();
 				long time = buffer.getInt() * 1000L;
@@ -184,7 +184,7 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		ON_DEMAND_POSITION((byte) 0x40) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, Beacon beacon, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
 				buffer.get();
 				float lng = buffer.getFloat();
 				float lat = buffer.getFloat();
@@ -205,23 +205,25 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		HISTORY_POSITION((byte) 0x50) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, Beacon beacon, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
 				// TODO Auto-generated method stub
 
 			}
 		},
 		ALARM((byte) 0x60) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, Beacon beacon, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
 				// TODO Auto-generated method stub
 
 			}
 		},
 		BLE_COORDINATE((byte) 0x70) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, Beacon beacon, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+				Beacon beacon = null;
 				byte move = buffer.get();
 				buffer.getInt();
+				boolean beaconChanged = false;
 				while (buffer.hasRemaining()) {
 					short major = buffer.getShort();
 					short minor = buffer.getShort();
@@ -232,21 +234,26 @@ public class LansitecCodec extends DeviceCodec {
 						if (beacon.getMajor().equals(newBeacon.getMajor()) && beacon.getMinor().equals(newBeacon.getMinor()) || newBeacon.getRssi() > beacon.getRssi()) {
 							mor.set(newBeacon);
 							c8yData.setMorToUpdate(mor);
-							c8yData.addEvent(mor, "Nearest beacon changed", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", newBeacon.getMajor(), newBeacon.getMinor(), newBeacon.getRssi()), null, updateTime);
+							beaconChanged = true;
 							beacon = newBeacon;
 						}
 					} else {
 						mor.set(newBeacon);
 						c8yData.setMorToUpdate(mor);
-						c8yData.addEvent(mor, "Nearest beacon changed", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", newBeacon.getMajor(), newBeacon.getMinor(), newBeacon.getRssi()), null, updateTime);
+						beaconChanged = true;
 						beacon = newBeacon;
 					}
+					if (beaconChanged) {
+						c8yData.addEvent(mor, "Nearest beacon changed", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", beacon.getMajor(), beacon.getMinor(), beacon.getRssi()), null, updateTime);
+					}
+					c8yData.addMeasurement(mor, "Max rssi", "rssi", "dBm", BigDecimal.valueOf(beacon.getRssi()), updateTime);
+					c8yData.addMeasurement(mor, String.format("%04X", major) + " - " + String.format("%04X", minor), "rssi", "dBm", BigDecimal.valueOf(rssi), updateTime);
 				}
 			}
 		},
 		ACKNOWLEDGE((byte) 0xF0) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, Beacon beacon, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
 				mor.set(new Configuration("Configuration requested..."));
 				c8yData.setMorToUpdate(mor);
 			}
@@ -265,7 +272,7 @@ public class LansitecCodec extends DeviceCodec {
 			}
 		}
 
-		public abstract void process(ManagedObjectRepresentation mor, Beacon beacon, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime);
+		public abstract void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime);
 
 	}
 
@@ -295,11 +302,7 @@ public class LansitecCodec extends DeviceCodec {
 			byte type = buffer.get();
 			TYPE t = TYPE.BY_VALUE.get((byte) (type & 0xf0));
 			logger.info("Frame type: {}", t.name());
-			if (t == TYPE.BLE_COORDINATE) {
-				t.process(mor, inventoryApi.get(mor.getId()).get(Beacon.class), type, buffer, c8yData, updateTime);
-			} else {
-				t.process(mor, null, type, buffer, c8yData, updateTime);
-			}
+			t.process(mor, type, buffer, c8yData, updateTime);
 		}
 
 		return c8yData;
