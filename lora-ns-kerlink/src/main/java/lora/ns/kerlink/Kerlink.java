@@ -16,16 +16,16 @@ import org.springframework.stereotype.Service;
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
-import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
 import lora.ns.DeviceData;
-import lora.ns.LNSInstanceWizardStep;
 import lora.ns.LNSProxy;
-import lora.ns.PropertyDescription;
-import lora.ns.PropertyDescription.PropertyType;
+import lora.ns.OperationData;
+import lora.ns.connector.LNSInstanceWizardStep;
+import lora.ns.connector.PropertyDescription;
+import lora.ns.connector.PropertyDescription.PropertyType;
 
 @Service
 public class Kerlink extends LNSProxy<Instance> {
@@ -39,8 +39,8 @@ public class Kerlink extends LNSProxy<Instance> {
 		wizard.add(new LNSInstanceWizardStep() {
 			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 			{
-				propertyDescriptions.add(new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.STRING));
-				propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.STRING));
+				propertyDescriptions.add(new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.TEXT));
+				propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.TEXT));
 				propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD));
 			}
 
@@ -73,15 +73,15 @@ public class Kerlink extends LNSProxy<Instance> {
 	}
 	
 	
-	private Map<String, String> statusMap = new HashMap<>();
+	private Map<String, OperationStatus> statusMap = new HashMap<>();
 	{
-		statusMap.put("OK", OperationStatus.SUCCESSFUL.toString());
-		statusMap.put("IN_PROGRESS", OperationStatus.EXECUTING.toString());
-		statusMap.put("KO", OperationStatus.FAILED.toString());
+		statusMap.put("OK", OperationStatus.SUCCESSFUL);
+		statusMap.put("IN_PROGRESS", OperationStatus.EXECUTING);
+		statusMap.put("KO", OperationStatus.FAILED);
 	}
 
 	@Override
-	public DeviceData extractLNSInfo(String event, String lnsInstanceId) {
+	public DeviceData processUplinkEvent(String event) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode rootNode = mapper.readTree(event);
@@ -92,7 +92,6 @@ public class Kerlink extends LNSProxy<Instance> {
             logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
             byte[] payload = BaseEncoding.base16().decode(rootNode.get("payload").asText().toUpperCase());
             Long updateTime = rootNode.get("recvTime").asLong();
-            String model = null;
             logger.info("Update time is: " + updateTime);
 
             List<MeasurementRepresentation> measurements = new ArrayList<>();
@@ -111,7 +110,7 @@ public class Kerlink extends LNSProxy<Instance> {
     		m.setDateTime(new DateTime(updateTime));
     		measurements.add(m);
 
-    		return new DeviceData(null, deviceEui, model, fPort, payload, updateTime, measurements, null, null);
+    		return new DeviceData(null, deviceEui, null, null, fPort, payload, updateTime, measurements, null, null);
         } catch (Exception e) {
             logger.error("Error on Mapping LoRa payload to Cumulocity", e);
         }
@@ -119,21 +118,20 @@ public class Kerlink extends LNSProxy<Instance> {
 	}
 
 	@Override
-	public OperationRepresentation getOperation(String event) {
-		OperationRepresentation operation = null;
+	public OperationData processDownlinkEvent(String event) {
+		OperationData data = new OperationData();
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			JsonNode rootNode = mapper.readTree(event);
-			logger.info("List of pending operations: {}", operations);
-			operation = operations.get(rootNode.get("dataDownId").asText());
-			logger.info("Operation found: {}", operation);
-			if (operation != null) {
-				operation.setStatus(statusMap.get(rootNode.get("status").asText()));
+			data.setCommandId(rootNode.get("dataDownId").asText());
+			data.setStatus(statusMap.get(rootNode.get("status").asText()));
+			if (data.getStatus() == OperationStatus.FAILED) {
+				data.setErrorMessage("Error");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return operation;
+		return data;
 	}
 	
 	@Override
@@ -142,7 +140,6 @@ public class Kerlink extends LNSProxy<Instance> {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			JsonNode rootNode = mapper.readTree(eventString);
-			logger.info("List of pending operations: {}", operations);
 			JsonNode op = rootNode.get("dataDownId");
 			if (op != null) {
 				result = true;

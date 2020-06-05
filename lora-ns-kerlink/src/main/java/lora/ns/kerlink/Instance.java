@@ -24,9 +24,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lora.codec.DownlinkData;
-import lora.ns.ALNSInstance;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
+import lora.ns.connector.ALNSInstance;
 import lora.ns.kerlink.dto.ClusterDto;
 import lora.ns.kerlink.dto.CustomerDto;
 import lora.ns.kerlink.dto.EndDeviceDto;
