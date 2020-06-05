@@ -1,6 +1,5 @@
 package lora.ns;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -18,21 +17,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
-import com.cumulocity.model.Agent;
 import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.model.idtype.GId;
 import com.cumulocity.model.operation.OperationStatus;
@@ -46,7 +37,6 @@ import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.cumulocity.rest.representation.tenant.OptionRepresentation;
 import com.cumulocity.sdk.client.Param;
 import com.cumulocity.sdk.client.QueryParam;
-import com.cumulocity.sdk.client.SDKException;
 import com.cumulocity.sdk.client.alarm.AlarmApi;
 import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
 import com.cumulocity.sdk.client.devicecontrol.OperationCollection;
@@ -59,83 +49,85 @@ import com.cumulocity.sdk.client.inventory.InventoryFilter;
 import com.cumulocity.sdk.client.inventory.ManagedObject;
 import com.cumulocity.sdk.client.inventory.ManagedObjectCollection;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
-import com.cumulocity.sdk.client.notification.Subscription;
-import com.cumulocity.sdk.client.notification.SubscriptionListener;
 import com.cumulocity.sdk.client.option.TenantOptionApi;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import c8y.Command;
-import c8y.Configuration;
-import c8y.Hardware;
-import c8y.IsDevice;
 import c8y.LpwanDevice;
-import c8y.Position;
-import c8y.RequiredAvailability;
-import c8y.SupportedOperations;
 import lora.codec.C8YData;
-import lora.codec.DeviceCodecRepresentation;
 import lora.codec.DownlinkData;
 import lora.codec.ms.CodecManager;
 import lora.common.C8YUtils;
 import lora.common.Component;
+import lora.ns.connector.LNSInstance;
+import lora.ns.connector.LNSInstanceRepresentation;
+import lora.ns.connector.LNSInstanceWizardStep;
+import lora.ns.device.LNSDeviceManager;
+import lora.ns.operation.LNSOperationManager;
 
 @EnableScheduling
 public abstract class LNSProxy<I extends LNSInstance> implements Component {
-	private static final String LNS_EXT_ID = "LoRa Network Server type ID";
+	public static final String LNS_EXT_ID = "LoRa Network Server type ID";
 
-	private static final String LNS_TYPE = "LoRa Network Server type";
+	public static final String LNS_TYPE = "LoRa Network Server type";
 
 	public static final String LNS_ID = "lnsId";
 
-	private static final String LNS_INSTANCE_REF = "lnsInstanceId";
+	public static final String LNS_INSTANCE_REF = "lnsInstanceId";
 
-	private static final String DEVEUI_TYPE = "LoRa devEUI";
+	public static final String DEVEUI_TYPE = "LoRa devEUI";
 
-	private static final String LNS_INSTANCE_TYPE = "LNS Instance";
-
-	@Autowired
-	protected C8YUtils c8yUtils;
+	public static final String LNS_INSTANCE_TYPE = "LNS Instance";
 
 	@Autowired
-	protected InventoryApi inventoryApi;
+	private C8YUtils c8yUtils;
 
 	@Autowired
-	protected IdentityApi identityApi;
+	private InventoryApi inventoryApi;
 
 	@Autowired
-	protected MeasurementApi measurementApi;
+	private IdentityApi identityApi;
 
 	@Autowired
-	protected EventApi eventApi;
+	private MeasurementApi measurementApi;
 
 	@Autowired
-	protected AlarmApi alarmApi;
+	private EventApi eventApi;
 
 	@Autowired
-	protected DeviceControlApi deviceControlApi;
+	private AlarmApi alarmApi;
 
 	@Autowired
-	protected MicroserviceSubscriptionsService subscriptionsService;
+	private DeviceControlApi deviceControlApi;
+
+	@Autowired
+	private MicroserviceSubscriptionsService subscriptionsService;
 
 	@Autowired
 	private CodecManager codecManager;
 
 	@Autowired
 	private TenantOptionApi tenantOptionApi;
+	
+	@Autowired
+	private LNSDeviceManager lnsDeviceManager;
+	
+	@Autowired
+	private AgentService agentService;
+	
+	@Autowired
+	private LNSOperationManager lnsOperationManager;
 
-	private Map<String, ManagedObjectRepresentation> agents = new HashMap<String, ManagedObjectRepresentation>();
+	private Map<String, Map<String, LNSInstance>> instances = new HashMap<>();
 
-	protected Map<String, Map<String, LNSInstance>> instances = new HashMap<>();
-
-	protected Map<String, OperationRepresentation> operations = new HashMap<>();
+	//protected Map<String, OperationRepresentation> operations = new HashMap<>();
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public abstract LinkedList<LNSInstanceWizardStep> getInstanceWizard();
 
-	public abstract DeviceData extractLNSInfo(String eventString, String lnsInstanceId);
+	public abstract DeviceData processUplinkEvent(String eventString);
 
-	protected abstract OperationRepresentation getOperation(String eventString);
+	public abstract OperationData processDownlinkEvent(String eventString);
 
 	public abstract boolean isOperationUpdate(String eventString);
 
@@ -160,7 +152,8 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 	@EventListener
 	private void init(MicroserviceSubscriptionAddedEvent event) {
 		getAllLNSInstances(event);
-		registerLNSProxy();
+		//registerLNSProxy();
+		agentService.registerAgent(this);
 	}
 
 	private void getAllLNSInstances(MicroserviceSubscriptionAddedEvent event) {
@@ -194,178 +187,13 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 		}
 	}
 
-	private void registerLNSProxy() {
-		ExternalIDRepresentation id = c8yUtils.findExternalId(this.getId(), LNS_EXT_ID);
-		ManagedObjectRepresentation agent = null;
-		if (id == null) {
-			agent = new ManagedObjectRepresentation();
-			agent.setType(LNS_TYPE);
-			agent.setName(getName());
-			agent.setProperty("version", getVersion());
-			agent.setProperty(LNS_ID, this.getId());
-			agent.set(new RequiredAvailability(5));
-			agent.set(new Agent());
-			agent.set(new IsDevice());
-			agent = inventoryApi.create(agent);
-
-			id = new ExternalIDRepresentation();
-			id.setExternalId(this.getId());
-			id.setType(LNS_EXT_ID);
-			id.setManagedObject(agent);
-			identityApi.create(id);
-		} else {
-			agent = inventoryApi.get(id.getManagedObject().getId());
-			agent.setLastUpdatedDateTime(null);
-			agent.setName(getName());
-			agent.setProperty("version", getVersion());
-			agent.setProperty(LNS_ID, this.getId());
-			agent.set(new RequiredAvailability(5));
-			if (agent.get(Agent.class) == null) {
-				agent.set(new Agent());
-			}
-			if (agent.get(IsDevice.class) == null) {
-				agent.set(new IsDevice());
-			}
-			inventoryApi.update(agent);
-		}
-		agents.put(subscriptionsService.getTenant(), agent);
-		deviceControlApi.getNotificationsSubscriber().subscribe(agent.getId(),
-				new OperationDispatcherSubscriptionListener(subscriptionsService.getTenant()));
-	}
-
 	public void mapEventToC8Y(String eventString, String lnsInstanceId) {
-		DeviceData event = extractLNSInfo(eventString, lnsInstanceId);
+		DeviceData event = processUplinkEvent(eventString);
 		if (instances.containsKey(subscriptionsService.getTenant())
 				&& instances.get(subscriptionsService.getTenant()).containsKey(lnsInstanceId)) {
 			event.setDeviceName(instances.get(subscriptionsService.getTenant()).get(lnsInstanceId)
 					.getDevice(event.getDevEui()).getName());
-			upsertDevice(lnsInstanceId, event);
-		}
-	}
-
-	private void upsertDevice(String lnsInstanceId, DeviceData event) {
-		try {
-			logger.info("Upsert device with devEui {} with Payload {} from fPort {}", event.getDevEui(),
-					event.getPayload(), event.getfPort());
-			ManagedObjectRepresentation mor = getDevice(event.getDevEui());
-			if (mor == null) {
-				mor = createDevice(lnsInstanceId, event.getDeviceName(), event.getDevEui());
-			}
-			mor.setLastUpdatedDateTime(null);
-			if (event.getModel() == null && mor.get(Hardware.class) != null) {
-				event.setModel(mor.get(Hardware.class).getModel());
-			}
-			for (MeasurementRepresentation m : event.getMeasurements()) {
-				m.setSource(mor);
-				measurementApi.create(m);
-			}
-			if (event.getLat() != null && event.getLng() != null) {
-				Position p = new Position();
-				p.setLat(event.getLat());
-				p.setLng(event.getLng());
-				mor.set(p);
-				inventoryApi.update(mor);
-				EventRepresentation locationUpdate = new EventRepresentation();
-				locationUpdate.setSource(mor);
-				locationUpdate.setType("c8y_LocationUpdate");
-				locationUpdate.set(p);
-				locationUpdate.setText("Location updated");
-				locationUpdate.setDateTime(new DateTime());
-				eventApi.create(locationUpdate);
-			}
-			if (!mor.hasProperty(LNS_INSTANCE_REF)) {
-				mor.setProperty(LNS_INSTANCE_REF, lnsInstanceId);
-				inventoryApi.update(mor);
-			}
-			DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
-			if (mor.getProperty("codec") != null
-					&& (codec == null || !codec.getId().equals(mor.getProperty("codec")))) {
-				mor.set(new DeviceCodecRepresentation(codecManager.getCodec(mor.getProperty("codec").toString())));
-				inventoryApi.update(mor);
-			}
-			if (mor.get(LpwanDevice.class) == null || !mor.get(LpwanDevice.class).isProvisioned()) {
-				mor.set(new LpwanDevice().provisioned(true));
-				inventoryApi.update(mor);
-			}
-			ManagedObject agentApi = inventoryApi
-					.getManagedObjectApi(agents.get(subscriptionsService.getTenant()).getId());
-			try {
-				agentApi.getChildDevice(mor.getId());
-			} catch (Exception e) {
-				agentApi.addChildDevice(mor.getId());
-			}
-			if (mor.get(Configuration.class) == null) {
-				getDeviceConfig(mor);
-			}
-			codecManager.decode(mor, event);
-		} catch (SDKException e) {
-			logger.info("Error on upserting Device", e);
-		}
-	}
-
-	private ManagedObjectRepresentation createDevice(String lnsInstanceId, String name, String devEUI) {
-		ManagedObjectRepresentation mor;
-		mor = new ManagedObjectRepresentation();
-		mor.setType("c8y_LoRaDevice");
-		mor.setName(name);
-		mor.setProperty(LNS_INSTANCE_REF, lnsInstanceId);
-		mor.set(new IsDevice());
-		SupportedOperations supportedOperations = new SupportedOperations();
-		supportedOperations.add("c8y_Command");
-		mor.setLastUpdatedDateTime(null);
-		mor.set(supportedOperations);
-		mor = inventoryApi.create(mor);
-		ManagedObject agentApi = inventoryApi.getManagedObjectApi(agents.get(subscriptionsService.getTenant()).getId());
-		agentApi.addChildDevice(mor.getId());
-		c8yUtils.createExternalId(mor, devEUI, DEVEUI_TYPE);
-		return mor;
-	}
-
-	public String getDeviceEui(GId id) {
-		String result = null;
-		ExternalIDCollection extIds = identityApi.getExternalIdsOfGlobalId(id);
-		if (extIds != null) {
-			for (ExternalIDRepresentation extId : extIds.get().allPages()) {
-				if (extId.getType().equals(DEVEUI_TYPE)) {
-					result = extId.getExternalId();
-					logger.info("Device {} matches devEUI {}", id.toString(), result);
-					break;
-				}
-			}
-			if (result == null) {
-				logger.info("Device {} has no external Ids or does not exist in tenant {}.", id.toString(),
-						subscriptionsService.getTenant());
-			}
-		} else {
-			logger.info("Device {} has no external Ids or does not exist in tenant {}.", id.toString(),
-					subscriptionsService.getTenant());
-		}
-		return result;
-	}
-
-	private class OperationDispatcherSubscriptionListener
-			implements SubscriptionListener<GId, OperationRepresentation> {
-
-		public OperationDispatcherSubscriptionListener(String tenant) {
-			this.tenant = tenant;
-		}
-
-		private String tenant;
-
-		@Override
-		public void onError(Subscription<GId> sub, Throwable e) {
-			logger.error("OperationDispatcher error!", e);
-		}
-
-		@Override
-		public void onNotification(Subscription<GId> sub, OperationRepresentation operation) {
-			try {
-				subscriptionsService.runForTenant(tenant, () -> {
-					executePending(operation);
-				});
-			} catch (SDKException e) {
-				logger.error("OperationDispatcher error!", e);
-			}
+			lnsDeviceManager.upsertDevice(lnsInstanceId, event, agentService.getAgent());
 		}
 	}
 
@@ -373,35 +201,25 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 		if (instances.containsKey(subscriptionsService.getTenant())
 				&& instances.get(subscriptionsService.getTenant()).containsKey(lnsInstanceId)) {
 			logger.info("LNS instance {} of type {} is known", lnsInstanceId, getId());
-			OperationRepresentation operation = getOperation(event);
-			if (operation != null) {
+			OperationData data = processDownlinkEvent(event);
+			if (data.getStatus() != OperationStatus.FAILED) {
+				OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId, data.getCommandId());
+            	operation.setStatus(data.getStatus().toString());
 				deviceControlApi.update(operation);
+				if (data.getStatus() == OperationStatus.SUCCESSFUL) {
+					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
+				}
 			} else {
-				logger.error("Could not process incoming event for tenant {}", subscriptionsService.getTenant());
+				if (data.getCommandId() != null) {
+					OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId, data.getCommandId());
+	            	operation.setStatus(OperationStatus.FAILED.toString());
+	            	operation.setFailureReason(data.getErrorMessage());
+					deviceControlApi.update(operation);
+					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
+				} else {
+					logger.error("Unknown operation");
+				}
 			}
-		}
-	}
-
-	@Async
-	private void executePending(OperationRepresentation operation) {
-		logger.info("Will execute operation {}", operation.toJSON());
-		if (getDeviceEui(operation.getDeviceId()) != null) {
-			logger.info("Processing operation {}", operation);
-			DownlinkData encodedData = codecManager.encode(getDeviceEui(operation.getDeviceId()), operation);
-			if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null) {
-				operation.setStatus(OperationStatus.EXECUTING.toString());
-				String lnsInstanceId = inventoryApi.get(operation.getDeviceId()).getProperty(LNS_INSTANCE_REF)
-						.toString();
-				processOperation(lnsInstanceId, encodedData, operation);
-			} else {
-				operation.setStatus(OperationStatus.FAILED.toString());
-				Command command = operation.get(Command.class);
-				command.setResult("Operation not supported.");
-				operation.set(command);
-			}
-			deviceControlApi.update(operation);
-		} else {
-			logger.info("Operation {} will be ignored", operation);
 		}
 	}
 
@@ -410,11 +228,12 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 		if (instances.get(subscriptionsService.getTenant()).get(lnsInstanceId).provisionDevice(deviceProvisioning)) {
 			ExternalIDRepresentation extId = c8yUtils.findExternalId(deviceProvisioning.getDevEUI(), DEVEUI_TYPE);
 			if (extId == null) {
-				mor = createDevice(lnsInstanceId, deviceProvisioning.getName(), deviceProvisioning.getDevEUI());
+				mor = lnsDeviceManager.createDevice(lnsInstanceId, deviceProvisioning.getName(), deviceProvisioning.getDevEUI(), agentService.getAgent());
+				//mor = createDevice(lnsInstanceId, deviceProvisioning.getName(), deviceProvisioning.getDevEUI());
 			} else {
 				mor = extId.getManagedObject();
 				ManagedObject agentApi = inventoryApi
-						.getManagedObjectApi(agents.get(subscriptionsService.getTenant()).getId());
+						.getManagedObjectApi(agentService.getAgent().getId());
 				agentApi.addChildDevice(mor.getId());
 			}
 			mor.set(new LpwanDevice().provisioned(true));
@@ -441,7 +260,7 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 			if (mor != null) {
 				alarm.setSource(mor);
 			} else {
-				alarm.setSource(agents.get(lnsInstanceId));
+				alarm.setSource(agentService.getAgent());
 			}
 			alarmApi.create(alarm);
 		}
@@ -463,29 +282,8 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 		return instances.get(subscriptionsService.getTenant()).get(lnsInstanceId).getDevices();
 	}
 
-	private String getTenantDomain() {
-		String result = null;
-		RestTemplate restTemplate = new RestTemplate();
-		try {
-			HttpHeaders headers = new HttpHeaders();
-			headers.set("Authorization", subscriptionsService.getCredentials(subscriptionsService.getTenant()).get()
-					.toCumulocityCredentials().getAuthenticationString());
-			headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-			result = restTemplate.exchange(System.getenv("C8Y_BASEURL") + "/tenant/currentTenant", HttpMethod.GET,
-					new HttpEntity<String>("", headers), String.class).getBody();
-			ObjectMapper mapper = new ObjectMapper();
-			result = mapper.readTree(result).get("domainName").asText();
-		} catch (HttpClientErrorException e) {
-			e.printStackTrace();
-			logger.error(e.getResponseBodyAsString());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-
 	private void configureRoutings(String lnsInstanceId, MicroserviceCredentials credentials) {
-		String url = "https://" + getTenantDomain() + "/service/lora-ns-" + this.getId() + "/" + lnsInstanceId;
+		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getId() + "/" + lnsInstanceId;
 		instances.get(subscriptionsService.getTenant()).get(lnsInstanceId).configureRoutings(url,
 				subscriptionsService.getTenant(), credentials.getUsername(), credentials.getPassword());
 	}
@@ -519,15 +317,14 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 		return mor;
 	}
 
-	protected void processOperation(String lnsId, DownlinkData operation, OperationRepresentation c8yOperation) {
-		LNSInstance instance = instances.get(subscriptionsService.getTenant()).get(lnsId);
+	protected void processOperation(String lnsInstanceId, DownlinkData operation, OperationRepresentation c8yOperation) {
+		LNSInstance instance = instances.get(subscriptionsService.getTenant()).get(lnsInstanceId);
 		if (instance != null) {
 			String commandId = instance.processOperation(operation, c8yOperation);
-			operations.put(commandId, c8yOperation);
-			c8yOperation.set(new LoraCommand(commandId));
+			lnsOperationManager.storeOperation(lnsInstanceId, c8yOperation, commandId);
 			deviceControlApi.update(c8yOperation);
 		} else {
-			logger.error("LNS instance {} of type {} could not be found on tenant {}", lnsId, getName(),
+			logger.error("LNS instance {} of type {} could not be found on tenant {}", lnsInstanceId, getName(),
 					subscriptionsService.getTenant());
 		}
 	}
@@ -537,7 +334,7 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 		subscriptionsService.runForEachTenant(() -> {
 			OperationFilter filter = new OperationFilter();
 			filter.byStatus(OperationStatus.PENDING)
-					.byAgent(agents.get(subscriptionsService.getTenant()).getId().getValue());
+					.byAgent(agentService.getAgent().getId().getValue());
 			OperationCollectionRepresentation opCollectionRepresentation;
 			OperationCollection oc = deviceControlApi.getOperationsByFilter(filter);
 			if (oc != null) {
@@ -546,7 +343,7 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 								.getNextPage(opCollectionRepresentation)) {
 					for (OperationRepresentation op : opCollectionRepresentation.getOperations()) {
 						System.out.println(op.getStatus());
-						executePending(op);
+						lnsOperationManager.executePending(op);
 					}
 				}
 			}
@@ -558,11 +355,11 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 		subscriptionsService.runForEachTenant(() -> {
 			C8YData c8yData = new C8YData();
 			DateTime now = new DateTime();
-			c8yData.addMeasurement(agents.get(subscriptionsService.getTenant()), "Memory", "Max Memory", "bytes",
+			c8yData.addMeasurement(agentService.getAgent(), "Memory", "Max Memory", "bytes",
 					BigDecimal.valueOf(Runtime.getRuntime().maxMemory()), now);
-			c8yData.addMeasurement(agents.get(subscriptionsService.getTenant()), "Memory", "Free Memory", "bytes",
+			c8yData.addMeasurement(agentService.getAgent(), "Memory", "Free Memory", "bytes",
 					BigDecimal.valueOf(Runtime.getRuntime().freeMemory()), now);
-			c8yData.addMeasurement(agents.get(subscriptionsService.getTenant()), "Memory", "Total Memory", "bytes",
+			c8yData.addMeasurement(agentService.getAgent(), "Memory", "Total Memory", "bytes",
 					BigDecimal.valueOf(Runtime.getRuntime().totalMemory()), now);
 			for (MeasurementRepresentation m : c8yData.getMeasurements()) {
 				measurementApi.create(m);

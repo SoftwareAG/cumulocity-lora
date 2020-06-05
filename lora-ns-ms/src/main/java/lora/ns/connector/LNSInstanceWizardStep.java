@@ -1,4 +1,4 @@
-package lora.ns;
+package lora.ns.connector;
 
 import java.util.LinkedList;
 

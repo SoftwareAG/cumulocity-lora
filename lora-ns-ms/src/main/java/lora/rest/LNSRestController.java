@@ -22,10 +22,10 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
-import lora.ns.LNSInstance;
-import lora.ns.LNSInstanceRepresentation;
-import lora.ns.LNSInstanceWizardStep;
 import lora.ns.LNSProxy;
+import lora.ns.connector.LNSInstance;
+import lora.ns.connector.LNSInstanceRepresentation;
+import lora.ns.connector.LNSInstanceWizardStep;
 
 @RestController
 public class LNSRestController {

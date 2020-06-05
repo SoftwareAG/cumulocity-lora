@@ -1,4 +1,4 @@
-package lora.ns;
+package lora.ns.connector;
 
 import java.math.BigDecimal;
 
@@ -15,7 +15,7 @@ public class PropertyDescription {
 	private String regExp;
 	
 	public enum PropertyType {
-		STRING, PASSWORD, INTEGER, NUMBER, DATETIME, BOOLEAN, LIST;
+		TEXT, PASSWORD, INTEGER, NUMBER, DATETIME, BOOLEAN, LIST;
 	}
 	
 	private PropertyType type;

@@ -1,4 +1,4 @@
-package lora.ns;
+package lora.ns.connector;
 
 import java.util.List;
 import java.util.Properties;
@@ -6,6 +6,8 @@ import java.util.Properties;
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
 
 import lora.codec.DownlinkData;
+import lora.ns.DeviceProvisioning;
+import lora.ns.EndDevice;
 
 public interface LNSInstance {
 	String getId();

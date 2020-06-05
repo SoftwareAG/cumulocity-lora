@@ -1,8 +1,10 @@
-package lora.ns;
+package lora.ns.connector;
 
 import java.util.Properties;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+
+import lora.ns.LNSProxy;
 
 public abstract class ALNSInstance implements LNSInstance {
 
