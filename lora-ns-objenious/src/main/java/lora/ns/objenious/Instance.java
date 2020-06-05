@@ -15,9 +15,9 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
 
 import lora.codec.DownlinkData;
-import lora.ns.ALNSInstance;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
+import lora.ns.connector.ALNSInstance;
 import lora.ns.objenious.rest.Device;
 import lora.ns.objenious.rest.DeviceCreate;
 import lora.ns.objenious.rest.DownlinkCreate;

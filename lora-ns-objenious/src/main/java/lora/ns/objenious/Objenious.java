@@ -14,18 +14,15 @@ import org.springframework.stereotype.Service;
 
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.model.operation.OperationStatus;
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
-import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
-import c8y.Hardware;
 import lora.ns.DeviceData;
-import lora.ns.LNSInstanceWizardStep;
 import lora.ns.LNSProxy;
-import lora.ns.objenious.rest.Profile;
+import lora.ns.OperationData;
+import lora.ns.connector.LNSInstanceWizardStep;
 
 @Service
 public class Objenious extends LNSProxy<Instance> {
@@ -39,7 +36,7 @@ public class Objenious extends LNSProxy<Instance> {
 	}
 
 	@Override
-	public DeviceData extractLNSInfo(String event, String lnsInstanceId) {
+	public DeviceData processUplinkEvent(String event) {
         ObjectMapper mapper = new ObjectMapper();
         DeviceData data = null;
         try {
@@ -57,7 +54,7 @@ public class Objenious extends LNSProxy<Instance> {
             logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
             byte[] payload = BaseEncoding.base16().decode(rootNode.get("payload_cleartext").asText().toUpperCase());
             Long updateTime = new DateTime(rootNode.get("timestamp").asText()).getMillis();
-            String model = null;
+            //String model = null;
             logger.info("Update time is: " + updateTime);
 
             List<MeasurementRepresentation> measurements = new ArrayList<>();
@@ -94,14 +91,14 @@ public class Objenious extends LNSProxy<Instance> {
     		m.setDateTime(new DateTime(updateTime));
     		measurements.add(m);
     		
-    		if (rootNode.has("profile_id")) {
-    			ManagedObjectRepresentation device = getDevice(deviceEui);
-    			if (device != null) {
-    				updateDevice(getDevice(deviceEui), ((Instance)instances.get(subscriptionsService.getTenant()).get(lnsInstanceId)).getProfile(rootNode.get("profile_id").asInt()));
-    			}
-    		}
+//    		if (rootNode.has("profile_id")) {
+//    			ManagedObjectRepresentation device = getDevice(deviceEui);
+//    			if (device != null) {
+//    				updateDevice(getDevice(deviceEui), ((Instance)instances.get(subscriptionsService.getTenant()).get(lnsInstanceId)).getProfile(rootNode.get("profile_id").asInt()));
+//    			}
+//    		}
 
-    		data = new DeviceData(name, deviceEui, model, fPort, payload, updateTime, measurements, lat != null ? new BigDecimal(lat) : null, lng != null ? new BigDecimal(lng) : null);
+    		data = new DeviceData(name, deviceEui, null, null, fPort, payload, updateTime, measurements, lat != null ? new BigDecimal(lat) : null, lng != null ? new BigDecimal(lng) : null);
         } catch (Exception e) {
         	e.printStackTrace();
             logger.error("Error on Mapping LoRa payload to Cumulocity", e);
@@ -110,111 +107,106 @@ public class Objenious extends LNSProxy<Instance> {
 	}
 
 	// TODO ugly, need to put all that in a config file
-	private void updateDevice(ManagedObjectRepresentation device, Profile profile) {
-		if (profile != null && (device.get(Hardware.class) == null || device.getProperty("codec") == null)) {
-			device.setLastUpdatedDateTime(null);
-			Hardware hardware = new Hardware();
-			String profileName = profile.getName().toLowerCase();
-			if (profileName.contains("nke")) {
-				device.setProperty("codec", "nke");
-				if (profileName.contains("50-70-053")) {
-					hardware.setModel("50-70-053");
-				}
-				if (profileName.contains("50-70-085")) {
-					hardware.setModel("50-70-085");
-				}
-				if (profileName.contains("50-70-043")) {
-					hardware.setModel("50-70-043");
-				}
-				if (profileName.contains("50-70-014")) {
-					hardware.setModel("50-70-014");
-				}
-				if (profileName.contains("50-70-072")) {
-					hardware.setModel("50-70-072");
-				}
-				if (profileName.contains("50-70-016")) {
-					hardware.setModel("50-70-016");
-				}
-				if (profileName.contains("50-70-008")) {
-					hardware.setModel("50-70-008");
-				}
-				if (profileName.contains("50-70-080")) {
-					hardware.setModel("50-70-080");
-				}
-			}
-			if (profileName.contains("senlab")) {
-				device.setProperty("codec", "senlab");
-				if (profileName.contains("pul")) {
-					hardware.setModel("Senlab Meter");
-				}
-				if (profileName.contains("tor")) {
-					hardware.setModel("Senlab Digital");
-				}
-				if (profileName.contains("thy")) {
-					hardware.setModel("Senlab humidity");
-				}
-				if (profileName.contains("tem")) {
-					hardware.setModel("Senlab temperature");
-				}
-			}
-			if (profileName.contains("adeunis")) {
-				device.setProperty("codec", "adeunis");
-				if (profileName.contains("arf8230")) {
-					hardware.setModel("pulse");
-				}
-				if (profileName.contains("arf8240")) {
-					hardware.setModel("modbus");
-				}
-				if (profileName.contains("arf8180")) {
-					hardware.setModel("temp");
-				}
-				if (profileName.contains("arf8275")) {
-					hardware.setModel("comfort");
-				}
-				if (profileName.contains("arf8170")) {
-					hardware.setModel("dc");
-				}
-			}
-			if (profileName.contains("pyrescom")) {
-				device.setProperty("codec", "pyrescom");
-				if (profileName.contains("class") && profileName.contains("air")) {
-					hardware.setModel("Class'Air");
-				}
-			}
-			
-			if (hardware.getModel() != null) {
-				device.set(hardware);
-			}
-			
-			inventoryApi.update(device);
-		}
-	}
+//	private void updateDevice(ManagedObjectRepresentation device, Profile profile) {
+//		if (profile != null && (device.get(Hardware.class) == null || device.getProperty("codec") == null)) {
+//			device.setLastUpdatedDateTime(null);
+//			Hardware hardware = new Hardware();
+//			String profileName = profile.getName().toLowerCase();
+//			if (profileName.contains("nke")) {
+//				device.setProperty("codec", "nke");
+//				if (profileName.contains("50-70-053")) {
+//					hardware.setModel("50-70-053");
+//				}
+//				if (profileName.contains("50-70-085")) {
+//					hardware.setModel("50-70-085");
+//				}
+//				if (profileName.contains("50-70-043")) {
+//					hardware.setModel("50-70-043");
+//				}
+//				if (profileName.contains("50-70-014")) {
+//					hardware.setModel("50-70-014");
+//				}
+//				if (profileName.contains("50-70-072")) {
+//					hardware.setModel("50-70-072");
+//				}
+//				if (profileName.contains("50-70-016")) {
+//					hardware.setModel("50-70-016");
+//				}
+//				if (profileName.contains("50-70-008")) {
+//					hardware.setModel("50-70-008");
+//				}
+//				if (profileName.contains("50-70-080")) {
+//					hardware.setModel("50-70-080");
+//				}
+//			}
+//			if (profileName.contains("senlab")) {
+//				device.setProperty("codec", "senlab");
+//				if (profileName.contains("pul")) {
+//					hardware.setModel("Senlab Meter");
+//				}
+//				if (profileName.contains("tor")) {
+//					hardware.setModel("Senlab Digital");
+//				}
+//				if (profileName.contains("thy")) {
+//					hardware.setModel("Senlab humidity");
+//				}
+//				if (profileName.contains("tem")) {
+//					hardware.setModel("Senlab temperature");
+//				}
+//			}
+//			if (profileName.contains("adeunis")) {
+//				device.setProperty("codec", "adeunis");
+//				if (profileName.contains("arf8230")) {
+//					hardware.setModel("pulse");
+//				}
+//				if (profileName.contains("arf8240")) {
+//					hardware.setModel("modbus");
+//				}
+//				if (profileName.contains("arf8180")) {
+//					hardware.setModel("temp");
+//				}
+//				if (profileName.contains("arf8275")) {
+//					hardware.setModel("comfort");
+//				}
+//				if (profileName.contains("arf8170")) {
+//					hardware.setModel("dc");
+//				}
+//			}
+//			if (profileName.contains("pyrescom")) {
+//				device.setProperty("codec", "pyrescom");
+//				if (profileName.contains("class") && profileName.contains("air")) {
+//					hardware.setModel("Class'Air");
+//				}
+//			}
+//			
+//			if (hardware.getModel() != null) {
+//				device.set(hardware);
+//			}
+//			
+//			inventoryApi.update(device);
+//		}
+//	}
 
 	@Override
-	public OperationRepresentation getOperation(String event) {
-		OperationRepresentation operation = null;
+	public OperationData processDownlinkEvent(String event) {
+		OperationData data = new OperationData();
+		data.setStatus(OperationStatus.SUCCESSFUL);
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode rootNode = mapper.readTree(event);
             String commandId = rootNode.get("command_id") != null ? rootNode.get("command_id").asText() : null;
             if (commandId != null) {
-				operation = operations.get(commandId);
+            	data.setCommandId(commandId);
 	            JsonNode error = rootNode.get("error");
-	            if (operation != null) {
-		            if (error != null) {
-		            	operation.setStatus(OperationStatus.FAILED.toString());
-		            	operation.setFailureReason(error.asText());
-		            } else {
-		            	operation.setStatus(OperationStatus.SUCCESSFUL.toString());
-		            }
+	            if (error != null) {
+	            	data.setErrorMessage(error.asText());
+	            	data.setStatus(OperationStatus.FAILED);
 	            }
-            } else {
-            	logger.info("Unknown operation");
             }
         } catch (Exception e) {
             logger.error("Error on Mapping LoRa payload to Cumulocity", e);
         }
-		return operation;
+		return data;
 	}
 	
 	@Override
