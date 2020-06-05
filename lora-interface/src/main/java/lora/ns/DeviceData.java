@@ -9,6 +9,7 @@ import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 public class DeviceData {
 	private String deviceName;
 	private String devEui;
+	private String codec;
 	private String model;
 	private int fPort;
 	private List<MeasurementRepresentation> measurements = new ArrayList<>();
@@ -16,10 +17,11 @@ public class DeviceData {
 	private BigDecimal lng;
 	private byte[] payload;
 	private Long dateTime;
-	public DeviceData(String deviceName, String devEui, String model, int fPort, byte[] payload, Long dateTime, List<MeasurementRepresentation> measurements, BigDecimal lat, BigDecimal lng) {
+	public DeviceData(String deviceName, String devEui, String codec, String model, int fPort, byte[] payload, Long dateTime, List<MeasurementRepresentation> measurements, BigDecimal lat, BigDecimal lng) {
 		super();
 		this.deviceName = deviceName;
 		this.devEui = devEui;
+		this.codec = codec;
 		this.model = model;
 		this.fPort = fPort;
 		this.measurements = measurements;
@@ -27,6 +29,12 @@ public class DeviceData {
 		this.lng = lng;
 		this.payload = payload;
 		this.dateTime = dateTime;
+	}
+	public String getCodec() {
+		return codec;
+	}
+	public void setCodec(String codec) {
+		this.codec = codec;
 	}
 	public String getModel() {
 		return model;
