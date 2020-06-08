@@ -2,7 +2,7 @@ package lora.ns.connector;
 
 import java.util.Properties;
 
-public class LNSInstanceRepresentation {
+public class LNSConnectorRepresentation {
 	private String name;
 	private Properties properties;
 	public String getName() {

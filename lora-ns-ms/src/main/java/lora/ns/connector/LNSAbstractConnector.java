@@ -4,23 +4,23 @@ import java.util.Properties;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
-import lora.ns.LNSProxy;
+import lora.ns.LNSIntegrationService;
 
-public abstract class ALNSInstance implements LNSInstance {
+public abstract class LNSAbstractConnector implements LNSConnector {
 
 	protected Properties properties = new Properties();
 	protected String id;
 	protected String name;
 	protected String type;
 
-	protected ALNSInstance(Properties properties) {
+	protected LNSAbstractConnector(Properties properties) {
 		this.setProperties(properties);
 	}
 	
-	protected ALNSInstance(ManagedObjectRepresentation instance) {
+	protected LNSAbstractConnector(ManagedObjectRepresentation instance) {
 		this.id = instance.getId().getValue();
 		this.name = instance.getName();
-		this.type = instance.getProperty(LNSProxy.LNS_ID).toString();
+		this.type = instance.getProperty(LNSIntegrationService.LNS_ID).toString();
 	}
 
 	@Override

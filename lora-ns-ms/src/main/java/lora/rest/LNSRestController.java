@@ -22,16 +22,16 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
-import lora.ns.LNSProxy;
-import lora.ns.connector.LNSInstance;
-import lora.ns.connector.LNSInstanceRepresentation;
-import lora.ns.connector.LNSInstanceWizardStep;
+import lora.ns.LNSIntegrationService;
+import lora.ns.connector.LNSConnector;
+import lora.ns.connector.LNSConnectorRepresentation;
+import lora.ns.connector.LNSConnectorWizardStep;
 
 @RestController
 public class LNSRestController {
 
 	@Autowired
-	private LNSProxy<?> lnsProxy;
+	private LNSIntegrationService<?> lnsProxy;
 
 	final Logger logger = LoggerFactory.getLogger(LNSRestController.class);
 
@@ -68,12 +68,12 @@ public class LNSRestController {
 	}
 	
 	@GetMapping(value = "/lnsinstances", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, Map<String, LNSInstance>> getLnsInstances() {
+	public Map<String, Map<String, LNSConnector>> getLnsInstances() {
 		return lnsProxy.getInstances();
 	}
 	
 	@PostMapping(value = "/lnsinstances", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ManagedObjectRepresentation addLnsInstance(@RequestBody LNSInstanceRepresentation instance) {
+	public ManagedObjectRepresentation addLnsInstance(@RequestBody LNSConnectorRepresentation instance) {
 		return lnsProxy.addLNSInstance(instance);
 	}
 	
@@ -84,7 +84,7 @@ public class LNSRestController {
 	}
 	
 	@GetMapping(value = "/wizard", produces = MediaType.APPLICATION_JSON_VALUE)
-	public LinkedList<LNSInstanceWizardStep> getWizard() {
+	public LinkedList<LNSConnectorWizardStep> getWizard() {
 		return lnsProxy.getInstanceWizard();
 	}
 }

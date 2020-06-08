@@ -9,7 +9,7 @@ import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
 
-public interface LNSInstance {
+public interface LNSConnector {
 	String getId();
 	String getType();
 	String getName();

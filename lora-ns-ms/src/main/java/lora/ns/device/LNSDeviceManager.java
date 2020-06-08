@@ -33,7 +33,7 @@ import lora.codec.DeviceCodecRepresentation;
 import lora.codec.ms.CodecManager;
 import lora.common.C8YUtils;
 import lora.ns.DeviceData;
-import lora.ns.LNSProxy;
+import lora.ns.LNSIntegrationService;
 
 @Component
 public class LNSDeviceManager {
@@ -96,8 +96,8 @@ public class LNSDeviceManager {
 				locationUpdate.setDateTime(new DateTime());
 				eventApi.create(locationUpdate);
 			}
-			if (!mor.hasProperty(LNSProxy.LNS_INSTANCE_REF)) {
-				mor.setProperty(LNSProxy.LNS_INSTANCE_REF, lnsInstanceId);
+			if (!mor.hasProperty(LNSIntegrationService.LNS_INSTANCE_REF)) {
+				mor.setProperty(LNSIntegrationService.LNS_INSTANCE_REF, lnsInstanceId);
 				inventoryApi.update(mor);
 			}
 			DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
@@ -131,7 +131,7 @@ public class LNSDeviceManager {
 		mor = new ManagedObjectRepresentation();
 		mor.setType("c8y_LoRaDevice");
 		mor.setName(name);
-		mor.setProperty(LNSProxy.LNS_INSTANCE_REF, lnsInstanceId);
+		mor.setProperty(LNSIntegrationService.LNS_INSTANCE_REF, lnsInstanceId);
 		mor.set(new IsDevice());
 		SupportedOperations supportedOperations = new SupportedOperations();
 		supportedOperations.add("c8y_Command");

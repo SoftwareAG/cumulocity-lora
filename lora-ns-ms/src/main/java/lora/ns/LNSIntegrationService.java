@@ -42,8 +42,6 @@ import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
 import com.cumulocity.sdk.client.devicecontrol.OperationCollection;
 import com.cumulocity.sdk.client.devicecontrol.OperationFilter;
 import com.cumulocity.sdk.client.event.EventApi;
-import com.cumulocity.sdk.client.identity.ExternalIDCollection;
-import com.cumulocity.sdk.client.identity.IdentityApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.inventory.InventoryFilter;
 import com.cumulocity.sdk.client.inventory.ManagedObject;
@@ -58,14 +56,14 @@ import lora.codec.DownlinkData;
 import lora.codec.ms.CodecManager;
 import lora.common.C8YUtils;
 import lora.common.Component;
-import lora.ns.connector.LNSInstance;
-import lora.ns.connector.LNSInstanceRepresentation;
-import lora.ns.connector.LNSInstanceWizardStep;
+import lora.ns.connector.LNSConnector;
+import lora.ns.connector.LNSConnectorWizardStep;
+import lora.ns.connector.LNSConnectorRepresentation;
 import lora.ns.device.LNSDeviceManager;
 import lora.ns.operation.LNSOperationManager;
 
 @EnableScheduling
-public abstract class LNSProxy<I extends LNSInstance> implements Component {
+public abstract class LNSIntegrationService<I extends LNSConnector> implements Component {
 	public static final String LNS_EXT_ID = "LoRa Network Server type ID";
 
 	public static final String LNS_TYPE = "LoRa Network Server type";
@@ -83,9 +81,6 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 
 	@Autowired
 	private InventoryApi inventoryApi;
-
-	@Autowired
-	private IdentityApi identityApi;
 
 	@Autowired
 	private MeasurementApi measurementApi;
@@ -117,13 +112,13 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 	@Autowired
 	private LNSOperationManager lnsOperationManager;
 
-	private Map<String, Map<String, LNSInstance>> instances = new HashMap<>();
+	private Map<String, Map<String, LNSConnector>> instances = new HashMap<>();
 
 	//protected Map<String, OperationRepresentation> operations = new HashMap<>();
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
-	public abstract LinkedList<LNSInstanceWizardStep> getInstanceWizard();
+	public abstract LinkedList<LNSConnectorWizardStep> getInstanceWizard();
 
 	public abstract DeviceData processUplinkEvent(String eventString);
 
@@ -145,7 +140,7 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 		return result;
 	}
 
-	public Map<String, Map<String, LNSInstance>> getInstances() {
+	public Map<String, Map<String, LNSConnector>> getInstances() {
 		return instances;
 	}
 
@@ -173,14 +168,14 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 		}
 		for (ManagedObjectRepresentation mor : col.get(queryParam).allPages()) {
 			logger.info("Retrieved instance: {} of type {}", mor.getName(), mor.getProperty(LNS_ID));
-			LNSInstance instance = getInstance(mor);
+			LNSConnector instance = getInstance(mor);
 			Properties properties = new Properties();
 			for (OptionRepresentation option : tenantOptionApi.getAllOptionsForCategory(instance.getId())) {
 				properties.setProperty(option.getKey(), option.getValue());
 			}
 			instance.setProperties(properties);
 			if (!instances.containsKey(subscriptionsService.getTenant())) {
-				instances.put(subscriptionsService.getTenant(), new HashMap<String, LNSInstance>());
+				instances.put(subscriptionsService.getTenant(), new HashMap<String, LNSConnector>());
 			}
 			instances.get(subscriptionsService.getTenant()).put(instance.getId(), instance);
 			configureRoutings(instance.getId(), event.getCredentials());
@@ -288,7 +283,7 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 				subscriptionsService.getTenant(), credentials.getUsername(), credentials.getPassword());
 	}
 
-	public ManagedObjectRepresentation addLNSInstance(LNSInstanceRepresentation instanceRepresentation) {
+	public ManagedObjectRepresentation addLNSInstance(LNSConnectorRepresentation instanceRepresentation) {
 		ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
 		mor.setType(LNS_INSTANCE_TYPE);
 		mor.setName(instanceRepresentation.getName());
@@ -304,11 +299,11 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 			tenantOptionApi.save(option);
 		});
 
-		LNSInstance instance = getInstance(mor);
+		LNSConnector instance = getInstance(mor);
 		instance.setProperties(instanceRepresentation.getProperties());
 
 		if (!instances.containsKey(subscriptionsService.getTenant())) {
-			instances.put(subscriptionsService.getTenant(), new HashMap<String, LNSInstance>());
+			instances.put(subscriptionsService.getTenant(), new HashMap<String, LNSConnector>());
 		}
 		instances.get(subscriptionsService.getTenant()).put(instance.getId(), instance);
 		configureRoutings(instance.getId(),
@@ -318,7 +313,7 @@ public abstract class LNSProxy<I extends LNSInstance> implements Component {
 	}
 
 	protected void processOperation(String lnsInstanceId, DownlinkData operation, OperationRepresentation c8yOperation) {
-		LNSInstance instance = instances.get(subscriptionsService.getTenant()).get(lnsInstanceId);
+		LNSConnector instance = instances.get(subscriptionsService.getTenant()).get(lnsInstanceId);
 		if (instance != null) {
 			String commandId = instance.processOperation(operation, c8yOperation);
 			lnsOperationManager.storeOperation(lnsInstanceId, c8yOperation, commandId);

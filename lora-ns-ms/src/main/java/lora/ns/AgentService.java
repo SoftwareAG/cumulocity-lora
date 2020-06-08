@@ -22,7 +22,7 @@ import com.cumulocity.sdk.client.notification.SubscriptionListener;
 import c8y.IsDevice;
 import c8y.RequiredAvailability;
 import lora.common.C8YUtils;
-import lora.ns.connector.LNSInstance;
+import lora.ns.connector.LNSConnector;
 import lora.ns.operation.LNSOperationManager;
 
 @Service
@@ -44,15 +44,15 @@ public class AgentService {
 	private Map<String, ManagedObjectRepresentation> agents;
 
 
-	public void registerAgent(LNSProxy<? extends LNSInstance> lnsProxy) {
-		ExternalIDRepresentation extId = c8yUtils.findExternalId(lnsProxy.getId(), LNSProxy.LNS_EXT_ID);
+	public void registerAgent(LNSIntegrationService<? extends LNSConnector> lnsProxy) {
+		ExternalIDRepresentation extId = c8yUtils.findExternalId(lnsProxy.getId(), LNSIntegrationService.LNS_EXT_ID);
 		ManagedObjectRepresentation agent = null;
 		if (extId == null) {
 			agent = new ManagedObjectRepresentation();
-			agent.setType(LNSProxy.LNS_TYPE);
+			agent.setType(LNSIntegrationService.LNS_TYPE);
 			agent.setName(lnsProxy.getName());
 			agent.setProperty("version", lnsProxy.getVersion());
-			agent.setProperty(LNSProxy.LNS_ID, lnsProxy.getId());
+			agent.setProperty(LNSIntegrationService.LNS_ID, lnsProxy.getId());
 			agent.set(new RequiredAvailability(5));
 			agent.set(new Agent());
 			agent.set(new IsDevice());
@@ -60,7 +60,7 @@ public class AgentService {
 
 			extId = new ExternalIDRepresentation();
 			extId.setExternalId(lnsProxy.getId());
-			extId.setType(LNSProxy.LNS_EXT_ID);
+			extId.setType(LNSIntegrationService.LNS_EXT_ID);
 			extId.setManagedObject(agent);
 			identityApi.create(extId);
 		} else {
@@ -68,7 +68,7 @@ public class AgentService {
 			agent.setLastUpdatedDateTime(null);
 			agent.setName(lnsProxy.getName());
 			agent.setProperty("version", lnsProxy.getVersion());
-			agent.setProperty(LNSProxy.LNS_ID, lnsProxy.getId());
+			agent.setProperty(LNSIntegrationService.LNS_ID, lnsProxy.getId());
 			agent.set(new RequiredAvailability(5));
 			if (agent.get(Agent.class) == null) {
 				agent.set(new Agent());

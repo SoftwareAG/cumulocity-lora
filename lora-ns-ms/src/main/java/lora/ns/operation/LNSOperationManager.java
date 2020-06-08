@@ -18,7 +18,7 @@ import com.cumulocity.sdk.client.inventory.InventoryApi;
 import c8y.Command;
 import lora.codec.DownlinkData;
 import lora.codec.ms.CodecManager;
-import lora.ns.LNSProxy;
+import lora.ns.LNSIntegrationService;
 import lora.ns.device.LNSDeviceManager;
 
 @Component
@@ -54,7 +54,7 @@ public abstract class LNSOperationManager {
 					operation);
 			if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null) {
 				operation.setStatus(OperationStatus.EXECUTING.toString());
-				String lnsConnectorId = inventoryApi.get(operation.getDeviceId()).getProperty(LNSProxy.LNS_INSTANCE_REF)
+				String lnsConnectorId = inventoryApi.get(operation.getDeviceId()).getProperty(LNSIntegrationService.LNS_INSTANCE_REF)
 						.toString();
 				processOperation(lnsConnectorId, encodedData, operation);
 			} else {
