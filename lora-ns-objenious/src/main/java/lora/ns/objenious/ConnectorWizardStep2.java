@@ -6,7 +6,7 @@ import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.connector.PropertyDescription;
 import lora.ns.connector.PropertyDescription.PropertyType;
 
-public class InstanceWizardStep2 implements LNSConnectorWizardStep {
+public class ConnectorWizardStep2 implements LNSConnectorWizardStep {
 	protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 	{
 		propertyDescriptions.add(new PropertyDescription("groupId", "Group", true, null, "/groups", null, null, null, null, null, PropertyType.LIST));

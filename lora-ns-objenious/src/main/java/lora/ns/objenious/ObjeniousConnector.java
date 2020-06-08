@@ -40,7 +40,7 @@ import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-public class Instance extends LNSAbstractConnector {
+public class ObjeniousConnector extends LNSAbstractConnector {
 
 	private ObjeniousService objeniousService;
 
@@ -70,11 +70,11 @@ public class Instance extends LNSAbstractConnector {
 
 	}
 	
-	public Instance(Properties properties) {
+	public ObjeniousConnector(Properties properties) {
 		super(properties);
 	}
 	
-	public Instance(ManagedObjectRepresentation instance) {
+	public ObjeniousConnector(ManagedObjectRepresentation instance) {
 		super(instance);
 	}
 

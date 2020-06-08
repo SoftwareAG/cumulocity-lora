@@ -25,14 +25,14 @@ import lora.ns.OperationData;
 import lora.ns.connector.LNSConnectorWizardStep;
 
 @Service
-public class Objenious extends LNSIntegrationService<Instance> {
+public class ObjeniousIntegrationService extends LNSIntegrationService<ObjeniousConnector> {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
 	{
-		wizard.add(new InstanceWizardStep1());
-		wizard.add(new InstanceWizardStep2());
+		wizard.add(new ConnectorWizardStep1());
+		wizard.add(new ConnectorWizardStep2());
 	}
 
 	@Override
