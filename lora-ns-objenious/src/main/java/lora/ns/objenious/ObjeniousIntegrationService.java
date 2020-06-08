@@ -20,16 +20,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
 import lora.ns.DeviceData;
-import lora.ns.LNSProxy;
+import lora.ns.LNSIntegrationService;
 import lora.ns.OperationData;
-import lora.ns.connector.LNSInstanceWizardStep;
+import lora.ns.connector.LNSConnectorWizardStep;
 
 @Service
-public class Objenious extends LNSProxy<Instance> {
+public class Objenious extends LNSIntegrationService<Instance> {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	LinkedList<LNSInstanceWizardStep> wizard = new LinkedList<LNSInstanceWizardStep>();
+	LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
 	{
 		wizard.add(new InstanceWizardStep1());
 		wizard.add(new InstanceWizardStep2());
@@ -230,7 +230,7 @@ public class Objenious extends LNSProxy<Instance> {
 	}
 
 	@Override
-	public LinkedList<LNSInstanceWizardStep> getInstanceWizard() {
+	public LinkedList<LNSConnectorWizardStep> getInstanceWizard() {
 		return wizard;
 	}
 }

@@ -17,7 +17,7 @@ import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
-import lora.ns.connector.ALNSInstance;
+import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.objenious.rest.Device;
 import lora.ns.objenious.rest.DeviceCreate;
 import lora.ns.objenious.rest.DownlinkCreate;
@@ -40,7 +40,7 @@ import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-public class Instance extends ALNSInstance {
+public class Instance extends LNSAbstractConnector {
 
 	private ObjeniousService objeniousService;
 
