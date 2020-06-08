@@ -21,22 +21,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
 import lora.ns.DeviceData;
-import lora.ns.LNSProxy;
+import lora.ns.LNSIntegrationService;
 import lora.ns.OperationData;
-import lora.ns.connector.LNSInstanceWizardStep;
+import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.connector.PropertyDescription;
 import lora.ns.connector.PropertyDescription.PropertyType;
 
 @Service
-public class Kerlink extends LNSProxy<Instance> {
+public class KerlinkIntegrationService extends LNSIntegrationService<KerlinkConnector> {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private 
 	
-	LinkedList<LNSInstanceWizardStep> wizard = new LinkedList<LNSInstanceWizardStep>();
+	LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
 	{
-		wizard.add(new LNSInstanceWizardStep() {
+		wizard.add(new LNSConnectorWizardStep() {
 			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 			{
 				propertyDescriptions.add(new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.TEXT));
@@ -54,7 +54,7 @@ public class Kerlink extends LNSProxy<Instance> {
 				return propertyDescriptions;
 			}
 		});
-		wizard.add(new LNSInstanceWizardStep() {
+		wizard.add(new LNSConnectorWizardStep() {
 			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 			{
 				propertyDescriptions.add(new PropertyDescription("clusterId", "Cluster", true, null, "/clusters", null, null, null, null, null, PropertyType.LIST));
@@ -166,7 +166,7 @@ public class Kerlink extends LNSProxy<Instance> {
 	}
 
 	@Override
-	public LinkedList<LNSInstanceWizardStep> getInstanceWizard() {
+	public LinkedList<LNSConnectorWizardStep> getInstanceWizard() {
 		return wizard;
 	}
 }

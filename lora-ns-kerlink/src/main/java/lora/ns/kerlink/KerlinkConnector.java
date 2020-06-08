@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
-import lora.ns.connector.ALNSInstance;
+import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.kerlink.dto.ClusterDto;
 import lora.ns.kerlink.dto.CustomerDto;
 import lora.ns.kerlink.dto.EndDeviceDto;
@@ -38,7 +38,7 @@ import lora.ns.kerlink.dto.PushConfigurationDto.PushConfigurationType;
 import lora.ns.kerlink.dto.PushConfigurationHeaderDto;
 import lora.ns.kerlink.dto.UserDto;
 
-public class Instance extends ALNSInstance {
+public class KerlinkConnector extends LNSAbstractConnector {
 	
 	private static final String CLUSTER_ID = "clusterId";
 	private static final String PASSWORD = "password";
@@ -53,11 +53,11 @@ public class Instance extends ALNSInstance {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	public Instance(Properties properties) {
+	public KerlinkConnector(Properties properties) {
 		super(properties);
 	}
 	
-	public Instance(ManagedObjectRepresentation instance) {
+	public KerlinkConnector(ManagedObjectRepresentation instance) {
 		super(instance);
 	}
 	
