@@ -5,10 +5,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.joda.time.DateTime;
@@ -57,8 +57,9 @@ import lora.codec.ms.CodecManager;
 import lora.common.C8YUtils;
 import lora.common.Component;
 import lora.ns.connector.LNSConnector;
-import lora.ns.connector.LNSConnectorWizardStep;
+import lora.ns.connector.LNSConnectorManager;
 import lora.ns.connector.LNSConnectorRepresentation;
+import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.device.LNSDeviceManager;
 import lora.ns.operation.LNSOperationManager;
 
@@ -102,19 +103,18 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 
 	@Autowired
 	private TenantOptionApi tenantOptionApi;
-	
+
 	@Autowired
 	private LNSDeviceManager lnsDeviceManager;
-	
+
 	@Autowired
 	private AgentService agentService;
-	
+
 	@Autowired
 	private LNSOperationManager lnsOperationManager;
 
-	private Map<String, Map<String, LNSConnector>> instances = new HashMap<>();
-
-	//protected Map<String, OperationRepresentation> operations = new HashMap<>();
+	@Autowired
+	private LNSConnectorManager lnsConnectorManager;
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -140,14 +140,14 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 		return result;
 	}
 
-	public Map<String, Map<String, LNSConnector>> getInstances() {
-		return instances;
+	public Map<String, LNSConnector> getConnectors() {
+		return lnsConnectorManager.getConnectors();
 	}
 
 	@EventListener
 	private void init(MicroserviceSubscriptionAddedEvent event) {
 		getAllLNSInstances(event);
-		//registerLNSProxy();
+		// registerLNSProxy();
 		agentService.registerAgent(this);
 	}
 
@@ -174,41 +174,44 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 				properties.setProperty(option.getKey(), option.getValue());
 			}
 			instance.setProperties(properties);
-			if (!instances.containsKey(subscriptionsService.getTenant())) {
-				instances.put(subscriptionsService.getTenant(), new HashMap<String, LNSConnector>());
-			}
-			instances.get(subscriptionsService.getTenant()).put(instance.getId(), instance);
+			lnsConnectorManager.addConnector(instance.getId(), instance);
 			configureRoutings(instance.getId(), event.getCredentials());
 		}
 	}
 
 	public void mapEventToC8Y(String eventString, String lnsInstanceId) {
-		DeviceData event = processUplinkEvent(eventString);
-		if (instances.containsKey(subscriptionsService.getTenant())
-				&& instances.get(subscriptionsService.getTenant()).containsKey(lnsInstanceId)) {
-			event.setDeviceName(instances.get(subscriptionsService.getTenant()).get(lnsInstanceId)
-					.getDevice(event.getDevEui()).getName());
-			lnsDeviceManager.upsertDevice(lnsInstanceId, event, agentService.getAgent());
+		if (isOperationUpdate(eventString)) {
+			updateOperation(eventString, lnsInstanceId);
+		} else {
+			DeviceData event = processUplinkEvent(eventString);
+			if (event != null) {
+				Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
+				if (connector.isPresent()) {
+					lnsDeviceManager.upsertDevice(lnsInstanceId, event, agentService.getAgent());
+				}
+			}
 		}
 	}
 
 	public void updateOperation(String event, String lnsInstanceId) {
-		if (instances.containsKey(subscriptionsService.getTenant())
-				&& instances.get(subscriptionsService.getTenant()).containsKey(lnsInstanceId)) {
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
+		if (connector.isPresent()) {
 			logger.info("LNS instance {} of type {} is known", lnsInstanceId, getId());
 			OperationData data = processDownlinkEvent(event);
 			if (data.getStatus() != OperationStatus.FAILED) {
-				OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId, data.getCommandId());
-            	operation.setStatus(data.getStatus().toString());
+				OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
+						data.getCommandId());
+				operation.setStatus(data.getStatus().toString());
 				deviceControlApi.update(operation);
 				if (data.getStatus() == OperationStatus.SUCCESSFUL) {
 					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
 				}
 			} else {
 				if (data.getCommandId() != null) {
-					OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId, data.getCommandId());
-	            	operation.setStatus(OperationStatus.FAILED.toString());
-	            	operation.setFailureReason(data.getErrorMessage());
+					OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
+							data.getCommandId());
+					operation.setStatus(OperationStatus.FAILED.toString());
+					operation.setFailureReason(data.getErrorMessage());
 					deviceControlApi.update(operation);
 					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
 				} else {
@@ -220,15 +223,17 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 
 	public ManagedObjectRepresentation provisionDevice(String lnsInstanceId, DeviceProvisioning deviceProvisioning) {
 		ManagedObjectRepresentation mor = null;
-		if (instances.get(subscriptionsService.getTenant()).get(lnsInstanceId).provisionDevice(deviceProvisioning)) {
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
+		if (connector.isPresent() && connector.get().provisionDevice(deviceProvisioning)) {
 			ExternalIDRepresentation extId = c8yUtils.findExternalId(deviceProvisioning.getDevEUI(), DEVEUI_TYPE);
 			if (extId == null) {
-				mor = lnsDeviceManager.createDevice(lnsInstanceId, deviceProvisioning.getName(), deviceProvisioning.getDevEUI(), agentService.getAgent());
-				//mor = createDevice(lnsInstanceId, deviceProvisioning.getName(), deviceProvisioning.getDevEUI());
+				mor = lnsDeviceManager.createDevice(lnsInstanceId, deviceProvisioning.getName(),
+						deviceProvisioning.getDevEUI(), agentService.getAgent());
+				// mor = createDevice(lnsInstanceId, deviceProvisioning.getName(),
+				// deviceProvisioning.getDevEUI());
 			} else {
 				mor = extId.getManagedObject();
-				ManagedObject agentApi = inventoryApi
-						.getManagedObjectApi(agentService.getAgent().getId());
+				ManagedObject agentApi = inventoryApi.getManagedObjectApi(agentService.getAgent().getId());
 				agentApi.addChildDevice(mor.getId());
 			}
 			mor.set(new LpwanDevice().provisioned(true));
@@ -274,13 +279,13 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 	}
 
 	public List<EndDevice> getDevices(String lnsInstanceId) {
-		return instances.get(subscriptionsService.getTenant()).get(lnsInstanceId).getDevices();
+		return lnsConnectorManager.getConnector(lnsInstanceId).get().getDevices();
 	}
 
 	private void configureRoutings(String lnsInstanceId, MicroserviceCredentials credentials) {
 		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getId() + "/" + lnsInstanceId;
-		instances.get(subscriptionsService.getTenant()).get(lnsInstanceId).configureRoutings(url,
-				subscriptionsService.getTenant(), credentials.getUsername(), credentials.getPassword());
+		lnsConnectorManager.getConnector(lnsInstanceId).get().configureRoutings(url, subscriptionsService.getTenant(),
+				credentials.getUsername(), credentials.getPassword());
 	}
 
 	public ManagedObjectRepresentation addLNSInstance(LNSConnectorRepresentation instanceRepresentation) {
@@ -302,20 +307,18 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 		LNSConnector instance = getInstance(mor);
 		instance.setProperties(instanceRepresentation.getProperties());
 
-		if (!instances.containsKey(subscriptionsService.getTenant())) {
-			instances.put(subscriptionsService.getTenant(), new HashMap<String, LNSConnector>());
-		}
-		instances.get(subscriptionsService.getTenant()).put(instance.getId(), instance);
+		lnsConnectorManager.addConnector(instance.getId(), instance);
 		configureRoutings(instance.getId(),
 				subscriptionsService.getCredentials(subscriptionsService.getTenant()).get());
 
 		return mor;
 	}
 
-	protected void processOperation(String lnsInstanceId, DownlinkData operation, OperationRepresentation c8yOperation) {
-		LNSConnector instance = instances.get(subscriptionsService.getTenant()).get(lnsInstanceId);
-		if (instance != null) {
-			String commandId = instance.processOperation(operation, c8yOperation);
+	protected void processOperation(String lnsInstanceId, DownlinkData operation,
+			OperationRepresentation c8yOperation) {
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
+		if (connector.isPresent()) {
+			String commandId = connector.get().processOperation(operation, c8yOperation);
 			lnsOperationManager.storeOperation(lnsInstanceId, c8yOperation, commandId);
 			deviceControlApi.update(c8yOperation);
 		} else {
@@ -328,8 +331,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 	private void processPendingOperations() {
 		subscriptionsService.runForEachTenant(() -> {
 			OperationFilter filter = new OperationFilter();
-			filter.byStatus(OperationStatus.PENDING)
-					.byAgent(agentService.getAgent().getId().getValue());
+			filter.byStatus(OperationStatus.PENDING).byAgent(agentService.getAgent().getId().getValue());
 			OperationCollectionRepresentation opCollectionRepresentation;
 			OperationCollection oc = deviceControlApi.getOperationsByFilter(filter);
 			if (oc != null) {
@@ -370,7 +372,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 	}
 
 	public void removeLNSInstance(String lnsInstanceId) {
-		instances.get(subscriptionsService.getTenant()).get(lnsInstanceId).removeRoutings();
+		lnsConnectorManager.getConnector(lnsInstanceId).get().removeRoutings();
 		inventoryApi.delete(new GId(lnsInstanceId));
 	}
 
@@ -386,7 +388,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 
 	public boolean deprovisionDevice(String lnsInstanceId, String deveui) {
 		boolean result = false;
-		if (instances.get(subscriptionsService.getTenant()).get(lnsInstanceId).deprovisionDevice(deveui)) {
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
+		if (connector.isPresent() && connector.get().deprovisionDevice(deveui)) {
 			ExternalIDRepresentation extId = c8yUtils.findExternalId(deveui, DEVEUI_TYPE);
 			if (extId != null) {
 				ManagedObjectRepresentation mor = inventoryApi.get(extId.getManagedObject().getId());

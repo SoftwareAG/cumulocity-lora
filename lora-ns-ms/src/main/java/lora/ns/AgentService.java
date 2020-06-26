@@ -1,5 +1,6 @@
 package lora.ns;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public class AgentService {
 	@Autowired
 	private LNSOperationManager lnsOperationManager;
 
-	private Map<String, ManagedObjectRepresentation> agents;
+	private Map<String, ManagedObjectRepresentation> agents = new HashMap<>();
 
 
 	public void registerAgent(LNSIntegrationService<? extends LNSConnector> lnsProxy) {

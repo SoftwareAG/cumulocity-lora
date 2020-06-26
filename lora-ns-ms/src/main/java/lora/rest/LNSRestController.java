@@ -68,8 +68,8 @@ public class LNSRestController {
 	}
 	
 	@GetMapping(value = "/lnsinstances", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, Map<String, LNSConnector>> getLnsInstances() {
-		return lnsProxy.getInstances();
+	public Map<String, LNSConnector> getLnsInstances() {
+		return lnsProxy.getConnectors();
 	}
 	
 	@PostMapping(value = "/lnsinstances", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

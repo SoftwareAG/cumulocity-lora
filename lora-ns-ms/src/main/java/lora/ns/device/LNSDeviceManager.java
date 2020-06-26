@@ -1,5 +1,7 @@
 package lora.ns.device;
 
+import java.util.Optional;
+
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +35,14 @@ import lora.codec.DeviceCodecRepresentation;
 import lora.codec.ms.CodecManager;
 import lora.common.C8YUtils;
 import lora.ns.DeviceData;
+import lora.ns.EndDevice;
 import lora.ns.LNSIntegrationService;
+import lora.ns.connector.LNSConnector;
+import lora.ns.connector.LNSConnectorManager;
 
 @Component
 public class LNSDeviceManager {
-	
+
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
@@ -64,6 +69,9 @@ public class LNSDeviceManager {
 	@Autowired
 	private CodecManager codecManager;
 
+	@Autowired
+	private LNSConnectorManager lnsConnectorManager;
+
 	public static final String DEVEUI_TYPE = "LoRa devEUI";
 
 	public void upsertDevice(String lnsInstanceId, DeviceData event, ManagedObjectRepresentation agent) {
@@ -72,7 +80,15 @@ public class LNSDeviceManager {
 					event.getPayload(), event.getfPort());
 			ManagedObjectRepresentation mor = getDevice(event.getDevEui());
 			if (mor == null) {
-				mor = createDevice(lnsInstanceId, event.getDeviceName(), event.getDevEui(), agent);
+				String name = event.getDevEui();
+				Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
+				if (connector.isPresent()) {
+					Optional<EndDevice> device = connector.get().getDevice(event.getDevEui());
+					if (device.isPresent()) {
+						name = device.get().getName();
+					}
+				}
+				mor = createDevice(lnsInstanceId, name, event.getDevEui(), agent);
 			}
 			mor.setLastUpdatedDateTime(null);
 			if (event.getModel() == null && mor.get(Hardware.class) != null) {
@@ -111,7 +127,7 @@ public class LNSDeviceManager {
 				inventoryApi.update(mor);
 			}
 			ManagedObject agentApi = inventoryApi
-					.getManagedObjectApi(agent.getId() /*agents.get(subscriptionsService.getTenant()).getId()*/);
+					.getManagedObjectApi(agent.getId() /* agents.get(subscriptionsService.getTenant()).getId() */);
 			try {
 				agentApi.getChildDevice(mor.getId());
 			} catch (Exception e) {
@@ -126,7 +142,8 @@ public class LNSDeviceManager {
 		}
 	}
 
-	public ManagedObjectRepresentation createDevice(String lnsInstanceId, String name, String devEUI, ManagedObjectRepresentation agent) {
+	public ManagedObjectRepresentation createDevice(String lnsInstanceId, String name, String devEUI,
+			ManagedObjectRepresentation agent) {
 		ManagedObjectRepresentation mor;
 		mor = new ManagedObjectRepresentation();
 		mor.setType("c8y_LoRaDevice");

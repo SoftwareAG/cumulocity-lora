@@ -19,10 +19,11 @@ import c8y.Command;
 import lora.codec.DownlinkData;
 import lora.codec.ms.CodecManager;
 import lora.ns.LNSIntegrationService;
+import lora.ns.connector.LNSConnectorManager;
 import lora.ns.device.LNSDeviceManager;
 
 @Component
-public abstract class LNSOperationManager {
+public class LNSOperationManager {
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -41,9 +42,10 @@ public abstract class LNSOperationManager {
 	@Autowired
 	private LNSDeviceManager lnsDeviceManager;
 
-	private Map<String, Map<String, Map<String, OperationRepresentation>>> operations = new HashMap<>();
+	@Autowired
+	private LNSConnectorManager lnsConnectorManager;
 
-	protected abstract String processOperation(DownlinkData operation, OperationRepresentation c8yOperation);
+	private Map<String, Map<String, Map<String, OperationRepresentation>>> operations = new HashMap<>();
 
 	@Async
 	public void executePending(OperationRepresentation operation) {
@@ -70,15 +72,9 @@ public abstract class LNSOperationManager {
 	}
 
 	public void processOperation(String lnsConnectorId, DownlinkData operation, OperationRepresentation c8yOperation) {
-		if (operations.containsKey(subscriptionsService.getTenant())
-				&& operations.get(subscriptionsService.getTenant()).containsKey(lnsConnectorId)) {
-			String commandId = processOperation(operation, c8yOperation);
-			storeOperation(lnsConnectorId, c8yOperation, commandId);
-			deviceControlApi.update(c8yOperation);
-		} else {
-			logger.error("LNS instance {} could not be found on tenant {}", lnsConnectorId,
-					subscriptionsService.getTenant());
-		}
+		String commandId = lnsConnectorManager.getConnector(lnsConnectorId).get().processOperation(operation, c8yOperation);
+		storeOperation(lnsConnectorId, c8yOperation, commandId);
+		deviceControlApi.update(c8yOperation);
 	}
 
 	public void storeOperation(String lnsConnectorId, OperationRepresentation c8yOperation, String commandId) {
