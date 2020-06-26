@@ -2,6 +2,7 @@ package lora.ns.kerlink;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -138,7 +139,7 @@ public class KerlinkConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public EndDevice getDevice(String devEui) {
+	public Optional<EndDevice> getDevice(String devEui) {
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -147,7 +148,7 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		RestTemplate restTemplate = new RestTemplate();
 		logger.info("Will get device info on URL: {}", baseUrl + "/endDevices/" + devEui);
 		EndDeviceDto endDeviceDto = restTemplate.exchange(baseUrl + "/endDevices/" + devEui, HttpMethod.GET, new HttpEntity<String>("", headers), EndDeviceDto.class).getBody();
-		return new EndDevice(devEui, endDeviceDto.getName(), endDeviceDto.getClassType(), endDeviceDto.getDevAddr(), endDeviceDto.getCluster().getName());
+		return Optional.of(new EndDevice(devEui, endDeviceDto.getName(), endDeviceDto.getClassType(), endDeviceDto.getDevAddr(), endDeviceDto.getCluster().getName()));
 	}
 
 	@Override

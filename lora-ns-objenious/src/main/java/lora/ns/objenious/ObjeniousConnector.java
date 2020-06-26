@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -121,7 +122,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public EndDevice getDevice(String devEui) {
+	public Optional<EndDevice> getDevice(String devEui) {
 		EndDevice result = null;
 		try {
 			Device device = objeniousService.getDevice(devEui).execute().body();
@@ -129,7 +130,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return result;
+		return Optional.ofNullable(result);
 	}
 
 	@Override
