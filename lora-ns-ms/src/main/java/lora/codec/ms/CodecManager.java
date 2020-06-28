@@ -113,6 +113,7 @@ public class CodecManager {
 		eventRepresentation.setText("LoRa raw payload");
 		eventRepresentation.setType("LoRaPayload");
 		eventRepresentation.setProperty("payload", Hex.encodeHexString(event.getPayload()));
+		eventRepresentation.setProperty("port", event.getfPort());
 		logger.info("Device details: {}", mor.toJSON());
 		if (mor.hasProperty("codec")) {
 			logger.info("Codec {} will be used with device {} for decoding payload {} on port {}", mor.getProperty("codec"), event.getDevEui(), event.getPayload(), event.getfPort());
