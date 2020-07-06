@@ -9,7 +9,7 @@
             <div class="col-sm-12">
                 <div class="c8y-select-wrapper">
                     <label for="model">Type:</label>
-                    <select class="form-control" [(ngModel)]="codec" (change)="loadModels(device.codec)"
+                    <select class="form-control" [(ngModel)]="codec" (change)="loadModels(codec)"
                         required>
                         <option>Please select a type</option>
                         <option *ngFor="let codec of codecs" [value]="codec.lora_codec_DeviceCodecRepresentation.id">
