@@ -28,7 +28,7 @@ export class LoraDevicesComponent {
     informationText: string;
     fileContent: string[][];
     deviceToDelete: IManagedObject;
-    @ViewChild("deleteDeviceModal", {static: false})
+    @ViewChild("deleteDeviceModal", { static: false })
     deleteDeviceModal: TemplateRef<any>;
     deleteDeviceModalRef: BsModalRef;
 
@@ -68,7 +68,7 @@ export class LoraDevicesComponent {
         this.informationText = _('Ooops! It seems that there is no device to display.');
         this.init();
     }
-    
+
     async init() {
         await this.loadCodecs();
         await this.loadProxies();
@@ -113,45 +113,53 @@ export class LoraDevicesComponent {
 
     // Add a managedObject (as device) to the database.
     async addDevice(name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, instance: string) {
-        let device = {
-            c8y_IsDevice: {},
-            devEUI: devEUI.toLowerCase(),
-            appEUI: appEUI.toLowerCase(),
-            appKey: appKey.toLowerCase(),
-            codec: type,
-            type: 'c8y_LoRaDevice',
-            c8y_Hardware: { model: model },
-            c8y_LpwanDevice: { provisioned: false },
-            c8y_SupportedOperations: ["c8y_Command"],
-            battery: 100,
-            lora_codec_DeviceCodecRepresentation: this.codecs.filter((codec) => codec.lora_codec_DeviceCodecRepresentation.id === type)[0].lora_codec_DeviceCodecRepresentation
-        };
-
-        if (name && name.length > 0) {
-            device = Object.assign({ name }, device);
-        }
-
-        let createdDevice = (await this.inventory.create(device)).data;
-        let deviceId = createdDevice.id;
-
-        let extId: IExternalIdentity = {
-            type: 'LoRa devEUI',
-            externalId: devEUI.toLowerCase(),
-            managedObject: {
-                id: deviceId
-            }
-        };
-        await this.identity.create(extId);
 
         if (instance) {
-            this.provision(createdDevice, instance)
+            this.provision({
+                name,
+                devEUI: devEUI.toLowerCase(),
+                appEUI: appEUI.toLowerCase(),
+                appKey: appKey.toLowerCase(),
+                codec: type,
+                model
+            }, instance)
+        } else {
+            let device = {
+                c8y_IsDevice: {},
+                devEUI: devEUI.toLowerCase(),
+                appEUI: appEUI.toLowerCase(),
+                appKey: appKey.toLowerCase(),
+                codec: type,
+                type: 'c8y_LoRaDevice',
+                c8y_Hardware: { model: model },
+                c8y_LpwanDevice: { provisioned: false },
+                c8y_SupportedOperations: ["c8y_Command"],
+                battery: 100,
+                lora_codec_DeviceCodecRepresentation: this.codecs.filter((codec) => codec.lora_codec_DeviceCodecRepresentation.id === type)[0].lora_codec_DeviceCodecRepresentation
+            };
+
+            if (name && name.length > 0) {
+                device = Object.assign({ name }, device);
+            }
+
+            let createdDevice = (await this.inventory.create(device)).data;
+            let deviceId = createdDevice.id;
+
+            let extId: IExternalIdentity = {
+                type: 'LoRa devEUI',
+                externalId: devEUI.toLowerCase(),
+                managedObject: {
+                    id: deviceId
+                }
+            };
+            await this.identity.create(extId);
         }
         this.loadDevices();
     }
 
     delete(device: IManagedObject) {
         this.deviceToDelete = device;
-        this.deleteDeviceModalRef = this.modalService.show(this.deleteDeviceModal, {backdrop: true, ignoreBackdropClick: true});
+        this.deleteDeviceModalRef = this.modalService.show(this.deleteDeviceModal, { backdrop: true, ignoreBackdropClick: true });
     }
 
     async endDelete(deprovision: boolean) {
@@ -175,7 +183,11 @@ export class LoraDevicesComponent {
     async loadModels(codec) {
         const response = await this.fetchClient.fetch('service/lora-codec-' + codec + '/models');
         if (response) {
-            this.models = await response.json();
+            try {
+                this.models = await response.json();
+            } catch (e) {
+                this.models = [];
+            }
         }
         else {
             this.models = [];
@@ -206,24 +218,16 @@ export class LoraDevicesComponent {
         })
     }
 
-    async provision(device: IManagedObject, instance: string) {
+    async provision(deviceProvisioning: { name: string, devEUI: string, appEUI: string, appKey: string, codec: string, model: string, lat?: number, lng?: number }, instance: string): Promise<IManagedObject> {
         console.log("Will provision device on LNS instance " + instance);
         let lnsInstance: IManagedObject = this.instanceMap[instance];
-        await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsId + '/' + instance + '/devices', {
+        return (await (await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsId + '/' + instance + '/devices', {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
-              },
-            body: JSON.stringify({
-                name: device.name,
-                devEUI: device.devEUI,
-                appEUI: device.appEUI,
-                appKey: device.appKey,
-                deviceModel: device.codec,
-                lat: null,
-                lng: null
-            })
-        });
+            },
+            body: JSON.stringify(deviceProvisioning)
+        })).json()).data;
     }
 
     async deprovision(device: IManagedObject) {

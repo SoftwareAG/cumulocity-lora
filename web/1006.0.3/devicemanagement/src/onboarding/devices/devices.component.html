@@ -6,25 +6,21 @@
             <h4 class="card-title">{{'Create a new device' | translate}}</h4>
         </div>
         <div class="card-block">
-            <div class="col-sm-6">
-                <div class="form-group">
-                    <label for="deviceName">Name:</label>
-                    <input #deviceName required />
-                </div>
-                <div class="form-group">
-                    <label for="devEUI">Dev EUI:</label>
-                    <input #devEUI required />
-                </div>
+            <div class="form-group col-sm-6">
+                <label for="deviceName">Name:</label>
+                <input #deviceName required />
             </div>
-            <div class="col-sm-6">
-                <div class="form-group">
-                    <label for="appEUI">App EUI:</label>
-                    <input #appEUI required />
-                </div>
-                <div class="form-group">
-                    <label for="appKey">App Key:</label>
-                    <input #appKey required />
-                </div>
+            <div class="form-group col-sm-6">
+                <label for="devEUI">Dev EUI:</label>
+                <input #devEUI required />
+            </div>
+            <div class="form-group col-sm-6">
+                <label for="appEUI">App EUI:</label>
+                <input #appEUI required />
+            </div>
+            <div class="form-group col-sm-6">
+                <label for="appKey">App Key:</label>
+                <input #appKey required />
             </div>
             <div class="col-sm-12">
                 <div class="c8y-select-wrapper">
