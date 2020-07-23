@@ -123,7 +123,7 @@ The `PropertyType.LIST` type is the one that will be used to create a `select` e
 
 For example, if URL is `/clusters`, you'll have to create a REST resource that serves this URI and should look like this:
 
-```
+```java
 @RestController
 public class KerlinkRestController {
 
@@ -133,12 +133,12 @@ public class KerlinkRestController {
 	}
 
 }
-````
+```
 
 Your LNSConnector implementation must expose a constructor that takes a `java.util.Properties` parameter.
 If you're extending from LNSAbstractConnector your just have to call the super constructor like this:
 
-```
+```java
 	public KerlinkConnector(Properties properties) {
 		super(properties);
 	}
