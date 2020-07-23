@@ -119,7 +119,29 @@ The last parameter of `PropertyDescription` constructor is the type of the data 
 
 `PropertyType.LIST` will be used to create a dropdown. Elements of this dropdown will be created by calling the URL given by the `url` parameter passed to the `PropertyDescription` constructor.
 
-For example, if `url` is `/clusters`, you'll have to create a REST resource that serves this URI and should look like this:
+For example, say you configure a wizard step like this:
+
+```java
+wizard.add(new LNSConnectorWizardStep() {
+    private final LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
+    {
+        propertyDescriptions.add(new PropertyDescription("clusterId", "Cluster", true, null, "/clusters", null, null, null, null, null, PropertyType.LIST));
+    }
+
+    @Override
+    public String getName() {
+        return "Select a cluster";
+    }
+
+    @Override
+    public LinkedList<PropertyDescription> getPropertyDescriptions() {
+        return propertyDescriptions;
+    }
+});
+```
+That means that you define a `clusterId` property for your connector and the value of this property needs to be selected in a list provided by the `/clusters` URI.
+
+Your microservice therefore needs to define this REST resource, which can be done this way:
 
 ```java
 @RestController
@@ -133,13 +155,23 @@ public class KerlinkRestController {
 }
 ```
 
+Several important notes here:
+
+* this must be a POST resource
+
+* the list returned by this resource must be a list of structures that must have those 2 properties in order to be used accordingly by the UI:
+
+    * `String name`
+
+    * `Integer id`
+
 Your LNSConnector implementation must expose a constructor that takes a `java.util.Properties` parameter.
 If you're extending from LNSAbstractConnector you just have to call the super constructor like this:
 
 ```java
-	public KerlinkConnector(Properties properties) {
-		super(properties);
-	}
+public KerlinkConnector(Properties properties) {
+    super(properties);
+}
 ```
 
 This allows to create a temporary connector to access the LNS API.
