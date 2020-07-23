@@ -9,13 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
+import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.model.idtype.GId;
+import com.cumulocity.rest.representation.alarm.AlarmRepresentation;
 import com.cumulocity.rest.representation.event.EventRepresentation;
 import com.cumulocity.rest.representation.identity.ExternalIDRepresentation;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.cumulocity.sdk.client.SDKException;
+import com.cumulocity.sdk.client.alarm.AlarmApi;
 import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
 import com.cumulocity.sdk.client.event.EventApi;
 import com.cumulocity.sdk.client.identity.ExternalIDCollection;
@@ -59,6 +62,9 @@ public class LNSDeviceManager {
 
 	@Autowired
 	protected EventApi eventApi;
+	
+	@Autowired
+	protected AlarmApi alarmApi;
 
 	@Autowired
 	protected DeviceControlApi deviceControlApi;
@@ -142,22 +148,40 @@ public class LNSDeviceManager {
 		}
 	}
 
-	public ManagedObjectRepresentation createDevice(String lnsInstanceId, String name, String devEUI,
+	public ManagedObjectRepresentation createDevice(String lnsConnectorId, String name, String devEUI,
 			ManagedObjectRepresentation agent) {
-		ManagedObjectRepresentation mor;
-		mor = new ManagedObjectRepresentation();
-		mor.setType("c8y_LoRaDevice");
-		mor.setName(name);
-		mor.setProperty(LNSIntegrationService.LNS_INSTANCE_REF, lnsInstanceId);
-		mor.set(new IsDevice());
-		SupportedOperations supportedOperations = new SupportedOperations();
-		supportedOperations.add("c8y_Command");
-		mor.setLastUpdatedDateTime(null);
-		mor.set(supportedOperations);
-		mor = inventoryApi.create(mor);
-		ManagedObject agentApi = inventoryApi.getManagedObjectApi(agent.getId());
-		agentApi.addChildDevice(mor.getId());
-		c8yUtils.createExternalId(mor, devEUI, DEVEUI_TYPE);
+		ManagedObjectRepresentation mor = null;
+		if (lnsConnectorId != null && devEUI != null) {
+			mor = new ManagedObjectRepresentation();
+			mor.setType("c8y_LoRaDevice");
+			mor.setName(name);
+			mor.set(new IsDevice());
+			SupportedOperations supportedOperations = new SupportedOperations();
+			supportedOperations.add("c8y_Command");
+			mor.set(supportedOperations);
+			mor.setProperty(LNSIntegrationService.LNS_INSTANCE_REF, lnsConnectorId);
+			mor = inventoryApi.create(mor);
+			ManagedObject agentApi = inventoryApi.getManagedObjectApi(agent.getId());
+			agentApi.addChildDevice(mor.getId());
+			c8yUtils.createExternalId(mor, devEUI, DEVEUI_TYPE);
+		} else {
+			if (lnsConnectorId == null) {
+				AlarmRepresentation alarm = new AlarmRepresentation();
+				alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
+				alarm.setType("Device provisioning error");
+				alarm.setText("Connector ID cannot be null");
+				alarm.setSource(agent);
+				alarmApi.create(alarm);
+			}
+			if (devEUI == null) {
+				AlarmRepresentation alarm = new AlarmRepresentation();
+				alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
+				alarm.setType("Device provisioning error");
+				alarm.setText("devEUI cannot be null");
+				alarm.setSource(agent);
+				alarmApi.create(alarm);
+			}
+		}
 		return mor;
 	}
 

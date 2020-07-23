@@ -7,7 +7,8 @@ public class DeviceProvisioning {
 	private String devEUI;
 	private String appEUI;
 	private String appKey;
-	private String deviceModel;
+	private String codec;
+	private String model;
 	private BigDecimal lat;
 	private BigDecimal lng;
 	public String getName() {
@@ -34,12 +35,6 @@ public class DeviceProvisioning {
 	public void setAppKey(String appKey) {
 		this.appKey = appKey;
 	}
-	public String getDeviceModel() {
-		return deviceModel;
-	}
-	public void setDeviceModel(String deviceModel) {
-		this.deviceModel = deviceModel;
-	}
 	public BigDecimal getLat() {
 		return lat;
 	}
@@ -51,5 +46,17 @@ public class DeviceProvisioning {
 	}
 	public void setLng(BigDecimal lng) {
 		this.lng = lng;
+	}
+	public String getCodec() {
+		return codec;
+	}
+	public void setCodec(String codec) {
+		this.codec = codec;
+	}
+	public String getModel() {
+		return model;
+	}
+	public void setModel(String model) {
+		this.model = model;
 	}
 }

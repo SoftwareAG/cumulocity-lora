@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import lora.ns.DeviceProvisioning;
+import lora.ns.DeviceProvisioningResponse;
 import lora.ns.EndDevice;
 import lora.ns.LNSIntegrationService;
 import lora.ns.connector.LNSConnector;
@@ -57,7 +58,7 @@ public class LNSRestController {
 	}
 	
 	@PostMapping(value = "/{lnsInstanceId}/devices", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ManagedObjectRepresentation provisionDevice(@RequestBody DeviceProvisioning deviceProvisioning, @PathVariable String lnsInstanceId) {
+	public DeviceProvisioningResponse provisionDevice(@RequestBody DeviceProvisioning deviceProvisioning, @PathVariable String lnsInstanceId) {
 		return lnsProxy.provisionDevice(lnsInstanceId, deviceProvisioning);
 	}
 	

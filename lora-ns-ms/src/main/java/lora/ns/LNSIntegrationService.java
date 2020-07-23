@@ -50,9 +50,9 @@ import com.cumulocity.sdk.client.measurement.MeasurementApi;
 import com.cumulocity.sdk.client.option.TenantOptionApi;
 
 import c8y.Command;
+import c8y.Hardware;
 import c8y.LpwanDevice;
 import lora.codec.C8YData;
-import lora.codec.DownlinkData;
 import lora.codec.ms.CodecManager;
 import lora.common.C8YUtils;
 import lora.common.Component;
@@ -115,10 +115,10 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 
 	@Autowired
 	private LNSConnectorManager lnsConnectorManager;
+	
+	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
-
-	public abstract LinkedList<LNSConnectorWizardStep> getInstanceWizard();
 
 	public abstract DeviceData processUplinkEvent(String eventString);
 
@@ -147,7 +147,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 	@EventListener
 	private void init(MicroserviceSubscriptionAddedEvent event) {
 		getAllLNSInstances(event);
-		// registerLNSProxy();
 		agentService.registerAgent(this);
 	}
 
@@ -221,26 +220,32 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 		}
 	}
 
-	public ManagedObjectRepresentation provisionDevice(String lnsInstanceId, DeviceProvisioning deviceProvisioning) {
+	public DeviceProvisioningResponse provisionDevice(String lnsInstanceId, DeviceProvisioning deviceProvisioning) {
+		DeviceProvisioningResponse response = new DeviceProvisioningResponse();
 		ManagedObjectRepresentation mor = null;
+		String errorMessage = null;
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent() && connector.get().provisionDevice(deviceProvisioning)) {
 			ExternalIDRepresentation extId = c8yUtils.findExternalId(deviceProvisioning.getDevEUI(), DEVEUI_TYPE);
 			if (extId == null) {
 				mor = lnsDeviceManager.createDevice(lnsInstanceId, deviceProvisioning.getName(),
 						deviceProvisioning.getDevEUI(), agentService.getAgent());
-				// mor = createDevice(lnsInstanceId, deviceProvisioning.getName(),
-				// deviceProvisioning.getDevEUI());
 			} else {
 				mor = extId.getManagedObject();
+				mor.setProperty(LNSIntegrationService.LNS_INSTANCE_REF, lnsInstanceId);
 				ManagedObject agentApi = inventoryApi.getManagedObjectApi(agentService.getAgent().getId());
 				agentApi.addChildDevice(mor.getId());
 			}
+			if (deviceProvisioning.getCodec() != null) {
+				mor.setProperty("codec", deviceProvisioning.getCodec());
+			}
+			if (deviceProvisioning.getModel() != null) {
+				Hardware hardware = new Hardware();
+				hardware.setModel(deviceProvisioning.getModel());
+				mor.set(hardware);
+			}
 			mor.set(new LpwanDevice().provisioned(true));
 			mor.setLastUpdatedDateTime(null);
-			if (!mor.hasProperty("codec")) {
-				mor.setProperty("codec", deviceProvisioning.getDeviceModel());
-			}
 			inventoryApi.update(mor);
 			EventRepresentation event = new EventRepresentation();
 			event.setType("Device provisioned");
@@ -252,8 +257,14 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 		} else {
 			AlarmRepresentation alarm = new AlarmRepresentation();
 			alarm.setType("Device provisioning error");
-			alarm.setText("Couldn't provision device " + deviceProvisioning.getDevEUI() + " in LNS instance "
-					+ lnsInstanceId);
+			if (connector.isPresent()) {
+				errorMessage = "Couldn't provision device " + deviceProvisioning.getDevEUI() + " in LNS connector "
+						+ lnsInstanceId;
+			} else {
+				errorMessage = "LNS connector Id '"
+						+ lnsInstanceId + "' doesn't exist. Please use a valid managed object Id.";
+			}
+			alarm.setText(errorMessage);
 			alarm.setDateTime(new DateTime());
 			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
 			mor = getDevice(deviceProvisioning.getDevEUI());
@@ -264,7 +275,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 			}
 			alarmApi.create(alarm);
 		}
-		return mor;
+		response.setDevice(mor);
+		response.setErrorMessage(errorMessage);
+		return response;
 	}
 
 	private void getDeviceConfig(ManagedObjectRepresentation mor) {
@@ -312,19 +325,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 				subscriptionsService.getCredentials(subscriptionsService.getTenant()).get());
 
 		return mor;
-	}
-
-	protected void processOperation(String lnsInstanceId, DownlinkData operation,
-			OperationRepresentation c8yOperation) {
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
-		if (connector.isPresent()) {
-			String commandId = connector.get().processOperation(operation, c8yOperation);
-			lnsOperationManager.storeOperation(lnsInstanceId, c8yOperation, commandId);
-			deviceControlApi.update(c8yOperation);
-		} else {
-			logger.error("LNS instance {} of type {} could not be found on tenant {}", lnsInstanceId, getName(),
-					subscriptionsService.getTenant());
-		}
 	}
 
 	@Scheduled(initialDelay = 10000, fixedDelay = 10000)
@@ -401,5 +401,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 			result = true;
 		}
 		return result;
+	}
+	
+	public LinkedList<LNSConnectorWizardStep> getInstanceWizard() {
+		return wizard;
 	}
 }

@@ -10,7 +10,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
+import com.cumulocity.model.idtype.GId;
 import com.cumulocity.model.operation.OperationStatus;
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
@@ -26,6 +28,8 @@ import lora.ns.device.LNSDeviceManager;
 public class LNSOperationManager {
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
+	
+	private static final String DOWNLINKS = "downlinks";
 
 	@Autowired
 	private InventoryApi inventoryApi;
@@ -72,9 +76,8 @@ public class LNSOperationManager {
 	}
 
 	public void processOperation(String lnsConnectorId, DownlinkData operation, OperationRepresentation c8yOperation) {
-		String commandId = lnsConnectorManager.getConnector(lnsConnectorId).get().processOperation(operation, c8yOperation);
+		String commandId = lnsConnectorManager.getConnector(lnsConnectorId).get().sendDownlink(operation);
 		storeOperation(lnsConnectorId, c8yOperation, commandId);
-		deviceControlApi.update(c8yOperation);
 	}
 
 	public void storeOperation(String lnsConnectorId, OperationRepresentation c8yOperation, String commandId) {
@@ -85,19 +88,63 @@ public class LNSOperationManager {
 			operations.get(subscriptionsService.getTenant()).put(lnsConnectorId, new HashMap<>());
 		}
 		operations.get(subscriptionsService.getTenant()).get(lnsConnectorId).put(commandId, c8yOperation);
+		storeOperationOnMO(lnsConnectorId, c8yOperation, commandId);
 	}
 
 	public OperationRepresentation retrieveOperation(String lnsConnectorId, String commandId) {
 		return operations.containsKey(subscriptionsService.getTenant())
 				&& operations.get(subscriptionsService.getTenant()).containsKey(lnsConnectorId)
 						? operations.get(subscriptionsService.getTenant()).get(lnsConnectorId).get(commandId)
-						: null;
+						: retrieveOperationFromMO(lnsConnectorId, commandId);
 	}
 
 	public void removeOperation(String lnsConnectorId, String commandId) {
 		if (operations.containsKey(subscriptionsService.getTenant())
 				&& operations.get(subscriptionsService.getTenant()).containsKey(lnsConnectorId)) {
 			operations.get(subscriptionsService.getTenant()).get(lnsConnectorId).remove(commandId);
+			removeOperationOnMO(lnsConnectorId, commandId);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void storeOperationOnMO(String lnsConnectorId, OperationRepresentation c8yOperation, String commandId) {
+		ManagedObjectRepresentation mor = inventoryApi.get(GId.asGId(lnsConnectorId));
+		if (mor != null) {
+			Map<String, String> downlinks = new HashMap<String, String>();
+			if (mor.hasProperty(DOWNLINKS)) {
+				downlinks = (Map<String, String>)mor.getProperty(DOWNLINKS);
+			}
+			downlinks.put(commandId, c8yOperation.getId().getValue());
+			mor = new ManagedObjectRepresentation();
+			mor.setId(GId.asGId(lnsConnectorId));
+			mor.setProperty(DOWNLINKS, downlinks);
+			inventoryApi.update(mor);
+		}
+	}
+	
+	private OperationRepresentation retrieveOperationFromMO(String lnsConnectorId, String commandId) {
+		OperationRepresentation result = null;
+		ManagedObjectRepresentation mor = inventoryApi.get(GId.asGId(lnsConnectorId));
+		if (mor != null && mor.hasProperty(DOWNLINKS)) {
+			@SuppressWarnings("unchecked")
+			Map<String, String> downlinks = (Map<String, String>)mor.getProperty(DOWNLINKS);
+			if (downlinks.containsKey(commandId)) {
+				result = deviceControlApi.getOperation(GId.asGId(downlinks.get(commandId)));
+			}
+		}
+		return result;
+	}
+	
+	private void removeOperationOnMO(String lnsConnectorId, String commandId) {
+		ManagedObjectRepresentation mor = inventoryApi.get(GId.asGId(lnsConnectorId));
+		if (mor != null && mor.hasProperty(DOWNLINKS)) {
+			@SuppressWarnings("unchecked")
+			Map<String, String> downlinks = (Map<String, String>)mor.getProperty(DOWNLINKS);
+			downlinks.remove(commandId);
+			mor = new ManagedObjectRepresentation();
+			mor.setId(GId.asGId(lnsConnectorId));
+			mor.setProperty(DOWNLINKS, downlinks);
+			inventoryApi.update(mor);
 		}
 	}
 }
