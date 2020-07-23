@@ -97,7 +97,7 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		RestTemplate restTemplate = new RestTemplate();
 		PaginatedDto<EndDeviceDto> endDevicesDto = restTemplate.exchange(baseUrl + "/endDevices", HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>(){}).getBody();
 		for (EndDeviceDto endDeviceDto : endDevicesDto.getList()) {
-			endDevices.add(new EndDevice(endDeviceDto.getDevEui(), endDeviceDto.getName(), endDeviceDto.getClassType(), endDeviceDto.getDevAddr(), endDeviceDto.getCluster().getName()));
+			endDevices.add(new EndDevice(endDeviceDto.getDevEui(), endDeviceDto.getName(), endDeviceDto.getClassType()));
 		}
 		return endDevices;
 	}
@@ -147,7 +147,7 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		RestTemplate restTemplate = new RestTemplate();
 		logger.info("Will get device info on URL: {}", baseUrl + "/endDevices/" + devEui);
 		EndDeviceDto endDeviceDto = restTemplate.exchange(baseUrl + "/endDevices/" + devEui, HttpMethod.GET, new HttpEntity<String>("", headers), EndDeviceDto.class).getBody();
-		return Optional.of(new EndDevice(devEui, endDeviceDto.getName(), endDeviceDto.getClassType(), endDeviceDto.getDevAddr(), endDeviceDto.getCluster().getName()));
+		return Optional.of(new EndDevice(devEui, endDeviceDto.getName(), endDeviceDto.getClassType()));
 	}
 
 	@Override

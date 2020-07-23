@@ -111,7 +111,7 @@ public class Instance extends LNSAbstractConnector {
 			List<Device> devices = response.body();
 			if (devices != null) {
 				result = devices.stream()
-						.map(device -> new EndDevice(device.getDeveui(), device.getDeveui(), "", "", ""))
+						.map(device -> new EndDevice(device.getDeveui(), device.getDeveui(), DeviceClass.BY_VALUE.get(device.getLora_device_class()).name()))
 						.collect(Collectors.toList());
 			}
 		} catch (IOException e) {
@@ -126,8 +126,7 @@ public class Instance extends LNSAbstractConnector {
 		EndDevice result = null;
 		try {
 			Device device = orbiwiseService.getDevice(devEui).execute().body();
-			result = new EndDevice(devEui, devEui, DeviceClass.BY_VALUE.get(device.getLora_device_class()).name(), "",
-					"");
+			result = new EndDevice(devEui, devEui, DeviceClass.BY_VALUE.get(device.getLora_device_class()).name());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

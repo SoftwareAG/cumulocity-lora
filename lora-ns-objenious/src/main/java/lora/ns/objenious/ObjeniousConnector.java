@@ -96,7 +96,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			List<Device> devices = response.body();
 			if (devices != null) {
 				result = devices.stream().map(
-						device -> new EndDevice(device.getProperties().get("deveui"), device.getLabel(), "", "", ""))
+						device -> new EndDevice(device.getProperties().getDeveui(), device.getLabel(), ""))
 						.collect(Collectors.toList());
 			}
 		} catch (IOException e) {
@@ -125,7 +125,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		EndDevice result = null;
 		try {
 			Device device = objeniousService.getDevice(devEui).execute().body();
-			result = new EndDevice(devEui, device.getLabel(), "", "", "");
+			result = new EndDevice(devEui, device.getLabel(), "A");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

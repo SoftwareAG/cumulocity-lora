@@ -121,7 +121,7 @@ public class LoriotConnector extends LNSAbstractConnector {
 			List<Device> devices = response.body();
 			if (devices != null) {
 				result = devices.stream().map(
-						device -> new EndDevice(device.getDeveui(), device.getTitle(), device.getDevclass(), "", ""))
+						device -> new EndDevice(device.getDeveui(), device.getTitle(), device.getDevclass()))
 						.collect(Collectors.toList());
 			}
 		} catch (IOException e) {
@@ -136,7 +136,7 @@ public class LoriotConnector extends LNSAbstractConnector {
 		EndDevice result = null;
 		try {
 			Device device = loriotService.getDevice(getProperties().getProperty("appid"), devEui).execute().body();
-			result = new EndDevice(devEui, device.getTitle(), device.getDevclass(), "", "");
+			result = new EndDevice(devEui, device.getTitle(), device.getDevclass());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
