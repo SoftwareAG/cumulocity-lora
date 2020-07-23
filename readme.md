@@ -97,11 +97,9 @@ The reason we need a wizard to configure a LNS connector is because most LNS gro
 
 For example Kerlink Wanesy groups devices in clusters, Loriot groups them in apps and Objenious in groups.
 
-So generally you have 2 steps to connect a LNS to Cumulocity: first step provides access to the LNS (for example URL and credentials) and second step lets you chose which group of devices you want to connect to Cumulocity.
+So generally you have 2 steps to connect a LNS to Cumulocity: first step provides access to the LNS (for example URL and credentials) and second step lets you choose which group of devices you want to connect to Cumulocity.
 
 A `LNSConnectorWizardStep` must provide a `LinkedList` of `PropertyDescription`s.
-
-The `PropertyDescription` is quite simple to understand, though how to access the groups of devices must be clarified.
 
 The last parameter of `PropertyDescription` constructor is the type of the data to display in the UI. It can be:
 
@@ -119,9 +117,9 @@ The last parameter of `PropertyDescription` constructor is the type of the data 
 
 * `PropertyType.LIST`
 
-The `PropertyType.LIST` type is the one that will be used to create a `select` element in the UI which options list will be created by calling the URL given by the `url` parameter passed to the `PropertyDescription` constructor.
+`PropertyType.LIST` will be used to create a dropdown. Elements of this dropdown will be created by calling the URL given by the `url` parameter passed to the `PropertyDescription` constructor.
 
-For example, if URL is `/clusters`, you'll have to create a REST resource that serves this URI and should look like this:
+For example, if `url` is `/clusters`, you'll have to create a REST resource that serves this URI and should look like this:
 
 ```java
 @RestController
@@ -136,7 +134,7 @@ public class KerlinkRestController {
 ```
 
 Your LNSConnector implementation must expose a constructor that takes a `java.util.Properties` parameter.
-If you're extending from LNSAbstractConnector your just have to call the super constructor like this:
+If you're extending from LNSAbstractConnector you just have to call the super constructor like this:
 
 ```java
 	public KerlinkConnector(Properties properties) {
@@ -145,3 +143,11 @@ If you're extending from LNSAbstractConnector your just have to call the super c
 ```
 
 This allows to create a temporary connector to access the LNS API.
+
+### Framework REST API
+
+The framework automatically exposes its REST API with springfox-swagger-ui.
+
+You can directly view and test the API by adding `/swagger-ui.html` to the URL of the microservice.
+
+Example: `https://lora-dev.cumulocity.com/service/lora-ns-objenious/swagger-ui.html`
