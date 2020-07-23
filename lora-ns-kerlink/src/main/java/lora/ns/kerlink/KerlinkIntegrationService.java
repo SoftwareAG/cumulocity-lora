@@ -32,9 +32,6 @@ public class KerlinkIntegrationService extends LNSIntegrationService<KerlinkConn
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private 
-	
-	LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
 	{
 		wizard.add(new LNSConnectorWizardStep() {
 			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
@@ -163,10 +160,5 @@ public class KerlinkIntegrationService extends LNSIntegrationService<KerlinkConn
 	@Override
 	public String getVersion() {
 		return "3.1";
-	}
-
-	@Override
-	public LinkedList<LNSConnectorWizardStep> getInstanceWizard() {
-		return wizard;
 	}
 }

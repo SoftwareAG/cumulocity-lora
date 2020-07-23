@@ -20,7 +20,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -104,7 +103,7 @@ public class KerlinkConnector extends LNSAbstractConnector {
 	}
 	
 	@Override
-	public String processOperation(DownlinkData operation, OperationRepresentation c8yOperation) {
+	public String sendDownlink(DownlinkData operation) {
 		String result = null;
 		if (jwt == null || jwt.isExpired()) {
 			login();

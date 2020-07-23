@@ -29,7 +29,6 @@ public class Orbiwise extends LNSIntegrationService<Instance> {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
 	{
 		wizard.add(new InstanceWizardStep1());
 	}
@@ -119,10 +118,5 @@ public class Orbiwise extends LNSIntegrationService<Instance> {
 	@Override
 	public String getVersion() {
 		return "1.0";
-	}
-
-	@Override
-	public LinkedList<LNSConnectorWizardStep> getInstanceWizard() {
-		return wizard;
 	}
 }

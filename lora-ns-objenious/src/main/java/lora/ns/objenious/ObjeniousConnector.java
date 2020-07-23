@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-import com.cumulocity.rest.representation.operation.OperationRepresentation;
 
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
@@ -134,7 +133,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public String processOperation(DownlinkData operation, OperationRepresentation c8yOperation) {
+	public String sendDownlink(DownlinkData operation) {
 		String result = null;
 		logger.info("Will send {} to Objenious.", operation.toString());
 		DownlinkCreateProtocolData protocolData = new DownlinkCreateProtocolData();
@@ -178,14 +177,22 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			deviceCreate.setProfileId(1);
 	
 			try {
-				result = objeniousService.createDevice(deviceCreate).execute().isSuccessful();
+				retrofit2.Response<Device> response = objeniousService.createDevice(deviceCreate).execute();
+				result = response.isSuccessful();
+				if (!result) {
+					logger.error(response.errorBody().string());
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else {
 			if (!device.isEnabled()) {
 				try {
-					result = objeniousService.reactivateDevice(deviceProvisioning.getDevEUI()).execute().isSuccessful();
+					retrofit2.Response<Device> response = objeniousService.reactivateDevice(deviceProvisioning.getDevEUI()).execute();
+					result = response.isSuccessful();
+					if (!result) {
+						logger.error(response.errorBody().string());
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

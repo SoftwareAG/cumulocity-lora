@@ -3,7 +3,6 @@ package lora.ns.objenious;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,14 +21,12 @@ import com.google.common.io.BaseEncoding;
 import lora.ns.DeviceData;
 import lora.ns.LNSIntegrationService;
 import lora.ns.OperationData;
-import lora.ns.connector.LNSConnectorWizardStep;
 
 @Service
 public class ObjeniousIntegrationService extends LNSIntegrationService<ObjeniousConnector> {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
 	{
 		wizard.add(new ConnectorWizardStep1());
 		wizard.add(new ConnectorWizardStep2());
@@ -227,10 +224,5 @@ public class ObjeniousIntegrationService extends LNSIntegrationService<Objenious
 	@Override
 	public String getVersion() {
 		return "1.0";
-	}
-
-	@Override
-	public LinkedList<LNSConnectorWizardStep> getInstanceWizard() {
-		return wizard;
 	}
 }

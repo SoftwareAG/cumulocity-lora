@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-import com.cumulocity.rest.representation.operation.OperationRepresentation;
 
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
@@ -136,7 +135,7 @@ public class Instance extends LNSAbstractConnector {
 	}
 
 	@Override
-	public String processOperation(DownlinkData operation, OperationRepresentation c8yOperation) {
+	public String sendDownlink(DownlinkData operation) {
 		String result = null;
 		logger.info("Will send {} to Orbiwan.", operation.toString());
 

@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-import com.cumulocity.rest.representation.operation.OperationRepresentation;
 
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
@@ -145,7 +144,7 @@ public class LoriotConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public String processOperation(DownlinkData operation, OperationRepresentation c8yOperation) {
+	public String sendDownlink(DownlinkData operation) {
 		String token = null;
 		try {
 			List<String> tokens = loriotService.getTokens(getProperties().getProperty("appid")).execute().body();
