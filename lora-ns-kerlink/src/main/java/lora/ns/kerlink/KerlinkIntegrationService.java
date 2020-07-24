@@ -34,11 +34,11 @@ public class KerlinkIntegrationService extends LNSIntegrationService<KerlinkConn
 	
 	{
 		wizard.add(new LNSConnectorWizardStep() {
-			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
+			final private LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 			{
-				propertyDescriptions.add(new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.TEXT));
-				propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.TEXT));
-				propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD));
+				propertyDescriptions.add(new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.TEXT, true));
+				propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.TEXT, true));
+				propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD, true));
 			}
 
 			@Override
@@ -52,9 +52,9 @@ public class KerlinkIntegrationService extends LNSIntegrationService<KerlinkConn
 			}
 		});
 		wizard.add(new LNSConnectorWizardStep() {
-			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
+			final private LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 			{
-				propertyDescriptions.add(new PropertyDescription("clusterId", "Cluster", true, null, "/clusters", null, null, null, null, null, PropertyType.LIST));
+				propertyDescriptions.add(new PropertyDescription("clusterId", "Cluster", true, null, "/clusters", null, null, null, null, null, PropertyType.LIST, false));
 			}
 
 			@Override
@@ -148,7 +148,7 @@ public class KerlinkIntegrationService extends LNSIntegrationService<KerlinkConn
 	}
 
 	@Override
-	public String getId() {
+	public String getType() {
 		return "kerlink";
 	}
 

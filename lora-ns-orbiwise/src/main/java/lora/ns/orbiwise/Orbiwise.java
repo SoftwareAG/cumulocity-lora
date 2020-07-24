@@ -3,7 +3,6 @@ package lora.ns.orbiwise;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +21,6 @@ import com.google.common.io.BaseEncoding;
 import lora.ns.DeviceData;
 import lora.ns.LNSIntegrationService;
 import lora.ns.OperationData;
-import lora.ns.connector.LNSConnectorWizardStep;
 
 @Service
 public class Orbiwise extends LNSIntegrationService<Instance> {
@@ -106,7 +104,7 @@ public class Orbiwise extends LNSIntegrationService<Instance> {
 	}
 
 	@Override
-	public String getId() {
+	public String getType() {
 		return "orbiwise";
 	}
 

@@ -212,7 +212,7 @@ public class ObjeniousIntegrationService extends LNSIntegrationService<Objenious
 	}
 
 	@Override
-	public String getId() {
+	public String getType() {
 		return "objenious";
 	}
 

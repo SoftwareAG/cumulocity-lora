@@ -9,8 +9,8 @@ import lora.ns.connector.PropertyDescription.PropertyType;
 public class InstanceWizardStep1 implements LNSConnectorWizardStep {
 	protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 	{
-		propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.TEXT));
-		propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD));
+		propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.TEXT, false));
+		propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD, true));
 	}
 
 	@Override

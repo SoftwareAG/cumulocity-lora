@@ -117,7 +117,7 @@ public class LoriotIntegrationService extends LNSIntegrationService<LoriotConnec
 	}
 
 	@Override
-	public String getId() {
+	public String getType() {
 		return "loriot";
 	}
 
