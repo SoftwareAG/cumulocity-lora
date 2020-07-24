@@ -134,8 +134,7 @@ export class LoraDevicesComponent {
                 c8y_Hardware: { model: model },
                 c8y_LpwanDevice: { provisioned: false },
                 c8y_SupportedOperations: ["c8y_Command"],
-                battery: 100,
-                lora_codec_DeviceCodecRepresentation: this.codecs.filter((codec) => codec.lora_codec_DeviceCodecRepresentation.id === type)[0].lora_codec_DeviceCodecRepresentation
+                battery: 100
             };
 
             if (name && name.length > 0) {
