@@ -26,6 +26,10 @@ This framework is composed of 2 parts:
 
 LNS Connectors as well as codecs are multitenant microservices that can fully scale.
 
+## General architecture
+
+![](architecture.png)
+
 ## How to create a new connector
 ### Interfaces and classes to extend/implement
 1. Abstract class `LNSIntegrationService<C extends LNSConnector>`
