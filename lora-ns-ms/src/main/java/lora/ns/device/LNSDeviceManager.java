@@ -118,8 +118,8 @@ public class LNSDeviceManager {
 				locationUpdate.setDateTime(new DateTime());
 				eventApi.create(locationUpdate);
 			}
-			if (!mor.hasProperty(LNSIntegrationService.LNS_INSTANCE_REF)) {
-				mor.setProperty(LNSIntegrationService.LNS_INSTANCE_REF, lnsInstanceId);
+			if (!mor.hasProperty(LNSIntegrationService.LNS_CONNECTOR_REF)) {
+				mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsInstanceId);
 				inventoryApi.update(mor);
 			}
 			DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
@@ -159,7 +159,7 @@ public class LNSDeviceManager {
 			SupportedOperations supportedOperations = new SupportedOperations();
 			supportedOperations.add("c8y_Command");
 			mor.set(supportedOperations);
-			mor.setProperty(LNSIntegrationService.LNS_INSTANCE_REF, lnsConnectorId);
+			mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsConnectorId);
 			mor = inventoryApi.create(mor);
 			ManagedObject agentApi = inventoryApi.getManagedObjectApi(agent.getId());
 			agentApi.addChildDevice(mor.getId());

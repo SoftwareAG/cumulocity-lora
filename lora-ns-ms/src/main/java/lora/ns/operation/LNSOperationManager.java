@@ -60,7 +60,7 @@ public class LNSOperationManager {
 					operation);
 			if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null) {
 				operation.setStatus(OperationStatus.EXECUTING.toString());
-				String lnsConnectorId = inventoryApi.get(operation.getDeviceId()).getProperty(LNSIntegrationService.LNS_INSTANCE_REF)
+				String lnsConnectorId = inventoryApi.get(operation.getDeviceId()).getProperty(LNSIntegrationService.LNS_CONNECTOR_REF)
 						.toString();
 				processOperation(lnsConnectorId, encodedData, operation);
 			} else {

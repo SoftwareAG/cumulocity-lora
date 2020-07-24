@@ -13,6 +13,7 @@ public class PropertyDescription {
 	private Integer minLength;
 	private Integer maxLength;
 	private String regExp;
+	private boolean encrypted;
 	
 	public enum PropertyType {
 		TEXT, PASSWORD, INTEGER, NUMBER, DATETIME, BOOLEAN, LIST;
@@ -21,7 +22,7 @@ public class PropertyDescription {
 	private PropertyType type;
 
 	public PropertyDescription(String name, String label, boolean required, String defaultValue, String url,
-			BigDecimal min, BigDecimal max, Integer minLength, Integer maxLength, String regExp, PropertyType type) {
+			BigDecimal min, BigDecimal max, Integer minLength, Integer maxLength, String regExp, PropertyType type, boolean encrypted) {
 		super();
 		this.name = name;
 		this.label = label;
@@ -34,6 +35,7 @@ public class PropertyDescription {
 		this.maxLength = maxLength;
 		this.regExp = regExp;
 		this.type = type;
+		this.encrypted = encrypted;
 	}
 
 	public String getName() {
@@ -122,5 +124,13 @@ public class PropertyDescription {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public boolean isEncrypted() {
+		return encrypted;
+	}
+
+	public void setEncrypted(boolean encrypted) {
+		this.encrypted = encrypted;
 	}
 }

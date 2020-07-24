@@ -55,7 +55,6 @@ import c8y.LpwanDevice;
 import lora.codec.C8YData;
 import lora.codec.ms.CodecManager;
 import lora.common.C8YUtils;
-import lora.common.Component;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
 import lora.ns.connector.LNSConnectorRepresentation;
@@ -64,18 +63,18 @@ import lora.ns.device.LNSDeviceManager;
 import lora.ns.operation.LNSOperationManager;
 
 @EnableScheduling
-public abstract class LNSIntegrationService<I extends LNSConnector> implements Component {
-	public static final String LNS_EXT_ID = "LoRa Network Server type ID";
+public abstract class LNSIntegrationService<I extends LNSConnector> {
+	public static final String LNS_EXT_ID = "LoRa Network Server type";
 
-	public static final String LNS_TYPE = "LoRa Network Server type";
+	public static final String LNS_MO_TYPE = "LoRa Network Server agent";
 
-	public static final String LNS_ID = "lnsId";
+	public static final String LNS_TYPE = "lnsType";
 
-	public static final String LNS_INSTANCE_REF = "lnsInstanceId";
+	public static final String LNS_CONNECTOR_REF = "lnsConnectorId";
 
 	public static final String DEVEUI_TYPE = "LoRa devEUI";
 
-	public static final String LNS_INSTANCE_TYPE = "LNS Instance";
+	public static final String LNS_CONNECTOR_TYPE = "LNS Connector";
 
 	@Autowired
 	private C8YUtils c8yUtils;
@@ -120,6 +119,12 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
+	public abstract String getType();
+	
+	public abstract String getName();
+	
+	public abstract String getVersion();
+	
 	public abstract DeviceData processUplinkEvent(String eventString);
 
 	public abstract OperationData processDownlinkEvent(String eventString);
@@ -152,7 +157,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 
 	private void getAllLNSInstances(MicroserviceSubscriptionAddedEvent event) {
 		logger.info("Looking for LNS Instances in tenant {}", subscriptionsService.getTenant());
-		InventoryFilter filter = new InventoryFilter().byType(LNS_INSTANCE_TYPE);
+		InventoryFilter filter = new InventoryFilter().byType(LNS_CONNECTOR_TYPE);
 		ManagedObjectCollection col = inventoryApi.getManagedObjectsByFilter(filter);
 		QueryParam queryParam = null;
 		try {
@@ -161,12 +166,12 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 				public String getName() {
 					return "query";
 				}
-			}, URLEncoder.encode(LNS_ID + " eq " + this.getId() + " and type eq '" + LNS_INSTANCE_TYPE + "'", "utf8"));
+			}, URLEncoder.encode(LNS_TYPE + " eq " + this.getType() + " and type eq '" + LNS_CONNECTOR_TYPE + "'", "utf8"));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		for (ManagedObjectRepresentation mor : col.get(queryParam).allPages()) {
-			logger.info("Retrieved instance: {} of type {}", mor.getName(), mor.getProperty(LNS_ID));
+			logger.info("Retrieved instance: {} of type {}", mor.getName(), mor.getProperty(LNS_TYPE));
 			LNSConnector instance = getInstance(mor);
 			Properties properties = new Properties();
 			for (OptionRepresentation option : tenantOptionApi.getAllOptionsForCategory(instance.getId())) {
@@ -195,7 +200,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 	public void updateOperation(String event, String lnsInstanceId) {
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent()) {
-			logger.info("LNS instance {} of type {} is known", lnsInstanceId, getId());
+			logger.info("LNS instance {} of type {} is known", lnsInstanceId, getType());
 			OperationData data = processDownlinkEvent(event);
 			if (data.getStatus() != OperationStatus.FAILED) {
 				OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
@@ -237,7 +242,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 						deviceProvisioning.getDevEUI(), agentService.getAgent());
 			} else {
 				mor = extId.getManagedObject();
-				mor.setProperty(LNSIntegrationService.LNS_INSTANCE_REF, lnsInstanceId);
+				mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsInstanceId);
 				ManagedObject agentApi = inventoryApi.getManagedObjectApi(agentService.getAgent().getId());
 				agentApi.addChildDevice(mor.getId());
 			}
@@ -301,23 +306,27 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 	}
 
 	private void configureRoutings(String lnsInstanceId, MicroserviceCredentials credentials) {
-		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getId() + "/" + lnsInstanceId;
+		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getType() + "/" + lnsInstanceId;
 		lnsConnectorManager.getConnector(lnsInstanceId).get().configureRoutings(url, subscriptionsService.getTenant(),
 				credentials.getUsername(), credentials.getPassword());
 	}
 
 	public ManagedObjectRepresentation addLNSInstance(LNSConnectorRepresentation instanceRepresentation) {
 		ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
-		mor.setType(LNS_INSTANCE_TYPE);
+		mor.setType(LNS_CONNECTOR_TYPE);
 		mor.setName(instanceRepresentation.getName());
-		mor.setProperty(LNS_ID, this.getId());
+		mor.setProperty(LNS_TYPE, this.getType());
 		mor = inventoryApi.create(mor);
 
 		String category = mor.getId().getValue();
 		instanceRepresentation.getProperties().forEach((k, v) -> {
 			OptionRepresentation option = new OptionRepresentation();
 			option.setCategory(category);
-			option.setKey(k.toString());
+			if (isPropertyEncrypted(k.toString())) {
+				option.setKey("credentials." + k.toString());
+			} else {
+				option.setKey(k.toString());
+			}
 			option.setValue(v.toString());
 			tenantOptionApi.save(option);
 		});
@@ -330,6 +339,20 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 				subscriptionsService.getCredentials(subscriptionsService.getTenant()).get());
 
 		return mor;
+	}
+	
+	private boolean isPropertyEncrypted(String key) {
+		boolean[] result = {false};
+		
+		wizard.forEach(step -> {
+			step.getPropertyDescriptions().forEach(p -> {
+				if (p.getName().equals(key)) {
+					result[0] = p.isEncrypted();
+				}
+			});
+		});
+		
+		return result[0];
 	}
 
 	@Scheduled(initialDelay = 10000, fixedDelay = 10000)

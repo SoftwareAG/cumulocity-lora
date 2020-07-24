@@ -20,7 +20,7 @@ public abstract class LNSAbstractConnector implements LNSConnector {
 	protected LNSAbstractConnector(ManagedObjectRepresentation instance) {
 		this.id = instance.getId().getValue();
 		this.name = instance.getName();
-		this.type = instance.getProperty(LNSIntegrationService.LNS_ID).toString();
+		this.type = instance.getProperty(LNSIntegrationService.LNS_TYPE).toString();
 	}
 
 	@Override

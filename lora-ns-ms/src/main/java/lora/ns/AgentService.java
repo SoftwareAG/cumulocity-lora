@@ -46,21 +46,21 @@ public class AgentService {
 
 
 	public void registerAgent(LNSIntegrationService<? extends LNSConnector> lnsProxy) {
-		ExternalIDRepresentation extId = c8yUtils.findExternalId(lnsProxy.getId(), LNSIntegrationService.LNS_EXT_ID);
+		ExternalIDRepresentation extId = c8yUtils.findExternalId(lnsProxy.getType(), LNSIntegrationService.LNS_EXT_ID);
 		ManagedObjectRepresentation agent = null;
 		if (extId == null) {
 			agent = new ManagedObjectRepresentation();
-			agent.setType(LNSIntegrationService.LNS_TYPE);
+			agent.setType(LNSIntegrationService.LNS_MO_TYPE);
 			agent.setName(lnsProxy.getName());
 			agent.setProperty("version", lnsProxy.getVersion());
-			agent.setProperty(LNSIntegrationService.LNS_ID, lnsProxy.getId());
+			agent.setProperty(LNSIntegrationService.LNS_TYPE, lnsProxy.getType());
 			agent.set(new RequiredAvailability(5));
 			agent.set(new Agent());
 			agent.set(new IsDevice());
 			agent = inventoryApi.create(agent);
 
 			extId = new ExternalIDRepresentation();
-			extId.setExternalId(lnsProxy.getId());
+			extId.setExternalId(lnsProxy.getType());
 			extId.setType(LNSIntegrationService.LNS_EXT_ID);
 			extId.setManagedObject(agent);
 			identityApi.create(extId);
@@ -69,7 +69,7 @@ public class AgentService {
 			agent.setLastUpdatedDateTime(null);
 			agent.setName(lnsProxy.getName());
 			agent.setProperty("version", lnsProxy.getVersion());
-			agent.setProperty(LNSIntegrationService.LNS_ID, lnsProxy.getId());
+			agent.setProperty(LNSIntegrationService.LNS_TYPE, lnsProxy.getType());
 			agent.set(new RequiredAvailability(5));
 			if (agent.get(Agent.class) == null) {
 				agent.set(new Agent());
