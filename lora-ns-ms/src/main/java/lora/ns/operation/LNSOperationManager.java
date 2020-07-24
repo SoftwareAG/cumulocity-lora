@@ -92,10 +92,17 @@ public class LNSOperationManager {
 	}
 
 	public OperationRepresentation retrieveOperation(String lnsConnectorId, String commandId) {
-		return operations.containsKey(subscriptionsService.getTenant())
+		OperationRepresentation result = operations.containsKey(subscriptionsService.getTenant())
 				&& operations.get(subscriptionsService.getTenant()).containsKey(lnsConnectorId)
 						? operations.get(subscriptionsService.getTenant()).get(lnsConnectorId).get(commandId)
-						: retrieveOperationFromMO(lnsConnectorId, commandId);
+						: null;
+
+		if (result == null) {
+			logger.info("Operation {} not in cache, fetching it from DB", commandId);
+			result = retrieveOperationFromMO(lnsConnectorId, commandId);
+		}
+		
+		return result;
 	}
 
 	public void removeOperation(String lnsConnectorId, String commandId) {

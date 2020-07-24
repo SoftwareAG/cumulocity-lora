@@ -115,7 +115,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 
 	@Autowired
 	private LNSConnectorManager lnsConnectorManager;
-	
+
 	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
@@ -200,10 +200,14 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 			if (data.getStatus() != OperationStatus.FAILED) {
 				OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
 						data.getCommandId());
-				operation.setStatus(data.getStatus().toString());
-				deviceControlApi.update(operation);
-				if (data.getStatus() == OperationStatus.SUCCESSFUL) {
-					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
+				if (operation != null) {
+					operation.setStatus(data.getStatus().toString());
+					deviceControlApi.update(operation);
+					if (data.getStatus() == OperationStatus.SUCCESSFUL) {
+						lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
+					}
+				} else {
+					logger.error("Unknown operation {} from LNS", data.getCommandId());
 				}
 			} else {
 				if (data.getCommandId() != null) {
@@ -226,7 +230,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 		String errorMessage = null;
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent() && connector.get().provisionDevice(deviceProvisioning)) {
-			ExternalIDRepresentation extId = c8yUtils.findExternalId(deviceProvisioning.getDevEUI(), DEVEUI_TYPE);
+			ExternalIDRepresentation extId = c8yUtils.findExternalId(deviceProvisioning.getDevEUI().toLowerCase(),
+					DEVEUI_TYPE);
 			if (extId == null) {
 				mor = lnsDeviceManager.createDevice(lnsInstanceId, deviceProvisioning.getName(),
 						deviceProvisioning.getDevEUI(), agentService.getAgent());
@@ -261,13 +266,13 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 				errorMessage = "Couldn't provision device " + deviceProvisioning.getDevEUI() + " in LNS connector "
 						+ lnsInstanceId;
 			} else {
-				errorMessage = "LNS connector Id '"
-						+ lnsInstanceId + "' doesn't exist. Please use a valid managed object Id.";
+				errorMessage = "LNS connector Id '" + lnsInstanceId
+						+ "' doesn't exist. Please use a valid managed object Id.";
 			}
 			alarm.setText(errorMessage);
 			alarm.setDateTime(new DateTime());
 			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
-			mor = getDevice(deviceProvisioning.getDevEUI());
+			mor = getDevice(deviceProvisioning.getDevEUI().toLowerCase());
 			if (mor != null) {
 				alarm.setSource(mor);
 			} else {
@@ -402,7 +407,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> implements C
 		}
 		return result;
 	}
-	
+
 	public LinkedList<LNSConnectorWizardStep> getInstanceWizard() {
 		return wizard;
 	}

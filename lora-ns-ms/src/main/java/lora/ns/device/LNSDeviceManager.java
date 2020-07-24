@@ -84,7 +84,7 @@ public class LNSDeviceManager {
 		try {
 			logger.info("Upsert device with devEui {} with Payload {} from fPort {}", event.getDevEui(),
 					event.getPayload(), event.getfPort());
-			ManagedObjectRepresentation mor = getDevice(event.getDevEui());
+			ManagedObjectRepresentation mor = getDevice(event.getDevEui().toLowerCase());
 			if (mor == null) {
 				String name = event.getDevEui();
 				Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
@@ -94,7 +94,7 @@ public class LNSDeviceManager {
 						name = device.get().getName();
 					}
 				}
-				mor = createDevice(lnsInstanceId, name, event.getDevEui(), agent);
+				mor = createDevice(lnsInstanceId, name, event.getDevEui().toLowerCase(), agent);
 			}
 			mor.setLastUpdatedDateTime(null);
 			if (event.getModel() == null && mor.get(Hardware.class) != null) {
@@ -133,7 +133,7 @@ public class LNSDeviceManager {
 				inventoryApi.update(mor);
 			}
 			ManagedObject agentApi = inventoryApi
-					.getManagedObjectApi(agent.getId() /* agents.get(subscriptionsService.getTenant()).getId() */);
+					.getManagedObjectApi(agent.getId());
 			try {
 				agentApi.getChildDevice(mor.getId());
 			} catch (Exception e) {
