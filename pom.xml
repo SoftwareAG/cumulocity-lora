@@ -25,7 +25,6 @@
 		<module>lora-ns-kerlink</module>
 		<module>lora-ns-objenious</module>
 		<module>lora-ns-orbiwise</module>
-		<module>lora-ns-cloudgate</module>
 		<module>lora-ns-loriot</module>
 		<module>lora-codec-elsys</module>
 		<module>lora-codec-lansitec</module>
