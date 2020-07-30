@@ -52,7 +52,7 @@
                         <option value="">Please select a connector</option>
                         <option *ngFor="let instance of lnsInstances" [value]="instance.id">
                             {{instance.name}} -
-                            {{proxyMap[instance.lnsId].name}}</option>
+                            {{proxyMap[instance.lnsType].name}}</option>
                     </select>
                 </div>
             </div>
@@ -116,12 +116,12 @@
         <td *ngIf="device.codec === undefined"> - </td>
         <td *ngIf="device.c8y_Hardware !== undefined">{{device.c8y_Hardware.model}}</td>
         <td *ngIf="device.c8y_Hardware === undefined"> - </td>
-        <td *ngIf="device.lnsInstanceId !== undefined">
-            {{proxyMap[instanceMap[device.lnsInstanceId].lnsId].name}}</td>
-        <td *ngIf="device.lnsInstanceId === undefined"> - </td>
-        <td *ngIf="device.lnsInstanceId !== undefined">{{instanceMap[device.lnsInstanceId].name}}
+        <td *ngIf="device.lnsConnectorId !== undefined">
+            {{proxyMap[instanceMap[device.lnsConnectorId].lnsType].name}}</td>
+        <td *ngIf="device.lnsConnectorId === undefined"> - </td>
+        <td *ngIf="device.lnsConnectorId !== undefined">{{instanceMap[device.lnsConnectorId].name}}
         </td>
-        <td *ngIf="device.lnsInstanceId === undefined"> - </td>
+        <td *ngIf="device.lnsConnectorId === undefined"> - </td>
         <td ng-class="{&quot;text-center&quot;:true}" class="ng-scope text-center">
             <div style="max-width:240px;" class="text-truncate">
                 <button class="btn-dot showOnHover" uib-tooltip="Delete device" tooltip-append-to-body="true"

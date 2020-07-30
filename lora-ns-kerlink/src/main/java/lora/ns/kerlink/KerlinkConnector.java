@@ -162,7 +162,6 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		this.baseUrl = properties.getProperty(BASE_URL);
 		this.username = properties.getProperty(USERNAME);
 		this.password = properties.getProperty(PASSWORD);
-		logger.info("baseUrl: {}", baseUrl);
 	}
 
 	@Override

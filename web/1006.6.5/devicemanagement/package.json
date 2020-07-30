@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "c8ycli server -u https://lora-dev.cumulocity.com",
+    "start": "c8ycli server -u https://isrdemocorn.eu-latest.cumulocity.com",
     "build": "c8ycli build",
     "deploy": "c8ycli deploy"
   },
@@ -23,23 +23,23 @@
     "@angular/platform-browser-dynamic": "8.2.13",
     "@angular/router": "8.2.13",
     "@angular/upgrade": "8.2.13",
-    "@c8y/ngx-components": "1006.0.10",
+    "@c8y/ngx-components": "1006.6.5",
     "core-js": "^3.4.0",
     "devextreme": "19.2.7",
     "devextreme-angular": "19.2.7",
     "rxjs": "~6.4.0",
     "url-search-params-polyfill": "6.0.0",
     "zone.js": "~0.9.1",
-    "@c8y/ng1-modules": "1006.0.10",
+    "@c8y/ng1-modules": "1006.6.5",
     "angular": "1.6.9",
-    "@c8y/style": "1006.0.10"
+    "@c8y/style": "1006.6.5"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.803.17",
     "@angular/compiler-cli": "8.2.13",
     "@angular/language-service": "8.2.13",
     "typescript": "3.5.3",
-    "@c8y/cli": "1006.0.10"
+    "@c8y/cli": "1006.6.5"
   },
   "c8y": {
     "application": {

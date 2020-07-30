@@ -43,14 +43,14 @@ export class LNSComponent {
     // The filter object will add query parameters
     // to the request which is made by the service.
     private lnsProxyFilter: object = {
-        type: 'LoRa Network Server type',
+        type: 'LoRa Network Server agent',
         // paging information will be a part of the response now
         withTotalPages: true,
         pageSize: 100
     };
 
     private instanceFilter: object = {
-        type: 'LNS Instance',
+        type: 'LNS Connector',
         // paging information will be a part of the response now
         withTotalPages: true,
         pageSize: 100
@@ -69,7 +69,7 @@ export class LNSComponent {
         this.lnsProxies = data;
         this.proxyMap = {};
         data.forEach(proxy => {
-            this.proxyMap[proxy.lnsId] = proxy;
+            this.proxyMap[proxy.lnsType] = proxy;
         });
     }
 

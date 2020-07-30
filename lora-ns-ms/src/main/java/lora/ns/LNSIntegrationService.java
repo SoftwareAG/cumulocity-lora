@@ -120,11 +120,11 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public abstract String getType();
-	
+
 	public abstract String getName();
-	
+
 	public abstract String getVersion();
-	
+
 	public abstract DeviceData processUplinkEvent(String eventString);
 
 	public abstract OperationData processDownlinkEvent(String eventString);
@@ -156,7 +156,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	private void getAllLNSInstances(MicroserviceSubscriptionAddedEvent event) {
-		logger.info("Looking for LNS Instances in tenant {}", subscriptionsService.getTenant());
+		logger.info("Looking for LNS Connectors in tenant {}", subscriptionsService.getTenant());
 		InventoryFilter filter = new InventoryFilter().byType(LNS_CONNECTOR_TYPE);
 		ManagedObjectCollection col = inventoryApi.getManagedObjectsByFilter(filter);
 		QueryParam queryParam = null;
@@ -166,12 +166,13 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 				public String getName() {
 					return "query";
 				}
-			}, URLEncoder.encode(LNS_TYPE + " eq " + this.getType() + " and type eq '" + LNS_CONNECTOR_TYPE + "'", "utf8"));
+			}, URLEncoder.encode(LNS_TYPE + " eq " + this.getType() + " and type eq '" + LNS_CONNECTOR_TYPE + "'",
+					"utf8"));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		for (ManagedObjectRepresentation mor : col.get(queryParam).allPages()) {
-			logger.info("Retrieved instance: {} of type {}", mor.getName(), mor.getProperty(LNS_TYPE));
+			logger.info("Retrieved connector: {} of type {}", mor.getName(), mor.getProperty(LNS_TYPE));
 			LNSConnector instance = getInstance(mor);
 			Properties properties = new Properties();
 			for (OptionRepresentation option : tenantOptionApi.getAllOptionsForCategory(instance.getId())) {
@@ -292,7 +293,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	private void getDeviceConfig(ManagedObjectRepresentation mor) {
 		if (codecManager.getAvailableOperations(mor) != null
-				&& codecManager.getAvailableOperations(mor).containsKey("get config")) {
+				&& codecManager.getAvailableOperations(mor).containsKey("get config") && !isWaitingConfig(mor)) {
 			OperationRepresentation operation = new OperationRepresentation();
 			Command command = new Command("get config");
 			operation.set(command);
@@ -301,12 +302,26 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		}
 	}
 
+	private boolean isWaitingConfig(ManagedObjectRepresentation mor) {
+		boolean[] result = { false };
+
+		deviceControlApi
+				.getOperationsByFilter(new OperationFilter().byDevice(mor.getId().getValue())
+						.byStatus(OperationStatus.EXECUTING).byFragmentType("c8y_Command"))
+				.get(2000).allPages().forEach(o -> {
+					result[0] |= o.get(Command.class).getText().contains("get config");
+				});
+
+		return result[0];
+	}
+
 	public List<EndDevice> getDevices(String lnsInstanceId) {
 		return lnsConnectorManager.getConnector(lnsInstanceId).get().getDevices();
 	}
 
 	private void configureRoutings(String lnsInstanceId, MicroserviceCredentials credentials) {
-		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getType() + "/" + lnsInstanceId;
+		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getType() + "/"
+				+ lnsInstanceId;
 		lnsConnectorManager.getConnector(lnsInstanceId).get().configureRoutings(url, subscriptionsService.getTenant(),
 				credentials.getUsername(), credentials.getPassword());
 	}
@@ -340,10 +355,10 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 		return mor;
 	}
-	
+
 	private boolean isPropertyEncrypted(String key) {
-		boolean[] result = {false};
-		
+		boolean[] result = { false };
+
 		wizard.forEach(step -> {
 			step.getPropertyDescriptions().forEach(p -> {
 				if (p.getName().equals(key)) {
@@ -351,7 +366,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 				}
 			});
 		});
-		
+
 		return result[0];
 	}
 

@@ -82,7 +82,7 @@ public class KerlinkIntegrationService extends LNSIntegrationService<KerlinkConn
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode rootNode = mapper.readTree(event);
-            String deviceEui = rootNode.get("endDevice").get("devEui").asText();
+            String deviceEui = rootNode.get("endDevice").get("devEui").asText().toLowerCase();
             int fPort = rootNode.get("fPort").asInt();
             double rssi = rootNode.get("gwInfo").get(0).get("rssi").asDouble();
             double snr = rootNode.get("gwInfo").get(0).get("snr").asDouble();

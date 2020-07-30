@@ -129,7 +129,7 @@ public class CodecManager {
 					AlarmRepresentation alarm = new AlarmRepresentation();
 					alarm.setSource(mor);
 					alarm.setType(LORA_DEVICE_PAYLOAD_ERROR);
-					alarm.setText(result.getMessage());
+					alarm.setText(result.getMessage() != null ? result.getMessage() : result.getResponse());
 					alarm.setDateTime(new DateTime());
 					alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
 					alarmApi.create(alarm);

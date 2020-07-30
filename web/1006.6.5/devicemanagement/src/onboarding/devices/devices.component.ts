@@ -50,14 +50,14 @@ export class LoraDevicesComponent {
     };
 
     private lnsProxyFilter: object = {
-        type: 'LoRa Network Server type',
+        type: 'LoRa Network Server agent',
         // paging information will be a part of the response now
         withTotalPages: true,
         pageSize: 100
     };
 
     private instanceFilter: object = {
-        type: 'LNS Instance',
+        type: 'LNS Connector',
         // paging information will be a part of the response now
         withTotalPages: true,
         pageSize: 100
@@ -97,7 +97,7 @@ export class LoraDevicesComponent {
         const { data, res, paging } = await this.inventory.list(this.lnsProxyFilter);
         this.lnsProxies = data;
         this.proxyMap = {};
-        data.forEach(proxy => this.proxyMap[proxy.lnsId] = proxy);
+        data.forEach(proxy => this.proxyMap[proxy.lnsType] = proxy);
         console.log("Proxy Map:");
         console.log(this.proxyMap);
     }

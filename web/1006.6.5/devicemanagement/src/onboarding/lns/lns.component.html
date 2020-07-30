@@ -17,7 +17,7 @@
                     <label for="model">LoRa network server:</label>
                     <select class="form-control" #model (change)="loadWizard(model.value)">
                         <option value="">Please select a provider</option>
-                        <option *ngFor="let proxy of lnsProxies" [value]="proxy.lnsId">
+                        <option *ngFor="let proxy of lnsProxies" [value]="proxy.lnsType">
                             {{proxy.name}}</option>
                     </select>
                 </div>
@@ -94,6 +94,6 @@
     </tr>
     <tr *ngFor="let instance of lnsInstances">
         <td>{{instance.name}}</td>
-        <td>{{proxyMap[instance.lnsId].name}}</td>
+        <td>{{proxyMap[instance.lnsType].name}}</td>
     </tr>
 </table>
