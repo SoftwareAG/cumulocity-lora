@@ -147,14 +147,17 @@ public class LansitecCodec extends DeviceCodec {
 			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
 				long vol = buffer.get();
 				long rssi = -buffer.get();
-				long snr = buffer.getShort();
+				long snr = 0;
+				if ((type & 0x07) > 0) {
+					snr = buffer.getShort();
+				}
 				byte gpsstat = buffer.get();
-				GPSSTATE gpsState = GPSSTATE.BY_VALUE.get((byte) (gpsstat >> 4));
+				GPSSTATE gpsState = GPSSTATE.BY_VALUE.get((byte) ((gpsstat&0xff) >> 4));
 				int vibState = gpsstat & 0xf;
 				byte chgstat = buffer.get();
-				CHGSTATE chgState = CHGSTATE.BY_VALUE.get((byte) (chgstat >> 4));
+				CHGSTATE chgState = CHGSTATE.BY_VALUE.get((byte) ((chgstat&0xff) >> 4));
 				c8yData.addEvent(mor, "Tracker status", String.format("GPSSTATE: %s\nVIBSTATE: %d\nCHGSTATE: %s",
-						gpsState.name(), vibState, chgState.name()), null, new DateTime());
+						gpsState != null ? gpsState.name() : "UNKNOWN(" + gpsstat + ")", vibState, chgState != null ? chgState.name() : "UNKNOWN(" + chgstat + ")"), null, new DateTime());
 				c8yData.addMeasurement(mor, "c8y_Battery", "level", "%", BigDecimal.valueOf(vol), new DateTime());
 				c8yData.addMeasurement(mor, "Tracker Signal Strength", "rssi", "dBm", BigDecimal.valueOf(rssi),
 						updateTime);

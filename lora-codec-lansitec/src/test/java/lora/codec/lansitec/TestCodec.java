@@ -2,11 +2,12 @@ package lora.codec.lansitec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
+import com.google.common.io.BaseEncoding;
+
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
-
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-import com.google.common.io.BaseEncoding;
 
 import lora.codec.C8YData;
 import lora.codec.DownlinkData;
@@ -14,13 +15,16 @@ import lora.codec.DownlinkData;
 public class TestCodec {
 	@Test
 	public void testHearbeat() {
-		byte[] payload = BaseEncoding.base16().decode("21643402260000ee74".toUpperCase());
+		byte[] payload = BaseEncoding.base16().decode("21640000009000FCA9".toUpperCase());
 		
 		LansitecCodec codec = new LansitecCodec();
 		
 		C8YData c8yData = codec.decode(new ManagedObjectRepresentation(), "Asset Tracker", 1, new DateTime(), payload);
 		
 		System.out.println(c8yData.getEvents().iterator().next().getText());
+		for (MeasurementRepresentation m : c8yData.getMeasurements()) {
+			System.out.println(m);
+		}
 
 	}
 	
