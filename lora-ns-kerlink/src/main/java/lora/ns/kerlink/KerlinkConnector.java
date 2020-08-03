@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,10 +22,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
@@ -152,8 +152,23 @@ public class KerlinkConnector extends LNSAbstractConnector {
 
 	@Override
 	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
-		// TODO Auto-generated method stub
-		return false;
+		if (jwt == null || jwt.isExpired()) {
+			login();
+		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
+		headers.set("Content-Type", "application/json,application/vnd.kerlink.iot-v1+json");
+		headers.set("Accept", "application/json,application/vnd.kerlink.iot-v1+json");
+		RestTemplate restTemplate = new RestTemplate();
+		EndDeviceDto dto = new EndDeviceDto();
+		dto.setCluster(new ClusterDto());
+		dto.getCluster().setId(Integer.parseInt(this.clusterId));
+		dto.setDevEui(deviceProvisioning.getDevEUI());
+		dto.setClassType("A");
+		dto.setAppEui(deviceProvisioning.getAppEUI());
+		dto.setAppKey(deviceProvisioning.getAppKey());
+		ResponseEntity<String> res = restTemplate.exchange(baseUrl + "/endDevices/" + deviceProvisioning.getDevEUI(), HttpMethod.PUT, new HttpEntity<EndDeviceDto>(dto, headers), String.class);
+		return res.getStatusCodeValue() == 201;
 	}
 
 	@Override
@@ -267,8 +282,15 @@ public class KerlinkConnector extends LNSAbstractConnector {
 
 	@Override
 	public boolean deprovisionDevice(String deveui) {
-		// TODO Auto-generated method stub
-		return false;
+		if (jwt == null || jwt.isExpired()) {
+			login();
+		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
+		headers.set("Accept", "application/json,application/vnd.kerlink.iot-v1+json");
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> res = restTemplate.exchange(baseUrl + "/endDevices/" + deveui, HttpMethod.DELETE, new HttpEntity<String>("", headers), String.class);
+		return res.getStatusCodeValue() == 204;
 	}
 
 	public List<ClusterDto> getClusters() {

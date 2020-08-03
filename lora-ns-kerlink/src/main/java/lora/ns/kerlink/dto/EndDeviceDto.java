@@ -8,6 +8,8 @@ public class EndDeviceDto {
 	private String devEui;
 	private String classType;
 	private String devAddr;
+	private String appEui;
+	private String appKey;
 	private ClusterDto cluster;
 
 	public ClusterDto getCluster() {
@@ -48,6 +50,22 @@ public class EndDeviceDto {
 
 	public void setDevAddr(String devAddr) {
 		this.devAddr = devAddr;
+	}
+
+	public String getAppEui() {
+		return appEui;
+	}
+
+	public void setAppEui(String appEui) {
+		this.appEui = appEui;
+	}
+
+	public String getAppKey() {
+		return appKey;
+	}
+
+	public void setAppKey(String appKey) {
+		this.appKey = appKey;
 	}
 	
 }
