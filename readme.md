@@ -31,6 +31,20 @@ LNS Connectors as well as codecs are multitenant microservices that can fully sc
 ![](architecture.png)
 
 ## How to create a new connector
+
+You'll need the following Maven dependency to start writing a new connector:
+
+```XML
+<dependency>
+    <groupId>com.softwareag</groupId>
+    <artifactId>lora-ns-ms</artifactId>
+    <version>${project.version}</version>
+</dependency>
+
+```
+
+You'll have to extend and implement 2 abstract classes and 1 interface:
+
 ### Interfaces and classes to extend/implement
 1. Abstract class `LNSIntegrationService<C extends LNSConnector>`
 
@@ -187,3 +201,19 @@ The framework automatically exposes its REST API with springfox-swagger-ui.
 You can directly view and test the API by adding `/swagger-ui.html` to the URL of the microservice.
 
 Example: `https://lora-dev.cumulocity.com/service/lora-ns-objenious/swagger-ui.html`
+
+## How to create a new codec
+
+Codecs can be written either in Java or Typescript/Javascript
+
+### Java implementation
+
+### Typescript implementation
+
+## Cumulocity Data model
+
+The data model is composed of the following managed objects:
+
+- 1 agent per kind of connector that centralizes all operations handling
+    - this will change with one agent per connector
+- 1 managed object per connector which stores operations/commands mapping and connection parameters as tenant options (can be encrypted)

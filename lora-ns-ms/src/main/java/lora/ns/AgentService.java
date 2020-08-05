@@ -45,31 +45,31 @@ public class AgentService {
 	private Map<String, ManagedObjectRepresentation> agents = new HashMap<>();
 
 
-	public void registerAgent(LNSIntegrationService<? extends LNSConnector> lnsProxy) {
-		ExternalIDRepresentation extId = c8yUtils.findExternalId(lnsProxy.getType(), LNSIntegrationService.LNS_EXT_ID);
+	public void registerAgent(LNSIntegrationService<? extends LNSConnector> lnsIntegrationService) {
+		ExternalIDRepresentation extId = c8yUtils.findExternalId(lnsIntegrationService.getType(), LNSIntegrationService.LNS_EXT_ID);
 		ManagedObjectRepresentation agent = null;
 		if (extId == null) {
 			agent = new ManagedObjectRepresentation();
 			agent.setType(LNSIntegrationService.LNS_MO_TYPE);
-			agent.setName(lnsProxy.getName());
-			agent.setProperty("version", lnsProxy.getVersion());
-			agent.setProperty(LNSIntegrationService.LNS_TYPE, lnsProxy.getType());
+			agent.setName(lnsIntegrationService.getName());
+			agent.setProperty("version", lnsIntegrationService.getVersion());
+			agent.setProperty(LNSIntegrationService.LNS_TYPE, lnsIntegrationService.getType());
 			agent.set(new RequiredAvailability(5));
 			agent.set(new Agent());
 			agent.set(new IsDevice());
 			agent = inventoryApi.create(agent);
 
 			extId = new ExternalIDRepresentation();
-			extId.setExternalId(lnsProxy.getType());
+			extId.setExternalId(lnsIntegrationService.getType());
 			extId.setType(LNSIntegrationService.LNS_EXT_ID);
 			extId.setManagedObject(agent);
 			identityApi.create(extId);
 		} else {
 			agent = inventoryApi.get(extId.getManagedObject().getId());
 			agent.setLastUpdatedDateTime(null);
-			agent.setName(lnsProxy.getName());
-			agent.setProperty("version", lnsProxy.getVersion());
-			agent.setProperty(LNSIntegrationService.LNS_TYPE, lnsProxy.getType());
+			agent.setName(lnsIntegrationService.getName());
+			agent.setProperty("version", lnsIntegrationService.getVersion());
+			agent.setProperty(LNSIntegrationService.LNS_TYPE, lnsIntegrationService.getType());
 			agent.set(new RequiredAvailability(5));
 			if (agent.get(Agent.class) == null) {
 				agent.set(new Agent());

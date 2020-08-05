@@ -264,7 +264,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			event.setDateTime(new DateTime());
 			event.setSource(mor);
 			eventApi.create(event);
-			getDeviceConfig(mor);
+			lnsDeviceManager.getDeviceConfig(mor);
 		} else {
 			AlarmRepresentation alarm = new AlarmRepresentation();
 			alarm.setType("Device provisioning error");
@@ -289,30 +289,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		response.setDevice(mor);
 		response.setErrorMessage(errorMessage);
 		return response;
-	}
-
-	private void getDeviceConfig(ManagedObjectRepresentation mor) {
-		if (codecManager.getAvailableOperations(mor) != null
-				&& codecManager.getAvailableOperations(mor).containsKey("get config") && !isWaitingConfig(mor)) {
-			OperationRepresentation operation = new OperationRepresentation();
-			Command command = new Command("get config");
-			operation.set(command);
-			operation.setDeviceId(mor.getId());
-			deviceControlApi.create(operation);
-		}
-	}
-
-	private boolean isWaitingConfig(ManagedObjectRepresentation mor) {
-		boolean[] result = { false };
-
-		deviceControlApi
-				.getOperationsByFilter(new OperationFilter().byDevice(mor.getId().getValue())
-						.byStatus(OperationStatus.EXECUTING).byFragmentType("c8y_Command"))
-				.get(2000).allPages().forEach(o -> {
-					result[0] |= o.get(Command.class).getText().contains("get config");
-				});
-
-		return result[0];
 	}
 
 	public List<EndDevice> getDevices(String lnsInstanceId) {

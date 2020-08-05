@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.model.idtype.GId;
+import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.alarm.AlarmRepresentation;
 import com.cumulocity.rest.representation.event.EventRepresentation;
 import com.cumulocity.rest.representation.identity.ExternalIDRepresentation;
@@ -20,6 +21,8 @@ import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.cumulocity.sdk.client.SDKException;
 import com.cumulocity.sdk.client.alarm.AlarmApi;
 import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
+import com.cumulocity.sdk.client.devicecontrol.OperationCollection;
+import com.cumulocity.sdk.client.devicecontrol.OperationFilter;
 import com.cumulocity.sdk.client.event.EventApi;
 import com.cumulocity.sdk.client.identity.ExternalIDCollection;
 import com.cumulocity.sdk.client.identity.IdentityApi;
@@ -220,6 +223,12 @@ public class LNSDeviceManager {
 	public void getDeviceConfig(ManagedObjectRepresentation mor) {
 		if (codecManager.getAvailableOperations(mor) != null
 				&& codecManager.getAvailableOperations(mor).containsKey("get config")) {
+			OperationCollection oc = deviceControlApi.getOperationsByFilter(new OperationFilter().byDevice(mor.getId().getValue()).byStatus(OperationStatus.EXECUTING));
+			for (OperationRepresentation o : oc.get(2000).allPages()) {
+				if (o.get(Command.class) != null && o.get(Command.class).getText().contains("get config")) {
+					return;
+				}
+			}
 			OperationRepresentation operation = new OperationRepresentation();
 			Command command = new Command("get config");
 			operation.set(command);
