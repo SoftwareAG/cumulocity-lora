@@ -65,6 +65,7 @@ public abstract class DeviceCodec implements Component {
 		ExternalIDRepresentation id = c8yUtils.findExternalId(this.getId(), CODEC_ID);
 		ManagedObjectRepresentation mor = null;
 		if (id == null) {
+			logger.info("Codec '{}' will be initialized in current tenant.", this.getId());
 			mor = new ManagedObjectRepresentation();
 			mor.set(new DeviceCodecRepresentation(this));
 			mor.setType(CODEC_TYPE);

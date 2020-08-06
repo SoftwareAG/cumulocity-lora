@@ -214,6 +214,5 @@ Codecs can be written either in Java or Typescript/Javascript
 
 The data model is composed of the following managed objects:
 
-- 1 agent per kind of connector that centralizes all operations handling
-    - this will change with one agent per connector
+- 1 agent per microservice that centralizes all operations handling
 - 1 managed object per connector which stores operations/commands mapping and connection parameters as tenant options (can be encrypted)

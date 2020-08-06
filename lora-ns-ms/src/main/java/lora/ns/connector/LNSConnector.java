@@ -7,6 +7,7 @@ import java.util.Properties;
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
+import lora.ns.Gateway;
 
 public interface LNSConnector {
 	String getId();
@@ -21,4 +22,5 @@ public interface LNSConnector {
 	void configureRoutings(String url, String tenant, String login, String password);
 	void removeRoutings();
 	boolean deprovisionDevice(String deveui);
+	List<Gateway> getGateways();
 }

@@ -11,16 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-
 import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
@@ -49,17 +39,26 @@ import com.cumulocity.sdk.client.inventory.ManagedObjectCollection;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
 import com.cumulocity.sdk.client.option.TenantOptionApi;
 
-import c8y.Command;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
 import c8y.Hardware;
 import c8y.LpwanDevice;
 import lora.codec.C8YData;
-import lora.codec.ms.CodecManager;
 import lora.common.C8YUtils;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
 import lora.ns.connector.LNSConnectorRepresentation;
 import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.device.LNSDeviceManager;
+import lora.ns.gateway.LNSGatewayManager;
 import lora.ns.operation.LNSOperationManager;
 
 @EnableScheduling
@@ -98,9 +97,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	private MicroserviceSubscriptionsService subscriptionsService;
 
 	@Autowired
-	private CodecManager codecManager;
-
-	@Autowired
 	private TenantOptionApi tenantOptionApi;
 
 	@Autowired
@@ -114,6 +110,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	@Autowired
 	private LNSConnectorManager lnsConnectorManager;
+
+	@Autowired
+	private LNSGatewayManager lnsGatewayManager;
 
 	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
 
@@ -180,6 +179,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			}
 			instance.setProperties(properties);
 			lnsConnectorManager.addConnector(instance.getId(), instance);
+			lnsGatewayManager.upsertGateways(mor);
 			configureRoutings(instance.getId(), event.getCredentials());
 		}
 	}
@@ -309,6 +309,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		mor.setProperty(LNS_TYPE, this.getType());
 		mor = inventoryApi.create(mor);
 
+		ManagedObject agentApi = inventoryApi.getManagedObjectApi(agentService.getAgent().getId());
+		agentApi.addChildDevice(mor.getId());
+
 		String category = mor.getId().getValue();
 		instanceRepresentation.getProperties().forEach((k, v) -> {
 			OptionRepresentation option = new OptionRepresentation();
@@ -328,6 +331,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		lnsConnectorManager.addConnector(instance.getId(), instance);
 		configureRoutings(instance.getId(),
 				subscriptionsService.getCredentials(subscriptionsService.getTenant()).get());
+
+		lnsGatewayManager.upsertGateways(mor);
 
 		return mor;
 	}

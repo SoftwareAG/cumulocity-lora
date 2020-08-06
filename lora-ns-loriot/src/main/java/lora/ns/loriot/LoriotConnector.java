@@ -20,6 +20,7 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
+import lora.ns.Gateway;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.loriot.rest.LoriotService;
 import lora.ns.loriot.rest.model.App;
@@ -51,7 +52,7 @@ public class LoriotConnector extends LNSAbstractConnector {
 		@Override
 		public Response intercept(Chain chain) throws IOException {
 			Request request = chain.request();
-			
+
 			if (sessionId == null) {
 				login();
 			}
@@ -89,17 +90,18 @@ public class LoriotConnector extends LNSAbstractConnector {
 			List<MediaType> mediaTypes = new ArrayList<MediaType>();
 			mediaTypes.add(MediaType.APPLICATION_JSON);
 			headers.setAccept(mediaTypes);
-			Session session = restTemplate.postForObject(getProperties().getProperty("url") + "/1/pub/login", new HttpEntity<String>(request, headers), Session.class);
+			Session session = restTemplate.postForObject(getProperties().getProperty("url") + "/1/pub/login",
+					new HttpEntity<String>(request, headers), Session.class);
 			logger.info("Received session: {}", session.getSession());
 			sessionId = session.getSession();
 		}
 
 	}
-	
+
 	public LoriotConnector(Properties properties) {
 		super(properties);
 	}
-	
+
 	public LoriotConnector(ManagedObjectRepresentation instance) {
 		super(instance);
 	}
@@ -117,11 +119,12 @@ public class LoriotConnector extends LNSAbstractConnector {
 	public List<EndDevice> getDevices() {
 		List<EndDevice> result = new ArrayList<EndDevice>();
 		try {
-			retrofit2.Response<List<Device>> response = loriotService.getDevices(getProperties().getProperty("appid")).execute();
+			retrofit2.Response<List<Device>> response = loriotService.getDevices(getProperties().getProperty("appid"))
+					.execute();
 			List<Device> devices = response.body();
 			if (devices != null) {
-				result = devices.stream().map(
-						device -> new EndDevice(device.getDeveui(), device.getTitle(), device.getDevclass()))
+				result = devices.stream()
+						.map(device -> new EndDevice(device.getDeveui(), device.getTitle(), device.getDevclass()))
 						.collect(Collectors.toList());
 			}
 		} catch (IOException e) {
@@ -160,9 +163,11 @@ public class LoriotConnector extends LNSAbstractConnector {
 		mediaTypes.add(MediaType.APPLICATION_JSON);
 		headers.setAccept(mediaTypes);
 		headers.setBearerAuth(token);
-		Downlink downlink = new Downlink(operation.getDevEui(), operation.getFport(), operation.getPayload(), getProperties().getProperty("appid"));
+		Downlink downlink = new Downlink(operation.getDevEui(), operation.getFport(), operation.getPayload(),
+				getProperties().getProperty("appid"));
 		logger.info("Will send {} to Loriot.", downlink.toJson());
-		DownlinkResponse response = restTemplate.postForObject(getProperties().getProperty("url") + "/1/rest", new HttpEntity<String>(downlink.toJson(), headers), DownlinkResponse.class);
+		DownlinkResponse response = restTemplate.postForObject(getProperties().getProperty("url") + "/1/rest",
+				new HttpEntity<String>(downlink.toJson(), headers), DownlinkResponse.class);
 
 		return response != null ? response.getSeqdn() : null;
 	}
@@ -172,7 +177,8 @@ public class LoriotConnector extends LNSAbstractConnector {
 		boolean result = false;
 		Device device = null;
 		try {
-			retrofit2.Response<Device> response = loriotService.getDevice(getProperties().getProperty("appid"), deviceProvisioning.getDevEUI()).execute();
+			retrofit2.Response<Device> response = loriotService
+					.getDevice(getProperties().getProperty("appid"), deviceProvisioning.getDevEUI()).execute();
 			if (response.code() == 200) {
 				device = response.body();
 			}
@@ -187,9 +193,10 @@ public class LoriotConnector extends LNSAbstractConnector {
 			deviceCreate.setAppkey(deviceProvisioning.getAppKey());
 			deviceCreate.setDescription("");
 			deviceCreate.setDevclass("A");
-	
+
 			try {
-				result = loriotService.createDevice(getProperties().getProperty("appid"), deviceCreate).execute().isSuccessful();
+				result = loriotService.createDevice(getProperties().getProperty("appid"), deviceCreate).execute()
+						.isSuccessful();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -201,7 +208,8 @@ public class LoriotConnector extends LNSAbstractConnector {
 	public void configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
 		try {
-			retrofit2.Response<List<Output>> outputs = loriotService.getOutputs(getProperties().getProperty("appid")).execute();
+			retrofit2.Response<List<Output>> outputs = loriotService.getOutputs(getProperties().getProperty("appid"))
+					.execute();
 			if (outputs.isSuccessful()) {
 				int i = 0;
 				for (Output output : outputs.body()) {
@@ -213,7 +221,8 @@ public class LoriotConnector extends LNSAbstractConnector {
 					i++;
 				}
 			}
-			HttpPush httpPush = new HttpPush(url + "/uplink", "Basic " + Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
+			HttpPush httpPush = new HttpPush(url + "/uplink",
+					"Basic " + Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
 			loriotService.createHttpPush(getProperties().getProperty("appid"), httpPush).execute();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -222,18 +231,18 @@ public class LoriotConnector extends LNSAbstractConnector {
 
 	@Override
 	public void removeRoutings() {
-		//TODO
+		// TODO
 	}
-	
+
 	public List<App> getApps() {
 		List<App> result = new ArrayList<App>();
-		
+
 		try {
 			result = loriotService.getApps().execute().body().getApps();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
 
@@ -246,5 +255,10 @@ public class LoriotConnector extends LNSAbstractConnector {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	@Override
+	public List<Gateway> getGateways() {
+		return new ArrayList<>();
 	}
 }

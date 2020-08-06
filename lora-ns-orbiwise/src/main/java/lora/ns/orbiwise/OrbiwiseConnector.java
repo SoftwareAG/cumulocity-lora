@@ -21,6 +21,7 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
+import lora.ns.Gateway;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.orbiwise.rest.OrbiwiseService;
 import lora.ns.orbiwise.rest.model.Device;
@@ -35,7 +36,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-public class Instance extends LNSAbstractConnector {
+public class OrbiwiseConnector extends LNSAbstractConnector {
 
 	private OrbiwiseService orbiwiseService;
 
@@ -85,11 +86,11 @@ public class Instance extends LNSAbstractConnector {
 
 	}
 
-	public Instance(Properties properties) {
+	public OrbiwiseConnector(Properties properties) {
 		super(properties);
 	}
 
-	public Instance(ManagedObjectRepresentation instance) {
+	public OrbiwiseConnector(ManagedObjectRepresentation instance) {
 		super(instance);
 	}
 
@@ -111,7 +112,8 @@ public class Instance extends LNSAbstractConnector {
 			List<Device> devices = response.body();
 			if (devices != null) {
 				result = devices.stream()
-						.map(device -> new EndDevice(device.getDeveui(), device.getDeveui(), DeviceClass.BY_VALUE.get(device.getLora_device_class()).name()))
+						.map(device -> new EndDevice(device.getDeveui(), device.getDeveui(),
+								DeviceClass.BY_VALUE.get(device.getLora_device_class()).name()))
 						.collect(Collectors.toList());
 			}
 		} catch (IOException e) {
@@ -225,5 +227,10 @@ public class Instance extends LNSAbstractConnector {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	@Override
+	public List<Gateway> getGateways() {
+		return new ArrayList<>();
 	}
 }

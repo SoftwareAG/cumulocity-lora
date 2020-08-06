@@ -17,6 +17,7 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
+import lora.ns.Gateway;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.objenious.rest.Device;
 import lora.ns.objenious.rest.DeviceCreate;
@@ -69,18 +70,18 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		}
 
 	}
-	
+
 	public ObjeniousConnector(Properties properties) {
 		super(properties);
 	}
-	
+
 	public ObjeniousConnector(ManagedObjectRepresentation instance) {
 		super(instance);
 	}
 
 	@Override
 	protected void init() {
-		//logger.info("Initializing Retrofit client to Objenious API");
+		// logger.info("Initializing Retrofit client to Objenious API");
 		OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new APIKeyInterceptor()).build();
 
 		Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).baseUrl("https://api.objenious.com/v1/")
@@ -95,8 +96,8 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			retrofit2.Response<List<Device>> response = objeniousService.getDevices().execute();
 			List<Device> devices = response.body();
 			if (devices != null) {
-				result = devices.stream().map(
-						device -> new EndDevice(device.getProperties().getDeveui(), device.getLabel(), ""))
+				result = devices.stream()
+						.map(device -> new EndDevice(device.getProperties().getDeveui(), device.getLabel(), ""))
 						.collect(Collectors.toList());
 			}
 		} catch (IOException e) {
@@ -105,10 +106,10 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 		return result;
 	}
-	
+
 	public Profile getProfile(int id) {
 		Profile result = null;
-		
+
 		retrofit2.Response<Profile> response;
 		try {
 			response = objeniousService.getProfile(id).execute();
@@ -116,7 +117,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
 
@@ -145,7 +146,8 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		downlinkCreate.setConfirmed(true);
 
 		try {
-			retrofit2.Response<DownlinkResponse> response = objeniousService.sendCommand(operation.getDevEui(), downlinkCreate).execute();
+			retrofit2.Response<DownlinkResponse> response = objeniousService
+					.sendCommand(operation.getDevEui(), downlinkCreate).execute();
 			if (response.isSuccessful()) {
 				result = response.body().getCommandId().toString();
 			}
@@ -175,7 +177,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			deviceCreate.setLng(deviceProvisioning.getLng());
 			deviceCreate.setGroupId(Integer.parseInt(properties.getProperty("groupId")));
 			deviceCreate.setProfileId(1);
-	
+
 			try {
 				retrofit2.Response<Device> response = objeniousService.createDevice(deviceCreate).execute();
 				result = response.isSuccessful();
@@ -188,7 +190,8 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		} else {
 			if (!device.isEnabled()) {
 				try {
-					retrofit2.Response<Device> response = objeniousService.reactivateDevice(deviceProvisioning.getDevEUI()).execute();
+					retrofit2.Response<Device> response = objeniousService
+							.reactivateDevice(deviceProvisioning.getDevEUI()).execute();
 					result = response.isSuccessful();
 					if (!result) {
 						logger.error(response.errorBody().string());
@@ -207,14 +210,13 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		try {
 			List<ScenarioRouting> routings = objeniousService.getRouting().execute().body();
 			if (routings != null) {
-				routings.stream().filter(routing -> routing.getName().equals(name))
-						.forEach(routing -> {
-							try {
-								objeniousService.deleteRouting(routing.getId()).execute();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						});
+				routings.stream().filter(routing -> routing.getName().equals(name)).forEach(routing -> {
+					try {
+						objeniousService.deleteRouting(routing.getId()).execute();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				});
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -249,22 +251,23 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	@Override
 	public void configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
-		configureRouting(url + "/downlink", tenant, login, password, tenant + "-" + this.getId() + "-downlink", MessageTypeEnum.DOWNLINK);
-		configureRouting(url + "/uplink", tenant, login, password, tenant + "-" + this.getId() + "-uplink", MessageTypeEnum.UPLINK);
+		configureRouting(url + "/downlink", tenant, login, password, tenant + "-" + this.getId() + "-downlink",
+				MessageTypeEnum.DOWNLINK);
+		configureRouting(url + "/uplink", tenant, login, password, tenant + "-" + this.getId() + "-uplink",
+				MessageTypeEnum.UPLINK);
 	}
-	
+
 	private void removeRouting(String name) {
 		try {
 			List<ScenarioRouting> routings = objeniousService.getRouting().execute().body();
 			if (routings != null) {
-				routings.stream().filter(routing -> routing.getName().equals(name))
-						.forEach(routing -> {
-							try {
-								objeniousService.deleteRouting(routing.getId()).execute();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						});
+				routings.stream().filter(routing -> routing.getName().equals(name)).forEach(routing -> {
+					try {
+						objeniousService.deleteRouting(routing.getId()).execute();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				});
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -276,16 +279,16 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		removeRouting(this.getId() + "-uplink");
 		removeRouting(this.getId() + "-downlink");
 	}
-	
+
 	public List<Group> getGroups() {
 		List<Group> result = new ArrayList<Group>();
-		
+
 		try {
 			result = objeniousService.getGroups().execute().body();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
 
@@ -298,5 +301,10 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	@Override
+	public List<Gateway> getGateways() {
+		return new ArrayList<>();
 	}
 }

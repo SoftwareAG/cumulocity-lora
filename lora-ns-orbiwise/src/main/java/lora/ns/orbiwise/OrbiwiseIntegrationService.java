@@ -23,7 +23,7 @@ import lora.ns.LNSIntegrationService;
 import lora.ns.OperationData;
 
 @Service
-public class Orbiwise extends LNSIntegrationService<Instance> {
+public class OrbiwiseIntegrationService extends LNSIntegrationService<OrbiwiseConnector> {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
