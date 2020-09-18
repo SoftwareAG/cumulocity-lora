@@ -1,0 +1,83 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "lorawan-stack/api/end_device.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/messages.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
+
+message GenerateDevAddrResponse {
+  bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
+}
+
+service Ns {
+  // GenerateDevAddr requests a device address assignment from the Network Server.
+  rpc GenerateDevAddr(google.protobuf.Empty) returns (GenerateDevAddrResponse) {
+    option (google.api.http) = {
+      get: "/ns/dev_addr"
+    };
+  };
+}
+
+// The AsNs service connects an Application Server to a Network Server.
+service AsNs {
+  rpc LinkApplication(stream google.protobuf.Empty) returns (stream ApplicationUp);
+  rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
+  rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty);
+  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
+}
+
+// The GsNs service connects a Gateway Server to a Network Server.
+service GsNs {
+  rpc HandleUplink(UplinkMessage) returns (google.protobuf.Empty);
+}
+
+// The NsEndDeviceRegistry service allows clients to manage their end devices on the Network Server.
+service NsEndDeviceRegistry {
+  // Get returns the device that matches the given identifiers.
+  // If there are multiple matches, an error will be returned.
+  rpc Get(GetEndDeviceRequest) returns (EndDevice) {
+    option (google.api.http) = {
+      get: "/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}"
+    };
+  };
+
+  // Set creates or updates the device.
+  rpc Set(SetEndDeviceRequest) returns (EndDevice) {
+    option (google.api.http) = {
+      put: "/ns/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}"
+      body: "*"
+      additional_bindings {
+        post: "/ns/applications/{end_device.ids.application_ids.application_id}/devices"
+        body: "*"
+      };
+    };
+  };
+
+  // Delete deletes the device that matches the given identifiers.
+  // If there are multiple matches, an error will be returned.
+  rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/ns/applications/{application_ids.application_id}/devices/{device_id}"
+    };
+  };
+}

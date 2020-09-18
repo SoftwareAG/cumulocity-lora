@@ -4,10 +4,10 @@ import { EventEmitter } from "events";
 import cron from "node-cron";
 
 export class MicroserviceSubscriptionService extends EventEmitter {
-    protected baseUrl: string = process.env.C8Y_BASEURL || "https://frpresales.cumulocity.com";
-    protected tenant: string = process.env.C8Y_BOOTSTRAP_TENANT || "t79736904";
-    protected user: string = process.env.C8Y_BOOTSTRAP_USER || "servicebootstrap_c8y-codec-interface";
-    protected password: string = process.env.C8Y_BOOTSTRAP_PASSWORD || "m2WfR74BiYmyR89ZsSw3WQ050dkI0QDI";
+    protected baseUrl: string = process.env.C8Y_BASEURL;
+    protected tenant: string = process.env.C8Y_BOOTSTRAP_TENANT;
+    protected user: string = process.env.C8Y_BOOTSTRAP_USER;
+    protected password: string = process.env.C8Y_BOOTSTRAP_PASSWORD;
     protected client: FetchClient;
     protected clients: Map<string, Client> = new Map<string, Client>();
 

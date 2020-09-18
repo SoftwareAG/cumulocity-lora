@@ -26,6 +26,7 @@
 		<module>lora-ns-objenious</module>
 		<module>lora-ns-orbiwise</module>
 		<module>lora-ns-loriot</module>
+		<module>lora-ns-ttn</module>
 		<module>lora-codec-elsys</module>
 		<module>lora-codec-lansitec</module>
 	</modules>

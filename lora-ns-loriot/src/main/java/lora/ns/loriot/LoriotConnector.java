@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -15,14 +17,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
 import lora.ns.Gateway;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.loriot.rest.LoriotService;
+import lora.ns.loriot.rest.model.AbpDeviceRegistration;
 import lora.ns.loriot.rest.model.App;
 import lora.ns.loriot.rest.model.Device;
 import lora.ns.loriot.rest.model.Downlink;
@@ -189,17 +190,54 @@ public class LoriotConnector extends LNSAbstractConnector {
 			OtaaDeviceRegistration deviceCreate = new OtaaDeviceRegistration();
 			deviceCreate.setTitle(deviceProvisioning.getName());
 			deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
-			deviceCreate.setAppeui(deviceProvisioning.getAppEUI());
-			deviceCreate.setAppkey(deviceProvisioning.getAppKey());
-			deviceCreate.setDescription("");
-			deviceCreate.setDevclass("A");
-
-			try {
-				result = loriotService.createDevice(getProperties().getProperty("appid"), deviceCreate).execute()
-						.isSuccessful();
-			} catch (IOException e) {
-				e.printStackTrace();
+			switch (deviceProvisioning.getProvisioningMode()) {
+				case ABP:
+					result = provisionDeviceAbp(deviceProvisioning);
+					break;
+				case OTAA:
+				default:
+					result = provisionDeviceOtaa(deviceProvisioning);
+					break;
 			}
+		}
+		return result;
+	}
+
+	private boolean provisionDeviceOtaa(DeviceProvisioning deviceProvisioning) {
+		boolean result = false;
+		OtaaDeviceRegistration deviceCreate = new OtaaDeviceRegistration();
+		deviceCreate.setTitle(deviceProvisioning.getName());
+		deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
+		deviceCreate.setAppeui(deviceProvisioning.getAppEUI());
+		deviceCreate.setAppkey(deviceProvisioning.getAppKey());
+		deviceCreate.setDescription("");
+		deviceCreate.setDevclass(Optional.ofNullable(deviceProvisioning.getDeviceClass().name()).orElse("A"));
+
+		try {
+			result = loriotService.createDeviceOtaa(getProperties().getProperty("appid"), deviceCreate).execute()
+					.isSuccessful();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	private boolean provisionDeviceAbp(DeviceProvisioning deviceProvisioning) {
+		boolean result = false;
+		AbpDeviceRegistration deviceCreate = new AbpDeviceRegistration();
+		deviceCreate.setTitle(deviceProvisioning.getName());
+		deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
+		deviceCreate.setAppskey(deviceProvisioning.getAppSKey());
+		deviceCreate.setNwkskey(deviceProvisioning.getNwkSKey());
+		deviceCreate.setDevaddr(deviceProvisioning.getDevAddr());
+		deviceCreate.setDescription("");
+		deviceCreate.setDevclass(Optional.ofNullable(deviceProvisioning.getDeviceClass().name()).orElse("A"));
+
+		try {
+			result = loriotService.createDeviceAbp(getProperties().getProperty("appid"), deviceCreate).execute()
+					.isSuccessful();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return result;
 	}

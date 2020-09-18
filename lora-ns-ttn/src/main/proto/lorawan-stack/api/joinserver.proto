@@ -1,0 +1,211 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+import "lorawan-stack/api/end_device.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/join.proto";
+import "lorawan-stack/api/keys.proto";
+import "lorawan-stack/api/lorawan.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
+
+message SessionKeyRequest {
+  // Join Server issued identifier for the session keys.
+  bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
+  // LoRaWAN DevEUI.
+  bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+  // The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).
+  bytes join_eui = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+}
+
+message NwkSKeysResponse {
+  // The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode).
+  KeyEnvelope f_nwk_s_int_key = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The (encrypted) Serving Network Session Integrity Key.
+  KeyEnvelope s_nwk_s_int_key = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The (encrypted) Network Session Encryption Key.
+  KeyEnvelope nwk_s_enc_key = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
+// The NsJs service connects a Network Server to a Join Server.
+service NsJs {
+  rpc HandleJoin(JoinRequest) returns (JoinResponse);
+  rpc GetNwkSKeys(SessionKeyRequest) returns (NwkSKeysResponse);
+}
+
+message AppSKeyResponse {
+  // The (encrypted) Application Session Key.
+  KeyEnvelope app_s_key = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
+// The AsJs service connects an Application Server to a Join Server.
+service AsJs {
+  rpc GetAppSKey(SessionKeyRequest) returns (AppSKeyResponse);
+}
+
+message CryptoServicePayloadRequest {
+  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
+  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  bytes payload = 3;
+  string provisioner_id = 4 [(gogoproto.customname) = "ProvisionerID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", max_len: 36}];
+  google.protobuf.Struct provisioning_data = 5;
+}
+
+message CryptoServicePayloadResponse {
+  bytes payload = 1;
+}
+
+message JoinAcceptMICRequest {
+  CryptoServicePayloadRequest payload_request = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
+  RejoinType join_request_type = 2 [(validate.rules).enum.defined_only = true];
+  bytes dev_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce"];
+}
+
+message DeriveSessionKeysRequest {
+  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
+  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  bytes join_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.JoinNonce"];
+  bytes dev_nonce = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce"];
+  bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
+  string provisioner_id = 6 [(gogoproto.customname) = "ProvisionerID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", max_len: 36}];
+  google.protobuf.Struct provisioning_data = 7;
+}
+
+message GetRootKeysRequest {
+  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
+  string provisioner_id = 2 [(gogoproto.customname) = "ProvisionerID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", max_len: 36}];
+  google.protobuf.Struct provisioning_data = 3;
+}
+
+// Service for network layer cryptographic operations.
+service NetworkCryptoService {
+  rpc JoinRequestMIC(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
+  rpc JoinAcceptMIC(JoinAcceptMICRequest) returns (CryptoServicePayloadResponse);
+  rpc EncryptJoinAccept(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
+  rpc EncryptRejoinAccept(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
+  rpc DeriveNwkSKeys(DeriveSessionKeysRequest) returns (NwkSKeysResponse);
+  // Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
+  rpc GetNwkKey(GetRootKeysRequest) returns (KeyEnvelope);
+}
+
+// Service for application layer cryptographic operations.
+service ApplicationCryptoService {
+  rpc DeriveAppSKey(DeriveSessionKeysRequest) returns (AppSKeyResponse);
+  // Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
+  rpc GetAppKey(GetRootKeysRequest) returns (KeyEnvelope);
+}
+
+message ProvisionEndDevicesRequest {
+  option deprecated = true;
+
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
+  // ID of the provisioner service as configured in the Join Server.
+  string provisioner_id = 2 [(gogoproto.customname) = "ProvisionerID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  // Vendor-specific provisioning data.
+  bytes provisioning_data = 3;
+
+  message IdentifiersList {
+    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+    repeated EndDeviceIdentifiers end_device_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceIDs"];
+  }
+  message IdentifiersRange {
+    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+    // DevEUI to start issuing from.
+    bytes start_dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "StartDevEUI"];
+  }
+  message IdentifiersFromData {
+    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  }
+  oneof end_devices {
+    // List of device identifiers that will be provisioned.
+    // The device identifiers must contain device_id and dev_eui.
+    // If set, the application_ids must equal the provision request's application_ids.
+    // The number of entries in data must match the number of given identifiers.
+    IdentifiersList list = 4;
+    // Provision devices in a range.
+    // The device_id will be generated by the provisioner from the vendor-specific data.
+    // The dev_eui will be issued from the given start_dev_eui.
+    IdentifiersRange range = 5;
+    // Provision devices with identifiers from the given data.
+    // The device_id and dev_eui will be generated by the provisioner from the vendor-specific data.
+    IdentifiersFromData from_data = 6;
+  }
+}
+
+// The JsEndDeviceRegistry service allows clients to manage their end devices on the Join Server.
+service JsEndDeviceRegistry {
+  // Get returns the device that matches the given identifiers.
+  // If there are multiple matches, an error will be returned.
+  rpc Get(GetEndDeviceRequest) returns (EndDevice) {
+    option (google.api.http) = {
+      get: "/js/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}"
+    };
+  };
+
+  // Set creates or updates the device.
+  rpc Set(SetEndDeviceRequest) returns (EndDevice) {
+    option (google.api.http) = {
+      put: "/js/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}"
+      body: "*"
+      additional_bindings {
+        post: "/js/applications/{end_device.ids.application_ids.application_id}/devices"
+        body: "*"
+      };
+    };
+  };
+
+  // This rpc is deprecated; use EndDeviceTemplateConverter service instead.
+  // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)
+  rpc Provision(ProvisionEndDevicesRequest) returns (stream EndDevice) {
+    option deprecated = true;
+    option (google.api.http) = {
+      put: "/js/applications/{application_ids.application_id}/provision-devices"
+      body: "*"
+    };
+  };
+
+  // Delete deletes the device that matches the given identifiers.
+  // If there are multiple matches, an error will be returned.
+  rpc Delete(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/js/applications/{application_ids.application_id}/devices/{device_id}"
+    };
+  };
+}
+
+message JoinEUIPrefix {
+  bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  uint32 length = 2;
+}
+
+message JoinEUIPrefixes {
+  repeated JoinEUIPrefix prefixes = 1 [(gogoproto.nullable) = false];
+}
+
+service Js {
+  rpc GetJoinEUIPrefixes(google.protobuf.Empty) returns (JoinEUIPrefixes) {
+    option (google.api.http) = {
+      get: "/js/join_eui_prefixes"
+    };
+  };
+}

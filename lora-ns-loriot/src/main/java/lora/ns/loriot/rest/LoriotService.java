@@ -2,6 +2,7 @@ package lora.ns.loriot.rest;
 
 import java.util.List;
 
+import lora.ns.loriot.rest.model.AbpDeviceRegistration;
 import lora.ns.loriot.rest.model.Apps;
 import lora.ns.loriot.rest.model.Device;
 import lora.ns.loriot.rest.model.HttpPush;
@@ -26,7 +27,10 @@ public interface LoriotService {
 	Call<Device> removeDevice(@Path("appid") String appid, @Path("deveui") String deveui);
 	
 	@POST("1/nwk/app/{appid}/devices/otaa")
-	Call<Device> createDevice(@Path("appid") String appid, @Body OtaaDeviceRegistration otaaDeviceRegistration);
+	Call<Device> createDeviceOtaa(@Path("appid") String appid, @Body OtaaDeviceRegistration otaaDeviceRegistration);
+	
+	@POST("1/nwk/app/{appid}/devices/abp")
+	Call<Device> createDeviceAbp(@Path("appid") String appid, @Body AbpDeviceRegistration abpDeviceRegistration);
 	
 	@GET("1/nwk/app/{appid}/devices")
 	Call<List<Device>> getDevices(@Path("appid") String appid);

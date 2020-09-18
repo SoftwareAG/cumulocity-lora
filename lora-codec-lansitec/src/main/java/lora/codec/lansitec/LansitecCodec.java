@@ -250,7 +250,7 @@ public class LansitecCodec extends DeviceCodec {
 						c8yData.addEvent(mor, "Nearest beacon changed", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", beacon.getMajor(), beacon.getMinor(), beacon.getRssi()), null, updateTime);
 					}
 					c8yData.addMeasurement(mor, "Max rssi", "rssi", "dBm", BigDecimal.valueOf(beacon.getRssi()), updateTime);
-					c8yData.addMeasurement(mor, String.format("%04X", major) + " - " + String.format("%04X", minor), "rssi", "dBm", BigDecimal.valueOf(rssi), updateTime);
+					c8yData.addMeasurement(mor, String.format("%04X", major) + "-" + String.format("%04X", minor), "rssi", "dBm", BigDecimal.valueOf(rssi), updateTime);
 				}
 			}
 		},

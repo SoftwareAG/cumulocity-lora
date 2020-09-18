@@ -1,0 +1,140 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "lorawan-stack/api/enums.proto";
+import "lorawan-stack/api/identifiers.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
+
+// Contains metadata for a received message. Each antenna that receives
+// a message corresponds to one RxMetadata.
+message RxMetadata {
+  option (gogoproto.populate) = false;
+
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  PacketBrokerMetadata packet_broker = 18;
+
+  uint32 antenna_index = 2;
+  google.protobuf.Timestamp time = 3 [(gogoproto.stdtime) = true];
+  // Gateway concentrator timestamp when the Rx finished (microseconds).
+  uint32 timestamp = 4;
+  // Gateway's internal fine timestamp when the Rx finished (nanoseconds).
+  uint64 fine_timestamp = 5;
+  // Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds).
+  bytes encrypted_fine_timestamp = 6;
+  string encrypted_fine_timestamp_key_id = 7 [(gogoproto.customname) = "EncryptedFineTimestampKeyID"];
+  // Received signal strength indicator (dBm).
+  // This value equals `channel_rssi`.
+  float rssi = 8 [(gogoproto.customname) = "RSSI"];
+  // Received signal strength indicator of the signal (dBm).
+  google.protobuf.FloatValue signal_rssi = 16 [(gogoproto.customname) = "SignalRSSI"];
+  // Received signal strength indicator of the channel (dBm).
+  float channel_rssi = 9 [(gogoproto.customname) = "ChannelRSSI"];
+  // Standard deviation of the RSSI during preamble.
+  float rssi_standard_deviation = 10 [(gogoproto.customname) = "RSSIStandardDeviation"];
+  // Signal-to-noise ratio (dB).
+  float snr = 11 [(gogoproto.customname) = "SNR"];
+  // Frequency offset (Hz).
+  int64 frequency_offset = 12;
+  // Antenna location; injected by the Gateway Server.
+  Location location = 13;
+  // Gateway downlink path constraint; injected by the Gateway Server.
+  DownlinkPathConstraint downlink_path_constraint = 14 [(validate.rules).enum.defined_only = true];
+  // Uplink token to be included in the Tx request in class A downlink; injected by gateway, Gateway Server or fNS.
+  bytes uplink_token = 15;
+  // Index of the gateway channel that received the message.
+  uint32 channel_index = 17 [(validate.rules).uint32 = {lte: 255}];
+  // Advanced metadata fields
+  // - can be used for advanced information or experimental features that are not yet formally defined in the API
+  // - field names are written in snake_case
+  google.protobuf.Struct advanced = 99;
+
+  // next: 19
+}
+
+message Location {
+  // The North–South position (degrees; -90 to +90), where 0 is the equator, North pole is positive, South pole is negative.
+  double latitude = 1 [(validate.rules).double = {gte: -90, lte: 90}];
+  // The East-West position (degrees; -180 to +180), where 0 is the Prime Meridian (Greenwich), East is positive , West is negative.
+  double longitude = 2 [(validate.rules).double = {gte: -180, lte: 180}];
+  // The altitude (meters), where 0 is the mean sea level.
+  int32 altitude = 3;
+  // The accuracy of the location (meters).
+  int32 accuracy = 4;
+  // Source of the location information.
+  LocationSource source = 5 [(validate.rules).enum.defined_only = true];
+}
+
+enum LocationSource {
+  option (gogoproto.goproto_enum_prefix) = false;
+  // The source of the location is not known or not set.
+  SOURCE_UNKNOWN = 0;
+  // The location is determined by GPS.
+  SOURCE_GPS = 1;
+  // The location is set in and updated from a registry.
+  SOURCE_REGISTRY = 3;
+  // The location is estimated with IP geolocation.
+  SOURCE_IP_GEOLOCATION = 4;
+  // The location is estimated with WiFi RSSI geolocation.
+  SOURCE_WIFI_RSSI_GEOLOCATION = 5;
+  // The location is estimated with BT/BLE RSSI geolocation.
+  SOURCE_BT_RSSI_GEOLOCATION = 6;
+  // The location is estimated with LoRa RSSI geolocation.
+  SOURCE_LORA_RSSI_GEOLOCATION = 7;
+  // The location is estimated with LoRa TDOA geolocation.
+  SOURCE_LORA_TDOA_GEOLOCATION = 8;
+  // The location is estimated by a combination of geolocation sources.
+  SOURCE_COMBINED_GEOLOCATION = 9;
+  // More estimation methods can be added.
+}
+
+message PacketBrokerMetadata {
+  // Message identifier generated by Packet Broker Router.
+  string message_id = 1 [(gogoproto.customname) = "MessageID"];
+  // LoRa Alliance NetID of the Packet Broker Forwarder Member.
+  bytes forwarder_net_id = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID", (gogoproto.customname) = "ForwarderNetID", (gogoproto.nullable) = false];
+  // Tenant ID managed by the Packet Broker Forwarder Member.
+  string forwarder_tenant_id = 3 [(gogoproto.customname) = "ForwarderTenantID"];
+  // Forwarder identifier issued by the Packet Broker Forwarder Member.
+  string forwarder_id = 4 [(gogoproto.customname) = "ForwarderID"];
+  // LoRa Alliance NetID of the Packet Broker Home Network Member.
+  bytes home_network_net_id = 5 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID", (gogoproto.customname) = "HomeNetworkNetID", (gogoproto.nullable) = false];
+  // Tenant ID managed by the Packet Broker Home Network Member.
+  // This value is empty if it cannot be determined by the Packet Broker Router.
+  string home_network_tenant_id = 6 [(gogoproto.customname) = "HomeNetworkTenantID"];
+  // Hops that the message passed. Each Packet Broker Router service appends an entry.
+  repeated PacketBrokerRouteHop hops = 7;
+}
+
+message PacketBrokerRouteHop {
+  // Time when the service received the message.
+  google.protobuf.Timestamp received_at = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // Sender of the message, typically the authorized client identifier.
+  string sender_name = 2;
+  // Sender IP address or host name.
+  string sender_address = 3;
+  // Receiver of the message.
+  string receiver_name = 4;
+  // Receiver agent.
+  string receiver_agent = 5;
+}

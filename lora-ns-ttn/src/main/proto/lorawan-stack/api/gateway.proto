@@ -1,0 +1,293 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "lorawan-stack/api/contact_info.proto";
+import "lorawan-stack/api/enums.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/metadata.proto";
+import "lorawan-stack/api/rights.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
+
+message GatewayBrand {
+  string id = 1 [(gogoproto.customname) = "ID"];
+  string name = 2;
+  string url = 3 [(gogoproto.customname) = "URL"];
+  // Logos contains file names of brand logos.
+  repeated string logos = 4;
+}
+
+message GatewayModel {
+  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string id = 2 [(gogoproto.customname) = "ID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string name = 3;
+}
+
+// Identifies an end device model with version information.
+message GatewayVersionIdentifiers {
+  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string model_id = 2 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string hardware_version = 3;
+  string firmware_version = 4;
+}
+
+message GatewayRadio {
+  bool enable = 1;
+  string chip_type = 2;
+  uint64 frequency = 3;
+  float rssi_offset = 4 [(gogoproto.customname) = "RSSIOffset"];
+
+  message TxConfiguration {
+    uint64 min_frequency = 1;
+    uint64 max_frequency = 2;
+    uint64 notch_frequency = 3;
+  }
+  TxConfiguration tx_configuration = 5;
+}
+
+// Template for creating gateways.
+message GatewayVersion {
+  option (gogoproto.populate) = false;
+
+  // Version identifiers.
+  GatewayVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+
+  // Photos contains file names of gateway photos.
+  repeated string photos = 2;
+  repeated GatewayRadio radios = 3;
+  uint32 clock_source = 7;
+}
+
+// Gateway is the message that defines a gateway on the network.
+message Gateway {
+  GatewayIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  string name = 4 [(validate.rules).string.max_len = 50];
+  string description = 5 [(validate.rules).string.max_len = 2000];
+
+  // Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data.
+  map<string,string> attributes = 6 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+
+  // Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.
+  repeated ContactInfo contact_info = 7;
+
+  GatewayVersionIdentifiers version_ids = 8 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+
+  // The address of the Gateway Server to connect to.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string gateway_server_address = 9 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+  bool auto_update = 10;
+  string update_channel = 11;
+
+  // Frequency plan ID of the gateway.
+  // This equals the first element of the frequency_plan_ids field.
+  string frequency_plan_id = 12 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
+
+  // Frequency plan IDs of the gateway.
+  // The first element equals the frequency_plan_id field.
+  repeated string frequency_plan_ids = 20 [(gogoproto.customname) = "FrequencyPlanIDs", (validate.rules).repeated = { max_items: 8, items{ string{ max_len: 64 } } }];
+
+  repeated GatewayAntenna antennas = 13 [(gogoproto.nullable) = false];
+  // The status of this gateway may be publicly displayed.
+  bool status_public = 14;
+  // The location of this gateway may be publicly displayed.
+  bool location_public = 15;
+  // Enable server-side buffering of downlink messages. This is recommended for gateways using the Semtech UDP Packet
+  // Forwarder v2.x or older, as it does not feature a just-in-time queue. If enabled, the Gateway Server schedules the
+  // downlink message late to the gateway so that it does not overwrite previously scheduled downlink messages that have
+  // not been transmitted yet.
+  bool schedule_downlink_late = 16;
+  // Enforcing gateway duty cycle is recommended for all gateways to respect spectrum regulations. Disable enforcing the
+  // duty cycle only in controlled research and development environments.
+  bool enforce_duty_cycle = 17;
+  DownlinkPathConstraint downlink_path_constraint = 18 [(validate.rules).enum.defined_only = true];
+  // Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite.
+  google.protobuf.Duration schedule_anytime_delay = 19 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
+  // update the location of this gateway from status messages
+  bool update_location_from_status = 21;
+
+  // next: 22
+}
+
+message Gateways {
+  repeated Gateway gateways = 1;
+}
+
+message GetGatewayRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the gateway fields that should be returned.
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message GetGatewayIdentifiersForEUIRequest {
+  bytes eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.nullable) = false, (gogoproto.customname) = "EUI"];
+}
+
+message ListGatewaysRequest {
+  // By default we list all gateways the caller has rights on.
+  // Set the user or the organization (not both) to instead list the gateways
+  // where the user or organization is collaborator on.
+  OrganizationOrUserIdentifiers collaborator = 1;
+  // The names of the gateway fields that should be returned.
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 3 [
+    (validate.rules).string = { in: ["", "gateway_id", "-gateway_id", "gateway_eui", "-gateway_eui", "name", "-name", "created_at", "-created_at"] }
+  ];
+  // Limit the number of results per page.
+  uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 5;
+}
+
+message CreateGatewayRequest {
+  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Collaborator to grant all rights on the newly created gateway.
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
+message UpdateGatewayRequest {
+  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the gateway fields that should be updated.
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message ListGatewayAPIKeysRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Limit the number of results per page.
+  uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 3;
+}
+
+message GetGatewayAPIKeyRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Unique public identifier for the API key.
+  string key_id = 2 [(gogoproto.customname) = "KeyID"];
+}
+
+message CreateGatewayAPIKeyRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  string name = 2 [(validate.rules).string.max_len = 50];
+  repeated Right rights = 3 [(validate.rules).repeated.items.enum.defined_only = true];
+}
+
+message UpdateGatewayAPIKeyRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
+message ListGatewayCollaboratorsRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Limit the number of results per page.
+  uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 3;
+}
+
+message GetGatewayCollaboratorRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
+message SetGatewayCollaboratorRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
+// GatewayAntenna is the message that defines a gateway antenna.
+message GatewayAntenna {
+  // gain is the antenna gain relative to this gateway, in dBi.
+  float gain = 1;
+  // location is the antenna's location.
+  Location location = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  map<string,string> attributes = 3 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+}
+
+message GatewayStatus {
+  // Current time of the gateway
+  google.protobuf.Timestamp time = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
+  // Boot time of the gateway
+  // - can be left out to save bandwidth; old value will be kept
+  google.protobuf.Timestamp boot_time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // Versions of gateway subsystems
+  // - each field can be left out to save bandwidth; old value will be kept
+  // - map keys are written in snake_case
+  // - for example:
+  //     firmware: "2.0.4"
+  //     forwarder: "v2-3.3.1"
+  //     fpga: "48"
+  //     dsp: "27"
+  //     hal: "v2-3.5.0"
+  map<string,string> versions = 3 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[_-]?[a-z0-9]){2,}$" , max_len: 36}];
+  // Location of each gateway's antenna
+  // - if left out, server uses registry-set location as fallback
+  repeated Location antenna_locations = 4;
+  // IP addresses of this gateway.
+  // Repeated addresses can be used to communicate addresses of multiple interfaces (LAN, Public IP, ...).
+  repeated string ip = 5 [(gogoproto.customname) = "IP"];
+  // Metrics
+  // - can be used for forwarding gateway metrics such as temperatures or performance metrics
+  // - map keys are written in snake_case
+  map<string,float> metrics = 6 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[_-]?[a-z0-9]){2,}$" , max_len: 36}];
+  // Advanced metadata fields
+  // - can be used for advanced information or experimental features that are not yet formally defined in the API
+  // - field names are written in snake_case
+  google.protobuf.Struct advanced = 99;
+}
+
+// Connection stats as monitored by the Gateway Server.
+message GatewayConnectionStats {
+  google.protobuf.Timestamp connected_at = 1 [(gogoproto.stdtime) = true];
+  string protocol = 2; // Protocol used to connect (for example, udp, mqtt, grpc)
+  google.protobuf.Timestamp last_status_received_at = 3 [(gogoproto.stdtime) = true];
+  GatewayStatus last_status = 4;
+  google.protobuf.Timestamp last_uplink_received_at = 5 [(gogoproto.stdtime) = true];
+  uint64 uplink_count = 6;
+  google.protobuf.Timestamp last_downlink_received_at = 7 [(gogoproto.stdtime) = true];
+  uint64 downlink_count = 8;
+
+  message RoundTripTimes {
+    google.protobuf.Duration min = 1 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration max = 2 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration median = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    uint32 count = 4;
+  }
+  RoundTripTimes round_trip_times = 9;
+
+  message SubBand {
+    uint64 min_frequency = 1;
+    uint64 max_frequency = 2;
+    float downlink_utilization_limit = 3;
+    float downlink_utilization = 4;
+  }
+  // Statistics for each sub band.
+  repeated SubBand sub_bands = 10;
+}

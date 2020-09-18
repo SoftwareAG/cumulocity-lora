@@ -1,0 +1,631 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/join.proto";
+import "lorawan-stack/api/keys.proto";
+import "lorawan-stack/api/lorawan.proto";
+import "lorawan-stack/api/messages.proto";
+import "lorawan-stack/api/picture.proto";
+import "lorawan-stack/api/metadata.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
+
+message Session {
+  reserved 1; // RFU: Session ID
+
+  // Device Address, issued by the Network Server or chosen by device manufacturer in case of testing range (beginning with 00-03).
+  // Known by Network Server, Application Server and Join Server. Owned by Network Server.
+  bytes dev_addr = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr", (gogoproto.nullable) = false];
+  SessionKeys keys = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Last uplink frame counter value used. Network Server only. Application Server assumes the Network Server checked it.
+  uint32 last_f_cnt_up = 4;
+  // Last network downlink frame counter value used. Network Server only.
+  uint32 last_n_f_cnt_down = 5;
+  // Last application downlink frame counter value used. Application Server only.
+  uint32 last_a_f_cnt_down = 6;
+  // Frame counter of the last confirmed downlink message sent. Network Server only.
+  uint32 last_conf_f_cnt_down = 7;
+  // Time when the session started. Network Server only.
+  google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // Queued Application downlink messages. Stored in Application Server and Network Server.
+  repeated ApplicationDownlink queued_application_downlinks = 9;
+}
+
+// MACParameters represent the parameters of the device's MAC layer (active or desired).
+// This is used internally by the Network Server.
+message MACParameters {
+  option (gogoproto.populate) = false;
+
+  // Maximum EIRP (dBm).
+  float max_eirp = 1 [(gogoproto.customname) = "MaxEIRP"];
+  reserved 2; // Deprecated: uplink_dwell_time
+  reserved 3; // Deprecated: downlink_dwell_time
+  // ADR: data rate index to use.
+  DataRateIndex adr_data_rate_index = 4 [(gogoproto.customname) = "ADRDataRateIndex", (validate.rules).enum.defined_only = true];
+  // ADR: transmission power index to use.
+  uint32 adr_tx_power_index = 5 [(gogoproto.customname) = "ADRTxPowerIndex", (validate.rules).uint32.lte = 15];
+  // ADR: number of retransmissions.
+  uint32 adr_nb_trans = 6 [(gogoproto.customname) = "ADRNbTrans", (validate.rules).uint32.lte = 15];
+  // ADR: number of messages to wait before setting ADRAckReq.
+  // This field is deprecated, use adr_ack_limit_exponent instead.
+  uint32 adr_ack_limit = 7 [(gogoproto.customname) = "ADRAckLimit", deprecated = true];
+  // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
+  // This field is deprecated, use adr_ack_delay_exponent instead.
+  uint32 adr_ack_delay = 8 [(gogoproto.customname) = "ADRAckDelay", deprecated = true];
+  // Rx1 delay (Rx2 delay is Rx1 delay + 1 second).
+  RxDelay rx1_delay = 9 [(validate.rules).enum.defined_only = true];
+  // Data rate offset for Rx1.
+  uint32 rx1_data_rate_offset = 10 [(validate.rules).uint32.lte = 7];
+  // Data rate index for Rx2.
+  DataRateIndex rx2_data_rate_index = 11 [(validate.rules).enum.defined_only = true];
+  // Frequency for Rx2 (Hz).
+  uint64 rx2_frequency = 12 [(validate.rules).uint64.gte = 100000];
+  // Maximum uplink duty cycle (of all channels).
+  AggregatedDutyCycle max_duty_cycle = 13 [(validate.rules).enum.defined_only = true];
+  // Time within which a rejoin-request must be sent.
+  RejoinTimeExponent rejoin_time_periodicity = 14 [(validate.rules).enum.defined_only = true];
+  // Message count within which a rejoin-request must be sent.
+  RejoinCountExponent rejoin_count_periodicity = 15 [(validate.rules).enum.defined_only = true];
+  // Frequency of the class B ping slot (Hz).
+  uint64 ping_slot_frequency = 16 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
+  // Data rate index of the class B ping slot.
+  // This field is deprecated, use ping_slot_data_rate_index_value instead.
+  DataRateIndex ping_slot_data_rate_index = 17 [deprecated = true];
+  // Frequency of the class B beacon (Hz).
+  uint64 beacon_frequency = 18 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
+
+  message Channel {
+    option (gogoproto.populate) = false;
+
+    // Uplink frequency of the channel (Hz).
+    uint64 uplink_frequency = 1 [(validate.rules).uint64.gte = 100000];
+    // Downlink frequency of the channel (Hz).
+    uint64 downlink_frequency = 2 [(validate.rules).uint64.gte = 100000];
+    // Index of the minimum data rate for uplink.
+    DataRateIndex min_data_rate_index = 3 [(validate.rules).enum.defined_only = true];
+    // Index of the maximum data rate for uplink.
+    DataRateIndex max_data_rate_index = 4 [(validate.rules).enum.defined_only = true];
+    // Channel can be used by device for uplink.
+    bool enable_uplink = 5;
+  }
+  // Configured uplink channels and optionally Rx1 frequency.
+  repeated Channel channels = 19 [(validate.rules).repeated.min_items = 1];
+
+  // Whether uplink dwell time is set (400ms).
+  // If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).
+  google.protobuf.BoolValue uplink_dwell_time = 20;
+  // Whether downlink dwell time is set (400ms).
+  // If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).
+  google.protobuf.BoolValue downlink_dwell_time = 21;
+
+  // ADR: number of messages to wait before setting ADRAckReq.
+  ADRAckLimitExponentValue adr_ack_limit_exponent = 22 [(gogoproto.customname) = "ADRAckLimitExponent"];
+  // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
+  ADRAckDelayExponentValue adr_ack_delay_exponent = 23 [(gogoproto.customname) = "ADRAckDelayExponent"];
+  // Data rate index of the class B ping slot.
+  //DataRateIndexValue ping_slot_data_rate_index_value = 24;
+}
+
+message EndDeviceBrand {
+  string id = 1 [(gogoproto.customname) = "ID"];
+  string name = 2;
+  string url = 3 [(gogoproto.customname) = "URL"];
+  // Logos contains file names of brand logos.
+  repeated string logos = 4;
+}
+
+message EndDeviceModel {
+  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string id = 2 [(gogoproto.customname) = "ID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string name = 3;
+}
+
+// Identifies an end device model with version information.
+message EndDeviceVersionIdentifiers {
+  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string model_id = 2 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string hardware_version = 3;
+  string firmware_version = 4;
+}
+
+// Template for creating end devices.
+message EndDeviceVersion {
+  option (gogoproto.populate) = false;
+
+  // Version identifiers.
+  EndDeviceVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+
+  // LoRaWAN MAC version.
+  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  // LoRaWAN PHY version.
+  PHYVersion lorawan_phy_version = 3 [(gogoproto.customname) = "LoRaWANPHYVersion", (validate.rules).enum.defined_only = true];
+  // ID of the frequency plan used by this device.
+  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
+
+  // Photos contains file names of device photos.
+  repeated string photos = 5;
+
+  // Whether the device supports class B.
+  bool supports_class_b = 6;
+  // Whether the device supports class C.
+  bool supports_class_c = 7;
+  // Default MAC layer settings of the device.
+  MACSettings default_mac_settings = 8 [(gogoproto.customname) = "DefaultMACSettings"];
+  // Minimum frequency the device is capable of using (Hz).
+  uint64 min_frequency = 9;
+  // Maximum frequency the device is capable of using (Hz).
+  uint64 max_frequency = 10;
+  // The device supports join (it's OTAA).
+  bool supports_join = 11;
+  // Whether the device resets the join and dev nonces (not LoRaWAN compliant).
+  bool resets_join_nonces = 12;
+
+  // Default formatters defining the payload formats for this end device.
+  MessagePayloadFormatters default_formatters = 13 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
+message MACSettings {
+  // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.Duration class_b_timeout = 1 [(gogoproto.stdduration) = true];
+  // Periodicity of the class B ping slot.
+  // If unset, the default value from Network Server configuration will be used.
+  PingSlotPeriodValue ping_slot_periodicity = 2;
+  // Data rate index of the class B ping slot.
+  // If unset, the default value from Network Server configuration will be used.
+  DataRateIndexValue ping_slot_data_rate_index = 3;
+  // Frequency of the class B ping slot (Hz).
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.UInt64Value ping_slot_frequency = 4 [(validate.rules).uint64.gte = 100000];
+  // Frequency of the class B beacon (Hz).
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.UInt64Value beacon_frequency = 25 [(validate.rules).uint64.gte = 100000];
+
+  // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.Duration class_c_timeout = 5 [(gogoproto.stdduration) = true];
+
+  // Class A Rx1 delay.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  RxDelayValue rx1_delay = 6;
+  // Rx1 data rate offset.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.UInt32Value rx1_data_rate_offset = 7 [(validate.rules).uint32.lte = 7];
+  // Data rate index for Rx2.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  DataRateIndexValue rx2_data_rate_index = 8;
+  // Frequency for Rx2 (Hz).
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  google.protobuf.UInt64Value rx2_frequency = 9 [(validate.rules).uint64.gte = 100000];
+  // List of factory-preset frequencies.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  repeated uint64 factory_preset_frequencies = 10;
+
+  // Maximum uplink duty cycle (of all channels).
+  AggregatedDutyCycleValue max_duty_cycle = 11;
+
+  // Whether the device supports 32-bit frame counters.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.BoolValue supports_32_bit_f_cnt = 12 [(gogoproto.customname) = "Supports32BitFCnt"];
+
+  // Whether the Network Server should use ADR for the device.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.BoolValue use_adr = 13 [(gogoproto.customname) = "UseADR"];
+  // The ADR margin tells the network server how much margin it should add in ADR requests.
+  // A bigger margin is less efficient, but gives a better chance of successful reception.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.FloatValue adr_margin = 14 [(gogoproto.customname) = "ADRMargin"];
+  // Whether the device resets the frame counters (not LoRaWAN compliant).
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.BoolValue resets_f_cnt = 15;
+  // The interval after which a DevStatusReq MACCommand shall be sent.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.Duration status_time_periodicity = 16 [(gogoproto.stdduration) = true];
+  // Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.UInt32Value status_count_periodicity = 17;
+
+  // The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  RxDelayValue desired_rx1_delay = 18;
+  // The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.UInt32Value desired_rx1_data_rate_offset = 19;
+  // The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept.
+  // If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.
+  DataRateIndexValue desired_rx2_data_rate_index = 20;
+  // The Rx2 frequency index Network Server should configure device to use via MAC commands.
+  // If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.
+  google.protobuf.UInt64Value desired_rx2_frequency = 21 [(validate.rules).uint64.gte = 100000];
+
+  // The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration will be used.
+  AggregatedDutyCycleValue desired_max_duty_cycle = 22;
+
+  // The ADR ACK limit Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  ADRAckLimitExponentValue desired_adr_ack_limit_exponent = 23 [(gogoproto.customname) = "DesiredADRAckLimitExponent"];
+  // The ADR ACK delay Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  ADRAckDelayExponentValue desired_adr_ack_delay_exponent = 24 [(gogoproto.customname) = "DesiredADRAckDelayExponent"];
+
+  // The data rate index of the class B ping slot Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration will be used.
+  DataRateIndexValue desired_ping_slot_data_rate_index = 27;
+  // The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  google.protobuf.UInt64Value desired_ping_slot_frequency = 28 [(validate.rules).uint64.gte = 100000];
+  // The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.UInt64Value desired_beacon_frequency = 29 [(validate.rules).uint64.gte = 100000];
+}
+
+// MACState represents the state of MAC layer of the device.
+// MACState is reset on each join for OTAA or ResetInd for ABP devices.
+// This is used internally by the Network Server and is read only.
+message MACState {
+  option (gogoproto.populate) = false;
+
+  // Current LoRaWAN MAC parameters.
+  MACParameters current_parameters = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Desired LoRaWAN MAC parameters.
+  MACParameters desired_parameters = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+
+  // Currently active LoRaWAN device class
+  // - Device class is A by default
+  // - If device sets ClassB bit in uplink, this will be set to B
+  // - If device sent DeviceModeInd MAC message, this will be set to that value
+  Class device_class = 3 [(validate.rules).enum.defined_only = true];
+  // LoRaWAN MAC version.
+  MACVersion lorawan_version = 4 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  // Time when the last confirmed downlink message or MAC command was scheduled.
+  google.protobuf.Timestamp last_confirmed_downlink_at = 5 [(gogoproto.stdtime) = true];
+  // Frame counter value of last uplink containing DevStatusAns.
+  uint32 last_dev_status_f_cnt_up = 6;
+  // Periodicity of the class B ping slot.
+  PingSlotPeriodValue ping_slot_periodicity = 7;
+  // A confirmed application downlink, for which an acknowledgment is expected to arrive.
+  ApplicationDownlink pending_application_downlink = 8;
+  // Queued MAC responses.
+  // Regenerated on each uplink.
+  repeated MACCommand queued_responses = 9;
+  // Pending MAC requests(i.e. sent requests, for which no response has been received yet).
+  // Regenerated on each downlink.
+  repeated MACCommand pending_requests = 10;
+
+  message JoinAccept {
+    // Payload of the join-accept received from Join Server.
+    bytes payload = 1 [(validate.rules).bytes = {min_len: 17, max_len: 33}];
+    // JoinRequest sent to Join Server.
+    JoinRequest request = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+    // Network session keys associated with the join.
+    SessionKeys keys = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+    repeated string correlation_ids = 4 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+  }
+  // Queued join-accept.
+  // Set each time a (re-)join request accept is received from Join Server and removed each time a downlink is scheduled.
+  JoinAccept queued_join_accept = 11;
+  // Pending join request.
+  // Set each time a join accept is scheduled and removed each time an uplink is received from the device.
+  JoinRequest pending_join_request = 12;
+  // Whether or not Rx windows are expected to be open.
+  // Set to true every time an uplink is received.
+  // Set to false every time a successful downlink scheduling attempt is made.
+  bool rx_windows_available = 13;
+
+  // Recent data uplink messages sorted by time.
+  // The number of messages stored may depend on configuration.
+  repeated UplinkMessage recent_uplinks = 14;
+  // Recent data downlink messages sorted by time.
+  // The number of messages stored may depend on configuration.
+  repeated DownlinkMessage recent_downlinks = 15;
+
+  // Time when the last network-initiated downlink message was scheduled.
+  google.protobuf.Timestamp last_network_initiated_downlink_at = 16 [(gogoproto.stdtime) = true];
+
+  // ADR Data rate index values rejected by the device.
+  // Reset each time `current_parameters.channels` change.
+  // Elements are sorted in ascending order.
+  repeated DataRateIndex rejected_adr_data_rate_indexes = 17 [(gogoproto.customname) = "RejectedADRDataRateIndexes", (validate.rules).repeated = { max_items: 15, items{ enum{ defined_only: true } } }];
+
+  // ADR TX output power index values rejected by the device.
+  // Elements are sorted in ascending order.
+  repeated uint32 rejected_adr_tx_power_indexes = 18 [(gogoproto.customname) = "RejectedADRTxPowerIndexes", (validate.rules).repeated = { max_items: 15, items{ uint32{ lte: 15 } } }];
+
+  // Frequencies rejected by the device.
+  repeated uint64 rejected_frequencies = 19 [(validate.rules).repeated.items.uint64.gte = 100000];
+
+  // Time when the last downlink message was scheduled.
+  google.protobuf.Timestamp last_downlink_at = 20 [(gogoproto.stdtime) = true];
+}
+
+// Power state of the device.
+enum PowerState {
+  POWER_UNKNOWN = 0;
+  POWER_BATTERY = 1;
+  POWER_EXTERNAL = 2;
+}
+
+// Authentication code for end devices.
+message EndDeviceAuthenticationCode {
+  option (gogoproto.populate) = false;
+
+  string value = 1 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
+  google.protobuf.Timestamp valid_from = 2 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp valid_to = 3 [(gogoproto.stdtime) = true];
+}
+
+// Defines an End Device registration and its state on the network.
+// The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
+// SDKs are responsible for combining (if desired) the three.
+message EndDevice {
+  option (gogoproto.populate) = false;
+
+  EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  // Friendly name of the device. Stored in Entity Registry.
+  string name = 4 [(validate.rules).string.max_len = 50];
+  // Description of the device. Stored in Entity Registry.
+  string description = 5 [(validate.rules).string.max_len = 2000];
+
+  // Key-value attributes for this end device. Typically used for organizing end devices or for storing integration-specific data. Stored in Entity Registry.
+  map<string,string> attributes = 6 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+
+  // Version Identifiers. Stored in Entity Registry, Network Server and Application Server.
+  EndDeviceVersionIdentifiers version_ids = 7 [(gogoproto.customname) = "VersionIDs"];
+
+  // Default service profile. Stored in Entity Registry.
+  string service_profile_id = 8 [(gogoproto.customname) = "ServiceProfileID", (validate.rules).string.max_len = 64];
+
+  // The address of the Network Server where this device is supposed to be registered.
+  // Stored in Entity Registry and Join Server.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string network_server_address = 9 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+  // The KEK label of the Network Server to use for wrapping network session keys.
+  // Stored in Join Server.
+  string network_server_kek_label = 47 [(gogoproto.customname) = "NetworkServerKEKLabel", (validate.rules).string.max_len = 2048];
+  // The address of the Application Server where this device is supposed to be registered.
+  // Stored in Entity Registry and Join Server.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string application_server_address = 10 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+  // The KEK label of the Application Server to use for wrapping the application session key.
+  // Stored in Join Server.
+  string application_server_kek_label = 48 [(gogoproto.customname) = "ApplicationServerKEKLabel", (validate.rules).string.max_len = 2048];
+  // The AS-ID of the Application Server to use.
+  // Stored in Join Server.
+  string application_server_id = 49 [(gogoproto.customname) = "ApplicationServerID", (validate.rules).string.max_len = 100];
+  // The address of the Join Server where this device is supposed to be registered.
+  // Stored in Entity Registry.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string join_server_address = 11 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+
+  // Location of the device. Stored in Entity Registry.
+  map<string,Location> locations = 12 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+
+  // Stored in Entity Registry.
+  Picture picture = 50;
+
+  // Whether the device supports class B.
+  // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
+  bool supports_class_b = 13;
+  // Whether the device supports class C.
+  // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
+  bool supports_class_c = 14;
+  // LoRaWAN MAC version. Stored in Network Server.
+  // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
+  MACVersion lorawan_version = 15 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  // LoRaWAN PHY version. Stored in Network Server.
+  // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
+  PHYVersion lorawan_phy_version = 16 [(gogoproto.customname) = "LoRaWANPHYVersion", (validate.rules).enum.defined_only = true];
+  // ID of the frequency plan used by this device.
+  // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
+  string frequency_plan_id = 17 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
+  // Minimum frequency the device is capable of using (Hz). Stored in Network Server.
+  // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
+  uint64 min_frequency = 18;
+  // Maximum frequency the device is capable of using (Hz). Stored in Network Server.
+  // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
+  uint64 max_frequency = 19;
+  // The device supports join (it's OTAA).
+  // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
+  bool supports_join = 20;
+  // Whether the device resets the join and dev nonces (not LoRaWAN compliant). Stored in Join Server.
+  // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
+  bool resets_join_nonces = 21;
+
+  // Device root keys. Stored in Join Server.
+  RootKeys root_keys = 22;
+
+  // Home NetID. Stored in Join Server.
+  bytes net_id = 23 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID", (gogoproto.customname) = "NetID"];
+  // Settings for how the Network Server handles MAC layer for this device. Stored in Network Server.
+  MACSettings mac_settings = 24 [(gogoproto.customname) = "MACSettings"];
+  // MAC state of the device. Stored in Network Server.
+  MACState mac_state = 25 [(gogoproto.customname) = "MACState"];
+  // Pending MAC state of the device. Stored in Network Server.
+  MACState pending_mac_state = 44 [(gogoproto.customname) = "PendingMACState"];
+  // Current session of the device. Stored in Network Server and Application Server.
+  Session session = 26;
+  // Pending session. Stored in Network Server and Application Server until RekeyInd is received.
+  Session pending_session = 27;
+
+  // Last DevNonce used.
+  // This field is only used for devices using LoRaWAN version 1.1 and later.
+  // Stored in Join Server.
+  uint32 last_dev_nonce = 28;
+  // Used DevNonces sorted in ascending order.
+  // This field is only used for devices using LoRaWAN versions preceding 1.1.
+  // Stored in Join Server.
+  repeated uint32 used_dev_nonces = 29;
+  // Last JoinNonce/AppNonce(for devices using LoRaWAN versions preceding 1.1) used.
+  // Stored in Join Server.
+  uint32 last_join_nonce = 30;
+  // Last Rejoin counter value used (type 0/2).
+  // Stored in Join Server.
+  uint32 last_rj_count_0 = 31 [(gogoproto.customname) = "LastRJCount0"];
+  // Last Rejoin counter value used (type 1).
+  // Stored in Join Server.
+  uint32 last_rj_count_1 = 32 [(gogoproto.customname) = "LastRJCount1"];
+
+  // Time when last DevStatus MAC command was received.
+  // Stored in Network Server.
+  google.protobuf.Timestamp last_dev_status_received_at = 33 [(gogoproto.stdtime) = true];
+  // The power state of the device; whether it is battery-powered or connected to an external power source.
+  // Received via the DevStatus MAC command at status_received_at.
+  // Stored in Network Server.
+  PowerState power_state = 34 [(validate.rules).enum.defined_only = true];
+  // Latest-known battery percentage of the device.
+  // Received via the DevStatus MAC command at last_dev_status_received_at or earlier.
+  // Stored in Network Server.
+  google.protobuf.FloatValue battery_percentage = 35 [(validate.rules).float = {gte: 0, lte: 1}];
+  // Demodulation signal-to-noise ratio (dB).
+  // Received via the DevStatus MAC command at last_dev_status_received_at.
+  // Stored in Network Server.
+  int32 downlink_margin = 36;
+
+  // Recent uplink messages with ADR bit set to 1 sorted by time. Stored in Network Server.
+  // The field is reset each time an uplink message carrying MACPayload is received with ADR bit set to 0.
+  // The number of messages stored is in the range [0,20];
+  repeated UplinkMessage recent_adr_uplinks = 37 [(gogoproto.customname) = "RecentADRUplinks"];
+  // Recent uplink messages sorted by time. Stored in Network Server.
+  // The number of messages stored may depend on configuration.
+  repeated UplinkMessage recent_uplinks = 38;
+  // Recent downlink messages sorted by time. Stored in Network Server.
+  // The number of messages stored may depend on configuration.
+  repeated DownlinkMessage recent_downlinks = 39;
+  // Queued Application downlink messages. Stored in Application Server,
+  // which sets them on the Network Server.
+  // This field is deprecated and is always set equal to session.queued_application_downlinks.
+  repeated ApplicationDownlink queued_application_downlinks = 40;
+
+  // The payload formatters for this end device. Stored in Application Server.
+  // Copied on creation from template identified by version_ids.
+  MessagePayloadFormatters formatters = 41;
+
+  // ID of the provisioner. Stored in Join Server.
+  string provisioner_id = 42 [(gogoproto.customname) = "ProvisionerID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", max_len: 36}];
+  // Vendor-specific provisioning data. Stored in Join Server.
+  google.protobuf.Struct provisioning_data = 43;
+
+  // Indicates whether this device represents a multicast group.
+  bool multicast = 45;
+
+  // Authentication code to claim ownership of the end device. Stored in Join Server.
+  EndDeviceAuthenticationCode claim_authentication_code = 46;
+
+  // Skip decryption of uplink payloads and encryption of downlink payloads.
+  // This field is deprecated, use skip_payload_crypto_override instead.
+  bool skip_payload_crypto = 51;
+  // Skip decryption of uplink payloads and encryption of downlink payloads.
+  // This field overrides the application-level setting.
+  google.protobuf.BoolValue skip_payload_crypto_override = 52;
+
+  // next: 53;
+}
+
+message EndDevices {
+  repeated EndDevice end_devices = 1;
+}
+
+message CreateEndDeviceRequest {
+  EndDevice end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
+message UpdateEndDeviceRequest {
+  EndDevice end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the end device fields that should be updated.
+  // See the API reference for which fields can be set on the different services.
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message GetEndDeviceRequest {
+  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the end device fields that should be returned.
+  // See the API reference for which fields can be returned by the different services.
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message GetEndDeviceIdentifiersForEUIsRequest {
+  bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+}
+
+message ListEndDevicesRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the end device fields that should be returned.
+  // See the API reference for which fields can be returned by the different services.
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 3 [
+    (validate.rules).string = { in: ["", "device_id", "-device_id", "join_eui", "-join_eui", "dev_eui", "-dev_eui", "name", "-name", "description", "-description", "created_at", "-created_at"] }
+  ];
+  // Limit the number of results per page.
+  uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 5;
+}
+
+message SetEndDeviceRequest {
+  EndDevice end_device = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the end device fields that should be updated.
+  // See the API reference for which fields can be set on the different services.
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message EndDeviceTemplate {
+  EndDevice end_device = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  string mapping_key = 3 [(validate.rules).string.max_len = 100];
+}
+
+message EndDeviceTemplateFormat {
+  string name = 1 [(validate.rules).string.max_len = 100];
+  string description = 2 [(validate.rules).string.max_len = 200];
+  repeated string file_extensions = 3 [(validate.rules).repeated = {max_items: 100, unique: true, items: {string: {pattern: "^(?:\\.[a-z0-9]{1,16}){1,2}$"}}}];
+}
+
+message EndDeviceTemplateFormats {
+  map<string, EndDeviceTemplateFormat> formats = 1 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+}
+
+message ConvertEndDeviceTemplateRequest {
+  // ID of the format.
+  string format_id = 1 [(gogoproto.customname) = "FormatID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  // Data to convert.
+  bytes data = 2;
+}
