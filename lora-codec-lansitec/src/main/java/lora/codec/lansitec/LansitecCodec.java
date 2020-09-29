@@ -375,4 +375,10 @@ public class LansitecCodec extends DeviceCodec {
 		return result;
 	}
 
+	@Override
+	protected Map<String, String> getChildDevicesNames() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

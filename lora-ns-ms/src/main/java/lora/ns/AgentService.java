@@ -2,6 +2,7 @@ package lora.ns;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +47,9 @@ public class AgentService {
 
 
 	public void registerAgent(LNSIntegrationService<? extends LNSConnector> lnsIntegrationService) {
-		ExternalIDRepresentation extId = c8yUtils.findExternalId(lnsIntegrationService.getType(), LNSIntegrationService.LNS_EXT_ID);
+		Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(lnsIntegrationService.getType(), LNSIntegrationService.LNS_EXT_ID);
 		ManagedObjectRepresentation agent = null;
-		if (extId == null) {
+		if (!extId.isPresent()) {
 			agent = new ManagedObjectRepresentation();
 			agent.setType(LNSIntegrationService.LNS_MO_TYPE);
 			agent.setName(lnsIntegrationService.getName());
@@ -59,13 +60,13 @@ public class AgentService {
 			agent.set(new IsDevice());
 			agent = inventoryApi.create(agent);
 
-			extId = new ExternalIDRepresentation();
-			extId.setExternalId(lnsIntegrationService.getType());
-			extId.setType(LNSIntegrationService.LNS_EXT_ID);
-			extId.setManagedObject(agent);
-			identityApi.create(extId);
+			ExternalIDRepresentation externalId = new ExternalIDRepresentation();
+			externalId.setExternalId(lnsIntegrationService.getType());
+			externalId.setType(LNSIntegrationService.LNS_EXT_ID);
+			externalId.setManagedObject(agent);
+			identityApi.create(externalId);
 		} else {
-			agent = inventoryApi.get(extId.getManagedObject().getId());
+			agent = inventoryApi.get(extId.get().getManagedObject().getId());
 			agent.setLastUpdatedDateTime(null);
 			agent.setName(lnsIntegrationService.getName());
 			agent.setProperty("version", lnsIntegrationService.getVersion());

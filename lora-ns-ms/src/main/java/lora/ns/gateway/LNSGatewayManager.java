@@ -93,9 +93,9 @@ public class LNSGatewayManager {
 
     private ManagedObjectRepresentation getGateway(String id) {
         ManagedObjectRepresentation result = null;
-        ExternalIDRepresentation extId = c8yUtils.findExternalId(id, GATEWAY_ID_TYPE);
-        if (extId != null) {
-            result = inventoryApi.get(extId.getManagedObject().getId());
+        Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(id, GATEWAY_ID_TYPE);
+        if (extId.isPresent()) {
+            result = inventoryApi.get(extId.get().getManagedObject().getId());
             result.setLastUpdatedDateTime(null);
         }
         return result;

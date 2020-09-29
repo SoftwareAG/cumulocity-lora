@@ -29,6 +29,7 @@
 		<module>lora-ns-ttn</module>
 		<module>lora-codec-elsys</module>
 		<module>lora-codec-lansitec</module>
+		<module>lora-codec-example</module>
 	</modules>
   
 	<properties>

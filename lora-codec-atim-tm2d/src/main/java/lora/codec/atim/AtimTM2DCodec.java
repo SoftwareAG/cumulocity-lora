@@ -249,4 +249,10 @@ public class AtimTM2DCodec extends DeviceCodec {
 		return new HashMap<String, DeviceOperation>();
 	}
 
+	@Override
+	protected Map<String, String> getChildDevicesNames() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

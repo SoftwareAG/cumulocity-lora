@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
+import com.cumulocity.microservice.subscription.repository.MicroserviceRepository;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.model.idtype.GId;
@@ -113,6 +114,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	@Autowired
 	private LNSGatewayManager lnsGatewayManager;
+
+	@Autowired
+	private MicroserviceRepository microserviceRepository;
 
 	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
 
@@ -236,13 +240,13 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		String errorMessage = null;
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent() && connector.get().provisionDevice(deviceProvisioning)) {
-			ExternalIDRepresentation extId = c8yUtils.findExternalId(deviceProvisioning.getDevEUI().toLowerCase(),
+			Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(deviceProvisioning.getDevEUI().toLowerCase(),
 					DEVEUI_TYPE);
-			if (extId == null) {
+			if (!extId.isPresent()) {
 				mor = lnsDeviceManager.createDevice(lnsInstanceId, deviceProvisioning.getName(),
 						deviceProvisioning.getDevEUI(), agentService.getAgent());
 			} else {
-				mor = extId.getManagedObject();
+				mor = extId.get().getManagedObject();
 				mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsInstanceId);
 				ManagedObject agentApi = inventoryApi.getManagedObjectApi(agentService.getAgent().getId());
 				agentApi.addChildDevice(mor.getId());
@@ -296,8 +300,10 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	private void configureRoutings(String lnsInstanceId, MicroserviceCredentials credentials) {
-		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getType() + "/"
-				+ lnsInstanceId;
+		//String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getType() + "/"
+		//		+ lnsInstanceId;
+		String url = microserviceRepository.getCurrentApplication().getExternalUrl() + "/" + lnsInstanceId;
+		logger.info("Connector URL is {}", url);
 		lnsConnectorManager.getConnector(lnsInstanceId).get().configureRoutings(url, subscriptionsService.getTenant(),
 				credentials.getUsername(), credentials.getPassword());
 	}
@@ -402,9 +408,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	public ManagedObjectRepresentation getDevice(String devEui) {
 		ManagedObjectRepresentation result = null;
-		ExternalIDRepresentation extId = c8yUtils.findExternalId(devEui, DEVEUI_TYPE);
-		if (extId != null) {
-			result = inventoryApi.get(extId.getManagedObject().getId());
+		Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(devEui, DEVEUI_TYPE);
+		if (extId.isPresent()) {
+			result = inventoryApi.get(extId.get().getManagedObject().getId());
 			result.setLastUpdatedDateTime(null);
 		}
 		return result;
@@ -414,9 +420,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		boolean result = false;
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent() && connector.get().deprovisionDevice(deveui)) {
-			ExternalIDRepresentation extId = c8yUtils.findExternalId(deveui, DEVEUI_TYPE);
-			if (extId != null) {
-				ManagedObjectRepresentation mor = inventoryApi.get(extId.getManagedObject().getId());
+			Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(deveui, DEVEUI_TYPE);
+			if (extId.isPresent()) {
+				ManagedObjectRepresentation mor = inventoryApi.get(extId.get().getManagedObject().getId());
 				mor.removeProperty("c8y_RequiredInterval");
 				mor.set(new LpwanDevice().provisioned(false));
 				mor.setLastUpdatedDateTime(null);

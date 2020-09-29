@@ -1,20 +1,15 @@
 package lora.codec;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.event.CumulocityAlarmStatuses;
 import com.cumulocity.rest.representation.alarm.AlarmRepresentation;
 import com.cumulocity.rest.representation.event.EventRepresentation;
-import com.cumulocity.rest.representation.identity.ExternalIDRepresentation;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.cumulocity.sdk.client.SDKException;
@@ -24,6 +19,12 @@ import com.cumulocity.sdk.client.event.EventApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
 import com.google.common.io.BaseEncoding;
+
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 
 import lora.common.C8YUtils;
 import lora.common.Component;
@@ -49,41 +50,52 @@ public abstract class DeviceCodec implements Component {
     protected MicroserviceSubscriptionsService subscriptionsService;
 
 	final protected Logger logger = LoggerFactory.getLogger(getClass());
-	
-	public static final String DEVEUI_TYPE = "LoRa devEUI";
+		
+	protected List<String> models = new ArrayList<>();
+	protected Map<String, String> childrenNames = new HashMap<>();
+	protected Map<String, Map<String, DeviceOperation>> operations = new HashMap<>();
+
 	public static final String CODEC_TYPE = "Device Codec";
 	public static final String CODEC_ID = "Codec ID";
 	
     abstract protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload);
 	abstract protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation);
-	public abstract List<String> getModels();
+	public List<String> getModels() {
+		return models;
+	}
 	public abstract DownlinkData askDeviceConfig(String devEui);
-	public abstract Map<String, DeviceOperation> getAvailableOperations(String model);
+	public Map<String, DeviceOperation> getAvailableOperations(String model) {
+		return operations.get(model);
+	}
+	protected Map<String, String> getChildDevicesNames() {
+		return childrenNames;
+	}
 	
 	@EventListener
 	private void registerCodec(MicroserviceSubscriptionAddedEvent event) {
-		ExternalIDRepresentation id = c8yUtils.findExternalId(this.getId(), CODEC_ID);
-		ManagedObjectRepresentation mor = null;
-		if (id == null) {
+		c8yUtils.findExternalId(this.getId(), CODEC_ID).map(extId -> {
+			ManagedObjectRepresentation mor = extId.getManagedObject();
+			mor.set(new DeviceCodecRepresentation(this));
+			return inventoryApi.update(mor);
+		}).orElseGet(() -> {
 			logger.info("Codec '{}' will be initialized in current tenant.", this.getId());
-			mor = new ManagedObjectRepresentation();
+			ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
 			mor.set(new DeviceCodecRepresentation(this));
 			mor.setType(CODEC_TYPE);
 			mor.setName(getName());
 			mor = inventoryApi.create(mor);
 			
-			id = c8yUtils.createExternalId(mor, this.getId(), CODEC_ID);		
-		} else {
-			mor = id.getManagedObject();
-			mor.set(new DeviceCodecRepresentation(this));
-			inventoryApi.update(mor);
-		}
+			c8yUtils.createExternalId(mor, this.getId(), CODEC_ID);
+
+			return mor;
+		});
 	}
 
-	protected void clearAlarm(String alarmType) {
+	protected void clearAlarm(ManagedObjectRepresentation device, String alarmType) {
 		try {
 			AlarmFilter filter = new AlarmFilter();
 			filter.byType(alarmType);
+			filter.bySource(device.getId());
 			filter.byStatus(CumulocityAlarmStatuses.ACTIVE);
 			for (AlarmRepresentation alarmRepresentation : alarmApi.getAlarmsByFilter(filter).get().allPages()) {
 				alarmRepresentation.setStatus(CumulocityAlarmStatuses.CLEARED.toString());
@@ -94,7 +106,7 @@ public abstract class DeviceCodec implements Component {
 		}
 	}
     
-    protected void processData(C8YData c8yData) {
+    protected void processData(String deveui, ManagedObjectRepresentation rootDevice, C8YData c8yData) {
 		for (MeasurementRepresentation m : c8yData.getMeasurements()) {
 			measurementApi.create(m);
 		}
@@ -105,21 +117,68 @@ public abstract class DeviceCodec implements Component {
 			alarmApi.create(a);
 		}
 		for (String t : c8yData.getAlarmsToClear()) {
-			clearAlarm(t);
+			clearAlarm(rootDevice, t);
 		}
-		if (c8yData.getMorToUpdate() != null) {
-			inventoryApi.update(c8yData.getMorToUpdate());
+		if (c8yData.updateRootDeviceRequired()) {
+			inventoryApi.update(c8yData.getRootDevice());
 		}
-    }
+		for (String childPath : c8yData.getChildMeasurements().keySet()) {
+			ManagedObjectRepresentation childDevice = getChildDevice(deveui, rootDevice, childPath);
+
+			for (MeasurementRepresentation m : c8yData.getChildMeasurements().get(childPath)) {
+				m.setSource(childDevice);
+				measurementApi.create(m);
+			}
+		}
+		for (String childPath : c8yData.getChildEvents().keySet()) {
+			ManagedObjectRepresentation childDevice = getChildDevice(deveui, rootDevice, childPath);
+
+			for (EventRepresentation e : c8yData.getChildEvents().get(childPath)) {
+				e.setSource(childDevice);
+				eventApi.create(e);
+			}
+		}
+		for (String childPath : c8yData.getChildAlarms().keySet()) {
+			ManagedObjectRepresentation childDevice = getChildDevice(deveui, rootDevice, childPath);
+
+			for (AlarmRepresentation a : c8yData.getChildAlarms().get(childPath)) {
+				a.setSource(childDevice);
+				alarmApi.create(a);
+			}
+		}
+		for (String childPath : c8yData.getChildAlarmsToClear().keySet()) {
+			ManagedObjectRepresentation childDevice = getChildDevice(deveui, rootDevice, childPath);
+
+			for (String t : c8yData.getChildAlarmsToClear().get(childPath)) {
+				clearAlarm(childDevice, t);
+			}
+		}
+	}
+	
+	private ManagedObjectRepresentation getChildDevice(String deveui, ManagedObjectRepresentation rootDevice, String childPath) {
+		String[] childIds = childPath.split("/");
+		ManagedObjectRepresentation currentDevice = rootDevice;
+
+		String currentChild = deveui;
+		for (String childId : childIds) {
+			currentChild += "/" + childId;
+			logger.info("Getting device {}.", currentChild);
+			currentDevice = c8yUtils.getChildDevice(currentChild).orElse(
+				c8yUtils.createChildDevice(currentDevice, currentChild, getChildDevicesNames().getOrDefault(currentChild, currentChild))
+			);
+		}
+
+		return currentDevice;
+	}
     
 	public Result<String> decode(Decode data) {
 		Result<String> result = new Result<String>(true, "Payload parsed with success", "OK");
 		try {
-			ManagedObjectRepresentation mor = c8yUtils.findExternalId(data.getDeveui(), DEVEUI_TYPE).getManagedObject();
+			ManagedObjectRepresentation mor = c8yUtils.getDevice(data.getDeveui()).get();
 			byte[] payload = BaseEncoding.base16().decode(data.getPayload().toUpperCase());
 			C8YData c8yData = decode(mor, data.getModel(), data.getfPort(), new DateTime(data.getUpdateTime()), payload);
 			logger.info("Processing payload {} from port {} for device {}", data.getPayload(), data.getfPort(), data.getDeveui());
-			processData(c8yData);
+			processData(data.getDeveui(), mor, c8yData);
 		} catch (Exception e) {
 			result = new Result<String>(false, e.getMessage(), "Couldn't process " + data.toString());
 		}
@@ -130,7 +189,7 @@ public abstract class DeviceCodec implements Component {
 		Result<DownlinkData> result = null;
 		try {
 			DownlinkData data = null;
-			ManagedObjectRepresentation mor = c8yUtils.findExternalId(encode.getDevEui(), DEVEUI_TYPE).getManagedObject();
+			ManagedObjectRepresentation mor = c8yUtils.getDevice(encode.getDevEui()).get();
 	
 			logger.info("Processing operation {} for device {}", encode.getOperation(), encode.getDevEui());
 			

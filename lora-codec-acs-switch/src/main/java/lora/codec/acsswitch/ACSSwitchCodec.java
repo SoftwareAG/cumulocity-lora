@@ -327,7 +327,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 			}
 			if (ra.getResponseInterval() > 0) {
 				mor.set(ra);
-				c8yData.setMorToUpdate(mor);
+				c8yData.updateRootDevice(mor);
 			}
 			break;
 		case WRITE_PARAMETER_ANSWER:
@@ -359,11 +359,6 @@ public class ACSSwitchCodec extends DeviceCodec {
 	@Override
 	public String getVersion() {
 		return "1.0";
-	}
-
-	@Override
-	public List<String> getModels() {
-		return new ArrayList<String>();
 	}
 
 	@Override

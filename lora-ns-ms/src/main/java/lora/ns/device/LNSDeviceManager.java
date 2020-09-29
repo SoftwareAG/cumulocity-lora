@@ -81,8 +81,6 @@ public class LNSDeviceManager {
 	@Autowired
 	private LNSConnectorManager lnsConnectorManager;
 
-	public static final String DEVEUI_TYPE = "LoRa devEUI";
-
 	public void upsertDevice(String lnsInstanceId, DeviceData event, ManagedObjectRepresentation agent) {
 		try {
 			logger.info("Upsert device with devEui {} with Payload {} from fPort {}", event.getDevEui(),
@@ -166,7 +164,7 @@ public class LNSDeviceManager {
 			mor = inventoryApi.create(mor);
 			ManagedObject agentApi = inventoryApi.getManagedObjectApi(agent.getId());
 			agentApi.addChildDevice(mor.getId());
-			c8yUtils.createExternalId(mor, devEUI, DEVEUI_TYPE);
+			c8yUtils.createExternalId(mor, devEUI, C8YUtils.DEVEUI_TYPE);
 		} else {
 			if (lnsConnectorId == null) {
 				AlarmRepresentation alarm = new AlarmRepresentation();
@@ -193,7 +191,7 @@ public class LNSDeviceManager {
 		ExternalIDCollection extIds = identityApi.getExternalIdsOfGlobalId(id);
 		if (extIds != null) {
 			for (ExternalIDRepresentation extId : extIds.get().allPages()) {
-				if (extId.getType().equals(DEVEUI_TYPE)) {
+				if (extId.getType().equals(C8YUtils.DEVEUI_TYPE)) {
 					result = extId.getExternalId();
 					logger.info("Device {} matches devEUI {}", id.toString(), result);
 					break;
@@ -212,9 +210,9 @@ public class LNSDeviceManager {
 
 	public ManagedObjectRepresentation getDevice(String devEui) {
 		ManagedObjectRepresentation result = null;
-		ExternalIDRepresentation extId = c8yUtils.findExternalId(devEui, DEVEUI_TYPE);
-		if (extId != null) {
-			result = inventoryApi.get(extId.getManagedObject().getId());
+		Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(devEui, C8YUtils.DEVEUI_TYPE);
+		if (extId.isPresent()) {
+			result = inventoryApi.get(extId.get().getManagedObject().getId());
 			result.setLastUpdatedDateTime(null);
 		}
 		return result;

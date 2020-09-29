@@ -1,16 +1,6 @@
 package lora.common;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import java.util.Optional;
 
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.ID;
@@ -18,7 +8,11 @@ import com.cumulocity.rest.representation.identity.ExternalIDRepresentation;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.sdk.client.SDKException;
 import com.cumulocity.sdk.client.identity.IdentityApi;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cumulocity.sdk.client.inventory.InventoryApi;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @org.springframework.stereotype.Component
 public class C8YUtils {
@@ -29,9 +23,15 @@ public class C8YUtils {
 	private IdentityApi identityApi;
 
 	@Autowired
+	private InventoryApi inventoryApi;
+
+	@Autowired
 	protected MicroserviceSubscriptionsService subscriptionsService;
+
+	public static final String DEVEUI_TYPE = "LoRa devEUI";
+	public static final String CHILD_DEVICE_TYPE = "LoRa child device ID";
 	
-    public ExternalIDRepresentation findExternalId(String externalId, String type) {
+    public Optional<ExternalIDRepresentation> findExternalId(String externalId, String type) {
         ID id = new ID();
         id.setType(type);
         id.setValue(externalId);
@@ -39,9 +39,9 @@ public class C8YUtils {
         try {
             extId = identityApi.getExternalId(id);
         } catch (SDKException e) {
-            logger.info("External ID {} not found", externalId);
+            logger.info("External ID {} with type {} not found", externalId, type);
         }
-        return extId;
+        return Optional.ofNullable(extId);
     }
     
     public ExternalIDRepresentation createExternalId(ManagedObjectRepresentation mor, String externalId, String type) {
@@ -52,9 +52,45 @@ public class C8YUtils {
 		identityApi.create(id);
 		
 		return id;
-    }
+	}
+	
+	public ManagedObjectRepresentation getOrCreateDevice(String externalId, ManagedObjectRepresentation device) {
+		return findExternalId(externalId, DEVEUI_TYPE)
+			.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
+			.orElseGet(() -> {
+				ManagedObjectRepresentation result = inventoryApi.create(device);
+				createExternalId(result, externalId, DEVEUI_TYPE);
+				return result;
+			});
+	}
+	
+	public Optional<ManagedObjectRepresentation> getDevice(String externalId) {
+		return Optional.ofNullable(findExternalId(externalId, DEVEUI_TYPE)
+			.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
+			.orElse(null));
+	}
+	
+	public Optional<ManagedObjectRepresentation> getChildDevice(String externalId) {
+		return Optional.ofNullable(findExternalId(externalId, CHILD_DEVICE_TYPE)
+			.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
+			.orElse(null));
+	}
+	
+	public ManagedObjectRepresentation createChildDevice(ManagedObjectRepresentation parentDevice, String childExternalId, String name) {
+		return findExternalId(childExternalId, CHILD_DEVICE_TYPE)
+			.map(extId -> extId.getManagedObject())
+			.orElseGet(() -> {
+				ManagedObjectRepresentation childDevice = new ManagedObjectRepresentation();
+				childDevice.setName(name);
+				childDevice.setType("LoRa child device");
+				childDevice = inventoryApi.create(childDevice);
+				createExternalId(childDevice, childExternalId, CHILD_DEVICE_TYPE);
+				inventoryApi.getManagedObjectApi(parentDevice.getId()).addChildDevice(childDevice.getId());
+				return childDevice;
+			});
+	}
 
-	public String getTenantDomain() {
+	/*public String getTenantDomain() {
 		String result = null;
 		RestTemplate restTemplate = new RestTemplate();
 		try {
@@ -73,5 +109,5 @@ public class C8YUtils {
 			e.printStackTrace();
 		}
 		return result;
-	}
+	}*/
 }
