@@ -159,12 +159,12 @@ public abstract class DeviceCodec implements Component {
 		String[] childIds = childPath.split("/");
 		ManagedObjectRepresentation currentDevice = rootDevice;
 
-		String currentChild = deveui;
+		String currentChild = "";
 		for (String childId : childIds) {
-			currentChild += "/" + childId;
+			currentChild +=  (currentChild.isEmpty() ? "" : "/") + childId;
 			logger.info("Getting device {}.", currentChild);
 			currentDevice = c8yUtils.getChildDevice(currentChild).orElse(
-				c8yUtils.createChildDevice(currentDevice, currentChild, getChildDevicesNames().getOrDefault(currentChild, currentChild))
+				c8yUtils.createChildDevice(currentDevice, deveui + "/" + currentChild, getChildDevicesNames().getOrDefault(currentChild, currentChild))
 			);
 		}
 
