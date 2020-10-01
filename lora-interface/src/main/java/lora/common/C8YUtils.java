@@ -1,5 +1,6 @@
 package lora.common;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
@@ -9,10 +10,17 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.sdk.client.SDKException;
 import com.cumulocity.sdk.client.identity.IdentityApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 @org.springframework.stereotype.Component
 public class C8YUtils {
@@ -90,7 +98,7 @@ public class C8YUtils {
 			});
 	}
 
-	/*public String getTenantDomain() {
+	public String getTenantDomain() {
 		String result = null;
 		RestTemplate restTemplate = new RestTemplate();
 		try {
@@ -109,5 +117,5 @@ public class C8YUtils {
 			e.printStackTrace();
 		}
 		return result;
-	}*/
+	}
 }

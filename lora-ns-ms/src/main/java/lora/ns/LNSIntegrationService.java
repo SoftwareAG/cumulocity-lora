@@ -300,9 +300,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	private void configureRoutings(String lnsInstanceId, MicroserviceCredentials credentials) {
-		//String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getType() + "/"
-		//		+ lnsInstanceId;
-		String url = microserviceRepository.getCurrentApplication().getExternalUrl() + "/" + lnsInstanceId;
+		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getType() + "/"
+				+ lnsInstanceId;
 		logger.info("Connector URL is {}", url);
 		lnsConnectorManager.getConnector(lnsInstanceId).get().configureRoutings(url, subscriptionsService.getTenant(),
 				credentials.getUsername(), credentials.getPassword());
