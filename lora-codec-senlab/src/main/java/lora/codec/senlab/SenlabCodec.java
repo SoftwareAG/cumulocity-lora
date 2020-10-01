@@ -61,8 +61,8 @@ public class SenlabCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
-		assert models.containsValue(model);
+	protected DownlinkData encode(ManagedObjectRepresentation mor, String _model, String operation) {
+		final String model = models.containsKey(_model) ? models.get(_model) : _model;
 		DownlinkData data = new DownlinkData();
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root;
@@ -245,7 +245,8 @@ public class SenlabCodec extends DeviceCodec {
 	}
 
 	@Override
-	public Map<String, DeviceOperation> getAvailableOperations(String model) {
+	public Map<String, DeviceOperation> getAvailableOperations(String _model) {
+		final String model = models.containsKey(_model) ? models.get(_model) : _model;
 		Map<String, DeviceOperation> result = new HashMap<String, DeviceOperation>();
 		JsonNode desc = getModelDetails(model);
 		ArrayNode operations = (ArrayNode) desc.get("operations");
