@@ -9,16 +9,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import com.cumulocity.rest.representation.event.EventRepresentation;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
+
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import c8y.Configuration;
 import c8y.Position;
@@ -117,7 +118,7 @@ public class LansitecCodec extends DeviceCodec {
 	enum TYPE {
 		REGISTER((byte) 0x10) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
 				String adr = (type & 8) != 0 ? "ON" : "OFF";
 				MODE mode = MODE.BY_MODE.get((byte) (type & 0x7));
 				byte smode = buffer.get();
@@ -144,7 +145,7 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		HEARTBEAT((byte) 0x20) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
 				long vol = buffer.get();
 				long rssi = -buffer.get();
 				long snr = 0;
@@ -167,7 +168,7 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		PERIODICAL_POSITION((byte) 0x30) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
 				float lng = buffer.getFloat();
 				float lat = buffer.getFloat();
 				long time = buffer.getInt() * 1000L;
@@ -187,7 +188,7 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		ON_DEMAND_POSITION((byte) 0x40) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
 				buffer.get();
 				float lng = buffer.getFloat();
 				float lat = buffer.getFloat();
@@ -208,55 +209,61 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		HISTORY_POSITION((byte) 0x50) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
 				// TODO Auto-generated method stub
 
 			}
 		},
 		ALARM((byte) 0x60) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
 				// TODO Auto-generated method stub
 
 			}
 		},
 		BLE_COORDINATE((byte) 0x70) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
 				Beacon beacon = null;
 				byte move = buffer.get();
 				buffer.getInt();
-				boolean beaconChanged = false;
+				//boolean beaconChanged = false;
+				List<Beacon> beacons = new ArrayList<>();
 				while (buffer.hasRemaining()) {
 					short major = buffer.getShort();
 					short minor = buffer.getShort();
 					byte rssi = buffer.get();
 					c8yData.addEvent(mor, "BLE coordinate", String.format("MOVE: %d\nMAJOR: %04X\nMINOR: %04X\nRSSI: %d", move, major, minor, rssi), null, updateTime);
-					Beacon newBeacon = new Beacon(String.format("%04X", major), String.format("%04X", minor), rssi);
-					if (beacon != null) {
-						if (beacon.getMajor().equals(newBeacon.getMajor()) && beacon.getMinor().equals(newBeacon.getMinor()) || newBeacon.getRssi() > beacon.getRssi()) {
-							mor.set(newBeacon);
-							c8yData.setMorToUpdate(mor);
-							beaconChanged = true;
-							beacon = newBeacon;
-						}
-					} else {
+					beacon = new Beacon(String.format("%04X", major), String.format("%04X", minor), rssi);
+					beacons.add(beacon);
+					c8yData.addMeasurement(mor, "Max rssi", "rssi", "dBm", BigDecimal.valueOf(beacon.getRssi()), updateTime);
+					c8yData.addMeasurement(mor, String.format("%04X", major) + "-" + String.format("%04X", minor), "rssi", "dBm", BigDecimal.valueOf(rssi), updateTime);
+				}
+
+				mor.set(algo.getPosition(mor, beacons));
+				c8yData.updateRootDevice(mor);
+				/*if (beacon != null) {
+					if (beacon.getMajor().equals(newBeacon.getMajor()) && beacon.getMinor().equals(newBeacon.getMinor()) || newBeacon.getRssi() > beacon.getRssi()) {
 						mor.set(newBeacon);
 						c8yData.setMorToUpdate(mor);
 						beaconChanged = true;
 						beacon = newBeacon;
 					}
-					if (beaconChanged) {
-						c8yData.addEvent(mor, "Nearest beacon changed", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", beacon.getMajor(), beacon.getMinor(), beacon.getRssi()), null, updateTime);
-					}
-					c8yData.addMeasurement(mor, "Max rssi", "rssi", "dBm", BigDecimal.valueOf(beacon.getRssi()), updateTime);
-					c8yData.addMeasurement(mor, String.format("%04X", major) + "-" + String.format("%04X", minor), "rssi", "dBm", BigDecimal.valueOf(rssi), updateTime);
+				} else {
+					mor.set(newBeacon);
+					c8yData.setMorToUpdate(mor);
+					beaconChanged = true;
+					beacon = newBeacon;
 				}
+				if (beaconChanged) {
+					c8yData.addEvent(mor, "Nearest beacon changed", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", beacon.getMajor(), beacon.getMinor(), beacon.getRssi()), null, updateTime);
+				}*/
+
 			}
 		},
 		ACKNOWLEDGE((byte) 0xF0) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
 				mor.set(new Configuration("Configuration requested..."));
 				c8yData.setMorToUpdate(mor);
 			}
@@ -275,7 +282,7 @@ public class LansitecCodec extends DeviceCodec {
 			}
 		}
 
-		public abstract void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime);
+		public abstract void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo);
 
 	}
 
@@ -298,6 +305,7 @@ public class LansitecCodec extends DeviceCodec {
 	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime,
 			byte[] payload) {
 		C8YData c8yData = new C8YData();
+		setAlgo("maxrssi");
 
 		ByteBuffer buffer = ByteBuffer.wrap(payload);
 
@@ -305,7 +313,12 @@ public class LansitecCodec extends DeviceCodec {
 			byte type = buffer.get();
 			TYPE t = TYPE.BY_VALUE.get((byte) (type & 0xf0));
 			logger.info("Frame type: {}", t.name());
-			t.process(mor, type, buffer, c8yData, updateTime);
+			try {
+				t.process(mor, type, buffer, c8yData, updateTime, currentAlgo);
+			} catch(Exception e) {
+				logger.error(e.getMessage());
+				e.printStackTrace();
+			}
 		}
 
 		return c8yData;
@@ -381,4 +394,28 @@ public class LansitecCodec extends DeviceCodec {
 		return null;
 	}
 
+	//UGLY!!!!!! not scalable!!!!!
+	//Need to store that in a managed object!!!
+	private Algo currentAlgo;
+
+	@Autowired
+	private List<Algo> algos;
+
+	public List<Algo> getAlgos() {
+		return algos;
+	}
+
+	public void setAlgo(String id) {
+		if (algos != null) {
+			for (Algo algo : algos) {
+				logger.info("Algo {} found", algo.getLabel());
+				if (algo.getId().equals(id)) {
+					logger.info("Algo found: {}", algo.getLabel());
+					currentAlgo = algo;
+				}
+			}
+		} else {
+			logger.info("No algorithms available!!!");
+		}
+	}
 }
