@@ -220,7 +220,7 @@ export class LoraDevicesComponent {
     async provision(deviceProvisioning: { name: string, devEUI: string, appEUI: string, appKey: string, codec: string, model: string, lat?: number, lng?: number }, instance: string): Promise<IManagedObject> {
         console.log("Will provision device on LNS instance " + instance);
         let lnsInstance: IManagedObject = this.instanceMap[instance];
-        return (await (await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsId + '/' + instance + '/devices', {
+        return (await (await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + '/' + instance + '/devices', {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
@@ -230,7 +230,7 @@ export class LoraDevicesComponent {
     }
 
     async deprovision(device: IManagedObject) {
-        await this.fetchClient.fetch('service/lora-ns-' + this.instanceMap[device.lnsInstanceId].lnsId + '/' + device.lnsInstanceId + '/devices/' + await this.getDevEUI(device), {
+        await this.fetchClient.fetch('service/lora-ns-' + this.instanceMap[device.lnsType].lnsId + '/' + device.lnsConnectorId + '/devices/' + await this.getDevEUI(device), {
             method: "DELETE"
         });
     }

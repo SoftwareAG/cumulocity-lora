@@ -35,20 +35,20 @@ public class MaxRSSIBeaconAlgo extends Algo {
                 try {
                     JsonNode rootNode = mapper.readTree(m.toJSON());
                     int rssi = rootNode.get(m.getType()).get("rssi").get("value").decimalValue().intValue();
-                    logger.info("Reading RSSI {} for beacon {}", rssi, newBeacon.getMajor() + "-" + newBeacon.getMinor());
+                    logger.info("Reading RSSI {} for beacon {} - {}", rssi, newBeacon.getMajor(), newBeacon.getMinor());
                     if (rssi > newBeacon.getRssi()) {
                         newBeacon.setRssi(rssi);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-            logger.info("Highest RSSI for beacon {} is {}", newBeacon.getMajor() + "-" + newBeacon.getMinor(), newBeacon.getRssi());
+             }
+            logger.info("Highest RSSI for beacon {} - {} is {}", newBeacon.getMajor(), newBeacon.getMinor(), newBeacon.getRssi());
         }
 
         for (Beacon newBeacon : beacons) {
             if (beacon != null) {
-                if (beacon.getMajor().equals(newBeacon.getMajor()) && beacon.getMinor().equals(newBeacon.getMinor()) || newBeacon.getRssi() > beacon.getRssi()) {
+                if (newBeacon.getRssi() > beacon.getRssi()) {
                     beacon = newBeacon;
                 }
             } else {
@@ -56,6 +56,7 @@ public class MaxRSSIBeaconAlgo extends Algo {
             }
 
         }
+        logger.info("New beacon is {} - {} with RSSI {}", beacon.getMajor(), beacon.getMinor(), beacon.getRssi());
         return beacon;
     }
 

@@ -120,6 +120,8 @@ public abstract class DeviceCodec implements Component {
 			clearAlarm(rootDevice, t);
 		}
 		if (c8yData.updateRootDeviceRequired()) {
+			c8yData.getRootDevice().setLastUpdatedDateTime(null);
+			logger.info("Upadating root device {}", c8yData.getRootDevice().toJSON());
 			inventoryApi.update(c8yData.getRootDevice());
 		}
 		for (String childPath : c8yData.getChildMeasurements().keySet()) {
@@ -180,6 +182,7 @@ public abstract class DeviceCodec implements Component {
 			logger.info("Processing payload {} from port {} for device {}", data.getPayload(), data.getfPort(), data.getDeveui());
 			processData(data.getDeveui(), mor, c8yData);
 		} catch (Exception e) {
+			e.printStackTrace();
 			result = new Result<String>(false, e.getMessage(), "Couldn't process " + data.toString());
 		}
 		return result;

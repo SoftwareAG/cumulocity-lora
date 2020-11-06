@@ -145,6 +145,7 @@ public class LNSDeviceManager {
 			}
 			codecManager.decode(mor, event);
 		} catch (SDKException e) {
+			e.printStackTrace();
 			logger.info("Error on upserting Device", e);
 		}
 	}
