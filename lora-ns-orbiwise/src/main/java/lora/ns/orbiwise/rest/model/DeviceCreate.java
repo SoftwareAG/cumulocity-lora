@@ -6,6 +6,9 @@ public class DeviceCreate {
 	private String deveui;
 	private String appeui;
 	private String appkey;
+	private Integer lora_device_class = 0;
+	private Boolean lora_fcnt_32bit = false;
+	private String lora_rx2_sf = "12";
 	private BigDecimal latitude;
 	private BigDecimal longitude;
 
@@ -38,5 +41,29 @@ public class DeviceCreate {
 	}
 	public void setLongitude(BigDecimal longitude) {
 		this.longitude = longitude;
+	}
+
+	public Integer getLora_device_class() {
+		return lora_device_class;
+	}
+
+	public void setLora_device_class(Integer lora_device_class) {
+		this.lora_device_class = lora_device_class;
+	}
+
+	public Boolean getLora_fcnt_32bit() {
+		return lora_fcnt_32bit;
+	}
+
+	public void setLora_fcnt_32bit(Boolean lora_fcnt_32bit) {
+		this.lora_fcnt_32bit = lora_fcnt_32bit;
+	}
+
+	public String getLora_rx2_sf() {
+		return lora_rx2_sf;
+	}
+
+	public void setLora_rx2_sf(String lora_rx2_sf) {
+		this.lora_rx2_sf = lora_rx2_sf;
 	}
 }
