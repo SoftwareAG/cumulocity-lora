@@ -24,13 +24,13 @@ public interface OrbiwiseService {
 	Call<Device> getDevice(@Path("devEui") String devEui);
 
 	@DELETE("nodes/{devEui}")
-	Call<Device> deprovisionDevice(@Path("devEui") String devEui);
+	Call<ResponseBody> deprovisionDevice(@Path("devEui") String devEui);
 
 	@PUT("nodes/{devEui}")
-	Call<Device> reactivateDevice(@Path("devEui") String devEui);
+	Call<ResponseBody> reactivateDevice(@Path("devEui") String devEui);
 	
 	@POST("nodes")
-	Call<Device> createDevice(@Body DeviceCreate device);
+	Call<ResponseBody> createDevice(@Body DeviceCreate device);
 	
 	@POST("nodes/{devEui}/payloads/dl?data_format=hex")
 	Call<DownlinkResponse> sendCommand(@Path("devEui") String devEui, @Query("port") int fport, @Body String payload);

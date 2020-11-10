@@ -168,7 +168,7 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 		}
 
 		try {
-			Response<Device> response = orbiwiseService.createDevice(deviceCreate).execute();
+			Response<ResponseBody> response = orbiwiseService.createDevice(deviceCreate).execute();
 			result = response.isSuccessful();
 			if (!response.isSuccessful()) {
 				logger.error("Error from Orbiwan: {}", response.errorBody().string());
