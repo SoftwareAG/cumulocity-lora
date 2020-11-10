@@ -8,7 +8,7 @@ public class DeviceCreate {
 	private String appkey;
 	private Integer lora_device_class = 0;
 	private Boolean lora_fcnt_32bit = false;
-	private String lora_rx2_sf = "SF12";
+	private String lora_rx2_sf = "SF9";
 	private BigDecimal latitude = BigDecimal.valueOf(0);
 	private BigDecimal longitude = BigDecimal.valueOf(0);
 
