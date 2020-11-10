@@ -230,7 +230,7 @@ export class LoraDevicesComponent {
     }
 
     async deprovision(device: IManagedObject) {
-        await this.fetchClient.fetch('service/lora-ns-' + this.instanceMap[device.lnsType].lnsId + '/' + device.lnsConnectorId + '/devices/' + await this.getDevEUI(device), {
+        await this.fetchClient.fetch('service/lora-ns-' + this.instanceMap[device.lnsConnectorId].lnsType + '/' + device.lnsConnectorId + '/devices/' + await this.getDevEUI(device), {
             method: "DELETE"
         });
     }
