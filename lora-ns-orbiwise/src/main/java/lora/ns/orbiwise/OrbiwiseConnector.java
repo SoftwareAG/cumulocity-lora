@@ -31,8 +31,8 @@ import lora.ns.orbiwise.rest.model.Pushmode;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -63,7 +63,7 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 	class APIKeyInterceptor implements Interceptor {
 
 		@Override
-		public Response intercept(Chain chain) throws IOException {
+		public okhttp3.Response intercept(Chain chain) throws IOException {
 			Request request = chain.request();
 
 			request = request.newBuilder()
@@ -72,7 +72,7 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 					.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 					.header("Accept", MediaType.APPLICATION_JSON_VALUE).build();
 
-			Response response = chain.proceed(request);
+			okhttp3.Response response = chain.proceed(request);
 
 			logger.info("Response code from {} {}: {}", request.method(), request.url(), response.code());
 
@@ -160,11 +160,19 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 		deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
 		deviceCreate.setAppeui(deviceProvisioning.getAppEUI());
 		deviceCreate.setAppkey(deviceProvisioning.getAppKey());
-		deviceCreate.setLatitude(deviceProvisioning.getLat());
-		deviceCreate.setLongitude(deviceProvisioning.getLng());
+		if (deviceProvisioning.getLat() != null) {
+			deviceCreate.setLatitude(deviceProvisioning.getLat());
+		}
+		if (deviceProvisioning.getLng() != null) {
+			deviceCreate.setLongitude(deviceProvisioning.getLng());
+		}
 
 		try {
-			result = orbiwiseService.createDevice(deviceCreate).execute().isSuccessful();
+			Response<Device> response = orbiwiseService.createDevice(deviceCreate).execute();
+			result = response.isSuccessful();
+			if (!response.isSuccessful()) {
+				logger.error("Error from Orbiwan: {}", response.errorBody().string());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
