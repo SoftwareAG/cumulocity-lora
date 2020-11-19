@@ -79,6 +79,14 @@ public class ElsysCodec extends DeviceCodec {
 				c8yData.addMeasurement(mor, "Motion", "count", "", motion, getTime(buffer, offsetSize));
 			}
 		},
+        CO2((byte)0x06) {
+
+            @Override
+            public void process(ManagedObjectRepresentation mor, ByteBuffer buffer, C8YData c8yData, int offsetSize) {
+                BigDecimal motion = BigDecimal.valueOf(buffer.getShort());
+                c8yData.addMeasurement(mor, "CO2", "ppm", "", motion, getTime(buffer, offsetSize));
+            }
+        },
 		BATTERY((byte)0x07) {
 
 			@Override
@@ -86,7 +94,15 @@ public class ElsysCodec extends DeviceCodec {
 				BigDecimal battery = BigDecimal.valueOf(buffer.getShort());
 				c8yData.addMeasurement(mor, "Battery", "power", "mV", battery, getTime(buffer, offsetSize));
 			}
-		};
+		},
+        PULSECOUNT2((byte)0x10) {
+
+            @Override
+            public void process(ManagedObjectRepresentation mor, ByteBuffer buffer, C8YData c8yData, int offsetSize) {
+                BigDecimal pc2 = BigDecimal.valueOf(buffer.getShort());
+                c8yData.addMeasurement(mor, "Pulse Count", "count", "", pc2, getTime(buffer, offsetSize));
+            }
+        };
 		
 		byte value;
 		int size;
