@@ -30,8 +30,6 @@ public class ElsysCodec extends DeviceCodec {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private List<String> models = new ArrayList<String>();
-
 	@Override
 	public String getId() {
 		return "elsys";

@@ -114,14 +114,22 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	@Override
 	public String sendDownlink(DownlinkData operation) {
-		logger.info("Will send {} to TTN.", operation.toString());
+		logger.info("Will send {} to TTN.", operation);
 		
 		DownlinkMessageProcessorBlockingStub service = DownlinkMessageProcessorGrpc.newBlockingStub(managedChannel)
 				.withCallCredentials(token);
 				
 		ApplicationDownlink result = service.process(ProcessDownlinkMessageRequest.newBuilder().setIds(getDeviceIds(operation.getDevEui())).setMessage(ApplicationDownlink.newBuilder().setFPort(operation.getFport()).setFrmPayload(ByteString.copyFrom(BaseEncoding.base16().decode(operation.getPayload()))).build()).build());
 
-		return result.getSessionKeyId().toString();
+		String downlinkCorrelationId = null;
+
+		for (String correlationId: result.getCorrelationIdsList()) {
+			if (correlationId.startsWith("as:downlink:")) {
+				downlinkCorrelationId = correlationId.split(":")[2];
+			}
+		}
+		
+		return downlinkCorrelationId;
 	}
 
 	@Override

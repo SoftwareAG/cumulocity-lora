@@ -63,7 +63,7 @@ public class C8YUtils {
 	}
 	
 	public ManagedObjectRepresentation getOrCreateDevice(String externalId, ManagedObjectRepresentation device) {
-		return findExternalId(externalId, DEVEUI_TYPE)
+		return findExternalId(externalId.toLowerCase(), DEVEUI_TYPE)
 			.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
 			.orElseGet(() -> {
 				ManagedObjectRepresentation result = inventoryApi.create(device);
@@ -73,13 +73,13 @@ public class C8YUtils {
 	}
 	
 	public Optional<ManagedObjectRepresentation> getDevice(String externalId) {
-		return Optional.ofNullable(findExternalId(externalId, DEVEUI_TYPE)
+		return Optional.ofNullable(findExternalId(externalId.toLowerCase(), DEVEUI_TYPE)
 			.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
 			.orElse(null));
 	}
 	
 	public Optional<ManagedObjectRepresentation> getChildDevice(String externalId) {
-		return Optional.ofNullable(findExternalId(externalId, CHILD_DEVICE_TYPE)
+		return Optional.ofNullable(findExternalId(externalId.toLowerCase(), CHILD_DEVICE_TYPE)
 			.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
 			.orElse(null));
 	}

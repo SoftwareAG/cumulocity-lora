@@ -2,6 +2,7 @@ package lora.ns.ttn;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,6 @@ import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.io.BaseEncoding;
 
 import lora.ns.DeviceData;
 import lora.ns.LNSIntegrationService;
@@ -28,8 +28,7 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	{
-		wizard.add(new InstanceWizardStep1());
-		//wizard.add(new InstanceWizardStep2());
+		wizard.add(new InstanceWizardStep());
 	}
 
 	@Override
@@ -43,21 +42,21 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
             double rssi = rootNode.get("uplink_message").get("rx_metadata").get(0).get("rssi").asDouble();
             double snr = rootNode.get("uplink_message").get("rx_metadata").get(0).get("snr").asDouble();
             logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
-            byte[] payload = BaseEncoding.base64().decode(rootNode.get("uplink_message").get("frm_payload").asText());
+            byte[] payload = Base64.getDecoder().decode(rootNode.get("uplink_message").get("frm_payload").asText());
             Long updateTime = new DateTime(rootNode.get("uplink_message").get("received_at").asText()).getMillis();
-            logger.info("Update time is: " + updateTime);
+            logger.info("Update time is: {}", updateTime);
 
             List<MeasurementRepresentation> measurements = new ArrayList<>();
     		MeasurementRepresentation m = new MeasurementRepresentation();
     		Map<String, MeasurementValue> measurementValueMap = new HashMap<>();
     		
     		MeasurementValue mv = new MeasurementValue();
-    		mv.setValue(new BigDecimal(rssi));
+    		mv.setValue(BigDecimal.valueOf(rssi));
     		mv.setUnit("dBm");
     		measurementValueMap.put("rssi", mv);
 
     		mv = new MeasurementValue();
-    		mv.setValue(new BigDecimal(snr));
+    		mv.setValue(BigDecimal.valueOf(snr));
     		mv.setUnit("dB");
     		measurementValueMap.put("snr", mv);
 
@@ -79,18 +78,35 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 		OperationData data = new OperationData();
         ObjectMapper mapper = new ObjectMapper();
         try {
-            JsonNode rootNode = mapper.readTree(event);
-            String commandId = rootNode.get("command_id") != null ? rootNode.get("command_id").asText() : null;
-            if (commandId != null) {
-            	data.setCommandId(commandId);
-	            JsonNode error = rootNode.get("error");
-		            if (error != null) {
-		            	data.setStatus(OperationStatus.FAILED);
-		            	data.setErrorMessage(error.asText());
-		            } else {
-		            	data.setStatus(OperationStatus.SUCCESSFUL);
-		            }
-            }
+			JsonNode rootNode = mapper.readTree(event);
+			if (rootNode.has("downlink_sent")) {
+				if (rootNode.get("end_device_ids").has("dev_eui")) {
+					logger.info("Downlink sent successfully to device {}", rootNode.get("end_device_ids").get("dev_eui"));
+				} else {
+					logger.info("Downlink sent successfully to device {}", rootNode.get("end_device_ids").get("device_id"));
+				}
+				data.setStatus(OperationStatus.SUCCESSFUL);
+				JsonNode correlationIds = rootNode.get("downlink_sent").get("correlation_ids");
+				for (JsonNode correlationId: correlationIds) {
+					if (correlationId.asText().startsWith("as:downlink:")) {
+						data.setCommandId(correlationId.asText().split(":")[2]);
+					}
+				}
+			} else if (rootNode.has("downlink_failed")) {
+				if (rootNode.get("end_device_ids").has("dev_eui")) {
+					logger.info("Downlink failed on device {}", rootNode.get("end_device_ids").get("dev_eui"));
+				} else {
+					logger.info("Downlink failed on device {}", rootNode.get("end_device_ids").get("device_id"));
+				}
+				data.setStatus(OperationStatus.FAILED);
+				data.setErrorMessage(rootNode.get("downlink_failed").get("error").get("message_format").asText());
+				JsonNode correlationIds = rootNode.get("downlink_failed").get("downlink").get("correlation_ids");
+				for (JsonNode correlationId: correlationIds) {
+					if (correlationId.asText().startsWith("as:downlink:")) {
+						data.setCommandId(correlationId.asText().split(":")[2]);
+					}
+				}
+			}
         } catch (Exception e) {
             logger.error("Error on Mapping LoRa payload to Cumulocity", e);
         }

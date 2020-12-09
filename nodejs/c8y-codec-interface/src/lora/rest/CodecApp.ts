@@ -5,19 +5,18 @@ import { DeviceCodec, Decode, Encode, MicroserviceSubscriptionService } from "..
 export class CodecApp {
   app: express.Application = express();
   PORT = process.env.PORT || 80;
-  subscriptionService: MicroserviceSubscriptionService = new MicroserviceSubscriptionService();
 
-  constructor(codec: DeviceCodec) {
+  constructor(codec: DeviceCodec, subscriptionService: MicroserviceSubscriptionService) {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.post("/decode", async (req: Request, res: Response, next: express.NextFunction) => {
       let decode: Decode = req.body;
-      res.json(await codec.decode(this.subscriptionService.getClient(req), decode));
+      res.json(await codec.decode(subscriptionService.getClient(req), decode));
     })
     
     this.app.post("/encode", async (req: Request, res: Response, next: express.NextFunction) => {
       let encode: Encode = req.body;
-      res.json(await codec.encode(this.subscriptionService.getClient(req), encode));
+      res.json(await codec.encode(subscriptionService.getClient(req), encode));
     })
     
     this.app.get("/models", (req: Request, res: Response, next: express.NextFunction) => {

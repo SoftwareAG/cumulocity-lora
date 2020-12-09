@@ -88,7 +88,7 @@ export abstract class DeviceCodec implements Component {
                         }
                     };
 
-                    mor = await (await client.inventory.create(mor)).data;
+                    mor = (await client.inventory.create(mor)).data;
 
                     id = {
                         externalId: this.getId(),
