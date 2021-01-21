@@ -16,18 +16,18 @@ export abstract class DeviceCodec implements Component {
     static CODEC_TYPE: string = "Device Codec";
     static CODEC_ID: string = "Codec ID";
 
-    protected abstract _decode(mo: IManagedObject, model: string, fport: number, time: Date, payload: string): C8YData;
-    protected abstract _encode(mo: IManagedObject, model: string, operation: string): DownlinkData;
-    abstract getModels(): Array<string>;
+    protected abstract _decode(client: Client, mo: IManagedObject, model: string, fport: number, time: Date, payload: string): C8YData;
+    protected abstract _encode(client: Client, mo: IManagedObject, model: string, operation: string): DownlinkData;
+    abstract getModels(client: Client): Array<string>;
     abstract askDeviceConfig(devEui: string): DownlinkData;
-    abstract getAvailableOperations(model: string): Map<string, DeviceOperation>;
+    abstract getAvailableOperations(client: Client, model: string): Map<string, DeviceOperation>;
 
     async decode(client: Client, decode: Decode): Promise<Result<string>> {
         let result: Result<string>;
         try {
             console.log(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`);
             let mor: IManagedObject = await this.getDevice(client, decode.deveui);
-            let c8yData: C8YData = this._decode(mor, decode.model, decode.fPort, decode.time, decode.payload);
+            let c8yData: C8YData = this._decode(client, mor, decode.model, decode.fPort, decode.time, decode.payload);
             this.processData(client, c8yData);
             result = {success: true, message: `Successfully processed payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`, response: "OK"};
         } catch(e) {
@@ -54,7 +54,7 @@ export abstract class DeviceCodec implements Component {
             } else if (encode.operation.includes("get config")) {
                 data = this.askDeviceConfig(encode.devEui);
             } else {
-                data = this._encode(mor, encode.model, encode.operation);
+                data = this._encode(client, mor, encode.model, encode.operation);
                 if (data) {
                     data.devEui = encode.devEui;
                 }

@@ -92,6 +92,41 @@
     </div>
 </div>
 
+<div class="split-scroll">
+    <c8y-data-grid
+      [title]="'Devices' | translate"
+      class="scroll-column"
+      [noMatchingItemsLabel]="'No matching devices.' | translate"
+      [columns]="columns"
+      [pagination]="pagination"
+      [selectable]="true"
+      [actionControls]="actionControls"
+      [bulkActionControls]="bulkActionControls"
+      [serverSideDataCallback]="serverSideDataCallback"
+    >
+      <c8y-column name="deveui">
+        <ng-container *c8yCellRendererDef="let context">
+            <a [routerLink]="['/device', context.value]">{{devEUIs[context.value]}}</a>
+        </ng-container>
+      </c8y-column>
+      <c8y-column name="type">
+        <ng-container *c8yCellRendererDef="let context">
+            {{codecMap[context.value] && codecMap[context.value].name}}
+        </ng-container>
+      </c8y-column>
+      <c8y-column name="lnstype">
+        <ng-container *c8yCellRendererDef="let context">
+            {{instanceMap[context.value] && proxyMap[instanceMap[context.value].lnsType] && proxyMap[instanceMap[context.value].lnsType].name}}
+        </ng-container>
+      </c8y-column>
+      <c8y-column name="lnsname">
+        <ng-container *c8yCellRendererDef="let context">
+            {{instanceMap[context.value] && instanceMap[context.value].name}}
+        </ng-container>
+      </c8y-column>
+    </c8y-data-grid>
+  </div>
+<!--  
 <div *ngIf="devices === undefined || devices.length === 0">
     {{informationText | translate}}
 </div>
@@ -153,3 +188,4 @@
             ng-reflect-translate="">Cancel</button>
     </div>
 </ng-template>
+-->

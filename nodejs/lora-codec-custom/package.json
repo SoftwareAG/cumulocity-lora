@@ -1,0 +1,30 @@
+{
+  "name": "lora-codec-custom",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "watch": "concurrently --kill-others npm:watch-*",
+    "watch-typescript": "tsc -w",
+    "watch-node": "nodemon dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@c8y/client": "^1005.7.11",
+    "c8y-codec-interface": "^1.0.14",
+    "vm2": "^3.9.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.9",
+    "@types/node": "^13.13.4",
+    "concurrently": "^5.2.0",
+    "nodemon": "^2.0.3",
+    "reflect-metadata": "^0.1.13",
+    "source-map-support": "^0.5.19",
+    "typescript": "^3.8.3"
+  }
+}

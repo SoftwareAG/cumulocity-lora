@@ -24,11 +24,19 @@ export class LoraNavigationFactory implements NavigatorNodeFactory {
       routerLinkExact: false
     });
 
+    let loraCodecs: NavigatorNode = new NavigatorNode({
+      label: _('Custom codecs'),
+      icon: 'c8y-business-rules',
+      path: '/codecs',
+      priority: 2,
+      routerLinkExact: false
+    });
+
     let loraNode: NavigatorNode = new NavigatorNode({
       label: _('LoRa'),
       icon: 'wifi',
       name: 'lora',
-      children: [loraDevice, loraNS],
+      children: [loraDevice, loraNS, loraCodecs],
       priority: 2,
       routerLinkExact: false
     });

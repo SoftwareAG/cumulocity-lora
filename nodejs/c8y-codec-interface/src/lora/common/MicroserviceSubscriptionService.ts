@@ -22,7 +22,6 @@ export class MicroserviceSubscriptionService extends EventEmitter {
     protected async getUsers() {
         this.client.fetch("/application/currentApplication/subscriptions").then(async result => {
             let allUsers = await result.json();
-            let newUsers: Map<string, { tenant: string, name: string, password: string }> = new Map<string, { tenant: string, name: string, password: string }>();
             let newClients: Map<string, Client> = new Map<string, Client>();
             if (allUsers) {
                 allUsers.users.forEach(user => {
@@ -36,7 +35,6 @@ export class MicroserviceSubscriptionService extends EventEmitter {
                         newClients.set(user.tenant, client);
     
                         this.emit('newMicroserviceSubscription', client);
-                        newUsers.set(user.tenant, user);
                     } else {
                         newClients.set(user.tenant, this.clients.get(user.tenant));
                     }
@@ -48,6 +46,10 @@ export class MicroserviceSubscriptionService extends EventEmitter {
         });
 
         //let allUsers = await (await this.client.get("/application/currentApplication/subscriptions")).data;
+    }
+
+    getClients(): Map<string, Client> {
+        return this.clients;
     }
 
     getClient(request: Request): Client {
