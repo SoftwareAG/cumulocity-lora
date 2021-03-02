@@ -1,0 +1,91 @@
+{
+  "name": "Cumulocity Linux Agent commands",
+  "syntax": "Cumulocity Linux Agent",
+  "templates": [
+    {
+      "name": "Get server URL",
+      "command": "get server",
+      "category": "Server settings"
+    },
+    {
+      "name": "Set server URL (https:// or mqtts://)",
+      "command": "set server https://example.com",
+      "category": "Server settings"
+    },
+    {
+      "name": "Get log level",
+      "command": "get log.level",
+      "category": "Log settings"
+    },
+    {
+      "name": "Set log level (\"debug`KEEP_ORIGINAL`\", \"info`KEEP_ORIGINAL`\", \"notice`KEEP_ORIGINAL`\", \"warning`KEEP_ORIGINAL`\", \"error`KEEP_ORIGINAL`\", \"critical`KEEP_ORIGINAL`\")",
+      "command": "set log.level info",
+      "category": "Log settings"
+    },
+    {
+      "name": "Get log quota",
+      "command": "get log.quota",
+      "category": "Log settings"
+    },
+    {
+      "name": "Set log quota (in KB)",
+      "command": "set log.quota 8192",
+      "category": "Log settings"
+    },
+    {
+      "name": "Get log path",
+      "command": "get log.path",
+      "category": "Log settings"
+    },
+    {
+      "name": "Get Lua plugins",
+      "command": "get lua.plugins",
+      "category": "Lua plugins settings"
+    },
+    {
+      "name": "Set Lua plugins",
+      "command": "set lua.plugins system,logview,canopen,shell",
+      "category": "Lua plugins settings"
+    },
+    {
+      "name": "Get CANopen interface type",
+      "command": "get canopen.type",
+      "category": "CANopen settings"
+    },
+    {
+      "name": "Get CANopen node ID",
+      "command": "get canopen.nodeID",
+      "category": "CANopen settings"
+    },
+    {
+      "name": "Get CANopen port",
+      "command": "get canopen.port",
+      "category": "CANopen settings"
+    },
+    {
+      "name": "Get CANopen serial port",
+      "command": "get canopen.serial",
+      "category": "CANopen settings"
+    },
+    {
+      "name": "Get memory reporting interval",
+      "command": "get system.mem.interval",
+      "category": "System resource settings"
+    },
+    {
+      "name": "Set memory reporting interval (in seconds)",
+      "command": "set system.mem.interval 60",
+      "category": "System resource settings"
+    },
+    {
+      "name": "Get CPU reporting interval",
+      "command": "get system.cpu.interval",
+      "category": "System resource settings"
+    },
+    {
+      "name": "Set CPU reporting interval (in seconds)",
+      "command": "set system.cpu.interval 60",
+      "category": "System resource settings"
+    }
+  ]
+}

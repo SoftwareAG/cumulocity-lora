@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-button-group.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-button-group.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-button-group.js",
+  "esm5": "../../esm5/ui/button-group/devextreme-angular-ui-button-group.js",
+  "esm2015": "../../esm2015/ui/button-group/devextreme-angular-ui-button-group.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-button-group.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-button-group.js",
+  "typings": "devextreme-angular-ui-button-group.d.ts",
+  "metadata": "devextreme-angular-ui-button-group.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/button-group"
+}

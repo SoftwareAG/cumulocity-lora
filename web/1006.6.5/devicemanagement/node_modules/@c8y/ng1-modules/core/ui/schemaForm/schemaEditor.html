@@ -1,0 +1,9 @@
+<ng-form name="schemaEditorForm" novalidate>
+  <div ng-repeat="property in vm.properties">
+    <c8y-schema-property-editor
+        property="property"
+        on-change="vm.onPropertyChange(property, originalProperty)"
+    >
+    </c8y-schema-property-editor>
+  </div>
+</ng-form>

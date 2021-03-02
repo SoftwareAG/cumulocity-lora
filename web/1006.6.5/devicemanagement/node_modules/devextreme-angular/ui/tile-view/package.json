@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-tile-view.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-tile-view.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-tile-view.js",
+  "esm5": "../../esm5/ui/tile-view/devextreme-angular-ui-tile-view.js",
+  "esm2015": "../../esm2015/ui/tile-view/devextreme-angular-ui-tile-view.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-tile-view.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-tile-view.js",
+  "typings": "devextreme-angular-ui-tile-view.d.ts",
+  "metadata": "devextreme-angular-ui-tile-view.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/tile-view"
+}

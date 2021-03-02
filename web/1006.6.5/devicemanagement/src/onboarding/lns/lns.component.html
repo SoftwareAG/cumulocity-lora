@@ -91,9 +91,36 @@
     <tr>
         <th translate>Name</th>
         <th translate>Type</th>
+        <th></th>
     </tr>
     <tr *ngFor="let instance of lnsInstances">
         <td>{{instance.name}}</td>
         <td>{{proxyMap[instance.lnsType].name}}</td>
+        <td ng-class="{&quot;text-center&quot;:true}" class="ng-scope text-center">
+            <div style="max-width:240px;" class="text-truncate">
+                <button class="btn-dot showOnHover" uib-tooltip="Delete LNS connector" tooltip-append-to-body="true"
+                    tooltip-placement="left" (click)="delete(instance)">
+                    <i c8y-icon="minus-circle" class="text-danger fa fw fa-minus-circle"></i>
+                </button>
+            </div>
+        </td>
     </tr>
 </table>
+
+
+<ng-template #deleteLNSModal>
+    <div class="modal-header">
+        <h4 id="dialog-name" class="modal-title pull-left">Confirm LNS connector
+            deletion
+        </h4>
+    </div>
+    <div class="modal-body">
+        LNS connector will be removed
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" (click)="endDelete()" translate=""
+            ng-reflect-translate="">Confirm</button>
+        <button class="btn btn-primary" (click)="deleteLNSModalRef.hide()" translate=""
+            ng-reflect-translate="">Cancel</button>
+    </div>
+</ng-template>

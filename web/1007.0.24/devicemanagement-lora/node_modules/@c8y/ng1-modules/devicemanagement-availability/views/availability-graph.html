@@ -1,0 +1,28 @@
+<div ng-if="graphData">
+  <div class="card availabilityGraph">
+    <div class="card-header">
+      <h4 class="card-title" translate>Last 30 days operability</h4>
+    </div>
+    <hr>
+    <div class="card-block">
+      <nvd3-multi-bar-chart
+        data="graphData"
+        id="availabilityGraph"
+        height="200"
+        width="900"
+        x="xGraph()"
+        y="yGraph()"
+        xAxisTickFormat="xTickFormat()"
+        color="colorGraph()"
+        showXAxis="true"
+        showYAxis="false"
+        tooltips="true"
+        tooltipcontent="tooltipGraph()">
+        <svg></svg>
+      </nvd3-multi-bar-chart>
+      <div class="text-center">
+        <small>{{operabilityTooltip | translate}}</small>
+      </div>
+    </div>
+  </div>
+</div>

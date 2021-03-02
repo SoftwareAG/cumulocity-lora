@@ -1,0 +1,1 @@
+"use strict";!function(){function t(t){this.icon=t.icon}t.$inject=["c8yAlarms"],angular.module("c8y.alarms").directive("c8yAlarmsSeverity",function(){return{restrict:"E",templateUrl:":::PLUGIN_PATH:::/severity.html",scope:{options:"=",severity:"="},controller:t,controllerAs:"vm",bindToController:!0}})}();

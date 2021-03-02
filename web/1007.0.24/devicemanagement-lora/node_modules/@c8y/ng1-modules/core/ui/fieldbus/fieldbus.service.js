@@ -1,0 +1,1 @@
+"use strict";!function(){function e(t,r){return{isApplicationAvailable:function(){try{var e=t.get("c8yDeviceDatabase");return e.areAnyFeaturesManifestsRegistered()}catch(e){return r.resolve(!1)}}}}e.$inject=["$injector","$q"],angular.module("c8y.ui").factory("c8yFieldbus",e)}();

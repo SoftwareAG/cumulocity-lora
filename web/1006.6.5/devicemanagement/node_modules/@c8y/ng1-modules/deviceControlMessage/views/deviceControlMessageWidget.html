@@ -1,0 +1,26 @@
+<div ng-controller="deviceControlMessageWidget">
+  <div ng-show="!visible" class="alert alert-warning" translate>
+    Operation not supported by this device
+  </div>
+  <div ng-show="visible">
+    <div class="input-group p-16">
+      <input
+        type="text"
+        class="form-control"
+        ng-model="str"
+        placeholder="{{ 'Message' | translate }}"
+      />
+      <span class="input-group-btn">
+        <button
+          title="{{ 'Send' | translate }}"
+          class="btn btn-primary"
+          ng-click="message(str)"
+          ng-disabled="!str"
+          translate
+        >
+          Send
+        </button>
+      </span>
+    </div>
+  </div>
+</div>

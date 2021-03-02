@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.auditLogs").controller("auditLogsCtrl",["$scope","c8yTitle","gettext",function(t,l,e){t.paging=null,l.changeTitle({title:e("Audit logs")})}]);

@@ -1,0 +1,23 @@
+<div class="form-group alert alert-warning" ng-hide="$ctrl.isDisabled">
+  <label translate>MSISDN is not set for tracker. Set it now.</label>
+  <div class="input-group" style="width: 250px;">
+    <input
+      type="text"
+      name="msisdn"
+      ng-model="msisdn"
+      class="form-control"
+      placeholder="{{ 'e.g. +495434323210`LOCALIZE`' | translate }}"
+      ng-pattern="/^\+?[\d|\s]+$/"
+    />
+    <div class="input-group-btn">
+      <button
+        title="{{ 'Set' | translate }}"
+        class="btn btn-primary"
+        ng-disabled="trackerForm.msisdn.$invalid || !msisdn"
+        ng-click="$ctrl.save(msisdn)"
+      >
+        {{ 'Set' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

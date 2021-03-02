@@ -1,0 +1,26 @@
+{
+  "name": "Authentication configuration",
+  "ngModules": [
+    "c8y.authenticationConfiguration"
+  ],
+  "category": "Administration",
+  "description": "Administrators can configure default and single sign-on authentication settings.",
+  "js": [
+    "authentication-configuration.module.js",
+
+    "sso-configuration/sso-configuration.component.js",
+    "sso-configuration/aad-template.component.js",
+    "sso-configuration/custom-template.component.js",
+
+    "sso-configuration/request-configuration.component.js",
+    "sso-configuration/basic-configuration.component.js",
+    "sso-configuration/user-id-configuration.component.js",
+    "sso-configuration/signature-configuration.component.js",
+    "sso-configuration/dynamic-access-mapping.component.js",
+    "sso-configuration/access-mapping.component.js",
+    "sso-configuration/logout-configuration.component.js",
+
+    "default-settings/controllers/password.js"
+  ],
+  "imports": ["administration-tfaSettings"]
+}

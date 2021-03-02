@@ -1,0 +1,16 @@
+{
+  "name": "Device status",
+  "description": "Displays device connectivity information",
+  "category": "Device",
+  "ngModules": [
+    "c8y.deviceStatus"
+  ],
+  "js": [
+    "deviceStatus.module.js",
+    "deviceStatus.component.js",
+    "availability.component.js",
+    "requiredAvailabilityIntervalSetting.component.js",
+    "ownerStatus.component.js",
+    "keyboardKeyHandler.service.js"
+  ]
+}

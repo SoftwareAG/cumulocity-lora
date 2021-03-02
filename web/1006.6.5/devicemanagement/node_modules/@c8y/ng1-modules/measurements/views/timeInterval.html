@@ -1,0 +1,50 @@
+<form class="form-inline">
+  <div class="form-group">
+    <div class="c8y-select-wrapper">
+      <select
+        class="form-control"
+        ng-hide="hideSelector"
+        ng-options="(interval.txt | translate) for interval in timeIntervals"
+        ng-model="selInterval"
+        ng-change="onChange()"
+      >
+      </select>
+      <span></span>
+    </div>
+  </div>
+
+  <div class="form-group datepicker" ng-show="isCustom()">
+    <input
+      class="form-control"
+      placeholder="{{ 'From`date`' | translate }}"
+      is-open="openFrom"
+      uib-datepicker-popup
+      datepicker-options="{maxDate: dateTo}"
+      show-button-bar="false"
+      ng-model="dateFrom"
+      ng-click="openFrom=true"
+    />
+  </div>
+
+  <div class="form-group datepicker" ng-show="isCustom()">
+    <input
+      class="form-control"
+      placeholder="{{ 'To`date`' | translate }}"
+      is-open="openTo"
+      uib-datepicker-popup
+      datepicker-options="{minDate: dateFrom}"
+      show-button-bar="false"
+      ng-model="dateTo"
+      ng-click="openTo=true"
+    />
+  </div>
+
+  <button
+    title="{{ 'Reload' | translate }}"
+    type="button"
+    class="btn btn-link"
+    ng-click="search(true)"
+  >
+    <i c8y-icon="refresh"></i> <translate>Reload</translate>
+  </button>
+</form>

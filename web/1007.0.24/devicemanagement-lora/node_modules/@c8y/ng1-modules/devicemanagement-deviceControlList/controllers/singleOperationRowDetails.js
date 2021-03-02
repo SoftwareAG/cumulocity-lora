@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e,t,i){e.getStandardKeys=i.getStandardKeys,e.c8yBulkOperationDetailsService=t}e.$inject=["$scope","c8yBulkOperationDetailsService","c8yDeviceControl"],angular.module("c8y.parts.deviceControlList").controller("deviceControlSingleOperationRowDetailsCtrl",e)}();

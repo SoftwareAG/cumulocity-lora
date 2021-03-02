@@ -1,0 +1,24 @@
+{
+  "name": "Asset location",
+  "ngModules": [
+    "c8y.parts.location"
+  ],
+  "category": "Device",
+  "icon": "home",
+  "color": "#F03F0F",
+  "description": "Define the location of an asset using a map and map-matching. This plugin contributes a new view.",
+  "css": [
+    "style.css"
+  ],
+  "js": [
+    "index.js",
+    "controllers/location.js"
+  ],
+  "folderName": "location",
+  "appsInclude": [
+    "devicemanagement"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

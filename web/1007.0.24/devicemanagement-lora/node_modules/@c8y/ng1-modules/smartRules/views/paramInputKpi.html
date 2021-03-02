@@ -1,0 +1,24 @@
+<div class="form-group">
+  <div class="input-group">
+    <select
+      class="form-control"
+      ng-options="kpi.id as getKpiLabel(kpi) for kpi in kpis | orderBy:['label','series']"
+      ng-model="kpiId"
+      ng-change="onKpiSelectionChange(kpiId)"
+      ng-required="param.required"
+    >
+      <option value="" ng-if="!param.required || !kpiId" ng-bind="placeholder(param)"></option>
+    </select>
+    <span class="input-group-btn">
+      <button
+        class="btn btn-primary"
+        type="button"
+        ng-click="openKpiSelector()"
+        uib-tooltip="{{ 'Select data point from library' | translate }}…"
+        tooltip-append-to-body="true"
+      >
+        <i c8y-icon="search"></i>
+      </button>
+    </span>
+  </div>
+</div>

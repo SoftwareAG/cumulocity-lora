@@ -1,0 +1,1 @@
+"use strict";var options=window.C8Y_APP;options.sensorPhone&&(options.modules.push("c8y.rotation3d"),require("@c8y/ng1-modules/rotation3dWidget/cumulocity"));

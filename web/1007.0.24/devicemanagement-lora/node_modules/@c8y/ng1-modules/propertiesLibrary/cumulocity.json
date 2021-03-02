@@ -1,0 +1,13 @@
+{
+  "name": "Properties library",
+  "ngModules": [
+    "c8y.propertiesLibrary"
+  ],
+  "category": "Properties",
+  "description": "Define custom properties for managed objects or tenants.",
+  "js": [
+    "index.js",
+    "jsonSchemaObjectsList.component.js",
+    "jsonSchemaObjectEditor.component.js"
+  ]
+}

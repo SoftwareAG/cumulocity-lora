@@ -1,0 +1,16 @@
+<button
+  ng-class="{'btn-pending': downloading}"
+  ng-disabled="downloading"
+  title="{{ 'Download' | translate }}"
+  ng-click="download(file)"
+  ng-switch="downloading"
+>
+  <span ng-switch-when="false">
+    <i c8y-icon="download"></i>
+    {{ 'Download' | translate }}
+  </span>
+  <span title="{{ 'Downloading' | translate }}…" ng-switch-when="true">
+    <i c8y-icon="download"></i>
+    {{ 'Downloading' | translate }}… ({{ downloadProgress | number: 0 }}%)
+  </span>
+</button>

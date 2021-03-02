@@ -1,0 +1,31 @@
+<div class="modal-header">
+  <h3 translate>Select schema properties</h3>
+</div>
+<div class="modal-body">
+  <c8y-property-selector
+    schema="schema"
+    properties="data.properties"
+    single-property-selection="true"
+  ></c8y-property-selector>
+</div>
+<div class="modal-footer">
+  <button
+    title="{{ 'Cancel' | translate }}"
+    type="button"
+    class="btn btn-default"
+    ng-click="dismiss()"
+    translate
+  >
+    Cancel
+  </button>
+  <button
+    title="{{ 'Select' | translate }}"
+    type="button"
+    data-ng-disabled="!data.properties.length"
+    class="btn btn-primary"
+    ng-click="close()"
+    translate
+  >
+    Select
+  </button>
+</div>

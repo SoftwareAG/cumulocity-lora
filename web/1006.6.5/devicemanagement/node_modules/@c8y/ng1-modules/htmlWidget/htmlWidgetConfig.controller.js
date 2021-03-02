@@ -1,0 +1,1 @@
+"use strict";!function(){function t(t,i){t.$on("saveWidget",function(){t.config.unsafe||(t.config.html=i.sanitizeString(t.config.html))}),t.htmlCodeTooltipVisible=!1,t.toggleHtmlCodeTooltip=function(){t.htmlCodeTooltipVisible=!t.htmlCodeTooltipVisible}}t.$inject=["$scope","c8ySanitizeHtml"],angular.module("c8y.parts.htmlwidget").controller("htmlWidgetConfigCtrl",t)}();

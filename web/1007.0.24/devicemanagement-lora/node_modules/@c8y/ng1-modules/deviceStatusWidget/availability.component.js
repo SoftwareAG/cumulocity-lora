@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.deviceStatus").component("deviceAvailabilityStatus",{controllerAs:"vm",templateUrl:":::PLUGIN_PATH:::/availability.html",bindings:{device:"<",status:"<"}});

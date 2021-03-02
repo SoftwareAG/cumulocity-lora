@@ -1,0 +1,40 @@
+<c8y-ui-action-bar-set>
+  <li>
+    <button
+      title="{{ 'Add endpoint' | translate }}"
+      class="btn btn-link"
+      ng-click="vm.addEndpoint()"
+    >
+      <i c8y-icon="plus-circle"></i>
+      <span translate>Add endpoint</span>
+    </button>
+  </li>
+</c8y-ui-action-bar-set>
+
+<div>
+  <div class="c8y-empty-state text-center" ng-show="vm.endpoints && vm.endpoints.length === 0">
+    <h1 c8y-icon="window-restore"></h1>
+    <h3 translate>There are no endpoints defined.</h3>
+    <p><small translate>Click below to add your first one.</small></p>
+    <button
+      title="{{ 'Add endpoint' | translate }}"
+      class="btn btn-primary"
+      ng-click="vm.addEndpoint()"
+      translate
+    >
+      Add endpoint
+    </button>
+  </div>
+
+  <div class="list-group endpoints-list">
+    <div class="list-group-item" ng-repeat="endpoint in vm.endpoints | orderBy:vm.endpointsOrderFn">
+      <c8y-remote-access-endpoint-card
+        endpoint="endpoint"
+        on-connect="vm.onConnect(endpoint)"
+        on-edit="vm.onEdit(endpoint)"
+        on-remove="vm.onRemove(endpoint)"
+      >
+      </c8y-remote-access-endpoint-card>
+    </div>
+  </div>
+</div>

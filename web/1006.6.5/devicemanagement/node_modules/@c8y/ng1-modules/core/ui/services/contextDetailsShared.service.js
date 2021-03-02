@@ -1,0 +1,1 @@
+"use strict";!function(){function t(t){var e=t.createEnum(["COMPUTED_PROPERTY_LAST_MEASUREMENT"]),n={};return{SHARED_CONTEXTS:e,get:function(t){return _.get(n,t)},set:function(t,e){n[t]=e},isAvailable:function(t){return!_.isEmpty(n[t])},clear:function(t){_.unset(n,t)}}}t.$inject=["c8yBase"],angular.module("c8y.ui").factory("contextDetailsSharedService",t)}();

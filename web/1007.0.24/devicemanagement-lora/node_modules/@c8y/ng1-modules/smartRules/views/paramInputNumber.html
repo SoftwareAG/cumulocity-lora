@@ -1,0 +1,10 @@
+<ng-form name="nestedSmartRuleForm">
+  <div class="form-group property-{{param.property}}" ng-class="{'has-error': nestedSmartRuleForm.$dirty && nestedSmartRuleForm.$invalid}">
+    <input type="number" class="form-control span" min="{{min}}" max="{{max}}" ng-model="rule.config[param.property]" placeholder="{{placeholder(param)}}" uib-tooltip="{{placeholder(param)}}" ng-required="param.required" />
+    <small class="text-muted" ng-if="isDefined(param.default)">{{'Default' | translate}}: {{param.default}}</small>
+    <small class="text-muted" ng-if="isDefined(min)">, {{'min' | translate}}: {{min}}</small>
+    <small class="text-muted" ng-if="isDefined(max)">, {{'max' | translate}}: {{max}}</small>
+  </div>
+</ng-form>
+
+

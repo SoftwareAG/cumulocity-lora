@@ -1,0 +1,19 @@
+{
+  "name": "Device users",
+  "ngModules": [
+    "c8y.parts.deviceUsers"
+  ],
+  "category": "Device",
+  "icon": "user",
+  "color": "#F03F0F",
+  "description": "Manage devices device users.",
+  "js": [
+    "index.js",
+    "controllers/deviceUserList.js",
+    "controllers/deviceUserDetail.js"
+  ],
+  "folderName": "deviceUsers",
+  "appsInclude": [
+    "administration"
+  ]
+}

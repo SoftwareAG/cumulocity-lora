@@ -1,0 +1,11 @@
+{
+  "name": "Fieldbus config",
+  "ngModules": [
+    "c8y.fieldbusConfig"
+  ],
+  "category": "Fieldbus",
+  "description": "Custom configuration plugin for fieldbus application",
+  "js": [
+    "fieldbus-config.module.js"
+  ]
+}

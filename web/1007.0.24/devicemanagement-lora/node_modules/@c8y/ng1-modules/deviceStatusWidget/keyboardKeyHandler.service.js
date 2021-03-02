@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e){var t=e.createEnum(["Enter","Escape"]);return{handle:function(e,a,n){e.key===t.Enter.value?a():e.key===t.Escape.value&&n()}}}e.$inject=["c8yBase"],angular.module("c8y.deviceStatus").factory("keyboardKeyHandler",e)}();

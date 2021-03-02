@@ -1,0 +1,16 @@
+<div ng-controller="devicePropertyWidgetCtrl">
+  <table ng-repeat="option in options|orderBy:'name'" class="table table-condensed" ng-class="{'no-border-top': singleOption}">
+    <thead ng-if="!singleOption">
+      <tr>
+        <th colspan="2">{{option.name}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="(field, val) in option.object track by field">
+        <th>{{field}}</th>
+        <td>{{val}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>

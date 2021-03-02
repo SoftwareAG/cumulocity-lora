@@ -1,0 +1,21 @@
+{
+  "name": "Log viewer",
+  "description": "Request and view device log files.",
+  "ngModules": [
+    "c8y.logViewer"
+  ],
+  "css": [
+    "style.css"
+  ],
+  "js": [
+    "index.js",
+    "controllers/logViewer.js",
+    "providers/logViewer.js",
+    "directives/logViewer.js",
+    "config.js"
+  ],
+  "folderName": "logViewer",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

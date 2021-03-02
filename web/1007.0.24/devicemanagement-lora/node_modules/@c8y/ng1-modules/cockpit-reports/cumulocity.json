@@ -1,0 +1,23 @@
+{
+  "name": "Dashboard",
+  "ngModules": [
+    "c8y.cockpit.reports"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "Reports are stand alone dashbaords without a context",
+  "imports": [
+    "core/dashboard2"
+  ],
+  "js": [
+    "index.js",
+    "reports.service.js",
+    "reports.controller.js",
+    "reports-detail.controller.js"
+  ],
+  "folderName": "reports",
+  "appsInclude": [
+    "cockpit"
+  ]
+}

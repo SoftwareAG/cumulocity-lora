@@ -1,0 +1,14 @@
+{
+  "name": "Device list",
+  "ngModules": [
+    "c8y.parts.deviceList"
+  ],
+  "category": "Device",
+  "icon": "bell",
+  "color": "#F2DF0F",
+  "description": "Display a list of available devices.",
+  "js": [
+    "index.js",
+    "deviceList.controller.js"
+  ]
+}

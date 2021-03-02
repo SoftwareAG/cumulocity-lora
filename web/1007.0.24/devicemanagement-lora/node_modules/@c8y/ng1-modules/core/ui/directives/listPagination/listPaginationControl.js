@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yListPaginationControl",function(){return{restrict:"EA",require:"^^c8yListPagination",link:function(i,t,n,a){i.pag=a.pag},templateUrl:":::PLUGIN_PATH:::/ui/views/listPagination/listPaginationControl.html"}});

@@ -1,0 +1,11 @@
+<fieldset ng-disabled="form.readonly" class="schema-form-fieldset {{ form.htmlClass }}">
+  <div class="legend form-block" ng-show="showTitle()">
+    {{ form.title | translate }}
+  </div>
+  <div
+    class="help-block"
+    ng-show="form.description"
+    ng-bind-html="form.description | translate"
+  ></div>
+  <sf-decorator ng-repeat="item in form.items" form="item"></sf-decorator>
+</fieldset>

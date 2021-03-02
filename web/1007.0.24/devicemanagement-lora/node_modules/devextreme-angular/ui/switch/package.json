@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-switch.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-switch.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-switch.js",
+  "esm5": "../../esm5/ui/switch/devextreme-angular-ui-switch.js",
+  "esm2015": "../../esm2015/ui/switch/devextreme-angular-ui-switch.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-switch.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-switch.js",
+  "typings": "devextreme-angular-ui-switch.d.ts",
+  "metadata": "devextreme-angular-ui-switch.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/switch"
+}

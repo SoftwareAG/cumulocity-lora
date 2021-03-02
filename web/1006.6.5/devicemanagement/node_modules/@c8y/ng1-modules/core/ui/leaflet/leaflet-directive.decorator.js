@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e){var n=angular.bind(e,e.setDefaults);return e.setDefaults=function(e,t){var a=_.isObjectLike(e)?e:{};return a.tileLayer||(a.tileLayer="//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"),n(a,t)},e}e.$inject=["$delegate"],angular.module("c8y.ui").config(function(){L.Icon.Default.imagePath="assets"}).decorator("leafletMapDefaults",e)}();

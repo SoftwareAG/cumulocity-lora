@@ -1,0 +1,363 @@
+{
+  "c8y_ModbusDeviceTypeInfo": {
+    "name": "Adeunis Field Test Device",
+    "minFieldbusUI": 4,
+    "fieldbusType": "actility"
+  },
+  "c8y_MessageIdConfiguration": {
+    "source" : "PAYLOAD",
+    "messageIdMapping": {
+      "startBit": 0,
+      "noBits":8
+    }
+  },
+  "c8y_Coils": [],
+  "c8y_Registers": [
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 88,
+      "noBits": 8,
+      "messageTypeId": 255,
+      "name": "Uplink count",
+      "eventMapping": {
+        "innerType": "uplink",
+        "fragmentType": "c8y_FrameCounter",
+        "text": "Frame count message received",
+        "type": "c8y_FrameCounter"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 96,
+      "noBits": 8,
+      "messageTypeId": 255,
+      "name": "Downlink count",
+      "eventMapping": {
+        "innerType": "downlink",
+        "text": "Frame count message received",
+        "fragmentType": "c8y_FrameCount",
+        "type": "c8y_FrameCount"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "measurementMapping": {
+        "series": "voltage",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "mV",
+      "decimalPlaces": 0,
+      "startBit": 104,
+      "noBits": 16,
+      "messageTypeId": 255,
+      "name": "Battery voltage",
+      "category": "Message type/status 255"
+    },
+    {
+      "measurementMapping": {
+        "series": "rssi",
+        "type": "c8y_SignalStrength"
+      },
+      "offset": 0,
+      "multiplier": -1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "dBm",
+      "decimalPlaces": 0,
+      "startBit": 120,
+      "noBits": 8,
+      "messageTypeId": 255,
+      "name": "Signal strength - RSSI",
+      "category": "Message type/status 255"
+    },
+    {
+      "measurementMapping": {
+        "series": "snr",
+        "type": "c8y_SignalStrength"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "dB",
+      "decimalPlaces": 0,
+      "startBit": 128,
+      "noBits": 8,
+      "messageTypeId": 255,
+      "name": "Signal strength - SNR",
+      "category": "Message type/status 255"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 1,
+      "noBits": 1,
+      "messageTypeId": 255,
+      "name": "Accelerometer trigger",
+      "eventMapping": {
+        "text": "Transmission triggered by the accelerometer",
+        "type": "c8y_Accelerometer"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 2,
+      "noBits": 1,
+      "messageTypeId": 255,
+      "name": "Push button 1 trigger",
+      "eventMapping": {
+        "text": "Button 1 is pressed",
+        "type": "c8y_PushButton1Event"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "measurementMapping": {
+        "series": "T",
+        "type": "c8y_Temperature"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "C",
+      "decimalPlaces": 0,
+      "startBit": 8,
+      "noBits": 8,
+      "messageTypeId": 255,
+      "name": "Temperature",
+      "category": "Message type/status 255"
+    },
+    {
+      "bcd": true,
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 255,
+      "name": "GPS latitude degree",
+      "eventMapping": {
+        "innerType": "latDegree",
+        "text": "Location event received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "bcd": true,
+      "offset": 0,
+      "multiplier": 0.001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 20,
+      "messageTypeId": 255,
+      "name": "GPS latitude minute",
+      "eventMapping": {
+        "innerType": "latMinute",
+        "text": "Location event received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "bcd": false,
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 47,
+      "noBits": 1,
+      "messageTypeId": 255,
+      "name": "GPS IsSouth",
+      "eventMapping": {
+        "innerType": "isSouth",
+        "text": "Location event received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "bcd": true,
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 48,
+      "noBits": 12,
+      "messageTypeId": 255,
+      "name": "GPS longitude degree",
+      "eventMapping": {
+        "innerType": "lngDegree",
+        "text": "Location event received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 84,
+      "noBits": 4,
+      "messageTypeId": 255,
+      "name": "GPS quality satellite count",
+      "eventMapping": {
+        "innerType": "satelliteCount",
+        "text": "GPS quality message received",
+        "fragmentType": "c8y_GPSQuality",
+        "type": "c8y_GPSQuality"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "bcd": true,
+      "offset": 0,
+      "multiplier": 0.01,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 60,
+      "noBits": 16,
+      "messageTypeId": 255,
+      "name": "GPS longitude minute",
+      "eventMapping": {
+        "innerType": "lngMinute",
+        "text": "Location event received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "bcd": false,
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 79,
+      "noBits": 1,
+      "messageTypeId": 255,
+      "name": "GPS isWest",
+      "eventMapping": {
+        "innerType": "isWest",
+        "text": "Location event received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Message type/status 255"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 80,
+      "noBits": 4,
+      "messageTypeId": 255,
+      "name": "GPS quality reception",
+      "eventMapping": {
+        "innerType": "receptionScale",
+        "fragmentType": "c8y_GpsQuality",
+        "text": "GPS quality message received",
+        "type": "c8y_GpsQuality"
+      },
+      "category": "Message type/status 255"
+    }
+  ]
+}

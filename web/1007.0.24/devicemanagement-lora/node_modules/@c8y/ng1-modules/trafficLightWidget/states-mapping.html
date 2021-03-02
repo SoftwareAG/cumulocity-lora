@@ -1,0 +1,64 @@
+<div class="form-group">
+  <label translate>States mapping</label>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th translate>State</th>
+      <th>
+        <span translate>Property</span>
+        <i
+          c8y-icon="info-circle"
+          uib-tooltip="{{'The value of the selected data point or property must be one of the following to have the respective light on: true, 1, any non-empty string or any non-null number.' | translate}}"
+          class="text-info"
+        >
+        </i>
+      </th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr
+      ng-repeat="(state, stateText) in vm.states"
+      ng-class="{danger: vm.isMappingInvalidForState(state)}"
+    >
+      <td>{{stateText | translate}}</td>
+      <td ng-switch="vm.mapping[state].computed">
+        <button
+          class="btn btn-xs btn-default"
+          type="button"
+          ng-switch-when="true"
+          ng-click="vm.editComputedProperty(vm.mapping[state])"
+        >
+          <i c8y-icon="bolt"></i> {{vm.humanizeProperty(vm.mapping[state])}}
+        </button>
+        <span ng-switch-default>{{vm.humanizeProperty(vm.mapping[state])}}</span>
+      </td>
+      <td class="text-right">
+        <button
+          class="btn btn-primary btn-xs showOnHover"
+          type="button"
+          title="{{'Select device property' | translate}}"
+          ng-click="vm.selectDevicePropertyForState(state)"
+        >
+          <i c8y-icon="pencil"></i>
+        </button>
+        <button
+          class="btn btn-primary btn-xs showOnHover"
+          type="button"
+          title="{{'Select fieldbus property' | translate}}"
+          ng-click="vm.selectFieldbusPropertyForState(state)"
+        >
+          <i c8y-icon="tasks"></i>
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <div
+    class="alert alert-warning"
+    ng-show="!vm.deviceId || vm.hasInvalidMapping"
+    translate
+  >
+    Select a device and complete the mapping for all light states.
+  </div>
+</div>

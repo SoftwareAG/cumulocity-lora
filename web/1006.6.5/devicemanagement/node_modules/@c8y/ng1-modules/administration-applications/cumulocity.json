@@ -1,0 +1,31 @@
+{
+  "name": "Application management",
+  "ngModules": [
+    "c8y.parts.applications"
+  ],
+  "category": "Administration",
+  "icon": "bell",
+  "color": "#F2DF0F",
+  "description": "An Administrator can subscribe and unsubscribe to applications.",
+  "js": [
+    "index.js",
+    "controllers/appDetailsTitle.js",
+    "controllers/applicationAccessEditor.js",
+    "controllers/permissions.js",
+    "directives/applicationAccessEditor.js",
+    "appWizard/appWizardMenuStep.component.js",
+    "appWizard/appWizardUploadStep.component.js",
+    "appWizard/appWizardExternalStep.component.js",
+    "appWizard/appWizardClone1Step.component.js",
+    "appWizard/appWizardClone2Step.component.js",
+    "appWizard/appWizardSmartAppStep.component.js",
+    "appWizard/appWizardSuccessStep.component.js",
+    "appWizard/context-path.directive.js",
+    "application-detail/application-detail.component.js",
+    "application-list-view/application-list-view.component.js"
+  ],
+  "folderName": "applications",
+  "appsInclude": [
+    "administration"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-nav-bar.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-nav-bar.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-nav-bar.js",
+  "esm5": "../../esm5/ui/nav-bar/devextreme-angular-ui-nav-bar.js",
+  "esm2015": "../../esm2015/ui/nav-bar/devextreme-angular-ui-nav-bar.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-nav-bar.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-nav-bar.js",
+  "typings": "devextreme-angular-ui-nav-bar.d.ts",
+  "metadata": "devextreme-angular-ui-nav-bar.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/nav-bar"
+}

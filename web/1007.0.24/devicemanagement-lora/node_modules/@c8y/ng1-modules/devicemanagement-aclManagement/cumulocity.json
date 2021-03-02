@@ -1,0 +1,21 @@
+{
+  "name": "Device permission management",
+  "ngModules": [
+    "c8y.aclManagement"
+  ],
+  "imports": [
+    "core/aclManagement"
+  ],
+  "category": "Device",
+  "icon": "security",
+  "color": "#F03F0F",
+  "description": "Manage access control list for device.",
+  "js": [
+    "index.js",
+    "controllers/aclManagementCtrl.js"
+  ],
+  "folderName": "aclManagement",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

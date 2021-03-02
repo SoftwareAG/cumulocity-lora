@@ -1,0 +1,13 @@
+<ng-form name="nestedSmartRuleForm">
+  <div class="form-group" ng-class="{'has-error': nestedSmartRuleForm.$dirty && nestedSmartRuleForm.$invalid}">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" ng-model="rule.config[param.property]" ng-required="param.required">
+        {{placeholder(param)}}
+      </label>
+    </div>
+  </div>
+</ng-form>
+
+
+

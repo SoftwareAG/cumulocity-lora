@@ -1,0 +1,31 @@
+<div style="height:90%;">
+  <svg width="100%" height="100%" viewBox="0 0 100 250" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generated for Cumulocity -->
+    <title>Traffic Light</title>
+    <desc>Traffic light indicator</desc>
+    <defs>
+      <radialGradient cx="50%" cy="50%" fx="50%" fy="50%" r="50%" id="r">
+        <stop stop-color="#FF0000" offset="0%"></stop>
+        <stop stop-color="#D0011B" offset="100%"></stop>
+      </radialGradient>
+      <radialGradient cx="50%" cy="50.6905692%" fx="50%" fy="50%" r="50%" id="y">
+        <stop stop-color="#FFD54A" offset="0%"></stop>
+        <stop stop-color="#F6A623" offset="100%"></stop>
+      </radialGradient>
+      <radialGradient cx="50%" cy="50%" fx="50%" fy="50%" r="50%" id="g">
+        <stop stop-color="#D5FF7A" offset="0%"></stop>
+        <stop stop-color="#8CC83C" offset="100%"></stop>
+      </radialGradient>
+      <radialGradient cx="50%" cy="50%" fx="50%" fy="50%" r="50%" id="k">
+        <stop stop-color="#5F5A5A" offset="0%"></stop>
+        <stop stop-color="#484646" offset="100%"></stop>
+      </radialGradient>
+    </defs>
+    <g id="traffic-light">
+      <path d="M0,50.2337032 C0,22.4903784 22.3869348,0 50,0 C77.6139454,0 100,22.4899605 100,50.2337032 L100,199.766297 C100,227.509622 77.6130652,250 50,250 C22.3860546,250 0,227.51004 0,199.766297 L0,50.2337032 Z" id="Rectangle" fill="#5F5A5A"></path>
+      <circle id="Oval" stroke="#FFFFFF" stroke-width="4" fill="{{'url(#' + (vm.updateStateValues().red ? 'r' : 'k') + ')'}}" cx="50" cy="50" r="33"></circle>
+      <circle id="Oval-Copy" stroke="#FFFFFF" stroke-width="4" fill="{{'url(#' + (vm.updateStateValues().yellow ? 'y' : 'k') + ')'}}" cx="50" cy="125" r="33"></circle>
+      <circle id="Oval-Copy-2" stroke="#FFFFFF" stroke-width="4" fill="{{'url(#' + (vm.updateStateValues().green ? 'g' : 'k') + ')'}}" cx="50" cy="200" r="33"></circle>
+    </g>
+  </svg>
+</div>

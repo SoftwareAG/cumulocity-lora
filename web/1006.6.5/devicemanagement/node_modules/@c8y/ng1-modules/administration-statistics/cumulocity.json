@@ -1,0 +1,18 @@
+{
+  "name": "Usage statistics",
+  "ngModules": [
+    "c8y.parts.statistics"
+  ],
+  "category": "Administration",
+  "icon": "home",
+  "color": "#F03F0F",
+  "description": "Display statistics of consumed resources.",
+  "js": [
+    "index.js",
+    "controllers/statistics.js"
+  ],
+  "folderName": "statistics",
+  "appsInclude": [
+    "administration"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Oauth - Paypal",
+  "ngModules": [
+    "c8y.parts.oauth"
+  ],
+  "category": "External",
+  "icon": "home",
+  "color": "#F03F0F",
+  "description": "Oauth login with paypal.",
+  "js": [
+    "index.js",
+    "controllers/oauth.js"
+  ]
+}

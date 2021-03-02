@@ -1,0 +1,14 @@
+{
+  "name": "Device protocols - deviceDatabase4 commons",
+  "description": "Common code for deviceDatabase4's device types in device protocols.",
+  "category": "Device",
+  "ngModules": [
+    "c8y.deviceProtocolForDeviceDatabase4"
+  ],
+  "js": [
+    "device-protocol-deviceDatabase4.module.js",
+    "device-type-protocol-base.provider.js",
+    "device-type-row-info.component.js",
+    "device-type-create-step.component.js"
+  ]
+}

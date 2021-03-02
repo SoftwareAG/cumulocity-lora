@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.assets").controller("RendererIconCtrl",["$scope","c8yComparisons",function(r,a){function o(){var c=r.value,o=r.config||{},n=o.map||[],e=_.find(n,function(o){return a.compare(a.convertDeprecatedComparisonType(o.comparison),c,o.value)});r.icon=e&&e.icon,r.color=e&&e.color}r.$watch("value",o),r.$watch("config",o)}]);

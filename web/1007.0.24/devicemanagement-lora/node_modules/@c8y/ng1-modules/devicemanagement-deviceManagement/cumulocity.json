@@ -1,0 +1,18 @@
+{
+  "name": "Device management",
+  "ngModules": ["c8y.deviceManagement"],
+  "category": "Device",
+  "icon": "home",
+  "color": "#F03F0F",
+  "description": "Manage the technical aspects of a device and ensure it is working correctly. View technical details, including hardware, mobile network and configuration data. Manage the installed firmware and software of the device. Reconfigure the device setttings. This plugin contributes the firmware and software repository entries in the navigator. Additionally it adds views to the device detail. ",
+  "imports": [
+    "core/deviceConfiguration",
+    "core/deviceDetail",
+    "core/deviceList",
+    "core/generic-ui",
+    "core/configurationRepository"
+  ],
+  "folderName": "deviceManagement",
+  "js": ["devicemanagement.module.js"],
+  "appsInclude": ["devicemanagement"]
+}

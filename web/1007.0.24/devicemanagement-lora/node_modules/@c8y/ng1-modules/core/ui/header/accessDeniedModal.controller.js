@@ -1,0 +1,1 @@
+"use strict";!function(){function s(s,e){var n=this;function r(){return angular.equals({},n.urls)}_.assign(n,{urls:s.urls,username:s.username,reset:function(){e.resetHideMessage(),n.urls=e.getUrls(),n.noAccessDeniedUrls=r()},dismiss:s.$dismiss}),n.noAccessDeniedUrls=r()}s.$inject=["$scope","c8yAccessDenied"],angular.module("c8y.ui").controller("accessDeniedModalCtrl",s)}();

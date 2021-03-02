@@ -1,0 +1,35 @@
+{
+  "name": "Device measurements",
+  "ngModules": [
+    "c8y.core.measurements2"
+  ],
+  "category": "Device",
+  "icon": "bell",
+  "color": "#F2DF0F",
+  "description": "Show measurement graphs for individual devices.",
+  "js": [
+    "index.js",
+    "controllers/measurements.js",
+    "directives/lineChart.js",
+    "controllers/lineChart.js",
+    "services/lineChartService.js",
+    "directives/timeIntervalChoice.js",
+
+    "measurements2/chart.service.js",
+    "measurements2/chart.directive.js",
+    "measurements2/chart.controller.js",
+    "measurements2/rtAutoMove.service.js",
+    "measurements2/iconBar.js",
+    "measurements2/chartCommon.service.js",
+    "measurements2/series.service.js",
+    "measurements2/axisX.service.js",
+    "measurements2/axisY.service.js",
+    "measurements2/hoverInfo.service.js",
+
+    "fragmentChart/fragmentChart.component.js"
+  ],
+  "css": [
+    "styles.css",
+    "measurements2/style.css"
+  ]
+}

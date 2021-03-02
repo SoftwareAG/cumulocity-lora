@@ -1,0 +1,33 @@
+/**
+* DevExtreme (widgets/common/tooltip.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./popover.less";
+
+.dx-tooltip-wrapper {
+    .dx-overlay-content {
+        min-width: 34px;
+        min-height: 26px;
+        text-align: center;
+        line-height: 0;
+
+        &:before {
+            display: inline-block;
+            height: 100%;
+            content: '';
+            vertical-align: middle;
+        }
+
+        .dx-popup-content {
+            display: inline-block;
+            padding: 12px 17px;
+            font-size: 0.85em;
+            line-height: normal;
+            white-space: nowrap;
+        }
+    }
+}

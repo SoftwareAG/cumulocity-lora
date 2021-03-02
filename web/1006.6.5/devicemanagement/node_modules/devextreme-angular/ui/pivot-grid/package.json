@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-pivot-grid.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-pivot-grid.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-pivot-grid.js",
+  "esm5": "../../esm5/ui/pivot-grid/devextreme-angular-ui-pivot-grid.js",
+  "esm2015": "../../esm2015/ui/pivot-grid/devextreme-angular-ui-pivot-grid.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-pivot-grid.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-pivot-grid.js",
+  "typings": "devextreme-angular-ui-pivot-grid.d.ts",
+  "metadata": "devextreme-angular-ui-pivot-grid.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/pivot-grid"
+}

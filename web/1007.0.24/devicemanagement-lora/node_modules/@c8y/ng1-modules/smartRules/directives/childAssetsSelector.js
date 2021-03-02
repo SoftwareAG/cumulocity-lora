@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.smartRules").directive("c8yChildAssetsSelector",function(){return{restrict:"E",scope:{parentMo:"&",selectedChildAssets:"&",onSelectionConfirmed:"&",disableSelection:"<"},controller:"c8yChildAssetsSelectorCtrl",controllerAs:"ctrl",templateUrl:":::PLUGIN_PATH:::/views/childAssetsSelector.html"}});

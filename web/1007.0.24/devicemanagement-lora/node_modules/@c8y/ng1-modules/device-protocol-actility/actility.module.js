@@ -1,0 +1,1 @@
+"use strict";!function(){function i(i){i.initUi()}function c(i){i.registerFeaturesManifest()}c.$inject=["c8yActilityDevice"],i.$inject=["c8yActilityDeviceProvider"],angular.module("c8y.actility",["c8y.deviceProtocols","c8y.deviceDatabase4","c8y.deviceProtocolForDeviceDatabase4"]).config(i).run(c)}();

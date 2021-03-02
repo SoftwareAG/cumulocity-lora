@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.smartRestEditor",[]).constant("smartRestEditorPluginPath",":::PLUGIN_PATH:::");

@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.parts.statistics",[]).config(["c8yNavigatorProvider","c8yViewsProvider",function(t,i){i.when("/statistics",{templateUrl:":::PLUGIN_PATH:::/views/index.html"})}]);

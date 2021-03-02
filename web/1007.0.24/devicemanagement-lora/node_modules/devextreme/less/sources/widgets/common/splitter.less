@@ -1,0 +1,42 @@
+/**
+* DevExtreme (widgets/common/splitter.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+.dx-splitter-wrapper {
+    height: 100%;
+    width: 0;
+    position: absolute;
+    z-index: 998;
+    top: 0;
+
+    &.dx-splitter-initial {
+        right: 0;
+    }
+
+    .dx-splitter-border {
+        z-index: 997;
+        height: 100%;
+        width: 3px;
+
+        .dx-splitter {
+            height: 100%;
+            width: 3px;
+            display: block;
+            cursor: col-resize;
+            z-index: 999; // Below @OVERLAY_ZINDEX: 1000
+
+            &.dx-splitter-transparent {
+                z-index: 998;
+            }
+
+            &.dx-state-disabled {
+                width: 0;
+                cursor: default;
+            }
+        }
+    }
+}

@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.sdk").directive("c8yLogin",["c8yCumulocity",function(c){return{restrict:"A",link:function(e,n){n.bind("click",function(){c.login(e.tenant(),e.user(),e.password(),e.rememberMe()).then(e.onSuccess).catch(e.onFailure)})},scope:{tenant:"&",user:"&",password:"&",rememberMe:"&",onSuccess:"&",onFailure:"&"}}}]);

@@ -1,0 +1,15 @@
+<div ng-controller="AlarmsController as vm">
+  <c8y-alarms-severity
+      severity="vm.activeSeverities"
+      options="vm.options"
+  >
+  </c8y-alarms-severity>
+  <c8y-alarm-list
+      class="alarm-list"
+      active-severities="vm.activeSeverities"
+      filter="vm.options"
+      realtime="true"
+      hide-header-actions="true"
+  >
+  </c8y-alarm-list>
+</div>

@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.smartRules").directive("smartRuleParamInputTextarea",function(){return{require:"^smartRuleParamInput",scope:{rule:"=",param:"="},restrict:"E",templateUrl:":::PLUGIN_PATH:::/views/paramInputTextarea.html",link:function(e,r,a,t){e.placeholder=t.placeholder}}});

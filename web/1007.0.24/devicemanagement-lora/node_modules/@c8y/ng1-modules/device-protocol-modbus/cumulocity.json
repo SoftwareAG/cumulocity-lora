@@ -1,0 +1,10 @@
+{
+    "name": "MODBUS mappings",
+    "ngModules": [
+      "c8y.modbus"
+    ],
+    "js": [
+      "modbus.module.js",
+      "modbus-device.provider.js"
+    ]
+  }

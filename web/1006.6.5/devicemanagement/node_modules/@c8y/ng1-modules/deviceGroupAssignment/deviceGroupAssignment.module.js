@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e,n){e.add({name:"deviceGroupAssignmentWidget",nameDisplay:n("Group assignment"),description:n("Widget can assign device to selected group"),widgetComponent:"groupAssignment",options:{groupSelectable:!1}})}e.$inject=["c8yComponentsProvider","gettext"],angular.module("c8y.deviceGroupAssignment",[]).config(e)}();

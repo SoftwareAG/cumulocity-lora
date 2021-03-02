@@ -1,0 +1,14 @@
+{
+  "name": "Application status ui",
+  "ngModules": [
+    "c8y.appStatusUI"
+  ],
+  "category": "Administration",
+  "description": "Allows to check current status of application",
+  "imports": [
+    "core/app-status"
+  ],
+  "js": [
+    "index.js"
+  ]
+}

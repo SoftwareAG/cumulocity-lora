@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-drop-down-box.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-drop-down-box.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-drop-down-box.js",
+  "esm5": "../../esm5/ui/drop-down-box/devextreme-angular-ui-drop-down-box.js",
+  "esm2015": "../../esm2015/ui/drop-down-box/devextreme-angular-ui-drop-down-box.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-drop-down-box.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-drop-down-box.js",
+  "typings": "devextreme-angular-ui-drop-down-box.d.ts",
+  "metadata": "devextreme-angular-ui-drop-down-box.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/drop-down-box"
+}

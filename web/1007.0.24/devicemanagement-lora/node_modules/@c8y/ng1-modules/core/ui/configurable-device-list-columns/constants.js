@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").constant("c8yConfigurableDeviceListColumnsConstants",{ALL_DEVICES_COLUMNS_META_USER_PREFERENCES_KEY_PREFIX:"all-devices-columns-meta_",FILTERING_MODE:{EQUALITY:"EQUALITY",EXISTENCE:"EXISTENCE"},SIMPLE_JSON_PATH_REGEX:/^[^.\s]+(\.\S+)*$/});

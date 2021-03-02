@@ -1,0 +1,1 @@
+"use strict";!function(){function n(t){function n(n){this.ranges=_.map(n||[],function(n){return new t(n)})}return n.prototype.add=function(n){this.ranges.push(new t(n))},n.prototype.find=function(t){return _.find(this.ranges,function(n){return n.matches(t)})},n}n.$inject=["Range"],angular.module("c8y.ui").factory("RangeSet",n)}();

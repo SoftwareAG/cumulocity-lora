@@ -1,0 +1,199 @@
+{
+  "c8y_ModbusDeviceTypeInfo": {
+    "name": "Windmill PLC",
+    "minFieldbusUI": 4,
+    "fieldbusType": "modbus"
+  },
+  "c8y_Coils": [],
+  "c8y_Registers": [
+    {
+      "min": 1,
+      "max": 3,
+      "signed": false,
+      "number": 2,
+      "divisor": 1,
+      "multiplier": 1,
+      "decimalPlaces": 0,
+      "unit": "",
+      "category": "Windmill #1",
+      "startBit": 0,
+      "input": false,
+      "name": "Mode #1",
+      "statusMapping": {
+        "status": "write"
+      },
+      "noBits": 16,
+      "enumValues": {
+        "1": "Off",
+        "2": "Manual",
+        "3": "Random"
+      }
+    },
+    {
+      "min": 0,
+      "max": 100,
+      "signed": false,
+      "number": 3,
+      "divisor": 1,
+      "multiplier": 1,
+      "decimalPlaces": 0,
+      "unit": "",
+      "input": false,
+      "startBit": 0,
+      "category": "Windmill #1",
+      "name": "Speed Setpoint #1",
+      "statusMapping": {
+        "status": "write"
+      },
+      "noBits": 16
+    },
+    {
+      "min": 0,
+      "max": 100,
+      "signed": false,
+      "measurementMapping": {
+        "series": "Windmill 1",
+        "type": "c8y_WindmillSpeed"
+      },
+      "number": 4,
+      "divisor": 1,
+      "multiplier": 1,
+      "decimalPlaces": 0,
+      "unit": "",
+      "startBit": 0,
+      "input": false,
+      "category": "Windmill #1",
+      "name": "Actual Speed #1",
+      "statusMapping": {
+        "status": "read"
+      },
+      "noBits": 16
+    },
+    {
+      "min": 1,
+      "max": 3,
+      "signed": false,
+      "number": 5,
+      "divisor": 1,
+      "multiplier": 1,
+      "decimalPlaces": 0,
+      "unit": "",
+      "category": "Windmill #2",
+      "startBit": 0,
+      "input": false,
+      "name": "Mode #2",
+      "statusMapping": {
+        "status": "write"
+      },
+      "noBits": 16,
+      "enumValues": {
+        "1": "Off",
+        "2": "Manual",
+        "3": "Random"
+      }
+    },
+    {
+      "min": 0,
+      "max": 100,
+      "signed": false,
+      "number": 6,
+      "divisor": 1,
+      "multiplier": 1,
+      "decimalPlaces": 0,
+      "unit": "",
+      "input": false,
+      "startBit": 0,
+      "category": "Windmill #2",
+      "name": "Speed Setpoint #2",
+      "statusMapping": {
+        "status": "write"
+      },
+      "noBits": 16
+    },
+    {
+      "min": 0,
+      "max": 100,
+      "signed": false,
+      "measurementMapping": {
+        "series": "Windmill 2",
+        "type": "c8y_WindmillSpeed"
+      },
+      "number": 7,
+      "divisor": 1,
+      "multiplier": 1,
+      "decimalPlaces": 0,
+      "unit": "",
+      "startBit": 0,
+      "input": false,
+      "category": "Windmill #2",
+      "name": "Actual Speed #2",
+      "statusMapping": {
+        "status": "read"
+      },
+      "noBits": 16
+    },
+    {
+      "min": 1,
+      "max": 3,
+      "signed": false,
+      "number": 8,
+      "divisor": 1,
+      "multiplier": 1,
+      "decimalPlaces": 0,
+      "unit": "",
+      "category": "Windmill #3",
+      "startBit": 0,
+      "input": false,
+      "name": "Mode #3",
+      "statusMapping": {
+        "status": "write"
+      },
+      "noBits": 16,
+      "enumValues": {
+        "1": "Off",
+        "2": "Manual",
+        "3": "Random"
+      }
+    },
+    {
+      "min": 0,
+      "max": 100,
+      "signed": false,
+      "number": 9,
+      "divisor": 1,
+      "multiplier": 1,
+      "decimalPlaces": 0,
+      "unit": "",
+      "input": false,
+      "startBit": 0,
+      "category": "Windmill #3",
+      "name": "Speed Setpoint #3",
+      "statusMapping": {
+        "status": "write"
+      },
+      "noBits": 16
+    },
+    {
+      "min": 0,
+      "max": 100,
+      "signed": false,
+      "measurementMapping": {
+        "series": "Windmill 3",
+        "type": "c8y_WindmillSpeed"
+      },
+      "number": 10,
+      "divisor": 1,
+      "multiplier": 1,
+      "decimalPlaces": 0,
+      "unit": "",
+      "startBit": 0,
+      "input": false,
+      "category": "Windmill #3",
+      "name": "Actual Speed #3",
+      "statusMapping": {
+        "status": "read"
+      },
+      "noBits": 16
+    }
+  ]
+}

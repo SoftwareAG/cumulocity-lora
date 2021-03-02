@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.relayWidget",[]).config(["c8yComponentsProvider","gettext",function(e,t){e.add({name:"Relay Widget",description:t("Widget for switching relay"),configTemplateUrl:":::PLUGIN_PATH:::/views/config.html",templateUrl:":::PLUGIN_PATH:::/views/widget.html"})}]);

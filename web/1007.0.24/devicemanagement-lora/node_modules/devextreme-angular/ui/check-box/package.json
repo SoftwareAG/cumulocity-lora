@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-check-box.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-check-box.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-check-box.js",
+  "esm5": "../../esm5/ui/check-box/devextreme-angular-ui-check-box.js",
+  "esm2015": "../../esm2015/ui/check-box/devextreme-angular-ui-check-box.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-check-box.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-check-box.js",
+  "typings": "devextreme-angular-ui-check-box.d.ts",
+  "metadata": "devextreme-angular-ui-check-box.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/check-box"
+}

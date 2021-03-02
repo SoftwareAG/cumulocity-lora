@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.modbusWidget4").constant("fieldbusConstants",{CANOPEN_DEVICE_FRAGMENT:"c8y_CANopenDevice",MODBUS_DEVICE_FRAGMENT:"c8y_ModbusDevice",PROFIBUS_DEVICE_FRAGMENT:"c8y_ProfibusDevice"});

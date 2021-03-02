@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").filter("capitalizeString",function(){function i(r){return r.charAt(0).toUpperCase()+r.slice(1).toLowerCase()}return function(r){var t=1<arguments.length&&void 0!==arguments[1]?arguments[1]:"all";if(!r)return r;if("first"===t)return i(r);var n=r.split(" ");return(n=_.map(n,function(r){return i(r)})).join(" ")}});

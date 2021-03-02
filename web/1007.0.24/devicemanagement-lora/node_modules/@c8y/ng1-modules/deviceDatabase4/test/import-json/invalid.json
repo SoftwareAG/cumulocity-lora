@@ -1,0 +1,19 @@
+{
+  "c8y_ModbusDeviceTypeInfo": {
+    "name": "Test model",
+    "minFieldbusUI": 4,
+    "fieldbusType": "modbus"
+  },
+  "c8y_Coils": [
+    {
+      "input" false,
+      "category": "Status",
+      "name": "Master switch",
+      "number": 1,
+      "enumValues": {
+        "0": "Off",
+        "1": "On"
+      }
+    }
+  ]
+}

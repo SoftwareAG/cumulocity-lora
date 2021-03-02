@@ -1,0 +1,37 @@
+<div class="modal-header">
+  <h3>
+    <i c8y-icon="{{ vm.resolve.title.icon }}"></i>
+    <span>{{ vm.resolve.title.text | translate }}</span>
+  </h3>
+</div>
+
+<div class="modal-inner-scroll">
+  <div class="modal-body">
+    <fieldset>
+      <div class="legend form-block">
+        {{ vm.resolve.timelineHeader | translate }}
+      </div>
+      <c8y-ui-operations-timeline operations="vm.resolve.operations"> </c8y-ui-operations-timeline>
+    </fieldset>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button
+    title="{{ 'Close' | translate }}"
+    class="btn btn-default"
+    ng-click="vm.dismiss()"
+    translate
+  >
+    Close
+  </button>
+
+  <button
+    title="{{ btn.label | translate }}"
+    class="btn"
+    ng-repeat="btn in vm.resolve.extraButtons"
+    ng-bind="btn.label | translate"
+    ng-class="btn.cls"
+    ng-click="btn.action();vm.dismiss()"
+  ></button>
+</div>

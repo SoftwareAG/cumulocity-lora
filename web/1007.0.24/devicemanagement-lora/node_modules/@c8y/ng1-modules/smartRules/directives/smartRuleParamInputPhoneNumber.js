@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.smartRules").directive("smartRuleParamInputPhoneNumber",function(){return{require:"^smartRuleParamInput",scope:{rule:"=",param:"="},restrict:"E",templateUrl:":::PLUGIN_PATH:::/views/paramInputPhoneNumber.html"}});

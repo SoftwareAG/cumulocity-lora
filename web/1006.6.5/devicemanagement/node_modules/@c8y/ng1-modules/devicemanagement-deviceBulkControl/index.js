@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.deviceBulkControl",["ui.bootstrap.progressbar"]).config(["c8yViewsProvider","gettext",function(e,o){e.when("/group/:groupId",{templateUrl:":::PLUGIN_PATH:::/views/list.html",name:o("Bulk operations"),icon:"c8y-energy"})}]);

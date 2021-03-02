@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.parts.dashboard2").factory("dashboardInventorySvc",["c8yInventory",function(a){return{createConfirm:function(e,t){var r=_.get(t,"id");return r?a.createChildAddition(e,r):a.create(e)},update:a.update,save:a.save,detail:a.detail,list:a.list,remove:a.remove}}]);

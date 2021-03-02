@@ -1,0 +1,11 @@
+{
+  "name": "Predefined Adeunis LoRaWan Sensor",
+  "syntax": "HEX",
+  "templates": [
+    {
+      "name": "Device setting",
+      "command": "03{DeviceType}{TransmitPeriod2Bytes}{ChannelStatus}{ChannelType1}{ChannelType2}0",
+      "category": "Device config"
+    }
+  ]
+}

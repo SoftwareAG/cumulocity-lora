@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-multi-view.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-multi-view.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-multi-view.js",
+  "esm5": "../../esm5/ui/multi-view/devextreme-angular-ui-multi-view.js",
+  "esm2015": "../../esm2015/ui/multi-view/devextreme-angular-ui-multi-view.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-multi-view.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-multi-view.js",
+  "typings": "devextreme-angular-ui-multi-view.d.ts",
+  "metadata": "devextreme-angular-ui-multi-view.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/multi-view"
+}

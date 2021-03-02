@@ -1,0 +1,17 @@
+<div data-ng-controller="OAuthCtrl">
+  <div class="form-group">
+    <label class="control-label" translate>Refresh token</label>
+    <div class="controls">
+      <input type="text" data-ng-model="token" class="form-control" disabled />
+    </div>
+  </div>
+  <a
+    title="{{ 'Log in' | translate }}"
+    ng-href="{{ getLoginUrl() }}"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="btn btn-primary"
+    translate
+    >Log in</a
+  >
+</div>

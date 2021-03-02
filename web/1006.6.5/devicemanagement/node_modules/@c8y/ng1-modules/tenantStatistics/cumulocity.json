@@ -1,0 +1,13 @@
+{
+  "name": "Tenant usage statistics",
+  "ngModules": [
+    "c8y.tenantStatistics"
+  ],
+  "category": "Platform",
+  "description": "Allows administrator to monitor usage statistics for all tenants.",
+  "js": [
+    "index.js",
+    "tenant-statistics.component.js",
+    "tenant-statistics-columns.service.js"
+  ]
+}

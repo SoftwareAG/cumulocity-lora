@@ -1,0 +1,14 @@
+{
+  "name": "Administrator Tenant Management",
+  "ngModules": [
+    "c8y.tenants"
+  ],
+  "category": "Platform",
+  "description": "Allows Administrator for managing tenants.",
+  "js": [
+    "index.js",
+    "controllers/list.js",
+    "controllers/detail.js",
+    "controllers/customProperties.js"
+  ]
+}

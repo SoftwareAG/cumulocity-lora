@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yDeviceList",function(){return{restrict:"E",templateUrl:":::PLUGIN_PATH:::/ui/views/deviceList.html",controller:"c8yDeviceListCtrl",controllerAs:"ctrl",scope:{parentDeviceId:"&",dynamicGroupId:"&",setTitles:"&"}}});

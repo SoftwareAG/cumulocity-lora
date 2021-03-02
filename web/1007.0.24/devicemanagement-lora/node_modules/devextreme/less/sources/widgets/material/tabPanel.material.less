@@ -1,0 +1,34 @@
+/**
+* DevExtreme (widgets/material/tabPanel.material.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./multiView.material.less";
+@import (once) "./tabs.material.less";
+
+.dx-tabpanel {
+    .dx-tabs {
+        display: block;
+        border-bottom: none;
+        background-color: @tabs-tab-bg;
+
+        .dx-empty-collection& {
+            border-top: none;
+        }
+    }
+
+    .dx-tab {
+        min-width: 72px;
+
+        &:not(.dx-tab-selected):not(.dx-state-hover) {
+            background: none;
+        }
+    }
+
+    .dx-tabs-wrapper {
+        display: block;
+    }
+}

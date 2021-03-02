@@ -1,0 +1,10 @@
+{
+    "name": "PROFIBUS mappings",
+    "ngModules": [
+      "c8y.profibus"
+    ],
+    "js": [
+      "profibus.module.js",
+      "profibus-device.provider.js"
+    ]
+  }

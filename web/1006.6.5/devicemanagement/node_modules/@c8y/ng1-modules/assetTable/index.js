@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.assets",[]).config(["c8yComponentsProvider",function(e){e.add({name:"Asset table",templateUrl:":::PLUGIN_PATH:::/views/assets.html",configTemplateUrl:":::PLUGIN_PATH:::/views/assetsConfig.html",previewImage:":::PLUGIN_PATH:::/img/asset-table-widget-pr.png",options:{groupsSelectable:!0}})}]);

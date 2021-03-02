@@ -1,0 +1,24 @@
+<div class="form-group">
+  <label style="width:100%;" translate>Select object model for rendering</label>
+  <select class="form-control" ng-model="vm.config.objectModel">
+    <option value="box.min.json" translate>Box model</option>
+    <option value="phoneModel.min.json" translate>Phone model</option>
+  </select>
+  <label style="width:100%;" translate>Wireframe</label>
+  <button
+    title="{{ 'Wireframe' | translate }}"
+    type="button"
+    class="btn btn-default"
+    ng-model="vm.config.isWireframe"
+    uib-btn-checkbox
+  >
+    <i c8y-icon="minus-circle" class="text-danger" ng-show="!vm.config.isWireframe"></i>
+    <i c8y-icon="check-circle" class="text-success" ng-show="vm.config.isWireframe"></i>
+    <span translate>Wireframe</span>
+  </button>
+  <label style="width:100%;" translate>Camera type</label>
+  <select class="form-control" ng-model="vm.config.cameraType">
+    <option value="OC" translate>Orthographic camera</option>
+    <option value="PC" translate>Perspective camera</option>
+  </select>
+</div>

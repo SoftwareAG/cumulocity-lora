@@ -1,0 +1,48 @@
+<div class="modal-header">
+  <h3><i c8y-icon="warning" class="text-danger"></i> {{ 'Error detail' | translate }}</h3>
+</div>
+<div class="modal-body">
+  <pre><code ng-bind-html="contents"></code></pre>
+</div>
+
+<div class="modal-footer">
+  <!-- <button class="btn btn-primary" ng-click="sendReport()">Send report</button> -->
+  <button
+    title="{{ 'Close' | translate }}"
+    type="button"
+    class="btn btn-default"
+    ng-click="close()"
+  >
+    {{ 'Close' | translate }}
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    ng-click="message()"
+    ng-show="mode === 'raw'"
+    ng-switch="isDanger()"
+  >
+    <i c8y-icon="comment"></i>
+    <span title="{{ 'Show summary' | translate }}" ng-switch-when="false">
+      {{ 'Show summary' | translate }}</span
+    >
+    <span title="{{ 'Show error message' | translate }}" ng-switch-when="true">
+      {{ 'Show error message' | translate }}</span
+    >
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    ng-click="rawData()"
+    ng-show="alert.detailedData && mode === 'msg'"
+    ng-switch="isDanger()"
+  >
+    <i c8y-icon="code"></i>
+    <span title="{{ 'Show details' | translate }}" ng-switch-when="false">
+      {{ 'Show details' | translate }}</span
+    >
+    <span title="{{ 'Raw error code' | translate }}" ng-switch-when="true">
+      {{ 'Raw error code' | translate }}</span
+    >
+  </button>
+</div>

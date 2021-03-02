@@ -1,0 +1,16 @@
+{
+  "name": "Tenant Applications",
+  "ngModules": [
+    "c8y.tenantApplications"
+  ],
+  "category": "Platform",
+  "description": "Allows Administrator for associating an application with tenant.",
+  "imports": [
+    "core/app-status"
+  ],
+  "js": [
+    "index.js",
+    "controllers/main.js",
+    "subscribed-applications/subscribed-applications.component.js"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+    "name": "CANBUS mappings",
+    "ngModules": [
+      "c8y.canbus"
+    ],
+    "js": [
+      "canbus.module.js",
+      "canbus-device.provider.js"
+    ]
+  }

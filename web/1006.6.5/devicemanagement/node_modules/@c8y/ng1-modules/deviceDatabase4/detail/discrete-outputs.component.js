@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.deviceDatabase4").component("c8yDeviceTypeDiscreteOutputs",{templateUrl:":::PLUGIN_PATH:::/detail/discrete-outputs.html",bindings:{discreteOutputsCategorized:"<",isEmpty:"<",addDiscreteOutput:"<",editDiscreteOutput:"<",removeDiscreteOutput:"<"},controllerAs:"vm"});

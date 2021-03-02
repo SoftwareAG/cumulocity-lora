@@ -1,0 +1,44 @@
+<div class="card">
+  <div class="card-header">
+    <h4 class="card-title">{{'Sessions' | translate }}</h4>
+  </div>
+  <hr>
+    <div class="c8y-empty-state" ng-if="vm.sessions.length === 0">
+      <p class="text-center" translate>
+        No sessions found.
+      </p>
+    </div>
+  <div class="list-group" ng-if="vm.sessions.length > 0">
+    <div class="list-group-item flex-row" ng-repeat="session in vm.sessions">
+      <div class="list-item-icon">
+        <i c8y-icon="exchange"></i>
+      </div>
+
+      <div class="list-item-body">
+        <div class="row">
+          <div class="col-sm-3">
+            <label class="small" translate>Customer</label>
+            <br class="visible-sm">
+            <span ng-bind="session.customer"></span>
+          </div>
+          <div class="col-sm-3">
+            <label class="small" translate>Started</label>
+            <br class="visible-sm">
+            <span ng-bind="session.sessionStartTime | absoluteDate"></span>
+          </div>
+          <div class="col-sm-3">
+            <label class="small" translate>Duration</label>
+            <br class="visible-sm">
+            <span ng-bind="session.duration | duration"></span>
+          </div>
+          <div class="col-sm-3">
+            <label class="small" translate>Data usage (MB)</label>
+            <br class="visible-sm">
+            <span ng-bind="session.volume"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

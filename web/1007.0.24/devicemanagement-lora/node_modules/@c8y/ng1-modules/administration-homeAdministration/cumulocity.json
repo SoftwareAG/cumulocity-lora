@@ -1,0 +1,18 @@
+{
+  "name": "Home - Administration",
+  "ngModules": [
+    "c8y.homeAdministration"
+  ],
+  "category": "Home",
+  "icon": "home",
+  "color": "#F03F0F",
+  "description": "Home view for the Administration application",
+  "js": [
+    "home-administration.config.js",
+    "home-administration.component.js"
+  ],
+  "folderName": "homeAdministration",
+  "appsInclude": [
+    "administration"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Default AT Commands",
+  "syntax" : "AT",
+  "templates" : [{
+    "name" : "Display selected roaming network",
+    "command": "AT+CMI;"
+  }, {
+    "name" : "Display selected roaming network",
+    "command": "AT+CMI;"
+  }]
+}

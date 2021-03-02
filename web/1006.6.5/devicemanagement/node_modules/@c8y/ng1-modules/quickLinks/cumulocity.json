@@ -1,0 +1,22 @@
+{
+  "name": "Quick Links component",
+  "ngModules": [
+    "c8y.welcome.quickLinks"
+  ],
+  "category": "Dashboard",
+  "description": "Displays quick links",
+  "imports": [
+    "core/groupsHierarchy"
+  ],
+  "js": [
+    "index.js",
+    "component.controller.js",
+    "controllers/deviceRegistration.js"
+  ],
+  "copy": [
+    "img/*"
+  ],
+  "css": [
+    "style.css"
+  ]
+}

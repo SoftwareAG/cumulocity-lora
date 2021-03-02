@@ -1,0 +1,420 @@
+<div ng-if="tracker.device">
+  <div ng-if="!tracker.device.c8y_Hardware.model || !tracker.modelInfo">
+    <div ng-if="!tracker.device.c8y_Hardware.model">
+      <div class="alert alert-warning" translate>
+        No tracker model specified for this device. Select one from the list of supported models
+        below.
+      </div>
+    </div>
+    <div ng-if="tracker.device.c8y_Hardware.model && !tracker.modelInfo">
+      <div class="alert alert-warning" translate>
+        Unsupported tracker model "{{ tracker.device.c8y_Hardware.model }}". Select one of the
+        supported models from the list below.
+      </div>
+    </div>
+    <div>
+      <ui-select style="z-index:20;" ng-model="tracker.newModel.name">
+        <ui-select-match placeholder="{{ 'Select tracker model' | translate }}">
+          {{ $select.selected.name }}
+        </ui-select-match>
+        <ui-select-choices
+          repeat="model.name as model in tracker.supportedModels | orderBy:'name' | filterByFields:$select.search:['name','description']:true"
+        >
+          <div>
+            <strong>{{ model.name }}</strong>
+            <p>
+              <small class="text-muted">
+                {{ model.description | translate }}
+              </small>
+            </p>
+          </div>
+        </ui-select-choices>
+      </ui-select>
+      <button
+        title="{{ 'Save' | translate }}"
+        type="button"
+        class="btn btn-primary"
+        ng-click="tracker.newModel.save()"
+        ng-disabled="!tracker.newModel.name"
+        translate
+      >
+        Save
+      </button>
+    </div>
+  </div>
+
+  <div ng-if="tracker.device">
+    <div ng-if="tracker.device.c8y_Hardware.model && !tracker.modelInfo.supportedOperations">
+      <div class="alert alert-warning" translate>
+        Use your manage tool to change the setup.
+      </div>
+    </div>
+  </div>
+
+  <form name="trackerForm" novalidate>
+    <c8y-msisdn-alert device="tracker.device"></c8y-msisdn-alert>
+
+    <div class="form-group" ng-if="tracker.restart.execute.supported">
+      <div class="alert alert-info pull-right">
+        <i c8y-icon="info"></i>
+        <translate
+          >Note: You may need to restart your device to actually apply new settings.</translate
+        >
+      </div>
+
+      <label translate>Restart</label>
+      <div class="form-control-static">
+        <button
+          type="button"
+          class="btn btn-primary"
+          ng-class="{'btn-pending': tracker.restart.execute.pending}"
+          ng-click="tracker.restart.execute()"
+          ng-disabled="tracker.restart.execute.pending"
+        >
+          <span
+            title="{{ 'Restart tracker' | translate }}"
+            ng-hide="tracker.restart.execute.pending"
+          >
+            {{ 'Restart tracker' | translate }}
+          </span>
+          <span
+            title="{{ 'Restarting tracker' | translate }}…"
+            ng-show="tracker.restart.execute.pending"
+          >
+            {{ 'Restarting tracker' | translate }}…
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-group" ng-if="tracker.location.setReportIntervalNoMotion.supported">
+      <label translate>Position reporting interval if no motion detected</label>
+      <div
+        class="input-group"
+        style="width: 250px;"
+        ng-class="{'has-error': trackerForm.reportIntervalNoMotion.$dirty && trackerForm.reportIntervalNoMotion.$invalid}"
+      >
+        <input
+          type="text"
+          name="reportIntervalNoMotion"
+          ng-model="tracker.location.reportIntervalNoMotion"
+          class="form-control"
+          placeholder="{{ 'e.g.' | translate }} 10"
+          ng-pattern="/^[\d]+$/"
+          ng-change="tracker.location.blockReportintervalNoMotionChange()"
+          style="width:95px;"
+        />
+        <span class="input-group-btn">
+          <select
+            name="unit"
+            class="form-control"
+            ng-model="tracker.location.setReportIntervalNoMotion.unit"
+            ng-options="item as (item.label | translate) for item in tracker.location.units"
+            style="min-width: 110px;"
+            ng-change="tracker.location.blockReportintervalNoMotionChange(); tracker.location.reportIntervalNoMotion = tracker.convertToUnits(tracker.location.reportIntervalNoMotion, tracker.location.setReportIntervalNoMotion.unit, {{
+              tracker.location.setReportIntervalNoMotion.unit.multiplier
+            }})"
+          ></select>
+        </span>
+        <span class="input-group-btn">
+          <button
+            type="button"
+            class="btn btn-primary"
+            ng-class="{'btn-pending': tracker.location.setReportIntervalNoMotion.pending}"
+            ng-click="tracker.location.setReportIntervalNoMotion()"
+            ng-disabled="tracker.location.setReportIntervalNoMotion.pending || trackerForm.reportIntervalNoMotion.$invalid"
+          >
+            <span
+              title="{{ 'Set' | translate }}"
+              ng-hide="tracker.location.setReportIntervalNoMotion.pending"
+            >
+              {{ 'Set' | translate }}
+            </span>
+            <span
+              title="{{ 'Setting' | translate }}…"
+              ng-show="tracker.location.setReportIntervalNoMotion.pending"
+            >
+              {{ 'Setting' | translate }}…
+            </span>
+          </button>
+        </span>
+      </div>
+      <c8y-alert-on-item
+        alert-text="{{ 'Value has been changed while you were editing it.' | translate }}"
+        alert-show="tracker.location.setReportIntervalNoMotion.changedInfo"
+        alert-btn-text="{{ 'refresh' | translate }}"
+        alert-btn-action="tracker.location.refreshReportIntervalNoMotion()"
+        alert-btn-icon="refresh"
+      ></c8y-alert-on-item>
+    </div>
+
+    <div class="form-group" ng-if="tracker.location.setMotionTracking.supported">
+      <label translate>Motion tracking</label>
+      <div>
+        <div class="btn-group" style="margin: 10px 0;">
+          <button
+            type="button"
+            class="btn btn-default"
+            ng-class="{'btn-pending': tracker.location.motionTracking.pending}"
+            ng-model="tracker.location.motionTracking"
+            ng-disabled="tracker.location.motionTracking.pending"
+            ng-change="tracker.location.blockMotionTrackingChange()"
+            uib-btn-checkbox
+          >
+            <i
+              c8y-icon="minus-circle"
+              class="text-danger"
+              ng-hide="tracker.location.motionTracking"
+            ></i>
+            <i
+              c8y-icon="check-circle"
+              class="text-success"
+              ng-show="tracker.location.motionTracking"
+            ></i>
+            <span translate>Motion tracking</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            ng-class="{'btn-pending': tracker.location.setMotionTracking.pending}"
+            ng-click="tracker.location.setMotionTracking()"
+            ng-disabled="tracker.location.setMotionTracking.pending"
+          >
+            <span
+              title="{{ 'Set motion tracking' | translate }}"
+              ng-hide="tracker.location.setMotionTracking.pending"
+            >
+              {{ 'Set motion tracking' | translate }}
+            </span>
+            <span
+              title="{{ 'Setting motion tracking' | translate }}…"
+              ng-show="tracker.location.setMotionTracking.pending"
+            >
+              {{ 'Setting motion tracking' | translate }}…;
+            </span>
+          </button>
+        </div>
+        <c8y-alert-on-item
+          alert-text="{{ 'Value has been changed while you were editing it.' | translate }}"
+          alert-show="tracker.location.setMotionTracking.changedInfo"
+          alert-btn-text="{{ 'refresh' | translate }}"
+          alert-btn-action="tracker.location.refreshMotionTracking()"
+          alert-btn-icon="refresh"
+        ></c8y-alert-on-item>
+      </div>
+    </div>
+
+    <div class="form-group" ng-if="tracker.location.setReportIntervalOnMotion.supported">
+      <label translate>Position reporting interval if motion detected</label>
+      <div
+        class="input-group"
+        style="width: 250px;"
+        ng-class="{'has-error': trackerForm.reportIntervalOnMotion.$dirty && trackerForm.reportIntervalOnMotion.$invalid}"
+      >
+        <input
+          type="text"
+          name="reportIntervalOnMotion"
+          ng-model="tracker.location.reportIntervalOnMotion"
+          class="form-control"
+          placeholder="{{ 'e.g. 10' | translate }}"
+          ng-pattern="/^[\d]+$/"
+          ng-change="tracker.location.blockReportIntervalOnMotionChange()"
+          ng-disabled="!(tracker.location.motionTracking||tracker.location.setReportIntervalOnMotion.changedInfo)"
+          style="width:95px;"
+        />
+        <span class="input-group-btn">
+          <select
+            name="unit"
+            class="form-control"
+            ng-model="tracker.location.setReportIntervalOnMotion.unit"
+            ng-options="item as (item.label | translate) for item in tracker.location.units"
+            style="min-width: 110px;"
+            ng-change="tracker.location.blockReportIntervalOnMotionChange(); tracker.location.reportIntervalOnMotion = tracker.convertToUnits(tracker.location.reportIntervalOnMotion, tracker.location.setReportIntervalOnMotion.unit, {{
+              tracker.location.setReportIntervalOnMotion.unit.multiplier
+            }})"
+            ng-disabled="!(tracker.location.motionTracking||tracker.location.setReportIntervalOnMotion.changedInfo)"
+          ></select>
+        </span>
+        <span class="input-group-btn">
+          <button
+            type="button"
+            class="btn btn-primary"
+            ng-class="{'btn-pending': tracker.location.setReportIntervalOnMotion.pending}"
+            ng-click="tracker.location.setReportIntervalOnMotion()"
+            ng-disabled="tracker.location.setReportIntervalOnMotion.pending || trackerForm.reportIntervalOnMotion.$invalid || !(tracker.location.motionTracking || tracker.location.setReportIntervalOnMotion.changedInfo)"
+          >
+            <span
+              title="{{ 'Set' | translate }}"
+              ng-hide="tracker.location.setReportIntervalOnMotion.pending"
+            >
+              {{ 'Set' | translate }}
+            </span>
+            <span
+              title="{{ 'Setting' | translate }}…"
+              ng-show="tracker.location.setReportIntervalOnMotion.pending"
+            >
+              {{ 'Setting' | translate }}…
+            </span>
+          </button>
+        </span>
+      </div>
+      <c8y-alert-on-item
+        alert-text="{{ 'Value has been changed while you were editing it.' | translate }}"
+        alert-show="tracker.location.setReportIntervalOnMotion.changedInfo"
+        alert-btn-text="{{ 'refresh' | translate }}"
+        alert-btn-action="tracker.location.refreshReportIntervalOnMotion()"
+        alert-btn-icon="refresh"
+      ></c8y-alert-on-item>
+    </div>
+
+    <div class="form-group" ng-if="tracker.sos.setSosNumber.supported">
+      <label translate>SOS contact number</label>
+      <div
+        class="input-group"
+        style="width: 250px;"
+        ng-class="{'has-error': trackerForm.sosNumber.$dirty && trackerForm.sosNumber.$invalid}"
+      >
+        <input
+          type="text"
+          name="sosNumber"
+          ng-model="tracker.sos.number"
+          class="form-control"
+          placeholder="{{ 'e.g. +495434323210`LOCALIZE`' | translate }}"
+          ng-pattern="/^\+?[\d|\s]+$/"
+          ng-change="tracker.sos.blockSosNumberChange()"
+        />
+        <span class="input-group-btn">
+          <button
+            type="button"
+            class="btn btn-primary"
+            ng-class="{'btn-pending': tracker.sos.setSosNumber.pending}"
+            ng-click="tracker.sos.setSosNumber()"
+            ng-disabled="tracker.sos.setSosNumber.pending"
+          >
+            <span title="{{ 'Set' | translate }}" ng-hide="tracker.sos.setSosNumber.pending">
+              {{ 'Set' | translate }}
+            </span>
+            <span title="{{ 'Setting' | translate }}…" ng-show="tracker.sos.setSosNumber.pending">
+              {{ 'Setting' | translate }}…
+            </span>
+          </button>
+        </span>
+      </div>
+      <c8y-alert-on-item
+        alert-text="{{ 'Value has been changed while you were editing it.' | translate }}"
+        alert-show="tracker.sos.setSosNumber.changedInfo"
+        alert-btn-text="{{ 'refresh' | translate }}"
+        alert-btn-action="tracker.sos.refreshSosNumber()"
+        alert-btn-icon="refresh"
+      ></c8y-alert-on-item>
+    </div>
+
+    <div class="form-group" ng-if="tracker.alarms.armAlarms.supported">
+      <label translate>Alarms</label>
+      <div>
+        <div class="btn-group" style="margin: 10px 0;">
+          <button
+            type="button"
+            class="btn btn-default"
+            ng-repeat="alarm in tracker.alarms.list"
+            ng-if="alarm.supported"
+            ng-model="tracker.alarms.status[alarm.key]"
+            ng-disabled="tracker.alarms.armAlarms.pending"
+            ng-change="tracker.alarms.blockAlarmsChange()"
+            uib-btn-checkbox
+          >
+            <i
+              c8y-icon="minus-circle"
+              class="text-danger"
+              ng-show="!tracker.alarms.status[alarm.key]"
+            ></i>
+            <i
+              c8y-icon="check-circle"
+              class="text-success"
+              ng-show="tracker.alarms.status[alarm.key]"
+            ></i>
+            <span ng-bind="alarm.label | translate"></span>
+          </button>
+        </div>
+      </div>
+      <div class="form-control-static">
+        <button
+          type="button"
+          class="btn btn-primary"
+          ng-class="{'btn-pending': tracker.alarms.armAlarms.pending}"
+          ng-click="tracker.alarms.armAlarms()"
+          ng-disabled="tracker.alarms.armAlarms.pending"
+        >
+          <span title="{{ 'Set alarms' | translate }}" ng-hide="tracker.alarms.armAlarms.pending">
+            {{ 'Set alarms' | translate }}
+          </span>
+          <span
+            title="{{ 'Setting alarms' | translate }}…"
+            ng-show="tracker.alarms.armAlarms.pending"
+          >
+            {{ 'Setting alarms' | translate }}…
+          </span>
+        </button>
+      </div>
+      <c8y-alert-on-item
+        alert-text="{{ 'Value has been changed while you were editing it.' | translate }}"
+        alert-show="tracker.alarms.armAlarms.changedInfo"
+        alert-btn-text="{{ 'refresh' | translate }}"
+        alert-btn-action="tracker.alarms.refreshAlarms()"
+        alert-btn-icon="refresh"
+      ></c8y-alert-on-item>
+    </div>
+
+    <div class="form-group" ng-if="tracker.situation.update.supported">
+      <label translate>Tracker situation</label>
+      <div class="form-control-static">
+        <button
+          type="button"
+          class="btn btn-primary"
+          ng-class="{'btn-pending': tracker.situation.update.pending}"
+          ng-click="tracker.situation.update()"
+          ng-disabled="tracker.situation.update.pending"
+        >
+          <span
+            title="{{ 'Update tracker situation' | translate }}"
+            ng-hide="tracker.situation.update.pending"
+          >
+            {{ 'Update tracker situation' | translate }}
+          </span>
+          <span
+            title="{{ 'Updating tracker situation' | translate }}…"
+            ng-show="tracker.situation.update.pending"
+          >
+            {{ 'Updating tracker situation' | translate }}…
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-group" ng-if="tracker.location.getSingle.supported">
+      <label translate>Single location</label>
+      <div class="form-control-static">
+        <button
+          type="button"
+          class="btn btn-primary"
+          ng-class="{'btn-pending': tracker.situation.update.pending}"
+          ng-click="tracker.location.getSingle()"
+          ng-disabled="tracker.location.getSingle.pending"
+        >
+          <span
+            title="{{ 'Get single location' | translate }}"
+            ng-hide="tracker.location.getSingle.pending"
+          >
+            {{ 'Get single location' | translate }}
+          </span>
+          <span
+            title="{{ 'Getting single location' | translate }}…"
+            ng-show="tracker.location.getSingle.pending"
+          >
+            {{ 'Getting single location' | translate }}…
+          </span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

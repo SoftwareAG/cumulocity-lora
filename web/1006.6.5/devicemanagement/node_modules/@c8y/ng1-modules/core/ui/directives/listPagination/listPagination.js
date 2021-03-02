@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yListPagination",function(){return{restrict:"EA",scope:{items:"=",pageSize:"@"},controller:"c8yListPaginationCtrl"}});

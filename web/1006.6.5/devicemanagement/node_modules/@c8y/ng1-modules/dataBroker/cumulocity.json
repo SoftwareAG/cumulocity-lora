@@ -1,0 +1,23 @@
+{
+  "name": "Data broker",
+  "ngModules": [
+    "c8y.dataBroker"
+  ],
+  "description": "Manage data export",
+  "js": [
+    "dataBroker.module.js",
+    "dataBroker.config.js",
+
+    "connectors/connectors.service.js",
+    "connectors/connectors.component.js",
+    "connectors/connectorEditor.component.js",
+
+    "connectorsAlarms/connectorAlarms.component.js",
+
+    "subscriptions/subscriptions.service.js",
+    "subscriptions/subscriptions.component.js",
+    "subscriptions/subscription.component.js",
+    "subscriptions/addSubscription.component.js",
+    "subscriptions/pendingSubscription.component.js"
+  ]
+}

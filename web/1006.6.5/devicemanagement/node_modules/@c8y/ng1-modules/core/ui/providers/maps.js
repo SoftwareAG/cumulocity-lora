@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").constant("c8yMapsConfiguration",{deviceListMap:{},tracking:{}});

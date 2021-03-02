@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e){this.route_list=e.ROUTE_LIST}e.$inject=["c8yRolesUi"],angular.module("c8y.roles").component("c8yRoleTitle",{templateUrl:":::PLUGIN_PATH:::/detail/roleTitle.html",bindings:{name:"<",subtitle:"@",onSave:"&"},controllerAs:"vm",controller:e})}();

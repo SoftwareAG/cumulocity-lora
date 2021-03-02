@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-text-box.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-text-box.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-text-box.js",
+  "esm5": "../../esm5/ui/text-box/devextreme-angular-ui-text-box.js",
+  "esm2015": "../../esm2015/ui/text-box/devextreme-angular-ui-text-box.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-text-box.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-text-box.js",
+  "typings": "devextreme-angular-ui-text-box.d.ts",
+  "metadata": "devextreme-angular-ui-text-box.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/text-box"
+}

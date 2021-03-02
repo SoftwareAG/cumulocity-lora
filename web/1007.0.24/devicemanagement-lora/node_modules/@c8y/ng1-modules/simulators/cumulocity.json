@@ -1,0 +1,25 @@
+{
+  "name": "SmartREST simulators",
+  "ngModules": [
+    "c8y.simulators"
+  ],
+  "category": "Simulators",
+  "description": "Create and edit simulators based on SmartREST messages",
+  "js": [
+    "index.js",
+    "simulators.service.js",
+    "simulatorsUi.provider.js",
+
+    "list/list.component.js",
+    "list/simulatorCloneDialog.component.js",
+    "add/simulatorAdd.component.js",
+
+    "detail/detail.component.js",
+    "detail/detail.controller.js",
+    "detail/instructionList.component.js",
+    "detail/instructionDetail.component.js",
+    "detail/instructionAdd.component.js",
+    "detail/operations.component.js",
+    "detail/operationAddDialog.component.js"
+  ]
+}

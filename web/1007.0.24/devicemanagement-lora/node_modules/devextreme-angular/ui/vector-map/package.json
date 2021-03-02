@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-vector-map.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-vector-map.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-vector-map.js",
+  "esm5": "../../esm5/ui/vector-map/devextreme-angular-ui-vector-map.js",
+  "esm2015": "../../esm2015/ui/vector-map/devextreme-angular-ui-vector-map.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-vector-map.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-vector-map.js",
+  "typings": "devextreme-angular-ui-vector-map.d.ts",
+  "metadata": "devextreme-angular-ui-vector-map.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/vector-map"
+}

@@ -1,0 +1,12 @@
+<div class="row">
+  <ng-form name="nestedSmartRuleForm1">
+    <div class="form-group col-lg-6" ng-class="{'has-error': nestedSmartRuleForm1.$dirty && nestedSmartRuleForm1.$invalid}">
+      <input name="amount" type="number" class="form-control" ng-model="timeInterval.amount" min="1" ng-required="param.required" placeholder="{{placeholder(param, fieldNames.AMOUNT)}}" uib-tooltip="{{placeholder(param, fieldNames.AMOUNT)}}">
+    </div>
+  </ng-form>
+  <ng-form name="nestedSmartRuleForm2">
+    <div class="form-group col-lg-6" ng-class="{'has-error': nestedSmartRuleForm2.$dirty && nestedSmartRuleForm2.$invalid}">
+      <select name="unit" class="form-control" ng-options="unit as (unit.label | translate) for unit in units | filter: {dontDisplay: false}" ng-model="timeInterval.unit" ng-required="param.required" placeholder="{{placeholder(param, fieldNames.UNIT)}}" uib-tooltip="{{placeholder(param, fieldNames.UNIT)}}"></select>
+    </div>
+  </ng-form>
+</div>

@@ -1,0 +1,11 @@
+<div ng-controller="HelpAndSupportCtrl" class="card-group-block interact-grid">
+
+  <a class="card" ng-href="{{doc.url | translate}}" target="_blank" rel="noopener noreferrer" ng-repeat="doc in docs">
+    <div class="card-block text-center">
+      <h1 class="text-gray-medium">
+        <i c8y-icon="{{doc.icon}}"></i>
+      </h1>
+      <small class="text-muted">{{doc.label | translate}}</small>
+    </div>
+  </a>
+</div>

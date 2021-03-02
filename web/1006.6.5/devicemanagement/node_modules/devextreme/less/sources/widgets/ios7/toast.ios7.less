@@ -1,0 +1,51 @@
+/**
+* DevExtreme (widgets/ios7/toast.ios7.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./overlay.ios7.less";
+
+.dx-toast-content {
+    color: white;
+    border-radius: 5px;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
+}
+
+.dx-toast-icon {
+    background-size: contain;
+}
+
+.dx-toast-info {
+    background-color: #6aa8dc;
+
+    .dx-toast-icon {
+        background-image: @IOS7_TOAST_INFO_BACKGROUND;
+    }
+}
+
+.dx-toast-warning {
+    background-color: #ffa062;
+
+    .dx-toast-icon {
+        background-image: @IOS7_TOAST_WARNING_BACKGROUND;
+    }
+}
+
+.dx-toast-error {
+    background-color: #ff6161;
+
+    .dx-toast-icon {
+        background-image: @IOS7_TOAST_ERROR_BACKGROUND;
+    }
+}
+
+.dx-toast-success {
+    background-color: #59b96b;
+
+    .dx-toast-icon {
+        background-image: @IOS7_TOAST_SUCCESS_BACKGROUND;
+    }
+}

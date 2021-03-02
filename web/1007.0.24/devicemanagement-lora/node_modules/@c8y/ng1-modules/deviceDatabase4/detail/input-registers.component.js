@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.deviceDatabase4").component("c8yDeviceTypeInputRegisters",{templateUrl:":::PLUGIN_PATH:::/detail/input-registers.html",bindings:{inputRegistersCategorized:"<",isEmpty:"<",addInputRegister:"<",editInputRegister:"<",removeInputRegister:"<"},controllerAs:"vm"});

@@ -1,0 +1,42 @@
+/**
+* DevExtreme (widgets/common/slideOut.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./slideOutView.less";
+@import (once) "./list.less";
+
+.dx-slideout {
+    height: 100%;
+    width: 100%;
+}
+
+.dx-slideout-menu {
+    min-width: 280px;
+    max-width: 350px;
+
+    .dx-list-item {
+        .dx-icon {
+            float: left;
+            margin-right: 15px;
+            width: 24px;
+            height: 24px;
+            background-size: 100% 100%;
+        }
+    }
+}
+
+.dx-slideout-item,
+.dx-slideout-item-content {
+    height: 100%;
+    width: 100%;
+}
+
+.dx-rtl .dx-slideout-menu .dx-list-item .dx-icon {
+    float: right;
+    margin-right: 0;
+    margin-left: 15px;
+}

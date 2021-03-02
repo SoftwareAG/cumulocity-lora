@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.cockpit.export").directive("c8yExportTimespan",["gettext",function(e){return{restrict:"AE",link:function(t){t.types={LAST_WEEK:e("Last week"),LAST_MONTH:e("Last month"),LAST_YEAR:e("Last year"),CUSTOM:e("Custom")}},scope:{timespan:"=c8yExportTimespan"},templateUrl:":::PLUGIN_PATH:::/views/timespan.html"}}]);

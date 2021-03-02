@@ -1,0 +1,13 @@
+<div ng-controller="kpiGraphCtrl">
+    <div c8y-measurement-line-chart
+      kpis="kpis"
+      device-id="{{deviceId}}"
+      interval="interval"
+      datapoints="child.config.datapoints"
+      aggregation-type="aggregationType"
+      auto-aggregation-off="true"
+      start-realtime="autoStart"
+      hide-realtime="true"
+      hide-header="true">
+    </div>
+</div>

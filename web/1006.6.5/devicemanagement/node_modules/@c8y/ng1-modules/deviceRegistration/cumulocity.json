@@ -1,0 +1,28 @@
+{
+  "name": "Device registration",
+  "ngModules": [
+    "c8y.deviceRegistration"
+  ],
+  "category": "Device",
+  "icon": "gears",
+  "color": "#F2DF0F",
+  "description": "Allows for registering new devices and accepting pending registrations.",
+  "js": [
+    "deviceRegistration.module.js",
+    "deviceRegistration.component.js",
+    "deviceRegistrationWizard/deviceRegistrationWizard.component.js",
+    "deviceRegistrationWizard/providersListSelectionStep.component.js",
+    "deviceRegistrationWizard/deviceRegistrationMainStep.component.js",
+    "deviceRegistrationWizard/generalRegistrationStep.component.js",
+    "deviceRegistrationWizard/bulkRegistrationStep.component.js",
+    "deviceRegistrationWizard/deviceRegistrationFinishStep.component.js",
+    "deviceRegistrationWizard/deviceRegistrationFlows.service.js",
+    "deviceRegistrationWizard/deviceRegistrationWizardUtils.service.js",
+    "deviceRegistrationWizard/multipleResultFinishStep.component.js",
+    "deviceProviders.provider.js"
+  ],
+  "copy": [
+    "resources/simpleBulkRegistrationTemplate.csv",
+    "resources/fullBulkRegistrationTemplate.csv"
+  ]
+}

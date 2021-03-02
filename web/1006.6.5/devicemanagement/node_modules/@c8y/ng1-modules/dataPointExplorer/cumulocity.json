@@ -1,0 +1,32 @@
+{
+  "name": "Data point explorer",
+  "ngModules": [
+    "c8y.cockpit.dataPointExplorer"
+  ],
+  "category": "Measurements",
+  "icon": "bell",
+  "color": "#F2DF0F",
+  "description": "Explore different types of measurements",
+  "imports": [
+    "core/deviceSelector",
+    "core/measurements"
+  ],
+  "css": [
+    "style.css"
+  ],
+  "js": [
+    "index.js",
+    "services/dataPoints.js",
+    "directives/dataPointList.js",
+    "directives/dataPointValidator.js",
+    "controllers/dataPointItem.js",
+    "controllers/dataPointList.js",
+    "controllers/dataPointAdd.js",
+    "controllers/dataPointExplorer.js",
+    "controllers/dataPointWidget.js",
+    "controllers/dataPointWidgetConfig.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

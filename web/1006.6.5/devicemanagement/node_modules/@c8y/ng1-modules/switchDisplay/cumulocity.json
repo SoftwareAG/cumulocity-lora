@@ -1,0 +1,22 @@
+{
+  "name": "Data point status",
+  "ngModules": [
+    "c8y.switchDisplay"
+  ],
+  "category": "Device",
+  "icon": "flag-o",
+  "description": "Displays in realtime the status of any binary data point.",
+  "less": [
+    "style/switchDisplayConfig.less",
+    "style/switchDisplay.less"
+  ],
+  "languages": ["en", "de"],
+  "js": [
+    "index.js",
+    "controller/switchDisplayCtrl.js",
+    "controller/switchDisplayConfigCtrl.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

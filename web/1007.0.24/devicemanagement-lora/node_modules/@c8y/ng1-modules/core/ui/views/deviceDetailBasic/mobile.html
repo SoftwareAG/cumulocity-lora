@@ -1,0 +1,83 @@
+<div class="card-header">
+  <h4 class="card-title">
+    {{'Mobile' | translate}}</div>
+  </h4>
+</div>
+<hr>
+<div class="card-block">
+  <div class="row">
+    <div class="form-group col-md-6" >
+      <label for="msisdn">{{'MSISDN' | translate}}</label>
+      <input id="msisdn" type="text" class="form-control" ng-model="device.c8y_Mobile.msisdn">
+    </div>
+    <div class="form-group col-md-6" ng-if="device.c8y_Mobile.imsi">
+      <label for="imsi" class="noicon">{{'IMSI' | translate}}</label>
+      <p class="form-control-static">{{device.c8y_Mobile.imsi}}</p>
+    </div>
+
+    <div class="form-group col-md-6" ng-if="device.c8y_Mobile.imei">
+      <label for="imei" class="noicon">{{'IMEI' | translate}}</label>
+      <p class="form-control-static">{{device.c8y_Mobile.imei}}</p>
+    </div>
+    <div class="form-group col-md-6" >
+      <label for="iccid" class="noicon">{{'ICCID' | translate}}</label>
+      <input id="iccid" type="text" class="form-control" ng-model="device.c8y_Mobile.iccid">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-inline" ng-if="device.c8y_Mobile.currentOperator">
+        <label for="currentOperator" class="noicon">{{'Operator`mobile-network`' | translate}}</label>
+        <p class="form-control-static">{{device.c8y_Mobile.currentOperator}}</p>
+      </div>
+      <div class="form-inline" ng-if="device.c8y_Mobile.currentBand">
+        <label for="currentBand" class="noicon">{{'Band' | translate}}</label>
+        <p class="form-control-static">{{device.c8y_Mobile.currentBand}}</p>
+      </div>
+      <div class="form-inline" ng-if="device.c8y_Mobile.currentBand">
+        <label for="conn_type" class="noicon">{{'Access technology' | translate}}</label>
+        <p class="form-control-static">{{device.c8y_Mobile.connType}}</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-inline" ng-if="device.c8y_Mobile.rssi">
+        <label for="rssi" class="noicon">{{'Signal strength' | translate}}</label>
+        <p class="form-control-static">{{device.c8y_Mobile.rssi}}</p>
+      </div>
+      <div class="form-inline" ng-if="device.c8y_Mobile.ecn0">
+        <label for="ecn0" class="noicon">{{'Signal quality' | translate}}</label>
+        <p class="form-control-static">{{device.c8y_Mobile.ecn0}}</p>
+      </div>
+      <div class="form-inline" ng-if="device.c8y_Mobile.rcsp">
+        <label for="rcsp" class="noicon">{{'Received signal code power' | translate}}</label>
+        <p class="form-control-static">{{device.c8y_Mobile.rcsp}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-inline" ng-if="device.c8y_Mobile.mcc">
+        <label for="mcc" class="noicon">{{'MCC' | translate}}</label>
+        <p class="form-control-static">{{device.c8y_Mobile.mcc}}</p>
+      </div>
+      <div class="form-inline" ng-if="device.c8y_Mobile.mnc">
+        <label for="mnc" class="noicon">{{'MNC' | translate}}</label>
+        <p class="form-control-static">{{device.c8y_Mobile.mnc}}</p>
+      </div>
+      <div class="form-inline" ng-if="device.c8y_Mobile.lac">
+        <label for="lac" class="noicon">{{'LAC' | translate}}</label>
+        <p class="form-control-static">{{device.c8y_Mobile.lac}}</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-inline" ng-if="device.c8y_Mobile.cellId">
+        <label for="cellId" class="noicon">{{'Cell ID' | translate}}</label>
+        <p class="form-control-static">{{device.c8y_Mobile.cellId}}</p>
+      </div>
+      <div class="form-inline" ng-show="device.c8y_Mobile.mcc && device.c8y_Mobile.mnc && device.c8y_Mobile.lac && device.c8y_Mobile.cellId">
+        <label class="noicon">{{'OpenCellId' | translate}}</label>
+        <p class="form-control-static"><a target="_blank" rel="noopener noreferrer" ng-href="http://opencellid.org/#action=locations.cell&mcc={{device.c8y_Mobile.mcc}}&mnc={{device.c8y_Mobile.mnc}}&lac={{device.c8y_Mobile.lac}}&cellid={{device.c8y_Mobile.cellId}}" title="{{'Go to OpenCellID and see location' | translate}}">{{'Locate' | translate}}</a></p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<form name="jsonSchemaObjectForm" class="scroll-column-nested-content" novalidate>
+  <div class="inner-scroll">
+    <div class="card-block">
+      <c8y-schema-editor
+        schema="vm.jsonSchemaObject.c8y_JsonSchema"
+        on-change="vm.onSchemaChange(schema)"
+      >
+      </c8y-schema-editor>
+    </div>
+  </div>
+
+  <div class="card-footer separator text-center">
+    <button
+      title="{{ 'Cancel' | translate }}"
+      class="btn btn-default"
+      ng-click="vm.cancel()"
+      translate
+    >
+      Cancel
+    </button>
+    <button
+      title="{{ 'Remove' | translate }}"
+      class="btn btn-danger"
+      ng-if="vm.jsonSchemaObject.id"
+      ng-click="vm.remove()"
+      translate
+    >
+      Remove
+    </button>
+    <button
+      title="{{ 'Save' | translate }}"
+      class="btn btn-primary"
+      ng-click="vm.save()"
+      ng-disabled="jsonSchemaObjectForm.$invalid || jsonSchemaObjectForm.$pristine"
+      translate
+    >
+      Save
+    </button>
+  </div>
+</form>

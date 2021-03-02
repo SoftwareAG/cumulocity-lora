@@ -1,0 +1,23 @@
+<label><small ng-bind="vm.label | translate"></small></label>
+<div class="dashboard-preview-list">
+  <label class="dashboard-preview-item list-group-item" ng-repeat="option in vm.options">
+    <input
+      type="radio"
+      ng-checked="option.class === vm.selectedOption.class"
+      ng-click="vm.onOptionClicked(option)">
+
+    <div class="preview-label">
+      <span ng-bind-html="option.label | translate"></span>&nbsp;
+      <small
+        ng-show="option === vm.placeholderOption"
+        class="text-muted"
+        >
+        <em translate>Dashboard default</em>
+      </small>&nbsp;
+      <small
+        ng-show="option.description"
+        ng-bind-html="option.description">
+      </small>
+    </div>
+  </label>
+</div>

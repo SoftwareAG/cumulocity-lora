@@ -1,0 +1,53 @@
+{
+  "name": "Smart rules",
+  "ngModules": [
+    "c8y.smartRules"
+  ],
+  "category": "Realtime analytics",
+  "description": "Allows for managing Smart Rules for event processing.",
+  "css": [
+    "node_modules/angular-cron-jobs/dist/angular-cron-jobs.css",
+    "styles/paramInputAlarmType.css",
+    "styles/nameTextArea.css"
+  ],
+  "imports": [
+    "core/map",
+    "core/dataPointExplorer"
+  ],
+  "js": [
+    "node_modules/angular-cron-jobs/dist/angular-cron-jobs.js",
+    "index.js",
+    "controllers/list.js",
+    "controllers/add.js",
+    "controllers/edit.js",
+    "controllers/smartRuleParamInput.js",
+    "controllers/childAssetsSelector.js",
+    "services/smartRuleTemplates.js",
+    "services/smartRules.js",
+    "directives/smartRuleParamInput.js",
+    "directives/smartRuleParamInputAlarmSeverity.js",
+    "directives/smartRuleParamInputAlarmType.js",
+    "directives/smartRuleParamInputCheckbox.js",
+    "directives/smartRuleParamInputDashboard.js",
+    "directives/smartRuleParamInputDefault.js",
+    "directives/smartRuleParamInputEmail.js",
+    "directives/smartRuleParamInputEscalationSteps.js",
+    "directives/smartRuleParamInputExportConfiguration.js",
+    "directives/smartRuleParamInputFrequency.js",
+    "directives/smartRuleParamInputGeofence.js",
+    "directives/smartRuleParamInputKpi.js",
+    "directives/smartRuleParamInputNumber.js",
+    "directives/smartRuleParamInputOperation.js",
+    "directives/smartRuleParamInputPhoneNumber.js",
+    "directives/smartRuleParamInputSelect.js",
+    "directives/smartRuleParamInputTextarea.js",
+    "directives/smartRuleParamInputTimeInterval.js",
+    "directives/smartRuleParamWarnMaxLength.js",
+    "directives/childAssetsSelector.js",
+    "list/smartRulesList.component.js",
+    "add/addSmartRuleButton.component.js"
+  ],
+  "copy": [
+    "images/*"
+  ]
+}

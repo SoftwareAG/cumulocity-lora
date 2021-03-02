@@ -1,0 +1,58 @@
+<div class="title"></div>
+<form
+  class=""
+  data-ng-controller="LoginCtrl"
+  data-ng-submit="login(tenant, username, password, remember)"
+>
+  <div class="control-group" data-ng-show="showTenant">
+    <label class="control-label" for="inputTenant">{{ 'Tenant' | translate }}</label>
+    <div class="controls">
+      <input
+        type="text"
+        id="inputTenant"
+        placeholder="{{ 'Tenant' | translate }}"
+        data-ng-model="tenant"
+        autocorrect="off"
+        autocapitalize="off"
+        c8y-autocomplete="off"
+      />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="inputUser">{{ 'User' | translate }}</label>
+    <div class="controls">
+      <input
+        type="text"
+        id="inputUser"
+        placeholder="{{ 'Username' | translate }}"
+        data-ng-model="username"
+        autocorrect="off"
+        autocapitalize="off"
+        c8y-autocomplete="off"
+      />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="inputPassword">{{ 'Password' | translate }}</label>
+    <div class="controls">
+      <input
+        type="password"
+        id="inputPassword"
+        placeholder="{{ 'Password' | translate }}"
+        data-ng-model="password"
+        c8y-autocomplete="off"
+      />
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <label class="checkbox">
+        <input title="{{ 'Remember me' | translate }}" type="checkbox" data-ng-model="remember" />
+        {{ 'Remember me' | translate }}
+      </label>
+      <button title="{{ 'Sign in' | translate }}" type="submit" class="btn btn-block btn-large">
+        {{ 'Sign in' | translate }} <i class="{{ iconStatus() }}"></i>
+      </button>
+    </div>
+  </div>
+</form>

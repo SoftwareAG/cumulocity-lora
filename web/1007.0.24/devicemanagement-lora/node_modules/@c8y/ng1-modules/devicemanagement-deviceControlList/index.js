@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.parts.deviceControlList",[]).config(["c8yNavigatorProvider","c8yViewsProvider","gettext",function(e,t,i){var c=i("Overviews"),o="devicecontrol/single";e.addNavigation({parent:c,name:i("Device control"),priority:1360,icon:"c8y-device-control",path:o}),t.when("/".concat(o),{templateUrl:"".concat(":::PLUGIN_PATH:::/views/","index.html")})}]);

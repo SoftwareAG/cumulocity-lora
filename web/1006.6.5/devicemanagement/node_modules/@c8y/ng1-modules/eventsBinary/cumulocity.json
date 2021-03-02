@@ -1,0 +1,18 @@
+{
+  "name": "Events binary component",
+  "ngModules": [
+    "c8y.eventsBinary"
+  ],
+  "category": "",
+  "description": "Component which displays binary attached to event if available",
+  "css": [
+    "styles/style.css"
+  ],
+  "js": [
+    "eventsBinary.module.js",
+    "components/eventBinaryPreview/eventBinaryPreview.js",
+    "components/eventBinaryActions/eventBinaryActions.js",
+    "components/eventBinaryIcon/eventBinaryIcon.js",
+    "services/eventsBinary.service.js"
+  ]
+}

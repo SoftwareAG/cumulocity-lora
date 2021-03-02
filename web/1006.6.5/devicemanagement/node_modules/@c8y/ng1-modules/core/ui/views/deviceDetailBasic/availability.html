@@ -1,0 +1,59 @@
+<div class="card">
+  <div class="card-header">
+    <h4 class="card-title">{{'Connection monitoring' | translate}}</h4>
+  </div>
+  <hr>
+  <div class="card-block">
+    <div style="min-height:70px;">
+      <div>
+        <span  c8y-icon="{{status.sendStatus.icon}}"
+          ng-class="status.sendStatus.class" class="sendStatus" style="font-size: 30px; vertical-align: middle;" uib-tooltip-html="status.sendStatus.tooltip | translate">
+        </span>
+        <span ng-if="!!status.sendStatus" class="description" ng-class="status.sendStatus.class" >{{parseAvailability(status.sendStatus.status) | translate}}</span>
+      </div>
+
+      <div>
+        <span ng-if="!!status.pushStatus" c8y-icon="{{status.pushStatus.icon}}" ng-class="status.pushStatus.class" class="pushStatus" style="font-size: 30px; vertical-align: middle;">
+        </span>
+        <span ng-if="!!status.pushStatus" class="description" ng-class="status.pushStatus.class">{{status.pushStatus.tooltip | translate}}</span>
+      </div>
+
+      <div>
+        <span ng-if="!!status.maintenanceStatus" c8y-icon="{{status.maintenanceStatus.icon}}"
+          ng-class="status.maintenanceStatus.class" class="maintenanceStatus" style="font-size: 30px; vertical-align: middle;">
+        </span>
+        <span ng-if="!!status.maintenanceStatus" class="description maintenanceStatus">{{parseAvailability('MAINTENANCE') | translate}}</span>
+      </div>
+    </div>
+
+
+    <div class="legend form-block">{{'Last communication' | translate}}</div>
+    <p>{{device.c8y_Availability.lastMessage|absoluteDate}}</p>
+
+    <div class="legend form-block">{{'Required interval' | translate}}</div>
+    <div ng-class="{'has-error': invalid('required_availability')}"
+         style="max-width:70px; display:inline-block;">
+         <input id="required_availability"
+                name="required_availability"
+                class="form-control"
+                placeholder="{{'e.g.' | translate}} 1"
+                ng-disabled="device.c8y_RequiredAvailability.responseInterval < 0"
+                ng-model="display.responseInterval"
+                c8y-number
+                c8y-max="maxRequiredIntervalLimit"
+                c8y-min="0"
+                uib-tooltip="{{validationHints(infoForm.required_availability)}}">
+    </div>
+    <span translate>minutes</span>
+    <br>
+    <br>
+    <div ng-if="device.c8y_Availability && device.c8y_RequiredAvailability">
+      <label class="c8y-switch" ng-click="switchMaintenance(device); ">
+        <input type="checkbox" ng-checked="status.maintenanceStatus">
+        <span></span>
+        <span translate ng-show="!!status.maintenanceStatus">Maintenance on</span>
+        <span translate ng-hide="!!status.maintenanceStatus">Maintenance off</span>
+      </label>
+    </div>
+  </div>
+</div>

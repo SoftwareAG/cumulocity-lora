@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Demo model",
+    "description": "Sample device model",
+    "category": "Demo",
+    "minFieldbusUI": 4,
+    "id": "Demo_1.0",
+    "fieldbusType": "modbus"
+  },
+  {
+    "name": "Windmill PLC",
+    "minFieldbusUI": 4,
+    "id": "Windmill_PLC",
+    "fieldbusType": "modbus"
+  }
+]

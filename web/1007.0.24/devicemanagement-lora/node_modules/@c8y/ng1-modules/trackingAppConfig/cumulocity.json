@@ -1,0 +1,15 @@
+{
+  "name": "Tracking app configuration",
+  "ngModules": [
+    "c8y.tracking.plugin"
+  ],
+  "category": "",
+  "icon": "cog",
+  "description": "Configures tracking app to work with existing plugins such as deviceListMap and tracking",
+  "js": [
+    "index.js"
+  ],
+  "css": [
+    "css/style.css"
+  ]
+}

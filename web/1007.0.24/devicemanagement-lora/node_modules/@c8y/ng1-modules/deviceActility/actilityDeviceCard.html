@@ -1,0 +1,69 @@
+<div class="card-group">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title" translate>
+          LoRa device
+        </h4>
+      </div>
+      <hr />
+      <div class="card-block">
+        <div class="form-group">
+          <div class="form-group">
+            <label translate>Deprovision device from ThingPark</label>
+          </div>
+          <div class="form-group" ng-show="vm.device.childDevices.references.length > 0">
+            <div class="checkbox">
+              <label>
+                <input
+                  title="{{ 'Including child devices of this device' | translate }}"
+                  type="checkbox"
+                  name="deprovisionChildren"
+                  ng-model="vm.deviceChildren.deprovision"
+                />
+                {{ 'Including child devices of this device' | translate }}
+              </label>
+            </div>
+          </div>
+          <button
+            title="{{ 'Deprovision' | translate }}"
+            type="button"
+            class="btn btn-primary"
+            ng-click="vm.deprovisionDevice()"
+            ng-disabled="!vm.device.c8y_LpwanDevice.provisioned"
+            translate
+          >
+            Deprovision
+          </button>
+        </div>
+      </div>
+      <div class="card-block">
+        <div class="form-group">
+          <label translate>Delete device without deprovisioning</label>
+        </div>
+        <div class="form-group" ng-show="vm.device.childDevices.references.length > 0">
+          <div class="checkbox">
+            <label>
+              <input
+                title="{{ 'Including child devices of this device' | translate }}"
+                type="checkbox"
+                name="deleteChildren"
+                ng-model="vm.deviceChildren.del"
+              />
+              {{ 'Including child devices of this device' | translate }}
+            </label>
+          </div>
+        </div>
+        <button
+          title="{{ 'Delete' | translate }}"
+          type="button"
+          class="btn btn-primary"
+          ng-click="vm.deleteDevice()"
+          translate
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

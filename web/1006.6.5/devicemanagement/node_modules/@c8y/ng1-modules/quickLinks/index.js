@@ -1,0 +1,1 @@
+"use strict";!function(){function i(i,e){i.add({name:"Quick links",description:e("Displays a panel with quick links"),templateUrl:":::PLUGIN_PATH:::/views/component.html",previewImage:":::PLUGIN_PATH:::/img/quick-links-widget-pr.png",options:{noDeviceTarget:!0}})}i.$inject=["c8yComponentsProvider","gettext"],angular.module("c8y.welcome.quickLinks",[]).config(i)}();

@@ -1,0 +1,17 @@
+{
+  "name": "Event list component",
+  "ngModules": [
+    "c8y.eventList"
+  ],
+  "category": "",
+  "icon": "rss",
+  "color": "#F03F0F",
+  "description": "A configurable component that display list of events depending on the type or device target",
+  "js": [
+    "index.js",
+    "eventList.controller.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

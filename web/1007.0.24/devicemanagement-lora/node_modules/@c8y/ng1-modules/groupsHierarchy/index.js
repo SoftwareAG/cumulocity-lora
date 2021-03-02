@@ -1,0 +1,1 @@
+"use strict";!function(){t.$inject=["groupTypesHierarchyNavigator"],i.$inject=["c8yGroupsHierarchyUiProvider"];var r=_.identity;function i(r){r.init()}function t(r){r.loadAll()}angular.module("c8y.groupsHierarchy",["c8y.deviceSelector"]).constant("parentNavigatorItemName",r("Groups")).constant("groupsHierarchyPluginPath",":::PLUGIN_PATH:::").config(i).run(t)}();

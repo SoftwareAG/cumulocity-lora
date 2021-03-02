@@ -1,0 +1,15 @@
+<div ng-controller="RendererButtonCtrl">
+  <button
+    title="{{ getBtnText(config.label) | translate }}"
+    class="btn btn-xs btn-primary"
+    ng-class="{'btn-pending': pending}"
+    ng-click="click()"
+    ng-disabled="disabled || pending"
+    ng-hide="hidden || !isApplicable()"
+  >
+    {{ getBtnText(config.label) | translate }}
+  </button>
+  <div ng-show="hidden || !isApplicable()" uib-tooltip="{{ 'N/A' | translate }}">
+    &ndash;
+  </div>
+</div>

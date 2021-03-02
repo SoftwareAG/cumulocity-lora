@@ -1,0 +1,82 @@
+<c8y-ui-title-set
+  title="'License management' | translate">
+</c8y-ui-title-set>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="c8y-empty-state text-center"
+      ng-show="vm.licenses.length == 0">
+      <h1 class="c8y-icon c8y-icon-book c8y-icon-duocolor"></h1>
+      <h3 translate>No licenses to display.</h3>
+    </div>
+    <div class="list-group">
+      <div class="list-group-item flex-row"
+        ng-repeat="license in vm.licenses">
+        <div class="list-item-actions">
+          <div class="dropdown settings"
+            uib-dropdown>
+            <button class="dropdown-toggle c8y-dropdown"
+              uib-dropdown-toggle
+              title="{{ 'Actions' | translate }}">
+              <i c8y-icon="ellipsis-v"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right"
+              uib-dropdown-menu>
+              <li>
+                <a title="{{ 'Delete license' | translate}}" ng-click="::$event.stopPropagation(); vm.remove(license)">
+                  <i c8y-icon="trash"></i> {{'Delete license' | translate}}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="list-item-icon">
+          <i c8y-icon="c8y-book"></i>
+        </div>
+        <div class="list-item-body">
+          <div class="row">
+              <div class="col-xs-10 text-truncate"
+              title="{{license.key}}">
+              {{license.key}}
+          </div>
+            <div class="col-xs-2 pull-right">
+              <i c8y-icon="check-circle" class="text-success" ></i> <small>{{ 'Valid' | translate}}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <form name="addLicenseForm" novalidate>
+      <div class="card">
+        <div class="card-block">
+          <div class="form-group">
+            <label translate>Add tenant license</label>
+            <input
+              type="text"
+              class="form-control"
+              name="license"
+              ng-model="vm.licenseKey"
+              placeholder="{{'e.g.' | translate}} xyz.com.licence=fd3007cb8ec14fbc532f5ad66fb1679440b76335c95351fd47ce8bb5f9644985e470"
+              required
+              >
+              <c8y-error-feedback field="addLicenseForm.license">
+              </c8y-error-feedback>
+          </div>
+        </div>
+        <div class="card-footer separator">
+          <button
+            title="{{ 'Add' | translate}}" 
+            class="btn btn-primary"
+            ng-disabled="addLicenseForm.$invalid || addLicenseForm.$pristine"
+            ng-click="vm.save(addLicenseForm)"
+            translate
+          >
+            Add
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

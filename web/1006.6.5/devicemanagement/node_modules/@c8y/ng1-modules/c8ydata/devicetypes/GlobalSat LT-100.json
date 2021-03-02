@@ -1,0 +1,737 @@
+{
+  "c8y_ModbusDeviceTypeInfo": {
+    "name": "GlobalSat LT-100",
+    "minFieldbusUI": 4,
+    "fieldbusType": "actility"
+  },
+  "c8y_MessageIdConfiguration": {
+    "source" : "PAYLOAD",
+    "messageIdMapping": {
+      "startBit": 10,
+      "noBits":6
+    }
+  },
+  "c8y_Coils": [],
+  "c8y_Registers": [
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 2,
+      "name": "Battery capacity",
+      "category": "Periodic mode report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 2,
+      "managedObjectMapping": {
+        "innerType": "lat",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Latitude",
+      "eventMapping": {
+        "innerType": "lat",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Periodic mode report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 2,
+      "managedObjectMapping": {
+        "innerType": "lng",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Longitude",
+      "eventMapping": {
+        "innerType": "lng",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Periodic mode report"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 4,
+      "name": "Battery capacity",
+      "category": "Static report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 4,
+      "managedObjectMapping": {
+        "innerType": "lat",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Latitude",
+      "eventMapping": {
+        "innerType": "lat",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Static report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 4,
+      "managedObjectMapping": {
+        "innerType": "lng",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Longitude",
+      "eventMapping": {
+        "innerType": "lng",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Static report"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 5,
+      "name": "Battery capacity",
+      "category": "Moving report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 5,
+      "managedObjectMapping": {
+        "innerType": "lat",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Latitude",
+      "eventMapping": {
+        "innerType": "lat",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Moving report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 5,
+      "managedObjectMapping": {
+        "innerType": "lng",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Longitude",
+      "eventMapping": {
+        "innerType": "lng",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Moving report"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 6,
+      "name": "Battery capacity",
+      "category": "Static to moving report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 6,
+      "managedObjectMapping": {
+        "innerType": "lat",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Latitude",
+      "eventMapping": {
+        "innerType": "lat",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Static to moving report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 7,
+      "managedObjectMapping": {
+        "innerType": "lng",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Longitude",
+      "eventMapping": {
+        "innerType": "lng",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Static to moving report"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 7,
+      "name": "Battery capacity",
+      "category": "Moving to static report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 7,
+      "managedObjectMapping": {
+        "innerType": "lat",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Latitude",
+      "eventMapping": {
+        "innerType": "lat",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Moving to static report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 7,
+      "managedObjectMapping": {
+        "innerType": "lng",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Longitude",
+      "eventMapping": {
+        "innerType": "lng",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Moving to static report"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 14,
+      "name": "Battery capacity",
+      "category": "Help report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 14,
+      "managedObjectMapping": {
+        "innerType": "lat",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Latitude",
+      "eventMapping": {
+        "innerType": "lat",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Help report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 14,
+      "managedObjectMapping": {
+        "innerType": "lng",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Longitude",
+      "eventMapping": {
+        "innerType": "lng",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Help report"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 15,
+      "name": "Battery capacity",
+      "category": "Low battery alarm report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 15,
+      "managedObjectMapping": {
+        "innerType": "lat",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Latitude",
+      "eventMapping": {
+        "innerType": "lat",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Low battery alarm report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 15,
+      "managedObjectMapping": {
+        "innerType": "lng",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Longitude",
+      "eventMapping": {
+        "innerType": "lng",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Low battery alarm report"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 17,
+      "name": "Battery capacity",
+      "category": "Power on (temperature)"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 17,
+      "managedObjectMapping": {
+        "innerType": "lat",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Latitude",
+      "eventMapping": {
+        "innerType": "lat",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Power on (temperature)"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 17,
+      "managedObjectMapping": {
+        "innerType": "lng",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Longitude",
+      "eventMapping": {
+        "innerType": "lng",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Power on (temperature)"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 19,
+      "name": "Battery capacity",
+      "category": "Power off (low battery)"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 19,
+      "managedObjectMapping": {
+        "innerType": "lat",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Latitude",
+      "eventMapping": {
+        "innerType": "lat",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Power off (low battery)"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 19,
+      "managedObjectMapping": {
+        "innerType": "lng",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Longitude",
+      "eventMapping": {
+        "innerType": "lng",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Power off (low battery)"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 20,
+      "name": "Battery capacity",
+      "category": "Power off (temperature)"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 20,
+      "managedObjectMapping": {
+        "innerType": "lat",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Latitude",
+      "eventMapping": {
+        "innerType": "lat",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Power off (temperature)"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.000001,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 20,
+      "managedObjectMapping": {
+        "innerType": "lng",
+        "fragmentType": "c8y_Position"
+      },
+      "name": "Longitude",
+      "eventMapping": {
+        "innerType": "lng",
+        "text": "Location updated",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_LocationUpdate"
+      },
+      "category": "Power off (temperature)"
+    }
+  ]
+}

@@ -54,6 +54,7 @@ import c8y.Hardware;
 import c8y.LpwanDevice;
 import lora.codec.C8YData;
 import lora.common.C8YUtils;
+import lora.common.ValidationResult;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
 import lora.ns.connector.LNSConnectorRepresentation;
@@ -239,7 +240,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		ManagedObjectRepresentation mor = null;
 		String errorMessage = null;
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
-		if (connector.isPresent() && connector.get().provisionDevice(deviceProvisioning)) {
+		ValidationResult validationResult = deviceProvisioning.validate();
+		if (validationResult.isOk() && connector.isPresent() && connector.get().provisionDevice(deviceProvisioning)) {
 			Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(deviceProvisioning.getDevEUI().toLowerCase(),
 					DEVEUI_TYPE);
 			if (!extId.isPresent()) {
@@ -275,6 +277,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			if (connector.isPresent()) {
 				errorMessage = "Couldn't provision device " + deviceProvisioning.getDevEUI() + " in LNS connector "
 						+ lnsInstanceId;
+				if (!validationResult.isOk()) {
+					errorMessage += validationResult.getReason();
+				}
 			} else {
 				errorMessage = "LNS connector Id '" + lnsInstanceId
 						+ "' doesn't exist. Please use a valid managed object Id.";

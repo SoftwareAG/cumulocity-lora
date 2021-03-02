@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yCheckDirty",function(){return{restrict:"A",require:"?^form",link:function(i,r,t,e){if(e){var c=!1;i.$watch(t.c8yCheckDirty,function(i,r){c&&!_.isUndefined(r)&&e.$setDirty(),c=!0},!0)}}}});

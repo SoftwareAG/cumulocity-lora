@@ -1,0 +1,116 @@
+<div class="dashboard" ng-class="getApplicableDashboardClasses(dashboard)">
+  <c8y-ui-action-bar-set ng-if="showBar()">
+    <button
+      title="{{ 'Add widget to dashboard' | translate }}"
+      class="btn btn-link"
+      ng-click="addChild()"
+      ng-disabled="!canWriteToDashboard()"
+    >
+      <i c8y-icon="plus-circle"></i> <translate>Add widget</translate>
+    </button>
+
+    <li ng-transclude="edit">
+      <button
+        title="{{ 'Edit dashboard' | translate }}"
+        class="btn btn-link"
+        ng-disabled="!canWriteToDashboard()"
+        ng-click="editDashboard()"
+      >
+        <i c8y-icon="pencil"></i> <translate>Edit</translate>
+      </button>
+    </li>
+
+    <button
+      title="{{ 'Toggle full screen' | translate }}"
+      class="btn btn-link"
+      ng-click="toggleFullscreen()"
+    >
+      <i c8y-icon="{{ fullScreen() ? 'compress' : 'expand' }}"></i>
+      <translate>Full screen</translate>
+    </button>
+
+    <li class="navbar-form">
+      <button
+        title="{{ 'Lock/unlock this dashboard' | translate }}"
+        class="btn btn-default"
+        ng-model="dashboardLocked"
+        ng-change="toggleLock()"
+        ng-disabled="changingLock || !canUnlock"
+        uib-btn-checkbox
+      >
+        <i c8y-icon="{{ isLocked(dashboard) ? 'lock' : 'unlock' }}"></i>
+      </button>
+    </li>
+
+    <button
+      action-bar-position="more"
+      title="{{ 'Copy dashboard' | translate }}"
+      ng-hide="isNamed"
+      ng-click="copyDashboard()"
+    >
+      <i c8y-icon="clone"></i> <translate>Copy dashboard</translate>
+    </button>
+
+    <button
+      action-bar-position="more"
+      title="{{ 'Delete dashboard' | translate }}"
+      ng-click="removeDashboard()"
+      ng-hide="isNamed"
+      ng-disabled="!canWriteToDashboard()"
+    >
+      <i c8y-icon="trash"></i> <translate>Delete dashboard</translate>
+    </button>
+
+    <button
+      action-bar-position="more"
+      title="{{ 'Restore default dashboard' | translate }}"
+      ng-click="restoreDefault()"
+      ng-show="isRestorable()"
+      ng-disabled="!canWriteToDashboard()"
+    >
+      <i c8y-icon="undo"></i> <translate>Restore dashboard</translate>
+    </button>
+
+    <button
+      action-bar-position="more"
+      title="{{ 'Send dashboard via email' | translate }}"
+      ng-click="sendViaEmail()"
+      ng-show="showSendViaEmail"
+    >
+      <i c8y-icon="paper-plane"></i> <translate>Send via email</translate>
+    </button>
+
+    <li action-bar-position="more" ng-transclude="actions"></li>
+  </c8y-ui-action-bar-set>
+
+  <!-- empty state -->
+  <div class="c8y-empty-state text-center" ng-show="nochildren">
+    <h1 class="c8y-icon c8y-icon-device c8y-icon-duocolor"></h1>
+    <h3 translate>No widgets to display.</h3>
+    <div ng-show="canWriteToDashboard()">
+      <p translate>Add widgets to this dashboard.</p>
+      <p>
+        <button
+          title="{{ 'Add widget' | translate }}"
+          ng-click="addChild()"
+          class="btn btn-primary"
+          translate
+        >
+          Add widget
+        </button>
+      </p>
+      <p c8y-guide-docs>
+        <small translate
+          >Find out more in the
+          <a c8y-guide-href="users-guide/cockpit/#dashboards">User guide`KEEP_ORIGINAL`</a>.</small
+        >
+      </p>
+    </div>
+  </div>
+  <!-- /.empty state -->
+
+  <div
+    class="dashboard-container grid-stack"
+    ng-style="getApplicableDashboardStyles(dashboard)"
+  ></div>
+</div>

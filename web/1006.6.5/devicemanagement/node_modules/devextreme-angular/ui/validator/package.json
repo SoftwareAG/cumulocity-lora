@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-validator.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-validator.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-validator.js",
+  "esm5": "../../esm5/ui/validator/devextreme-angular-ui-validator.js",
+  "esm2015": "../../esm2015/ui/validator/devextreme-angular-ui-validator.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-validator.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-validator.js",
+  "typings": "devextreme-angular-ui-validator.d.ts",
+  "metadata": "devextreme-angular-ui-validator.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/validator"
+}

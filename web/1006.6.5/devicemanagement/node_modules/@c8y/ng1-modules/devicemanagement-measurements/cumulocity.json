@@ -1,0 +1,17 @@
+{
+  "name": "Device measurements",
+  "ngModules": [
+    "c8y.parts.measurements"
+  ],
+  "category": "Device",
+  "icon": "bell",
+  "color": "#F2DF0F",
+  "description": "Show measurement graphs for individual devices.",
+  "js": [
+    "index.js"
+  ],
+  "folderName": "measurements",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

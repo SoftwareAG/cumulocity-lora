@@ -1,0 +1,10 @@
+{
+    "name": "SIGFOX mappings",
+    "ngModules": [
+      "c8y.sigfox"
+    ],
+    "js": [
+      "sigfox.module.js",
+      "sigfox-device.provider.js"
+    ]
+  }

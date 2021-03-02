@@ -1,0 +1,80 @@
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+.axis text {
+  font-size:10px;
+}
+
+.c8yGraphContainer {
+  position: relative;
+}
+
+.graphHoverInfoCurrent,
+.graphHoverInfo {
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+  padding: 5px;
+  color: #666;
+  font-size: 12px;
+  position: absolute;
+  width: 250px;
+}
+
+.graphHoverInfo {
+  top: 0;
+}
+
+.graphHoverInfoCurrent {
+  width: 130px;
+  box-shadow: none;
+  z-index: 1000;
+}
+
+.graphHoverInfo .colorbox {
+  width: 5px;
+  height: 10px;
+  display: inline-block;
+}
+
+.graphHoverInfo .seriesTitle {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin: 0;
+  margin-top:5px;
+  padding: 0;
+}
+
+.c8yGraphFill {
+  position : relative;
+}
+
+.c8yGraphFill .c8yGraphContainer {
+  position: absolute;
+  top: 0;
+  bottom: 50px;
+  right: 0;
+  left: 0;
+}
+
+.c8yGraphContainer .axis .tick line,
+.c8yGraphContainer .axis .domain {
+  stroke: #CCC;
+}
+
+.rightAlignCalendar {
+  position: relative;
+}
+
+.rightAlignCalendar .dropdown-menu{
+  left: -193px !important;
+}

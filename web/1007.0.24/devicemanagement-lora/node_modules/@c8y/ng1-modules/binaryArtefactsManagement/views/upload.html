@@ -1,0 +1,36 @@
+<div class="modal-header separator" ng-show="title">
+  <h3>{{ title | translate }}</h3>
+</div>
+<div class="modal-inner-scroll">
+  <div class="modal-body">
+    <form role="form" name="filesUploadForm" novalidate>
+      <div class="form-group">
+        <label translate>Files to upload</label>
+        <file-picker
+          files="files"
+          multiple="true"
+          required="filesRequired"
+          disabled="uploading"
+        ></file-picker>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="modal-footer">
+  <button title="{{ 'Cancel' | translate }}" class="btn btn-default" ng-click="dismiss()" translate>
+    Cancel
+  </button>
+  <button
+    class="btn btn-primary"
+    ng-class="{'btn-pending': uploading}"
+    ng-click="upload()"
+    ng-disabled="filesUploadForm.$invalid || !canUpload() || uploading"
+  >
+    <span title="{{ 'Upload' | translate }}" ng-hide="uploading">
+      {{ 'Upload' | translate }}
+    </span>
+    <span title="{{ 'Uploading' | translate }}…" ng-show="uploading">
+      {{ 'Uploading' | translate }}… ({{ uploadProgress | number: 0 }}%)
+    </span>
+  </button>
+</div>

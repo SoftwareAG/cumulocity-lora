@@ -1,0 +1,22 @@
+{
+  "name": "Branding: Cumulocity",
+  "category": "Branding",
+  "description": "Branding for Cumulocity",
+  "copy": [
+    {
+      "files": "img/*",
+      "webpackIgnore": true
+    },
+    {
+      "files": "assets/*",
+      "webpackIgnore": true
+    },
+    {
+      "files": "font/*",
+      "webpackIgnore": true
+    }
+  ],
+  "less": [
+    "branding.less"
+  ]
+}

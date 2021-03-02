@@ -1,0 +1,1 @@
+"use strict";!function(){function i(i){i.add({name:"sigfox",featureAppName:"sigfox-agent",label:"Sigfox",flow:{single:["sigfox","finish"],multiple:["providers-list","sigfox","finish"]}})}i.$inject=["c8yDeviceProvidersProvider"],angular.module("c8y.deviceRegistrationSigfox",["c8y.deviceRegistration"]).config(i)}();

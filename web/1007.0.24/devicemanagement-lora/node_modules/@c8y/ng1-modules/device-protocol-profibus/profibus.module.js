@@ -1,0 +1,1 @@
+"use strict";!function(){function i(i){i.initUi()}function e(i){i.registerFeaturesManifest()}e.$inject=["c8yProfibusDevice"],i.$inject=["c8yProfibusDeviceProvider"],angular.module("c8y.profibus",["c8y.deviceProtocols","c8y.deviceDatabase4"]).config(i).run(e)}();

@@ -1,0 +1,80 @@
+<form name="addOperationForm" novalidate>
+  <div class="modal-header" ng-show="title">
+    <h3>{{ title | translate }}</h3>
+  </div>
+  <div class="modal-body">
+    <div
+      class="form-group col-lg-12"
+      ng-class="{'has-error': addOperationForm.$dirty && addOperationForm.$invalid}"
+    >
+      <textarea
+        c8y-code-editor="json"
+        class="form-control"
+        name="operation"
+        ng-model="operation.json"
+        uib-tooltip="{{ placeholder(param) | translate }}"
+        style="height: 250px;"
+        required
+      ></textarea>
+    </div>
+    <div class="input-group">
+      <ui-select ng-model="operation.chosen">
+        <ui-select-match placeholder="{{ 'Select or search operation' | translate }}">
+          <div>
+            <span class="list-group-item-heading"
+              >{{ $select.selected.name }}
+              <small ng-show="$select.selected.category" class="text-muted">{{
+                $select.selected.category
+              }}</small></span
+            >
+            <span class="list-group-item-text"
+              ><small class="text-muted">{{ $select.selected.text | translate }}</small></span
+            >
+          </div>
+        </ui-select-match>
+        <ui-select-choices repeat="operation in commandTemplates | filter: $select.search">
+          <div>
+            <span class="list-group-item-heading"
+              >{{ operation.name }}
+              <small ng-show="operation.category" class="text-muted">{{
+                operation.category
+              }}</small></span
+            >
+            <span class="list-group-item-text"
+              ><small class="text-muted">{{ operation.text | translate }}</small></span
+            >
+          </div>
+        </ui-select-choices>
+      </ui-select>
+      <span class="input-group-btn" style="vertical-align: top">
+        <button
+          title="{{ 'Use this operation' | translate }}" 
+          class="btn btn-primary"
+          type="button"
+          ng-click="chooseOperation(operation.chosen)"
+        >
+          <i c8y-icon="share"></i>
+        </button>
+      </span>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button
+      title="{{ 'Cancel' | translate }}" 
+      class="btn btn-default"
+      ng-click="dismiss()"
+      translate
+    >
+      Cancel
+    </button>
+    <button
+      title="{{ 'Add' | translate }}"
+      class="btn btn-primary"
+      data-ng-disabled="addOperationForm.$invalid"
+      ng-click="close()"
+      translate
+    >
+      Add
+    </button>
+  </div>
+</form>

@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").filter("dateOnly",function(){return function(t){var n,r=t;return t&&(n=moment(t)),n&&n.isValid()&&(r=n.format("LL")),r}}).filter("timeOnly",function(){return function(t){var n,r=t;return t&&(n=moment(t)),n&&n.isValid()&&(r=n.format("HH:mm:ss")),r}});

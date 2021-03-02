@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").filter("humanize2",function(){return function(e){var r=e||"";return r=r.replace(/\./g," ").replace(/c8y[\s,_]*/gi,"").replace(/([A-Z][a-z])/g," $1").replace(/^\$\.?/,"").replace(/^\s*/,"").replace(/\s*$/,"").replace(/\s+/g," "),_.capitalize(r)}});

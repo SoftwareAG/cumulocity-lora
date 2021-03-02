@@ -1,0 +1,6 @@
+<div ng-transclude>
+  <button title="{{ vm.label | translate }}" class="btn btn-link" ng-click="vm.add()">
+    <i c8y-icon="{{ vm.icon || 'plus-square' }}"></i>
+    <span ng-bind="(vm.label | translate) || ('New' | translate)"></span>
+  </button>
+</div>

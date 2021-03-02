@@ -1,0 +1,6 @@
+{
+  "description": "Contains the data static data",
+  "c8yData": true,
+  "onlyModuleNameContextPath": true,
+  "folderName": "c8ydata"
+}

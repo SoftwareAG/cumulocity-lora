@@ -1,0 +1,40 @@
+/**
+* DevExtreme (widgets/ios7/dropDownList.ios7.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./dropDownEditor.ios7.less";
+@import (once) "./list.ios7.less";
+
+.dx-dropdownlist-popup-wrapper {
+    height: 100%;
+
+    .dx-overlay-content {
+        max-height: 50%;
+    }
+
+    .dx-popup-content {
+        padding: 0;
+        height: 100%;
+    }
+
+    .dx-list {
+        height: 100%;
+
+        &:not(.dx-list-select-decorator-enabled) .dx-list-item-content {
+            padding: 0.5em 1em;
+
+            &:after {
+                display: none;
+            }
+        }
+    }
+
+    .dx-scrollview-content {
+        position: static;
+        overflow: hidden;
+    }
+}

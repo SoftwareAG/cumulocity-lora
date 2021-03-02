@@ -1,0 +1,1 @@
+"use strict";!function(){function n(t){return t}!function(){try{angular.module("gettext")}catch(t){angular.module("gettext",[]).constant("gettext",n).constant("gettextCatalog",{getString:n})}}(),angular.module("c8y.core",["ngRoute","angularFileUpload","gettext"]).constant("c8yConfig",window.c8yConfig)}();

@@ -1,0 +1,1 @@
+"use strict";!function(){try{var i=require("ini/ini.js");angular.module("c8y.deviceDatabase4").constant("ini",i)}catch(i){if(!window.jasmine)throw i}}();

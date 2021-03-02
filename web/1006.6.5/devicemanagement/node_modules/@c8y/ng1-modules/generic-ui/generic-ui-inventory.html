@@ -1,0 +1,64 @@
+<div ng-if="!vm.onlyBasicOperations" class="scroll-column-nested-content">
+  <div class="card-header separator">
+    <h4>{{ vm.title }}</h4>
+  </div>
+  <div class="inner-scroll" ng-form="MainForm">
+    <div class="list-group">
+      <c8y-generic-ui-inventory-property
+        ng-repeat="property in vm.mutatedProperties"
+        property="property"
+        operations="property.operationList"
+        context="vm.context"
+        class="list-group-item"
+        create-operation="vm.createOperation(operation, name, property)"
+      >
+      </c8y-generic-ui-inventory-property>
+    </div>
+  </div>
+  <div class="card-footer separator" ng-show="vm.showSave">
+    <button
+      title="{{ 'Save' | translate }}"
+      class="btn btn-primary"
+      ng-disabled="MainForm.$invalid || MainForm.$pristine || vm.saving"
+      ng-click="vm.save()"
+      translate
+    >
+      Save
+    </button>
+  </div>
+</div>
+
+<div ng-if="vm.onlyBasicOperations">
+  <c8y-generic-ui-operation-list-button
+    ng-click="$event.stopPropagation()"
+    operations="vm.propertyContainsBasicOperations.operationList"
+    modal-title="{{ vm.title }}"
+    context="vm.context"
+  >
+  </c8y-generic-ui-operation-list-button>
+
+  <div
+    class="dropdown card-actions"
+    style="top:0;"
+    uib-dropdown
+    ng-click="$event.stopPropagation()"
+    dropdown-append-to-body="true"
+  >
+    <button
+      type="button"
+      title="{{ 'Settings' | translate }}"
+      class="dropdown-toggle c8y-dropdown"
+      uib-dropdown-toggle
+    >
+      <i c8y-icon="ellipsis-v"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+      <li ng-repeat="basicOperation in vm.propertyContainsBasicOperations.operations">
+        <a title="{{ basicOperation.name | translate }}" href="" ng-click="vm.execute($index)">
+          <i c8y-icon="{{ vm.getIcon($index) }}"></i>
+          {{ basicOperation.name | translate }}
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>

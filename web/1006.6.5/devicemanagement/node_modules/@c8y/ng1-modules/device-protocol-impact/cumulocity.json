@@ -1,0 +1,13 @@
+{
+  "name": "IMPACT mappings",
+  "ngModules": [
+    "c8y.impact"
+  ],
+  "js": [
+    "impact.module.js",
+    "impact.provider.js",
+    "impact-create-step.component.js",
+    "impact-detail.component.js",
+    "impact-resource.component.js"
+  ]
+}

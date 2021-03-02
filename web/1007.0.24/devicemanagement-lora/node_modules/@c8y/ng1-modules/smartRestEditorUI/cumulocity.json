@@ -1,0 +1,14 @@
+{
+  "name": "SmartREST 2.0 templates editor UI",
+  "ngModules": [
+    "c8y.smartRestEditorUI"
+  ],
+  "category": "SmartREST",
+  "description": "Add UI for defining SmartREST 2.0 templates for communication of IoT devices with Cumulocity.",
+  "imports": [
+    "core/smartRestEditor"
+  ],
+  "js": [
+    "index.js"
+  ]
+}

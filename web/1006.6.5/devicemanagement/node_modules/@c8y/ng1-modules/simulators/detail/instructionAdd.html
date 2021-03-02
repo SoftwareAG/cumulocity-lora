@@ -1,0 +1,20 @@
+<div class="tight-grid">
+  <div class="col-xs-6">
+    <button
+      title="{{ 'Add instruction' | translate }}"
+      class="btn-add-block"
+      ng-click="vm.addType('message')"
+    >
+      <i c8y-icon="{{ vm.icons.message }}"></i> {{ 'Add instruction' | translate }}
+    </button>
+  </div>
+  <div class="col-xs-6">
+    <button
+      title="{{ 'Add sleep' | translate }}"
+      class="btn-add-block"
+      ng-click="vm.addType('sleep')"
+    >
+      <i c8y-icon="{{ vm.icons.sleep }}"></i> {{ 'Add sleep' | translate }}
+    </button>
+  </div>
+</div>

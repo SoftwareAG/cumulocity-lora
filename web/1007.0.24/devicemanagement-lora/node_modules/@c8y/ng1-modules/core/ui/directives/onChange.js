@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yOnChange",function(){return{restrict:"A",scope:{c8yOnChange:"&"},link:function(c,n){n.bind("change",function(n){c.$apply(function(){c.c8yOnChange({event:n})})})}}});

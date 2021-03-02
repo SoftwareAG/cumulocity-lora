@@ -1,0 +1,106 @@
+<form name="addIconMapForm" novalidate>
+  <div class="modal-header">
+    <h3 translate>Icon configuration</h3>
+  </div>
+  <div class="modal-body">
+    <table class="table table-condensed table-vertical-middle">
+      <thead>
+        <tr>
+          <th class="col-lg-3" translate>Property</th>
+          <th class="col-lg-3" translate>Comparison</th>
+          <th class="col-lg-2" translate>Value</th>
+          <th class="col-lg-2" translate>Icon</th>
+          <th class="col-lg-2" translate>Color</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="map in iconMap.map track by $index">
+          <td>
+            <tt ng-bind="iconMap.actionType"></tt>
+          </td>
+          <td>
+            <ui-select ng-model="map.comparison">
+              <ui-select-match placeholder="{{ 'Select or search comparison' | translate }}">
+                {{ $select.selected.label | translate }}
+              </ui-select-match>
+              <ui-select-choices
+                repeat="comparison.value as comparison in comparisons | filter:$select.search"
+              >
+                <div>
+                  {{ comparison.label | translate }}
+                </div>
+              </ui-select-choices>
+            </ui-select>
+          </td>
+          <td>
+            <input
+              class="form-control"
+              type="text"
+              ng-model="map.value"
+              placeholder="{{ 'e.g.' | translate }} 1234"
+              required
+            />
+          </td>
+          <td>
+            <ui-select ng-model="map.icon">
+              <ui-select-match placeholder="{{ 'Select or search icon' | translate }}">
+                <i c8y-icon="{{ $select.selected }}"></i>
+                {{ $select.selected }}
+              </ui-select-match>
+              <ui-select-choices repeat="icon in icons | filter: $select.search">
+                <div><i c8y-icon="{{ icon }}"></i> {{ icon }}</div>
+              </ui-select-choices>
+            </ui-select>
+          </td>
+          <td>
+            <input
+              c8y-color-picker
+              type="text"
+              class="form-control"
+              name="color"
+              ng-model="map.color"
+            />
+          </td>
+          <td>
+            <button
+              ng-disabled="iconMap.map.length < 2"
+              class="btn btn-danger btn-xs showOnHover pull-right"
+              title="{{ 'Add map' | translate }}"
+              ng-click="onDelete(iconMap.map, $index)"
+            >
+              <i c8y-icon="times"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <a
+      title="{{ 'Add condition' | translate }}"
+      href=""
+      class="btn-add-block"
+      ng-click="addMap(iconMap.map)"
+    >
+      <i c8y-icon="plus-circle"></i> <translate>Add condition</translate>
+    </a>
+  </div>
+  <div class="modal-footer">
+    <button
+      title="{{ 'Cancel' | translate }}"
+      class="btn btn-default"
+      ng-click="dismiss()"
+      translate
+    >
+      Cancel
+    </button>
+    <button
+      title="{{ 'Save' | translate }}"
+      class="btn btn-primary"
+      ng-disabled="addIconMapForm.$invalid"
+      ng-click="close(iconMap)"
+      translate
+    >
+      Save
+    </button>
+  </div>
+</form>

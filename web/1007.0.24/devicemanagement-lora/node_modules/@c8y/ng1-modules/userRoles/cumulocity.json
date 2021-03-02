@@ -1,0 +1,15 @@
+{
+  "name": "User Role Management",
+  "ngModules": [
+    "c8y.userRoles"
+  ],
+  "js": [
+    "index.js",
+    "userRoles.service.js",
+    "userRolesUi.service.js",
+    "inventoryRolesTab/inventoryRolesTab.component.js",
+    "rolesAssetTree/rolesAssetTree.component.js",
+    "inventoryRoleSelector/inventoryRoleSelector.component.js",
+    "copyRolesModal/copyRolesModal.component.js"
+  ]
+}

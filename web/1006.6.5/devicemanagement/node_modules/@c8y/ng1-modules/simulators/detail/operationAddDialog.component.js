@@ -1,0 +1,1 @@
+"use strict";!function(){function i(i){this.icons=i.icons}i.$inject=["c8ySimulatorsUi"],angular.module("c8y.simulators").component("c8yOperationAddDialog",{templateUrl:":::PLUGIN_PATH:::/detail/operationAddDialog.html",bindings:{close:"&",dismiss:"&"},controller:i,controllerAs:"vm"})}();

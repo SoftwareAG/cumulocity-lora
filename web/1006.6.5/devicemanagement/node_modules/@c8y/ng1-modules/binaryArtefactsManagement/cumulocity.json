@@ -1,0 +1,13 @@
+{
+  "name": "Binary Artefacts Management",
+  "ngModules": [
+    "c8y.binaryArtefactsManagement"
+  ],
+  "category": "Binary Artefacts",
+  "description": "Allows for managing binary artefacts saved in Cumulocity platform.",
+  "js": [
+    "index.js",
+    "controllers/list.js",
+    "controllers/upload.js"
+  ]
+}

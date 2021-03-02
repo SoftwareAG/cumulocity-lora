@@ -1,0 +1,34 @@
+/**
+* DevExtreme (widgets/material/validation.material.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "../base/validation.less";
+@import (once) "./overlay.material.less";
+
+.dx-size-default() {
+    @MATERIAL_VALIDATION_MESSAGE_PADDING: 6px;
+    @MATERIAL_VALIDATIONSUMMARY_ITEM_MARGIN: 10px;
+}
+
+.dx-size-compact() {
+    @MATERIAL_VALIDATION_MESSAGE_PADDING: 4px;
+    @MATERIAL_VALIDATIONSUMMARY_ITEM_MARGIN: 6px;
+}
+
+.dx-invalid-message > .dx-overlay-content {
+    background-color: transparent;
+    color: @VALIDATION_MESSAGE_BACKGROUND_COLOR;
+    padding: @MATERIAL_VALIDATION_MESSAGE_PADDING 0 0;
+}
+
+.dx-validationsummary > .dx-validationsummary-item:not(:last-child) {
+    margin-bottom: @MATERIAL_VALIDATIONSUMMARY_ITEM_MARGIN;
+}
+
+.dx-form-validation-summary {
+    margin-top: 20px;
+}

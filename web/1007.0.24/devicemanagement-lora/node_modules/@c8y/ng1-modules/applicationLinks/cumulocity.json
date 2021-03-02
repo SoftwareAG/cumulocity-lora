@@ -1,0 +1,17 @@
+{
+  "name": "Applications component",
+  "ngModules": [
+    "c8y.welcome.applications"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "A component with quick links to applications",
+  "js": [
+    "index.js",
+    "applications.controller.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

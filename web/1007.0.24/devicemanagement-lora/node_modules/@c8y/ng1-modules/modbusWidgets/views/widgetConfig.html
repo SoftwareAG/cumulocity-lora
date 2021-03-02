@@ -1,0 +1,68 @@
+<div ng-controller="modbusWidgetConfigCtrl">
+  <div class="row" ng-if="!showOnlyHoldingRegisters">
+    <div class="col-lg-6">
+      <div class="form-group" ng-show="discreteOutputs.length >= 0">
+        <label translate>Coils (discrete outputs)</label>
+        <div class="alert alert-warning" ng-show="discreteOutputs.length === 0" translate>
+           No coils available.
+        </div>
+        <div class="checkbox" ng-repeat="discreteOutput in discreteOutputs | orderBy:'name'">
+          <label>
+            <input type="checkbox" value="" ng-model="discreteOutput.selected" ng-change="updateFields()">
+            <span ng-bind="discreteOutput.name"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="form-group" ng-show="discreteInputs.length >= 0">
+        <label translate>Discrete inputs</label>
+        <div class="alert alert-warning" ng-show="discreteInputs.length === 0" translate>
+           No discrete inputs available.
+        </div>
+        <div class="checkbox" ng-repeat="discreteInput in discreteInputs | orderBy:'name'">
+          <label>
+            <input type="checkbox" value="" ng-model="discreteInput.selected" ng-change="updateFields()">
+            <span ng-bind="discreteInput.name"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="form-group" ng-show="holdingRegisters.length >= 0">
+        <label ng-if="!isOPCUADevice" translate>Holding registers</label>
+        <label ng-if="isOPCUADevice" translate>Variables</label>
+        <div class="alert alert-warning" ng-show="holdingRegisters.length === 0">
+          <span ng-if="!isOPCUADevice" translate>No holding registers available.</span>
+          <span ng-if="isOPCUADevice" translate>No variables available.</span>
+        </div>
+        <div class="checkbox" ng-repeat="holdingRegister in holdingRegisters | orderBy:'name'">
+          <label>
+            <input type="checkbox" value="" ng-model="holdingRegister.selected" ng-change="updateFields()">
+            <span ng-bind="holdingRegister.name"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6" ng-if="!showOnlyHoldingRegisters">
+      <div class="form-group" ng-show="inputRegisters.length >= 0">
+        <label translate>Input registers</label>
+        <div class="alert alert-warning" ng-show="inputRegisters.length === 0" translate>
+           No input registers available.
+        </div>
+        <div class="checkbox" ng-repeat="inputRegister in inputRegisters | orderBy:'name'">
+          <label>
+            <input type="checkbox" value="" ng-model="inputRegister.selected" ng-change="updateFields()">
+            <span ng-bind="inputRegister.name"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <input type="hidden" name="fieldsControl" ng-model="fieldsControl" />
+</div>

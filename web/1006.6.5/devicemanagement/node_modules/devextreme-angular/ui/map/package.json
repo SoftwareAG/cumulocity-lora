@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-map.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-map.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-map.js",
+  "esm5": "../../esm5/ui/map/devextreme-angular-ui-map.js",
+  "esm2015": "../../esm2015/ui/map/devextreme-angular-ui-map.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-map.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-map.js",
+  "typings": "devextreme-angular-ui-map.d.ts",
+  "metadata": "devextreme-angular-ui-map.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/map"
+}

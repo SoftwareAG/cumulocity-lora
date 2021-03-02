@@ -1,0 +1,13 @@
+{
+  "name": "Platform configuration management",
+  "ngModules": [
+    "c8y.platformConfiguration"
+  ],
+  "category": "Administration",
+  "description": "Manage platform configuration in runtime",
+  "js": [
+    "index.js",
+    "platformConfigurationUi.provider.js",
+    "platformConfigurationForm.component.js"
+  ]
+}

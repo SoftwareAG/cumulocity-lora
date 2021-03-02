@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e){e.initUi()}function n(e){e.registerFeaturesManifest()}n.$inject=["c8yCanopenDevice"],e.$inject=["c8yCanopenDeviceProvider"],angular.module("c8y.canopen",["c8y.deviceProtocols","c8y.deviceDatabase4"]).config(e).run(n)}();

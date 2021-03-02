@@ -1,0 +1,234 @@
+/**
+ * DevExtreme (ui/scheduler/workspaces/ui.scheduler.work_space.indicator.js)
+ * Version: 19.2.7
+ * Build date: Thu Mar 26 2020
+ *
+ * Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+ * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+ */
+"use strict";
+var _renderer = require("../../../core/renderer");
+var _renderer2 = _interopRequireDefault(_renderer);
+var _uiScheduler = require("./ui.scheduler.work_space");
+var _uiScheduler2 = _interopRequireDefault(_uiScheduler);
+var _component_registrator = require("../../../core/component_registrator");
+var _component_registrator2 = _interopRequireDefault(_component_registrator);
+var _date = require("../../../core/utils/date");
+var _date2 = _interopRequireDefault(_date);
+var _extend = require("../../../core/utils/extend");
+var _window = require("../../../core/utils/window");
+var _window2 = _interopRequireDefault(_window);
+
+function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+        "default": obj
+    }
+}
+var toMs = _date2.default.dateToMilliseconds;
+var SCHEDULER_DATE_TIME_INDICATOR_CLASS = "dx-scheduler-date-time-indicator";
+var TIME_PANEL_CURRENT_TIME_CELL_CLASS = "dx-scheduler-time-panel-current-time-cell";
+var HEADER_CURRENT_TIME_CELL_CLASS = "dx-scheduler-header-panel-current-time-cell";
+var SchedulerWorkSpaceIndicator = _uiScheduler2.default.inherit({
+    _getToday: function() {
+        var date = this.option("indicatorTime") || new Date;
+        return this.invoke("convertDateByTimezone", date) || date
+    },
+    _needRenderDateTimeIndicator: function() {
+        var today = this._getToday();
+        var endViewDate = _date2.default.trimTime(this.getEndViewDate());
+        return _date2.default.dateInRange(today, this._firstViewDate, new Date(endViewDate.getTime() + toMs("day")))
+    },
+    needRenderDateTimeIndication: function() {
+        if (!_window2.default.hasWindow()) {
+            return false
+        }
+        var today = this._getToday();
+        return today >= _date2.default.trimTime(new Date(this.getStartViewDate()))
+    },
+    _renderDateTimeIndication: function() {
+        if (this.needRenderDateTimeIndication()) {
+            if (this.option("shadeUntilCurrentTime")) {
+                this._shader.render(this)
+            }
+            if (this.option("showCurrentTimeIndicator") && this._needRenderDateTimeIndicator()) {
+                var groupCount = this._getGroupCount() || 1;
+                var $container = this._dateTableScrollable.$content();
+                var height = this.getIndicationHeight();
+                var rtlOffset = this._getRtlOffset(this.getCellWidth());
+                if (height > 0) {
+                    this._renderIndicator(height, rtlOffset, $container, groupCount)
+                }
+            }
+        }
+    },
+    _renderIndicator: function(height, rtlOffset, $container, groupCount) {
+        for (var i = 0; i < groupCount; i++) {
+            var $indicator = this._createIndicator($container);
+            $indicator.width(this.getCellWidth());
+            this._groupedStrategy.shiftIndicator($indicator, height, rtlOffset, i)
+        }
+    },
+    _createIndicator: function($container) {
+        var $indicator = (0, _renderer2.default)("<div>").addClass(SCHEDULER_DATE_TIME_INDICATOR_CLASS);
+        $container.append($indicator);
+        return $indicator
+    },
+    _getRtlOffset: function(width) {
+        return this.option("rtlEnabled") ? this._dateTableScrollable.$content().get(0).getBoundingClientRect().width - this.getTimePanelWidth() - width : 0
+    },
+    _setIndicationUpdateInterval: function() {
+        if (!this.option("showCurrentTimeIndicator") || 0 === this.option("indicatorUpdateInterval")) {
+            return
+        }
+        this._clearIndicatorUpdateInterval();
+        this._indicatorInterval = setInterval(function() {
+            this._refreshDateTimeIndication()
+        }.bind(this), this.option("indicatorUpdateInterval"))
+    },
+    _clearIndicatorUpdateInterval: function() {
+        if (this._indicatorInterval) {
+            clearInterval(this._indicatorInterval);
+            delete this._indicatorInterval
+        }
+    },
+    _isVerticalShader: function() {
+        return true
+    },
+    getIndicationWidth: function(groupIndex) {
+        var maxWidth = this.getCellWidth() * this._getCellCount();
+        var difference = this._getIndicatorDuration();
+        if (difference > this._getCellCount()) {
+            difference = this._getCellCount()
+        }
+        var width = difference * this.getRoundedCellWidth(groupIndex, groupIndex * this._getCellCount(), difference);
+        return maxWidth < width ? maxWidth : width
+    },
+    getIndicatorOffset: function(groupIndex) {
+        var difference = this._getIndicatorDuration() - 1;
+        var offset = difference * this.getRoundedCellWidth(groupIndex, groupIndex * this._getCellCount(), difference);
+        return offset
+    },
+    _getIndicatorDuration: function() {
+        var today = this._getToday();
+        var firstViewDate = new Date(this._firstViewDate);
+        var timeDiff = today.getTime() - firstViewDate.getTime();
+        if ("workWeek" === this.option("type")) {
+            timeDiff -= this._getWeekendsCount(Math.round(timeDiff / toMs("day"))) * toMs("day")
+        }
+        return Math.ceil((timeDiff + 1) / toMs("day"))
+    },
+    getIndicationHeight: function() {
+        var today = this._getToday();
+        var cellHeight = this.getCellHeight();
+        var date = new Date(this._firstViewDate);
+        if (this._needRenderDateTimeIndicator()) {
+            date.setFullYear(today.getFullYear(), today.getMonth(), today.getDate())
+        }
+        var duration = today.getTime() - date.getTime();
+        var cellCount = duration / this.getCellDuration();
+        return cellCount * cellHeight
+    },
+    _dispose: function() {
+        this._clearIndicatorUpdateInterval();
+        this.callBase.apply(this, arguments)
+    },
+    _refreshDateTimeIndication: function() {
+        this._cleanDateTimeIndicator();
+        this._shader && this._shader.clean();
+        this._renderDateTimeIndication()
+    },
+    _isCurrentTime: function(date) {
+        if (this.option("showCurrentTimeIndicator") && this._needRenderDateTimeIndicator()) {
+            var today = this._getToday();
+            var result = false;
+            date = new Date(date);
+            date.setFullYear(today.getFullYear(), today.getMonth(), today.getDate());
+            var startCellDate = new Date(date);
+            var endCellDate = new Date(date);
+            if (_date2.default.sameDate(today, date)) {
+                startCellDate = startCellDate.setMilliseconds(date.getMilliseconds() - this.getCellDuration() + 1);
+                endCellDate = endCellDate.setMilliseconds(date.getMilliseconds() + this.getCellDuration());
+                result = _date2.default.dateInRange(today, startCellDate, endCellDate)
+            }
+            return result
+        }
+    },
+    _isCurrentTimeHeaderCell: function(headerIndex) {
+        var result = false;
+        if (this.option("showCurrentTimeIndicator") && this._needRenderDateTimeIndicator()) {
+            var date = this._getDateByIndex(headerIndex);
+            var now = this.option("indicatorTime") || new Date;
+            result = _date2.default.sameDate(date, now)
+        }
+        return result
+    },
+    _getTimeCellClass: function(i) {
+        var startViewDate = this._getTimeCellDate(i);
+        var cellClass = this.callBase(i);
+        if (this._isCurrentTime(startViewDate)) {
+            return cellClass + " " + TIME_PANEL_CURRENT_TIME_CELL_CLASS
+        }
+        return cellClass
+    },
+    _getHeaderPanelCellClass: function(i) {
+        var cellClass = this.callBase(i);
+        if (this._isCurrentTimeHeaderCell(i)) {
+            return cellClass + " " + HEADER_CURRENT_TIME_CELL_CLASS
+        }
+        return cellClass
+    },
+    _cleanView: function() {
+        this.callBase();
+        this._cleanDateTimeIndicator()
+    },
+    _dimensionChanged: function() {
+        this.callBase();
+        this._refreshDateTimeIndication()
+    },
+    _cleanDateTimeIndicator: function() {
+        this.$element().find("." + SCHEDULER_DATE_TIME_INDICATOR_CLASS).remove()
+    },
+    _cleanWorkSpace: function() {
+        this.callBase();
+        this._renderDateTimeIndication();
+        this._setIndicationUpdateInterval()
+    },
+    _optionChanged: function(args) {
+        switch (args.name) {
+            case "showCurrentTimeIndicator":
+            case "indicatorTime":
+                this._cleanWorkSpace();
+                break;
+            case "indicatorUpdateInterval":
+                this._setIndicationUpdateInterval();
+                break;
+            case "showAllDayPanel":
+                this.callBase(args);
+                this._refreshDateTimeIndication();
+                break;
+            case "allDayExpanded":
+                this.callBase(args);
+                this._refreshDateTimeIndication();
+                break;
+            case "crossScrollingEnabled":
+                this.callBase(args);
+                this._refreshDateTimeIndication();
+                break;
+            case "shadeUntilCurrentTime":
+                this._refreshDateTimeIndication();
+                break;
+            default:
+                this.callBase(args)
+        }
+    },
+    _getDefaultOptions: function() {
+        return (0, _extend.extend)(this.callBase(), {
+            showCurrentTimeIndicator: true,
+            indicatorTime: new Date,
+            indicatorUpdateInterval: 5 * toMs("minute"),
+            shadeUntilCurrentTime: true
+        })
+    }
+});
+(0, _component_registrator2.default)("dxSchedulerWorkSpace", SchedulerWorkSpaceIndicator);
+module.exports = SchedulerWorkSpaceIndicator;

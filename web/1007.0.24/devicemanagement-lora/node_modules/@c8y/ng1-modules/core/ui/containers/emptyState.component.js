@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").component("c8yUiEmptyState",{templateUrl:":::PLUGIN_PATH:::/ui/containers/emptyState.html",controllerAs:"vm",transclude:!0,bindings:{title:"<",subtitle:"<",icon:"<"}});

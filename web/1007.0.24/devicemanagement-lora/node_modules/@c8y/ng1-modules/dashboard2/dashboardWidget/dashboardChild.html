@@ -1,0 +1,58 @@
+<div
+  class="card card-dashboard grid-stack-item-content"
+  ng-class="getApplicableWidgetClasses(child, $parent.dashboard)"
+  ng-style="getApplicableWidgetStyles(child, $parent.dashboard)"
+>
+  <div
+    class="card-header-actions"
+    ng-class="{'draggableCursor drag-handle ': !$parent.isFrozen && !child._isFrozen}"
+  >
+    <div class="card-title">
+      <!-- <div ng-show="!$parent.isFrozen && !child._isFrozen"><i c8y-icon="ellipsis-v"></i></div> -->
+      <span
+        ng-bind="getTranslatedChildTitle(child)"
+        title="{{ getTranslatedChildTitle(child) }}"
+      ></span>
+    </div>
+    <div class="header-actions">
+      <div
+        class="optionsBtn dropdown"
+        ng-if="!$parent.isFrozen && !child._isFrozen && !child._hideOptions"
+        uib-dropdown
+      >
+        <a
+          title="{{ 'Settings' | translate }}"
+          href=""
+          class="btnIcon dropdown-toggle c8y-dropdown"
+          uib-dropdown-toggle
+        >
+          <i c8y-icon="cog"></i>
+        </a>
+
+        <ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+          <li>
+            <a title="{{ 'Edit' | translate }}" href="" ng-click="editChild(child)">
+              <i c8y-icon="pencil"></i> <translate>Edit</translate>
+            </a>
+          </li>
+          <li>
+            <a title="{{ 'Remove' | translate }}" href="" ng-click="removeChild(child)">
+              <i c8y-icon="trash"></i> <translate>Remove</translate>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="child.templateUrl" class="card-inner-scroll" ng-include="child.templateUrl"></div>
+
+  <div ng-if="child.widgetComponent" class="card-inner-scroll">
+    <c8y-ui-component
+      component-name="child.widgetComponent"
+      config="child.config"
+      context="dashboardContext"
+    >
+    </c8y-ui-component>
+  </div>
+</div>

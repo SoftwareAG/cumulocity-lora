@@ -1,0 +1,12 @@
+{
+  "name": "Actility device management",
+  "ngModules": [
+    "c8y.deviceActility"
+  ],
+  "category": "Device",
+  "description": "Manage actility device",
+  "js": [
+    "deviceActility.module.js",
+    "deviceActility.service.js"
+  ]
+}

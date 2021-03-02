@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e,t){this.deviceId=t.deviceId}e.$inject=["$scope","$routeParams"],angular.module("c8y.parts.deviceList").controller("DeviceListCtrl",e),e.$inject=["$scope","$routeParams"]}();

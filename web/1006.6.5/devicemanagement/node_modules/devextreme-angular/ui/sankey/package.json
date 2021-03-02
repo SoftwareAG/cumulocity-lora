@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-sankey.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-sankey.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-sankey.js",
+  "esm5": "../../esm5/ui/sankey/devextreme-angular-ui-sankey.js",
+  "esm2015": "../../esm2015/ui/sankey/devextreme-angular-ui-sankey.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-sankey.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-sankey.js",
+  "typings": "devextreme-angular-ui-sankey.d.ts",
+  "metadata": "devextreme-angular-ui-sankey.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/sankey"
+}

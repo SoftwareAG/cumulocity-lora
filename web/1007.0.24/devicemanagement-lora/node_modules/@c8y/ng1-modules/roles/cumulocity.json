@@ -1,0 +1,20 @@
+{
+  "name": "Roles management",
+  "ngModules": [
+    "c8y.roles"
+  ],
+  "category": "Administration",
+  "description": "Manage the roles for access control",
+  "js": [
+    "index.js",
+    "rolesUi.provider.js",
+    "list/rolesList.component.js",
+    "list/rolesOverview.controller.js",
+
+    "detail/roleTitle.component.js",
+    "detail/roleDetailInventory.component.js",
+    "detail/roleDetailGlobal.component.js",
+    "detail/roleGlobalSaveConfirm.controller.js",
+    "detail/roleInventoryPermissionList.component.js"
+  ]
+}

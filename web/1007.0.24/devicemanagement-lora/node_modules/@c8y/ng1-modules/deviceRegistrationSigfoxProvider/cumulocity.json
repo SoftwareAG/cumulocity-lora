@@ -1,0 +1,16 @@
+{
+  "name": "Device registration - Sigfox provider",
+  "ngModules": [
+    "c8y.deviceRegistrationSigfox"
+  ],
+  "import": [
+    "core/deviceRegistration"
+  ],
+  "category": "Device",
+  "description": "Provides device registration wizard functionality for Sigfox devices.",
+  "js": [
+    "drSigfoxProvider.module.js",
+    "deviceRegistrationSigfox.component.js",
+    "deviceRegistrationSigfoxProvider.service.js"
+  ]
+}

@@ -1,0 +1,5 @@
+<ng-form name="nestedSmartRuleForm">
+  <div class="form-group property-{{param.property}}" ng-class="{'has-error': nestedSmartRuleForm.$dirty && nestedSmartRuleForm.$invalid}">
+    <input type="{{param.type}}" class="form-control span" ng-model="rule.config[param.property]" placeholder="{{placeholder(param)}}" uib-tooltip="{{placeholder(param)}}" ng-required="param.required" />
+  </div>
+</ng-form>

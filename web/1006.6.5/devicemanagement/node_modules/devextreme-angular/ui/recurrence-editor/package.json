@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-recurrence-editor.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-recurrence-editor.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-recurrence-editor.js",
+  "esm5": "../../esm5/ui/recurrence-editor/devextreme-angular-ui-recurrence-editor.js",
+  "esm2015": "../../esm2015/ui/recurrence-editor/devextreme-angular-ui-recurrence-editor.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-recurrence-editor.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-recurrence-editor.js",
+  "typings": "devextreme-angular-ui-recurrence-editor.d.ts",
+  "metadata": "devextreme-angular-ui-recurrence-editor.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/recurrence-editor"
+}

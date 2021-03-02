@@ -1,0 +1,523 @@
+{
+  "id": "c8ySchema",
+  "title": "Managed object",
+  "type": "object",
+  "printFormat": "hidden",
+  "properties": {
+    "id": {
+      "title": "ID",
+      "type": "string",
+      "readonly": true
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "type": {
+      "title": "Type",
+      "type": "string"
+    },
+    "owner": {
+      "title": "Owner",
+      "type": "string"
+    },
+    "lastUpdated": {
+      "title": "Last updated",
+      "type": "string",
+      "printFormat": "datetime",
+      "readonly": true
+    },
+    "c8y_ActiveAlarmsStatus": {
+      "title": "Active alarms status",
+      "type": "object",
+      "printFormat": "hidden",
+      "properties": {
+        "critical": {
+          "title": "Critical",
+          "type": "number",
+          "readonly": true
+        },
+        "major": {
+          "title": "Major",
+          "type": "number",
+          "readonly": true
+        },
+        "minor": {
+          "title": "Minor",
+          "type": "number",
+          "readonly": true
+        },
+        "warning": {
+          "title": "Warning",
+          "type": "number",
+          "readonly": true
+        }
+      }
+    },
+    "c8y_Address": {
+      "title": "Address",
+      "type": "object",
+      "printFormat": "hidden",
+      "properties": {
+        "street": {
+          "title": "Street",
+          "type": "string"
+        },
+        "city": {
+          "title": "City",
+          "type": "string"
+        },
+        "cityCode": {
+          "title": "City code",
+          "type": "string"
+        },
+        "territory": {
+          "title": "Territory",
+          "type": "string"
+        },
+        "region": {
+          "title": "Region",
+          "type": "string"
+        },
+        "country": {
+          "title": "Country",
+          "type": "string"
+        }
+      }
+    },
+    "c8y_Availability": {
+      "title": "Availability",
+      "type": "object",
+      "printFormat": "hidden",
+      "properties": {
+        "status": {
+          "title": "Status",
+          "type": "string",
+          "readonly": true
+        },
+        "lastMessage": {
+          "title": "Last message",
+          "type": "string",
+          "printFormat": "datetime",
+          "readonly": true
+        }
+      }
+    },
+    "c8y_Connection": {
+      "title": "Connection",
+      "type": "object",
+      "printFormat": "hidden",
+      "properties": {
+        "status": {
+          "title": "Status",
+          "type": "string",
+          "readonly": true
+        }
+      }
+    },
+    "c8y_CommunicationMode": {
+      "title": "Communication mode",
+      "type": "object",
+      "printFormat": "hidden",
+      "properties": {
+        "mode": {
+          "title": "Mode",
+          "type": "string"
+        }
+      }
+    },
+    "c8y_Firmware": {
+      "title": "Firmware",
+      "type": "object",
+      "printFormat": "hidden",
+      "readonly": true,
+      "properties": {
+        "moduleVersion": {
+          "title": "Module version",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "url": {
+          "title": "URL",
+          "type": "string"
+        }
+      }
+    },
+    "c8y_Hardware": {
+      "title": "Hardware",
+      "type": "object",
+      "printFormat": "hidden",
+      "properties": {
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "serialNumber": {
+          "title": "Serial number",
+          "type": "string"
+        },
+        "revision": {
+          "title": "Revision",
+          "type": "string"
+        }
+      }
+    },
+    "c8y_LpwanDevice": {
+      "title": "LPWAN device",
+      "type": "object",
+      "properties": {
+        "provisioned": {
+          "title": "Provisioned",
+          "type": "string",
+          "readonly": true
+        }
+      }
+    },
+    "c8y_Mobile": {
+      "title": "Mobile",
+      "type": "object",
+      "printFormat": "hidden",
+      "properties": {
+        "cellId": {
+          "title": "Cell ID",
+          "type": "string"
+        },
+        "connType": {
+          "title": "Connection type",
+          "type": "string",
+          "readonly": true
+        },
+        "currentOperator": {
+          "title": "Current operator",
+          "type": "string",
+          "readonly": true
+        },
+        "currentBand": {
+          "title": "Current band",
+          "type": "string",
+          "readonly": true
+        },
+        "ecn0": {
+          "title": "ECN0",
+          "type": "string",
+          "readonly": true
+        },
+        "iccid": {
+          "title": "ICCID",
+          "type": "string"
+        },
+        "imei": {
+          "title": "IMEI",
+          "type": "string"
+        },
+        "imsi": {
+          "title": "IMSI",
+          "type": "string"
+        },
+        "lac": {
+          "title": "LAC",
+          "type": "string"
+        },
+        "mcc": {
+          "title": "MCC",
+          "type": "string"
+        },
+        "mnc": {
+          "title": "MNC",
+          "type": "string"
+        },
+        "msisdn": {
+          "title": "MSISDN",
+          "type": "string"
+        },
+        "rcsp": {
+          "title": "RCSP",
+          "type": "string",
+          "readonly": true
+        },
+        "rscp": {
+          "title": "RSCP",
+          "type": "string",
+          "readonly": true
+        },
+        "rsrp": {
+          "title": "RSRP",
+          "type": "string",
+          "readonly": true
+        },
+        "rsrq": {
+          "title": "RSRQ",
+          "type": "string",
+          "readonly": true
+        },
+        "rssi": {
+          "title": "RSSI",
+          "type": "string",
+          "readonly": true
+        }
+      }
+    },
+    "c8y_Network": {
+      "title": "Network",
+      "type": "object",
+      "printFormat": "hidden",
+      "properties": {
+        "c8y_DHCP": {
+          "title": "DHCP",
+          "type": "object",
+          "printFormat": "hidden",
+          "properties": {
+            "addressRange": {
+              "title": "Address range",
+              "type": "object",
+              "printFormat": "hidden",
+              "properties": {
+                "start": {
+                  "title": "Start",
+                  "type": "string"
+                },
+                "end": {
+                  "title": "End",
+                  "type": "string"
+                }
+              }
+            },
+            "dns1": {
+              "title": "DNS 1",
+              "type": "string"
+            },
+            "dns2": {
+              "title": "DNS 2",
+              "type": "string"
+            },
+            "enabled": {
+              "title": "Enabled",
+              "type": "integer"
+            }
+          }
+        },
+        "c8y_LAN": {
+          "title": "LAN",
+          "type": "object",
+          "printFormat": "hidden",
+          "properties": {
+            "enabled": {
+              "title": "Enabled",
+              "type": "integer"
+            },
+            "ip": {
+              "title": "IP",
+              "type": "string"
+            },
+            "mac": {
+              "title": "MAC",
+              "type": "string"
+            },
+            "name": {
+              "title": "Name",
+              "type": "string"
+            },
+            "netmask": {
+              "title": "Netmask",
+              "type": "string"
+            }
+          }
+        },
+        "c8y_WAN": {
+          "title": "WAN",
+          "type": "object",
+          "printFormat": "hidden",
+          "properties": {
+            "apn": {
+              "title": "APN",
+              "type": "string"
+            },
+            "authType": {
+              "title": "Auth type",
+              "type": "string"
+            },
+            "ip": {
+              "title": "IP",
+              "type": "string"
+            },
+            "password": {
+              "title": "Password",
+              "type": "string"
+            },
+            "simStatus": {
+              "title": "SIM status",
+              "type": "string"
+            },
+            "username": {
+              "title": "Username",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "c8y_Notes": {
+      "title": "Notes",
+      "type": "string",
+      "x-schema-form": {
+        "type": "textarea"
+      }
+    },
+    "creationTime": {
+      "title": "Creation time",
+      "type": "string",
+      "printFormat": "datetime",
+      "readonly": true
+    },
+    "c8y_Position": {
+      "title": "Position",
+      "type": "object",
+      "printFormat": "hidden",
+      "properties": {
+        "lng": {
+          "title": "Longitude",
+          "type": "number"
+        },
+        "lat": {
+          "title": "Latitude",
+          "type": "number"
+        },
+        "alt": {
+          "title": "Altitude",
+          "type": "number"
+        }
+      }
+    },
+    "c8y_RequiredAvailability": {
+      "title": "Required availability",
+      "type": "object",
+      "printFormat": "hidden",
+      "properties": {
+        "responseInterval": {
+          "title": "Response interval",
+          "type": "integer"
+        }
+      }
+    },
+    "c8y_Software": {
+      "title": "Software",
+      "type": "object",
+      "printFormat": "hidden",
+      "readonly": true,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "url": {
+          "title": "URL",
+          "type": "string"
+        }
+      }
+    },
+
+    "alarmCountToday": {
+      "title": "Alarm count today",
+      "type": "number",
+      "readonly": true,
+      "computed": true,
+      "config": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "title": "Alarm type",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "alarmCount3Months": {
+      "title": "Alarm count 3 months",
+      "type": "number",
+      "readonly": true,
+      "computed": true,
+      "config": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "title": "Alarm type",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "eventCountToday": {
+      "title": "Event count today",
+      "type": "number",
+      "readonly": true,
+      "computed": true,
+      "config": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "title": "Event type",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "eventCount3Months": {
+      "title": "Event count 3 months",
+      "type": "number",
+      "readonly": true,
+      "computed": true,
+      "config": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "title": "Event type",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "lastDeviceMessage": {
+      "title": "Last device message",
+      "type": "string",
+      "printFormat": "datetime",
+      "readonly": true,
+      "computed": true
+    },
+    "lastMeasurement": {
+      "title": "Last measurement",
+      "type": "string",
+      "readonly": true,
+      "computed": true,
+      "config": true
+    },
+   "childDevicesCount": {
+      "title": "Number of child devices",
+      "type": "number",
+      "readonly": true,
+      "computed": true
+    },
+    "childAssetsCount": {
+      "title": "Number of child assets",
+      "type": "number",
+      "readonly": true,
+      "computed": true
+    },
+    "configurationSnapshot": {
+      "title": "Configuration snapshot",
+      "type": "string",
+      "readonly": true,
+      "computed": true
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Access control",
+  "ngModules": [
+    "c8y.parts.applicationSettings"
+  ],
+  "icon": "list",
+  "color": "#F2DF0F",
+  "category": "Administration",
+  "gallery": [
+    "gallery/01.png",
+    "gallery/02.png"
+  ],
+  "description": "Administrators can define the default application and CORS access control for Cumulocity Applications.",
+  "js": [
+    "index.js",
+    "controllers/applicationSettings.js"
+  ],
+  "copy": [
+    "gallery/*"
+  ],
+  "folderName": "applicationSettings",
+  "appsInclude": [
+    "administration"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Application status",
+  "ngModules": [
+    "c8y.appStatus"
+  ],
+  "category": "Administration",
+  "description": "Allows to check current status of application",
+  "js": [
+    "index.js",
+    "app-status/app-status.component.js",
+    "app-instances/app-instances.component.js",
+    "app-tenant-subscriptions-list/app-tenant-subscriptions-list.component.js",
+    "app-alarms/app-alarms.component.js",
+    "app-events/app-events.component.js",
+    "app-instances-details/app-instances-details.component.js"
+  ]
+}

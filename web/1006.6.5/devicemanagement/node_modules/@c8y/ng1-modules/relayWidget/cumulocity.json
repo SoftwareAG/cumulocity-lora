@@ -1,0 +1,13 @@
+{
+  "name": "Relay widget",
+  "ngModules": [
+    "c8y.relayWidget"
+  ],
+  "category": "Widgets",
+  "description": "Widget for switching relay",
+  "js": [
+    "index.js",
+    "relay.controller.js",
+    "relay.service.js"
+  ]
+}

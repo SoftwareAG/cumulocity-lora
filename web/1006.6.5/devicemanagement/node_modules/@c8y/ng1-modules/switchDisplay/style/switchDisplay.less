@@ -1,0 +1,30 @@
+//@import "../../c8yBranding/variables/index.less";
+
+// Temporary for DT HMI
+@brand-success: #5cb85c;
+@brand-danger: #bb1200;
+
+.switchDisplay {
+  td {
+    padding: 20px !important;
+  }
+  .statusButton {
+    .icon {
+      margin-right: 10px;
+    }
+    &.activeState {
+      font-weight: bold;
+      color: @brand-success;
+      .icon {
+        font-size: 120%;
+      }
+    }
+    &.inactiveState {
+      font-weight: bold;
+      color: @brand-danger;
+      .icon {
+        font-size: 120%;
+      }
+    }
+  }
+}

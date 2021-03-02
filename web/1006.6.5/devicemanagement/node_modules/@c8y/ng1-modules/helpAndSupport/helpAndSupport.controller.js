@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.welcome.helpandsupport").controller("HelpAndSupportCtrl",["$scope","c8yDocs",function(c,o){o.list().then(function(o){c.docs=o})}]);

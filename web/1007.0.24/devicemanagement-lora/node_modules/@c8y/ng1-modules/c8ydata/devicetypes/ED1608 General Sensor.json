@@ -1,0 +1,783 @@
+{
+  "c8y_ModbusDeviceTypeInfo": {
+    "minFieldbusUI": 4,
+    "name": "ED1608 General Sensor",
+    "fieldbusType": "actility"
+  },
+  "c8y_MessageIdConfiguration": {
+    "source" : "PAYLOAD",
+    "messageIdMapping": {
+      "startBit": 0,
+      "noBits":8
+    }
+  },
+  "c8y_Coils": [],
+  "c8y_Registers": [
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 8,
+      "noBits": 8,
+      "messageTypeId": 0,
+      "name": "Battery",
+      "category": "Alive"
+    },
+    {
+      "measurementMapping": {
+        "series": "voltage",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "mV",
+      "decimalPlaces": 0,
+      "startBit": 8,
+      "noBits": 16,
+      "messageTypeId": 9,
+      "name": "Battery voltage",
+      "category": "Analog message"
+    },
+    {
+      "offset": 1000,
+      "multiplier": 0.01,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "mBar",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 16,
+      "messageTypeId": 2,
+      "name": "Air pressure",
+      "category": "GenSens"
+    },
+    {
+      "measurementMapping": {
+        "series": "min",
+        "type": "c8y_DailyTemp"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "C",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 8,
+      "messageTypeId": 11,
+      "name": "Minimum temperature",
+      "category": "Daily report"
+    },
+    {
+      "measurementMapping": {
+        "series": "max",
+        "type": "c8y_DailyTemp"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "C",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 8,
+      "messageTypeId": 11,
+      "name": "Maximum temperature",
+      "category": "Daily report"
+    },
+    {
+      "measurementMapping": {
+        "series": "voltage",
+        "type": "c8y_AnalogIn1"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "mV",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 16,
+      "messageTypeId": 9,
+      "name": "Analog in 1",
+      "category": "Analog message"
+    },
+    {
+      "measurementMapping": {
+        "series": "min",
+        "type": "c8y_DailyHumidity"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 32,
+      "noBits": 8,
+      "messageTypeId": 11,
+      "name": "Minimum humidity",
+      "category": "Daily report"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 32,
+      "noBits": 8,
+      "messageTypeId": 0,
+      "name": "GPS fix age",
+      "eventMapping": {
+        "innerType": "GPSFixAge",
+        "fragmentType": "c8y_Alive",
+        "text": "Alive event received",
+        "type": "c8y_AliveEvent"
+      },
+      "category": "Alive"
+    },
+    {
+      "measurementMapping": {
+        "series": "T",
+        "type": "c8y_Temperature"
+      },
+      "offset": 0,
+      "multiplier": 100,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "C",
+      "decimalPlaces": 0,
+      "startBit": 32,
+      "noBits": 16,
+      "messageTypeId": 2,
+      "name": "Temperature",
+      "category": "GenSens"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 40,
+      "noBits": 5,
+      "messageTypeId": 0,
+      "name": "Sat in fix",
+      "eventMapping": {
+        "innerType": "satInFix",
+        "text": "Alive event received",
+        "fragmentType": "c8y_Alive",
+        "type": "c8y_AliveEvent"
+      },
+      "category": "Alive"
+    },
+    {
+      "measurementMapping": {
+        "series": "max",
+        "type": "c8y_DailyHumidity"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 40,
+      "noBits": 8,
+      "messageTypeId": 11,
+      "name": "Maximum humidity",
+      "category": "Daily report"
+    },
+    {
+      "measurementMapping": {
+        "series": "voltage",
+        "type": "c8y_AnalogIn2"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "mV",
+      "decimalPlaces": 0,
+      "startBit": 40,
+      "noBits": 16,
+      "messageTypeId": 9,
+      "name": "Analog in 2",
+      "category": "Analog message"
+    },
+    {
+      "measurementMapping": {
+        "series": "x-direction",
+        "type": "c8y_Gravity"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "G",
+      "decimalPlaces": 0,
+      "startBit": 40,
+      "noBits": 8,
+      "messageTypeId": 3,
+      "name": "Gravity in x-direction",
+      "category": "Rotation"
+    },
+    {
+      "measurementMapping": {
+        "series": "T",
+        "type": "c8y_Temperature"
+      },
+      "offset": 0,
+      "multiplier": 10,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 40,
+      "noBits": 16,
+      "messageTypeId": 1,
+      "name": "Temperature",
+      "category": "Tracking"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 45,
+      "noBits": 1,
+      "messageTypeId": 0,
+      "name": "Latitude bit 24",
+      "eventMapping": {
+        "innerType": "latBit24",
+        "text": "Position message received.",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Alive"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 46,
+      "noBits": 2,
+      "messageTypeId": 0,
+      "name": "Longitude bit 24-25",
+      "eventMapping": {
+        "innerType": "lngBit24-25",
+        "text": "Position message received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Alive"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 48,
+      "noBits": 24,
+      "messageTypeId": 0,
+      "name": "Latitude bit 0-23",
+      "eventMapping": {
+        "innerType": "latBit0-23",
+        "text": "Position message received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Alive"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Humidity"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 48,
+      "noBits": 8,
+      "messageTypeId": 2,
+      "name": "Humidity",
+      "category": "GenSens"
+    },
+    {
+      "measurementMapping": {
+        "series": "max",
+        "type": "c8y_DailyBaro"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 48,
+      "noBits": 8,
+      "messageTypeId": 11,
+      "name": "Maximum baro",
+      "category": "Daily report"
+    },
+    {
+      "measurementMapping": {
+        "series": "y-direction",
+        "type": "c8y_Gravity"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "G",
+      "decimalPlaces": 0,
+      "startBit": 48,
+      "noBits": 8,
+      "messageTypeId": 3,
+      "name": "Gravity in y-direction",
+      "category": "Rotation"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 8,
+      "messageTypeId": 1,
+      "name": "GPS fix age",
+      "eventMapping": {
+        "innerType": "GPSFixAge",
+        "fragmentType": "c8y_Tracking",
+        "text": "Tracking event received",
+        "type": "c8y_TrackingEvent"
+      },
+      "category": "Tracking"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.706,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "degree",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 8,
+      "messageTypeId": 2,
+      "name": "Level x",
+      "eventMapping": {
+        "innerType": "levelX",
+        "fragmentType": "c8y_BeamEvent",
+        "text": "Inverse sinus of beam level message received",
+        "type": "c8y_BeamEvent"
+      },
+      "category": "GenSens"
+    },
+    {
+      "measurementMapping": {
+        "series": "min",
+        "type": "c8y_DailyBaro"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 8,
+      "messageTypeId": 11,
+      "name": "Minimum baro",
+      "category": "Daily report"
+    },
+    {
+      "measurementMapping": {
+        "series": "z-direction",
+        "type": "c8y_Gravity"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "G",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 8,
+      "messageTypeId": 3,
+      "name": "Gravity in z-direction",
+      "category": "Rotation"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 64,
+      "noBits": 5,
+      "messageTypeId": 1,
+      "name": "Sat in fix",
+      "eventMapping": {
+        "innerType": "satInFix",
+        "text": "Tracking event received",
+        "fragmentType": "c8y_Tracking",
+        "type": "c8y_TrackingEvent"
+      },
+      "category": "Tracking"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.706,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 64,
+      "noBits": 8,
+      "messageTypeId": 2,
+      "name": "Level y",
+      "eventMapping": {
+        "innerType": "levelY",
+        "text": "Inverse sinus of beam level message received",
+        "fragmentType": "c8y_Beam",
+        "type": "c8y_BeamEvent"
+      },
+      "category": "GenSens"
+    },
+    {
+      "measurementMapping": {
+        "series": "R",
+        "type": "c8y_DailyRunning"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "h",
+      "decimalPlaces": 0,
+      "startBit": 64,
+      "noBits": 16,
+      "messageTypeId": 11,
+      "name": "Running hours",
+      "category": "Daily report"
+    },
+    {
+      "measurementMapping": {
+        "series": "x-direction",
+        "type": "c8y_MagneticField"
+      },
+      "offset": 0,
+      "multiplier": 0.1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "uTesla",
+      "decimalPlaces": 0,
+      "startBit": 64,
+      "noBits": 8,
+      "messageTypeId": 3,
+      "name": "Magnetic field in x-direction",
+      "category": "Rotation"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 69,
+      "noBits": 1,
+      "messageTypeId": 1,
+      "name": "Latitude bit 24",
+      "eventMapping": {
+        "innerType": "latBit24",
+        "text": "Position message received.",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Tracking"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 70,
+      "noBits": 2,
+      "messageTypeId": 1,
+      "name": "Longitude bit 24-25",
+      "eventMapping": {
+        "innerType": "lngBit24-25",
+        "text": "Position message received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Tracking"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 72,
+      "noBits": 24,
+      "messageTypeId": 1,
+      "name": "Latitude Bit 0-23",
+      "eventMapping": {
+        "innerType": "latBit0-23",
+        "text": "Position message received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Tracking"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 72,
+      "noBits": 24,
+      "messageTypeId": 0,
+      "name": "Longitude bit 0-23",
+      "eventMapping": {
+        "innerType": "lngBit0-23",
+        "text": "Position message received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Alive"
+    },
+    {
+      "offset": 0,
+      "multiplier": 0.706,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 72,
+      "noBits": 8,
+      "messageTypeId": 2,
+      "name": "Level z",
+      "eventMapping": {
+        "innerType": "levelZ",
+        "text": "Inverse sinus of beam level message received",
+        "fragmentType": "c8y_Beam",
+        "type": "c8y_BeamEvent"
+      },
+      "category": "GenSens"
+    },
+    {
+      "measurementMapping": {
+        "series": "y-direction",
+        "type": "c8y_MagneticField"
+      },
+      "offset": 0,
+      "multiplier": 0.1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "uTesla",
+      "decimalPlaces": 0,
+      "startBit": 72,
+      "noBits": 8,
+      "messageTypeId": 3,
+      "name": "Magnetic field in y-direction",
+      "category": "Rotation"
+    },
+    {
+      "measurementMapping": {
+        "series": "D",
+        "type": "c8y_DailyDistance"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "km",
+      "decimalPlaces": 0,
+      "startBit": 80,
+      "noBits": 16,
+      "messageTypeId": 11,
+      "name": "Travelled distance",
+      "category": "Daily report"
+    },
+    {
+      "measurementMapping": {
+        "series": "z-direction",
+        "type": "c8y_MagneticField"
+      },
+      "offset": 0,
+      "multiplier": 0.1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "uTesla",
+      "decimalPlaces": 0,
+      "startBit": 80,
+      "noBits": 8,
+      "messageTypeId": 3,
+      "name": "Magnetic field in z-direction",
+      "category": "Rotation"
+    },
+    {
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 96,
+      "noBits": 24,
+      "messageTypeId": 1,
+      "name": "Longitude bit 0-23",
+      "eventMapping": {
+        "innerType": "lngBit0-23",
+        "text": "Position message received",
+        "fragmentType": "c8y_Position",
+        "type": "c8y_Position"
+      },
+      "category": "Tracking"
+    }
+  ]
+}

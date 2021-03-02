@@ -1,0 +1,15 @@
+{
+  "name": "Device measurement request",
+  "ngModules": [
+    "c8y.tixiDeviceControl"
+  ],
+  "category": "Device",
+  "description": "Supports ad-hoc requests for measurements.",
+  "js": [
+    "index.js"
+  ],
+  "folderName": "tixiDeviceControl",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

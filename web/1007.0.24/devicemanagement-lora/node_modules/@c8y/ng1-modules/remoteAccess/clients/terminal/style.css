@@ -1,0 +1,25 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+}
+
+#terminal {
+  margin: 15px;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: black; 
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(148, 57, 14); 
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(196, 75, 19); 
+}

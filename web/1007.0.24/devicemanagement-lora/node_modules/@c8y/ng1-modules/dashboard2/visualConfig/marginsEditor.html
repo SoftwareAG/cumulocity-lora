@@ -1,0 +1,53 @@
+<form name="marginsForm" novalidate>
+  <div ng-if="vm.singleValue">
+    <div class="form-group">
+      <label for="margin" ng-bind="(vm.label || vm.defaultLabels.single) | translate"></label>
+      <div class="input-group">
+        <input id="margin" name="margin" type="number" class="form-control" ng-model="vm.margins.margin" ng-change="vm.onMarginsChanged()" placeholder="{{vm.getPlaceholder()}}" ng-min="0" ng-max="50">
+        <span class="input-group-addon">px</span>
+      </div>
+      <c8y-error-feedback field="marginsForm.margin"></c8y-error-feedback>
+    </div>
+  </div>
+  <div ng-if="!vm.singleValue">
+    <label>
+      <small translate>Widget margins</small>
+    </label>
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label for="topMargin" ng-bind="(vm.labels.top || vm.defaultLabels.top) | translate"></label>
+        <div class="input-group">
+          <input id="topMargin" name="topMargin" type="number" class="form-control" ng-model="vm.margins.top" ng-change="vm.onMarginsChanged()" placeholder="{{vm.getPlaceholder('top')}}" ng-min="0" ng-max="50">
+          <span class="input-group-addon">px</span>
+        </div>
+        <c8y-error-feedback field="marginsForm.topMargin"></c8y-error-feedback>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="bottomMargin" ng-bind="(vm.labels.bottom || vm.defaultLabels.bottom) | translate"></label>
+        <div class="input-group">
+          <input id="bottomMargin" name="bottomMargin" type="number" class="form-control" ng-model="vm.margins.bottom" ng-change="vm.onMarginsChanged()" placeholder="{{vm.getPlaceholder('bottom')}}" ng-min="0" ng-max="50">
+          <span class="input-group-addon">px</span>
+        </div>
+        <c8y-error-feedback field="marginsForm.bottomMargin"></c8y-error-feedback>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label for="leftMargin" ng-bind="(vm.labels.left || vm.defaultLabels.left) | translate"></label>
+        <div class="input-group">
+          <input id="leftMargin" name="leftMargin" type="number" class="form-control" ng-model="vm.margins.left" ng-change="vm.onMarginsChanged()" placeholder="{{vm.getPlaceholder('left')}}" ng-min="0" ng-max="50">
+          <span class="input-group-addon">px</span>
+        </div>
+        <c8y-error-feedback field="marginsForm.leftMargin"></c8y-error-feedback>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="rightMargin" ng-bind="(vm.labels.right || vm.defaultLabels.right) | translate"></label>
+        <div class="input-group">
+          <input id="rightMargin" name="rightMargin" type="number" class="form-control" ng-model="vm.margins.right" ng-change="vm.onMarginsChanged()" placeholder="{{vm.getPlaceholder('right')}}" ng-min="0" ng-max="50">
+          <span class="input-group-addon">px</span>
+        </div>
+        <c8y-error-feedback field="marginsForm.rightMargin"></c8y-error-feedback>
+      </div>
+    </div>
+  </div>
+</form>

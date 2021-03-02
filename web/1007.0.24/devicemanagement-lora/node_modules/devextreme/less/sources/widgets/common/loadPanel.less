@@ -1,0 +1,54 @@
+/**
+* DevExtreme (widgets/common/loadPanel.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./loadIndicator.less";
+@import (once) "./overlay.less";
+
+.dx-loadpanel-content {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background: #fefefe;
+    text-align: center;
+    .user-select(none);
+
+    -webkit-user-drag: none;
+    border-radius: 5px;
+
+    &:before {
+        display: inline-block;
+        height: 100%;
+        content: '';
+        vertical-align: middle;
+    }
+}
+
+.dx-loadpanel-content-wrapper {
+    display: inline-block;
+    width: 100%;
+    vertical-align: middle;
+}
+
+.dx-loadpanel-message {
+    text-align: center;
+}
+
+.dx-loadpanel-content.dx-loadpanel-pane-hidden {
+    box-shadow: none;
+    border: none;
+    background: none;
+}
+
+@keyframes dx-loadpanel-opacity {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

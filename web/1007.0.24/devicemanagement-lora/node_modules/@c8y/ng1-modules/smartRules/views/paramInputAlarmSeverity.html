@@ -1,0 +1,10 @@
+<ng-form name="nestedSmartRuleForm">
+  <div class="form-group property-{{param.property}}" ng-class="{'has-error': nestedSmartRuleForm.$dirty && nestedSmartRuleForm.$invalid}">
+    <ui-select class="form-control" ng-model="rule.config[param.property]" ng-required="param.required" uib-tooltip="{{placeholder(param) | translate}}">
+      <ui-select-match placeholder="{{placeholder(param) | translate}}" ng-bind="$select.selected | translate"></ui-select-match>
+      <ui-select-choices repeat="severity in severities | filterByFields: $select.search:[]:true">
+        <div ng-bind="severity | translate"></div>
+      </ui-select-choices>
+    </ui-select>
+  </div>
+</ng-form>

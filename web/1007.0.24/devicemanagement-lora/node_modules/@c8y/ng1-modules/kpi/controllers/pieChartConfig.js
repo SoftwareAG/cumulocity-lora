@@ -1,0 +1,1 @@
+"use strict";!function(){function t(i){function e(t){return!0===t.__active}i.differentUnits=!1,i.$watchCollection(function(){var t=_.filter(i.config.datapoints,e);if(t.length){var n=_.head(t).unit;return _.every(t,{unit:n})}return!0},function(t){i.differentUnits=!t})}t.$inject=["$scope"],angular.module("c8y.parts.kpi").controller("pieChartConfigCtrl",t)}();

@@ -1,0 +1,12 @@
+[DeviceInfo]
+VendorName=Cumulocity
+ProductName=CANopen
+RevisionNumber=2
+
+[1000]
+ParameterName=DeviceType
+ObjectType=0x7
+DataType=0x0007
+AccessType=ro
+DefaultValue=197009
+PDOMapping=0

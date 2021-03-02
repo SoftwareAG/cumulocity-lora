@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Terminal</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <script src="../remoteAccessClients.service.js"></script>
+
+  <script>
+    var terminalSize = { cols: 132, rows: 43 };
+    var clientService = new RemoteAccessClientsService(window.location, window.localStorage);
+
+    clientService.loadCss('style.css');
+    clientService.loadCss('xterm.css');
+    clientService.loadJs('xterm.js');
+    clientService.loadJs('text.min.js');
+    clientService.loadJs('telnet-negotiator.js');
+    clientService.loadJs('shell-adapter.js');
+    clientService.loadJs('index.js');
+  </script>
+</head>
+
+<body>
+  <div id="terminal"></div>
+</body>
+
+</html>

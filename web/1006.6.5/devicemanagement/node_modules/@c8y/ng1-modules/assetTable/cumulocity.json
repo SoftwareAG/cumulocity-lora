@@ -1,0 +1,28 @@
+{
+  "name": "Asset table component",
+  "ngModules": [
+    "c8y.assets"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "A configurable component that display in the table properties of the assets",
+  "css": [
+    "assetTable2/style.css"
+  ],
+  "js": [
+    "assetTable2/index.js",
+    "comparisons.service.js",
+    "assetTable2/assets.controller.js",
+    "assetTable2/assetsConfig.controller.js",
+    "assetTable2/assets.service.js",
+    "assetTable2/sort.directive.js",
+    "assetTable2/rendererIcon.controller.js",
+    "assetTable2/configIconMap.controller.js",
+    "assetTable2/rendererButton.controller.js",
+    "assetTable2/rendererButtonConfig.controller.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-range-slider.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-range-slider.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-range-slider.js",
+  "esm5": "../../esm5/ui/range-slider/devextreme-angular-ui-range-slider.js",
+  "esm2015": "../../esm2015/ui/range-slider/devextreme-angular-ui-range-slider.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-range-slider.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-range-slider.js",
+  "typings": "devextreme-angular-ui-range-slider.d.ts",
+  "metadata": "devextreme-angular-ui-range-slider.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/range-slider"
+}

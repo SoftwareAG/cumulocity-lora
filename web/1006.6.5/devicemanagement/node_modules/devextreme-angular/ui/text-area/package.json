@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-text-area.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-text-area.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-text-area.js",
+  "esm5": "../../esm5/ui/text-area/devextreme-angular-ui-text-area.js",
+  "esm2015": "../../esm2015/ui/text-area/devextreme-angular-ui-text-area.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-text-area.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-text-area.js",
+  "typings": "devextreme-angular-ui-text-area.d.ts",
+  "metadata": "devextreme-angular-ui-text-area.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/text-area"
+}

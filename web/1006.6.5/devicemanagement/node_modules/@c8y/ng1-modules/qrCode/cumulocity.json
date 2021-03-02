@@ -1,0 +1,15 @@
+{
+  "name": "QR code",
+  "ngModules": [
+    "c8y.qrCode"
+  ],
+  "category": "Verticals",
+  "description": "Allows for printing QR codes for single and multiple routes and devices.",
+  "js": [
+    "index.js",
+    "controllers/qrCode.js",
+    "directives/displayQrCode.js",
+    "services/qrCodePrinter.js",
+    "services/qrCodeTemplate.js"
+  ]
+}

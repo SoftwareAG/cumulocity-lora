@@ -1,0 +1,17 @@
+{
+  "name": "Asset properties widget",
+  "ngModules": [
+    "c8y.parts.assetPropertyWidget"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "Show editable asset properties in a dashboard widget",
+  "js": [
+    "index.js",
+    "main.controller.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

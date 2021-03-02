@@ -1,0 +1,42 @@
+/**
+* DevExtreme (widgets/common/buttonGroup.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./button.less";
+
+.dx-buttongroup {
+    display: inline-block;
+}
+
+.dx-buttongroup-wrapper {
+    .flex-container(row, nowrap);
+
+    height: 100%;
+    width: 100%;
+}
+
+.dx-buttongroup-item {
+    flex: 0 1 auto;
+
+    &.dx-button-mode-outlined,
+    &.dx-button-mode-contained {
+        border-left-width: 0;
+
+        &.dx-button {
+            border-radius: 0;
+        }
+    }
+
+    &.dx-button-mode-text {
+        margin-left: 1px;
+    }
+}
+
+.dx-buttongroup-item-has-width {
+    flex: 1 1 auto;
+}
+

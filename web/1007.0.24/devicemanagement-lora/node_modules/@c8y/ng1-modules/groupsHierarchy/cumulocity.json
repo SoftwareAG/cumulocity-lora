@@ -1,0 +1,23 @@
+{
+  "name": "Groups hierarchy",
+  "ngModules": [
+    "c8y.groupsHierarchy"
+  ],
+  "category": "Groups",
+  "list": true,
+  "description": "Provides support for creating and browsing groups hierarchies.",
+  "css": [
+    "style/style.css"
+  ],
+  "imports": [
+    "core/deviceSelector",
+    "devicemanagement/aclManagement"
+  ],
+  "js": [
+    "index.js",
+    "groupsHierarchyUi.provider.js",
+    "controllers/groupsListCtrl.js",
+    "controllers/groupDevicesCtrl.js",
+    "controllers/assetSearchCtrl.js"
+  ]
+}

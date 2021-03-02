@@ -1,0 +1,39 @@
+//@import "../../c8yBranding/variables/index.less";
+
+// Temporary for DT HMI
+@modal-footer-border-color: #e5e5e5;
+@gray: #8F9EA2;
+
+.switchDisplayConfig {
+  table {
+    tr td {
+      border: none;
+      &.labels {
+        padding-bottom: 0;
+      }
+      &.inputs {
+          padding-top: 0;
+      }
+    }
+    tr:hover td {
+      background: none;
+    }
+  }
+  input {
+    width: 100%;
+    padding: 2px;
+  }
+  button {
+    text-transform: uppercase;
+  }
+  .buttonsExistingSwitches {
+    border-bottom: 2px solid @modal-footer-border-color;
+  }
+  .actionButtons {
+    padding-bottom: 14px;
+    margin-bottom: -1px;
+  }
+  .btn-link {
+    color: @gray;
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-speed-dial-action.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-speed-dial-action.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-speed-dial-action.js",
+  "esm5": "../../esm5/ui/speed-dial-action/devextreme-angular-ui-speed-dial-action.js",
+  "esm2015": "../../esm2015/ui/speed-dial-action/devextreme-angular-ui-speed-dial-action.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-speed-dial-action.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-speed-dial-action.js",
+  "typings": "devextreme-angular-ui-speed-dial-action.d.ts",
+  "metadata": "devextreme-angular-ui-speed-dial-action.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/speed-dial-action"
+}

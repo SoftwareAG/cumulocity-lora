@@ -1,0 +1,1 @@
+"use strict";!function(){function i(t){return{priority:1,restrict:"A",link:function(c,i){i.bind("click",function(i){t.logout(),c.ngClick(),i.stopPropagation()})},scope:{ngClick:"&"}}}i.$inject=["c8yCumulocity"],angular.module("c8y.sdk").directive("c8yLogout",i)}();

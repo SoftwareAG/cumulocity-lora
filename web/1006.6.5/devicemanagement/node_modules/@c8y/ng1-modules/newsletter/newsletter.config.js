@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e,t){e.addComponentGroup({name:"newsletter",label:t("Newsletter"),priority:1e3}),e.addComponent({priority:1e3,template:'<c8y-subscribe-newsletter user="user" form="forms.userForm" />',ngStyle:{float:"left",marginRight:"1.6em"}},"newsletter")}e.$inject=["c8yUserSettingsBlocksProvider","gettext"],angular.module("c8y.newsletter").config(e)}();

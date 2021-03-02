@@ -1,0 +1,21 @@
+<ng-form name="inputValueForm">
+  <c8y-schema-form
+    schema="vm.inputValueSchema"
+    form="vm.inputValueForm"
+    model="vm.placeholders"
+    options="vm.options"
+    class="form-group-sm"
+  >
+  </c8y-schema-form>
+
+  <button
+    title="{{ 'Execute' | translate }}"
+    type="button"
+    ng-disabled="inputValueForm.$invalid || vm.isInProgress(operation)"
+    ng-click="vm.execute(operation, vm.placeholders); vm.popoverOpen = false;"
+    class="btn btn-primary btn-block"
+    translate
+  >
+    Execute
+  </button>
+</ng-form>

@@ -1,0 +1,18 @@
+{
+  "name": "VendMe device control",
+  "ngModules": [
+    "c8y.parts.vendMeDeviceControl"
+  ],
+  "category": "Verticals",
+  "icon": "home",
+  "color": "#F03F0F",
+  "description": "Configure vending telemetry device specific aspects, including protocols used to communicate with the vending machine. This plugin contributes a view to the device details.",
+  "js": [
+    "index.js",
+    "controllers/vendMeDeviceControl.js"
+  ],
+  "folderName": "vendMeDeviceControl",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

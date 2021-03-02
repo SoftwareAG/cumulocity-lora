@@ -1,0 +1,1 @@
+"use strict";!function(){function n(e,n){var t="c8y_TenantPolicy";return{list:function(){var n={type:t};return e.list(n)},detail:e.detail,remove:e.remove,save:function(n){n.id||(n.type=t);return e.save(n)},isTopTenant:n.isCurrentUserTopTenant}}n.$inject=["c8yInventory","c8yTenant"],angular.module("c8y.tenantPolicies").factory("c8yTenantPolicies",n)}();

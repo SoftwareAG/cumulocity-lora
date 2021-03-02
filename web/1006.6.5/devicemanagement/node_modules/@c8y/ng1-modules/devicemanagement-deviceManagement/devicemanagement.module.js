@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e,c,i){e.configDefaultView(),c.provideDeviceTab(),i.initUi()}e.$inject=["c8yGenericUiConfigProvider","c8yRemoteAccessUIProvider","c8yDeviceProtocolUiProvider"],angular.module("c8y.deviceManagement",["c8y.genericUi","c8y.remoteAccess","c8y.deviceProtocols"]).config(e)}();

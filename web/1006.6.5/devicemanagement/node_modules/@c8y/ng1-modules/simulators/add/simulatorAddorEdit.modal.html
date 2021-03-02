@@ -1,0 +1,86 @@
+<div class="modal-header">
+  <h3>
+    <i class="c8y-icon c8y-icon-simulator c8y-icon-duocolor"></i>
+    <span title="{{ 'Add simulator' | translate }}" translate ng-hide="vm.editInstances"
+      >Add simulator</span
+    >
+    <span
+      title="{{ 'Edit number of simulator instances' | translate }}"
+      translate
+      ng-show="vm.editInstances"
+      >Edit number of simulator instances</span
+    >
+  </h3>
+</div>
+<div class="modal-body">
+  <form name="newSimulatorForm" role="form" novalidate>
+    <div class="form-group" ng-if="!vm.editInstances">
+      <label for="presets">
+        <span title="{{ 'Select initial instructions' | translate }}" translate>Presets</span>
+      </label>
+      <div class="c8y-select-wrapper">
+        <select
+          name="presets"
+          class="form-control"
+          ng-model="vm.preset"
+          ng-options="p as (p.name | translate) for p in vm.presets"
+          ng-change="vm.onPresetSelected()"
+        ></select>
+        <span></span>
+      </div>
+      <c8y-error-feedback field="newSimulatorForm.presets"></c8y-error-feedback>
+    </div>
+
+    <div class="form-group" ng-if="!vm.editInstances">
+      <label for="name">
+        <span title="{{ 'Descriptive simulator name' | translate }}" translate>Simulator name</span>
+      </label>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        class="form-control"
+        ng-model="vm.newSimulator.name"
+        ng-maxlength="500"
+        placeholder="{{ 'e.g. My simulator' | translate }}"
+        required
+      />
+      <c8y-error-feedback field="newSimulatorForm.name"></c8y-error-feedback>
+    </div>
+
+    <div class="form-group">
+      <label for="numberInstances">
+        <span title="{{ 'Number of instances of the simulator to create' | translate }}" translate
+          >Number of instances</span
+        >
+      </label>
+      <div class="row">
+        <div class="col-xs-10">
+          <input type="range" step="1" min="1" max="10" ng-model="vm.newSimulator.instances" />
+        </div>
+        <div class="col-xs-2">
+          <span class="text" ng-bind="vm.newSimulator.instances"></span>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button
+    title="{{ 'Cancel' | translate }}"
+    class="btn btn-default"
+    ng-click="vm.cancel()"
+    translate
+  >
+    Cancel
+  </button>
+  <button
+    title="{{ 'Create' | translate }}"
+    class="btn btn-primary"
+    ng-click="vm.ok()"
+    ng-disabled="newSimulatorForm.$pending || newSimulatorForm.$invalid"
+    translate
+  >
+    Create
+  </button>
+</div>

@@ -1,0 +1,38 @@
+<div class="tabContainer hidden-xs"
+  ng-show="vm.showTabs()"
+  >
+  <button class="tabs-slider tabs-slider-left">
+    <i c8y-icon="chevron-left"></i>
+  </button>
+  <button class="tabs-slider tabs-slider-right">
+    <i c8y-icon="chevron-right"></i>
+  </button>
+  <ul class="nav nav-tabs nav-tabsc8y">
+    <li
+      ng-repeat="tab in vm.tabs"
+      ng-class="{active: tab.active}"
+      ng-if="tab.show">
+      <a ng-href="#{{::tab.path}}" title="{{(tab.label || tab.name) | translate}}">
+        <i c8y-icon="{{::tab.icon}}" ng-show="::tab.icon"></i>
+        <span class="txt">
+          {{(tab.label || tab.name) | translate}}
+        </span>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="visible-xs mobile-tabs" ng-show="vm.showTabs()">
+  <div class="c8y-select-wrapper">
+    <select ng-hide="vm.selectedTabPath"></select>
+    <select ng-model="vm.selectedTabPath" ng-change="vm.navigateTo(vm.selectedTabPath)" ng-if="vm.selectedTabPath">
+      <option
+        ng-repeat="tab in vm.tabs"
+        ng-if="tab.show"
+        ng-value="::tab.path"
+        ng-selected="tab.active">
+        {{(tab.label || tab.name) | translate}}
+      </option>
+    </select>
+  </div>
+</div>

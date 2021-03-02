@@ -1,0 +1,19 @@
+{
+  "name": "AssetTrack",
+  "ngModules": [
+    "c8y.parts.tracking"
+  ],
+  "category": "Verticals",
+  "icon": "home",
+  "color": "#F03F0F",
+  "description": "View the historic locations of a device, browser its trace for a given time period. This plugin contributes a new view to the device details.",
+  "js": [
+    "index.js",
+    "controllers/tracking.js",
+    "controllers/config.js"
+  ],
+  "folderName": "tracking",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

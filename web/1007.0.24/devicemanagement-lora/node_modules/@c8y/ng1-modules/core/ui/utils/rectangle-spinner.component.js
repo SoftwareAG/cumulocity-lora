@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").component("c8yRectangleSpinner",{templateUrl:":::PLUGIN_PATH:::/ui/utils/rectangle-spinner.html",bindings:{message:"<"},controllerAs:"vm"});

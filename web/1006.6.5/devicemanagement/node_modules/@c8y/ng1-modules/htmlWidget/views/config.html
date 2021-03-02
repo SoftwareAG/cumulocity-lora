@@ -1,0 +1,56 @@
+<div ng-controller="htmlWidgetConfigCtrl" class="html-widget-config">
+  <div class="form-group">
+    <label>
+      {{'HTML code' | translate}}
+      <button class="btn btn-link" ng-click="toggleHtmlCodeTooltip()" uib-tooltip="{{'Toggle help text' | translate}}">
+        <i c8y-icon="question-circle-o" ng-class="{'text-primary': !htmlCodeTooltipVisible, 'text-muted': htmlCodeTooltipVisible}"></i>
+      </button>
+    </label>
+    <div class="alert alert-info text-left" ng-show="htmlCodeTooltipVisible">
+      <p translate>You can use the following variables in your HTML code:</p>
+      <ul>
+        <li>
+          <var ng-non-bindable>{{device}}</var> &ndash;
+          <translate>current device or group, you can access its properties e.g.</translate> <var ng-non-bindable>{{device.name}}</var>,
+        </li>
+        <li>
+          <var ng-non-bindable>{{devices}}</var> &ndash;
+          <translate>children of current device or group, you can access their properties e.g.</translate> <var ng-non-bindable>{{devices[14200].name}}</var>,
+        </li>
+        <li>
+          <var ng-non-bindable>{{devicesCount}}</var> &ndash;
+          <translate>number of devices</translate>,
+        </li>
+        <li>
+          <var ng-non-bindable>{{deviceGroupsCount}}</var> &ndash;
+          <translate>number of groups</translate>,
+        </li>
+        <li>
+          <var ng-non-bindable>{{usersCount}}</var> &ndash;
+          <translate>number of users</translate>,
+        </li>
+        <li>
+          <var ng-non-bindable>{{criticalDevicesCount}}</var> &ndash;
+          <translate>number of devices with critical alarm status</translate>,
+        </li>
+        <li>
+          <var ng-non-bindable>{{onlineCount}}</var> &ndash;
+          <translate>number of online devices</translate>.
+        </li>
+      </ul>
+    </div>
+
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" ng-model="config.unsafe"> {{'Allow insecure use of elements and attributes' | translate}}
+      </label>
+    </div>
+
+    <div class="form-group">
+    <textarea class="form-control" ng-model="config.html" rows="10" required></textarea>
+    <span ng-if="!config.unsafe" id="helpBlock" class="help-block" translate>
+      HTML code will be sanitized.
+    </span>
+    </div>
+  </div>
+</div>

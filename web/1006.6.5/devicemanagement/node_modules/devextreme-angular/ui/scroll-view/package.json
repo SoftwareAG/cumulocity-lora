@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-scroll-view.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-scroll-view.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-scroll-view.js",
+  "esm5": "../../esm5/ui/scroll-view/devextreme-angular-ui-scroll-view.js",
+  "esm2015": "../../esm2015/ui/scroll-view/devextreme-angular-ui-scroll-view.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-scroll-view.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-scroll-view.js",
+  "typings": "devextreme-angular-ui-scroll-view.d.ts",
+  "metadata": "devextreme-angular-ui-scroll-view.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/scroll-view"
+}

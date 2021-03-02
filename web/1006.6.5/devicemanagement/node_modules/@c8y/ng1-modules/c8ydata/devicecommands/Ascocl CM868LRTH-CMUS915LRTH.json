@@ -1,0 +1,51 @@
+{
+  "name": "Predefined Ascocl CM868LRTH-CMUS915LRTH",
+  "syntax": "HEX",
+  "templates": [
+    {
+      "name": "Enquire presentation info",
+      "command": "05456E715F:5",
+      "category": "Device info"
+    },
+    {
+      "name": "Enquire serial number",
+      "command": "05456E715F:6",
+      "category": "Device info"
+    },
+    {
+      "name": "Enquire device release info",
+      "command": "05456E715F:7",
+      "category": "Device info"
+    },
+    {
+      "name": "Enquire battery level info",
+      "command": "05456E715F:8",
+      "category": "Device info"
+    },
+    {
+      "name": "Set ALIVE interval",
+      "command": "04{TMALIVE2Bytes}{Checksum}:9",
+      "category": "Report"
+    },
+    {
+      "name": "Set MODE",
+      "command": "{TotalPayloadLength}{MODE}{CNFGRGST2Bytes}{CNTELPS2Bytes}{TMELPS2Bytes}{Checksum}:12",
+      "category": "Device config"
+    },
+    {
+      "name": "Set FLAGS",
+      "command": "04{FLAGS2Bytes}{Checksum}:13",
+      "category": "Device config"
+    },
+    {
+      "name": "Set humidity threshold",
+      "command": "0F{ThresholdLow4Bytes}{ThresholdHigh4Bytes}{HYSTH4Bytes}{NUMTHRL}{Checksum}:30",
+      "category": "Sensor threshold"
+    },
+    {
+      "name": "Set temperature threshold",
+      "command": "0F{ThresholdLow4Bytes}{ThresholdHigh4Bytes}{HYSTH4Bytes}{NUMTHRL}{Checksum}:31",
+      "category": "Sensor threshold"
+    }
+  ]
+}

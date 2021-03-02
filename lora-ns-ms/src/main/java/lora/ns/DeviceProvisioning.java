@@ -5,7 +5,10 @@ import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class DeviceProvisioning {
+import lora.common.ValidationResult;
+import lora.common.Validator;
+
+public class DeviceProvisioning implements Validator {
 	private String name;
 	private String devEUI;
 
@@ -178,5 +181,39 @@ public class DeviceProvisioning {
 
 	public void setProvisioningMode(ProvisioningMode provisioningMode) {
 		this.provisioningMode = provisioningMode;
+	}
+
+	public ValidationResult validate() {
+		boolean result = true;
+		String reason = "";
+
+		if (devEUI == null || devEUI.isBlank() || devEUI.isEmpty()) {
+			result = false;
+			reason += "\ndevEUI is required.";
+		}
+		if (appEUI == null || appEUI.isBlank() || appEUI.isEmpty()) {
+			result = false;
+			reason += "\nappEUI is required.";
+		}
+		switch(provisioningMode) {
+			case OTAA:
+			if (appKey == null || appKey.isBlank() || appKey.isEmpty()) {
+				result = false;
+				reason += "\nappKey is required for OTAA registration.";
+			}
+			break;
+			case ABP:
+			if (appSKey == null || appSKey.isBlank() || appSKey.isEmpty()) {
+				result = false;
+				reason += "\nappSKey is required for ABP registration.";
+			}
+			if (nwkSKey == null || nwkSKey.isBlank() || nwkSKey.isEmpty()) {
+				result = false;
+				reason += "\nnwkSKey is required for ABP registration.";
+			}
+			break;
+		}
+
+		return new ValidationResult(result, reason);
 	}
 }

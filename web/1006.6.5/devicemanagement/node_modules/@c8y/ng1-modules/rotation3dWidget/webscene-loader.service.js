@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.rotation3d").service("c8yWebSceneLoader",function(){var n=new window.THREE.ObjectLoader;return{load:function(e){return n.load(":::PLUGIN_PATH:::/meshes/".concat(e))}}});

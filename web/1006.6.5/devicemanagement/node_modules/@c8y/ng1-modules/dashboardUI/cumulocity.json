@@ -1,0 +1,14 @@
+{
+  "name": "Dashboard UI",
+  "ngModules": [
+    "c8y.parts.dashboardUI"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "Dashboard to display multiple plugins in a single view on individual device/group level.",
+  "js": [
+    "dashboardUi.module.js",
+    "dashboardUi.provider.js"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "LWM2M mappings",
+  "ngModules": [
+    "c8y.lwm2m"
+  ],
+  "js": [
+    "module.js",
+    "lwm2m.provider.js",
+    "lwm2mUploadStep.component.js",
+    "lwm2mFinalStep.component.js",
+    "lwm2mDetail.component.js",
+    "lwm2mResource.component.js",
+    "lwm2mValidationRules/lwm2mValidationRules.component.js",
+    "lwm2mValidationRules/lwm2mValidationRule.component.js",
+    "postOperations/lwm2mPostOperations.component.js",
+    "postOperations/lwm2mPostOperationsUi.provider.js",
+    "bootstrap/bootstrap-config.module.js",
+    "bootstrap/bootstrap-config.component.js"
+  ]
+}

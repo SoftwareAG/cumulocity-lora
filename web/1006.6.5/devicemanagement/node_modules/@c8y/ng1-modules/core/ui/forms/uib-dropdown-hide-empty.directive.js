@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("uibDropdown",function(){return{restrict:"A",link:function(n,i){var t=i.find("[uib-dropdown-menu]"),e=i.find("[uib-dropdown-toggle]");n.$watch(function(){return 0<t.children().not(".ng-hide").length},function(n){e.toggleClass("ng-hide",!n)})}}});

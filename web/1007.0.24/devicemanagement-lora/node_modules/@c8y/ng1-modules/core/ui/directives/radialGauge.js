@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yRadialGauge",function(){return{restrict:"EA",scope:{dp:"=",measurement:"=",time:"=",value:"=?",lowerLimit:"=?",upperLimit:"=?",ranges:"=?",valueUnit:"=?",precision:"=?",width:"&",height:"&",fractionSize:"="},controller:"c8yRadialGaugeCtrl",controllerAs:"ctrl"}});

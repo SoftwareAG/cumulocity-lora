@@ -1,0 +1,1 @@
+"use strict";!function(){function t(t){var o=this;_.assign(o,{CONFIG:t.VIEW_CONFIG,showEmptyState:function(){return o.isEmpty},add:function(){return t.addWithWizard()}})}t.$inject=["c8yDeviceProtocolUi"],angular.module("c8y.deviceProtocols").component("c8yDeviceProtocolView",{templateUrl:":::PLUGIN_PATH:::/deviceProtocolView.html",controllerAs:"vm",controller:t})}();

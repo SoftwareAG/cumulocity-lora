@@ -1,0 +1,35 @@
+/**
+* DevExtreme (widgets/material/autocomplete.material.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./dropDownList.material.less";
+
+.autocomplete-editor-container-offset() {
+    right: @MATERIAL_INVALID_BADGE_HORIZONTAL_PADDING;
+
+    .dx-rtl &,
+    .dx-rtl& {
+        left: @MATERIAL_INVALID_BADGE_HORIZONTAL_PADDING;
+    }
+}
+
+.dx-autocomplete.dx-invalid,
+.dx-autocomplete.dx-valid {
+    .dx-texteditor-buttons-container {
+        &:after {
+            .autocomplete-editor-container-offset();
+        }
+    }
+}
+
+.dx-autocomplete.dx-validation-pending {
+    .dx-texteditor-buttons-container {
+        .dx-pending-indicator {
+            .autocomplete-editor-container-offset();
+        }
+    }
+}
