@@ -1,0 +1,24 @@
+{
+  "description": "Generic UI",
+  "ngModules": [
+    "c8y.genericUi",
+    "c8y.configAudit"
+  ],
+  "js": [
+    "module.js",
+    "generic-ui.service.js",
+    "generic-ui-config.provider.js",
+    "generic-ui-auto.component.js",
+    "generic-ui.component.js",
+    "generic-ui-inventory.component.js",
+    "generic-ui-inventory-property.component.js",
+    "generic-ui-operation-list-button.component.js",
+    "data.mock.js",
+
+    "config-audit/index.js",
+    "config-audit/config-audit.service.js",
+    "config-audit/config-audit-modal.component.js",
+    "config-audit/config-audit.component.js",
+    "config-audit/config-audit-diff.component.js"
+  ]
+}

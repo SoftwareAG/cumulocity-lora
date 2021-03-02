@@ -1,0 +1,28 @@
+/**
+* DevExtreme (widgets/material/tileView.material.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./scrollView.material.less";
+
+.dx-tile {
+    color: @tileview-color;
+    background-color: @tileview-bg;
+    border: 1px solid @tileview-border-color;
+    text-align: left;
+
+    &.dx-state-focused,
+    &.dx-state-hover {
+        background-color: @tileview-hover-bg;
+        border-color: @tileview-hover-border-color;
+    }
+
+    &.dx-state-active {
+        background-color: @tileview-active-bg;
+        color: @tileview-active-color;
+        border-color: transparent;
+    }
+}

@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").filter("hex",function(){return function(e){var t=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{},n=t.prefix,r=t.suffix,i=t.lowerCase,o="";return _.isUndefined(e)||_.isNull(e)||(o=_.toNumber(e).toString(16),i||(o=o.toUpperCase()),o="".concat(n||"").concat(o).concat(r||"")),o}});

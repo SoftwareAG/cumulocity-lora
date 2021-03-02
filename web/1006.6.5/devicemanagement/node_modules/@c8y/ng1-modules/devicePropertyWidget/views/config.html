@@ -1,0 +1,11 @@
+<div ng-controller="devicePropertyWidgetConfigCtrl">
+
+  <div class="form-group">
+    <label translate>Fragments</label>
+
+    <div ng-include="':::PLUGIN_PATH:::/views/fragmentList.html'">
+    </div>
+
+    <input type="hidden" name="fieldsControl" ng-model="fieldsControl">
+  </div>
+</div>

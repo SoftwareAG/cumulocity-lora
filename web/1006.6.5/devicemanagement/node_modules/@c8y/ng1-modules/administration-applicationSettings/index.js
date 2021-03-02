@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.parts.applicationSettings",[]).config(["c8yNavigatorProvider","c8yViewsProvider","gettext",function(t,i,a){t.addNavigation({parent:a("Settings"),name:a("Application"),path:"applicationsettings",icon:"cog",priority:1900}),i.when("/applicationsettings",{templateUrl:":::PLUGIN_PATH:::/views/index.html"})}]);

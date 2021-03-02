@@ -1,0 +1,27 @@
+{
+  "name": "rotation3d",
+  "ngModules": ["c8y.rotation3d"],
+  "category": "Widgets",
+  "description": "widget for 3d position preview",
+  "js": [
+    "index.js",
+    "components/viewer3d.component.js",
+    "components/webscene.component.js",
+    "components/viewer3dConfig.component.js",
+    "webscene-loader.service.js",
+    "node_modules/three/build/three.min.js",
+    "node_modules/three/examples/js/controls/OrbitControls.js"
+  ],
+  "webpackOverride": {
+    "js": [
+      "index.js",
+      "webpack-specific.js",
+      "components/viewer3d.component.js",
+      "components/webscene.component.js",
+      "components/viewer3dConfig.component.js",
+      "webscene-loader.service.js",
+      "node_modules/three/examples/js/controls/OrbitControls.js"
+    ],
+    "copy": ["img/*"]
+  }
+}

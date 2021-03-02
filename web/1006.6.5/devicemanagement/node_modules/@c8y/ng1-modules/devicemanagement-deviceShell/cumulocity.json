@@ -1,0 +1,19 @@
+{
+  "name": "Device shell",
+  "ngModules": [
+    "c8y.deviceShell"
+  ],
+  "category": "Device",
+  "description": "Send commands to devices and receive responses in realtime.",
+  "js": [
+    "index.js",
+    "controllers/deviceShell.js",
+    "controllers/commandTemplates.js",
+    "controllers/deviceStatus.js",
+    "directives/deviceStatus.js"
+  ],
+  "folderName": "deviceShell",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

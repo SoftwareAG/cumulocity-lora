@@ -1,0 +1,10 @@
+{
+    "name": "CANopen mappings",
+    "ngModules": [
+      "c8y.canopen"
+    ],
+    "js": [
+      "canopen.module.js",
+      "canopen-device.provider.js"
+    ]
+  }

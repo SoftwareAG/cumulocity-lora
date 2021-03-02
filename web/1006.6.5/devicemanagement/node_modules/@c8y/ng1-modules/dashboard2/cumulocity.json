@@ -1,0 +1,37 @@
+{
+  "name": "Dashboard",
+  "ngModules": [
+    "c8y.parts.dashboard2"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "Dashboard to agregate multiple plugins in a single view.",
+  "css": [
+    "node_modules/gridstack/dist/gridstack.css",
+    "style.css"
+  ],
+  "js": [
+    "node_modules/gridstack/dist/gridstack.js",
+    "index.js",
+    "dashboard.service.js",
+    "dashboardStyle.service.js",
+    "dashboardInventory.service.js",
+    "communication.service.js",
+    "dashboardViaEmail.service.js",
+
+    "dashboard/dashboard.directive.js",
+    "dashboard/dashboard.controller.js",
+    "dashboard/dashboardSelect.controller.js",
+    "dashboard/edit.controller.js",
+    "dashboard/new.controller.js",
+    "dashboard/dashboardPermissions.component.js",
+
+    "dashboardWidget/dashboardChild.directive.js",
+    "dashboardWidget/config.controller.js",
+    "dashboardWidget/widget-footer.directive.js",
+
+    "visualConfig/classSelector.component.js",
+    "visualConfig/marginsEditor.component.js"
+  ]
+}

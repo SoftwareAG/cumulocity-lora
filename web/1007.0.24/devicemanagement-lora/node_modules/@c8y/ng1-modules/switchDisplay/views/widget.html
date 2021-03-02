@@ -1,0 +1,12 @@
+
+<table class="table switchDisplay" ng-controller="switchDisplayCtrl">
+  <tr ng-repeat="switch in switches">
+    <td>{{switch.name}}</td>
+    <td class="statusButton text-center text-muted" ng-class="{activeState: switch.value === switch.activeValue}">
+      <i class="icon" c8y-icon="check"></i>{{switch.activeLabel}}
+    </td>
+    <td class="statusButton text-center text-muted" ng-class="{inactiveState: switch.value === switch.inactiveValue}">
+      <i class="icon" c8y-icon="times"></i>{{switch.inactiveLabel}}
+    </td>
+  </tr>
+</table>

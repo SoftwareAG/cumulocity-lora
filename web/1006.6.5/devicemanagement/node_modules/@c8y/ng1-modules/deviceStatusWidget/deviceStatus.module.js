@@ -1,0 +1,1 @@
+"use strict";!function(){function t(t,e){t.add({name:"deviceStatusWidget",nameDisplay:e("Device status"),description:e("Widget displays connectivity status for particular device"),widgetComponent:"c8yDeviceStatus",options:{groupSelectable:!1}})}t.$inject=["c8yComponentsProvider","gettext"],angular.module("c8y.deviceStatus",[]).config(t)}();

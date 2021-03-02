@@ -1,0 +1,132 @@
+<form name="addIconMapForm" novalidate>
+  <div class="modal-header" ng-show="title">
+    <h3>{{ title | translate }}</h3>
+  </div>
+  <div class="modal-body">
+    <button class="btn btn-xs btn-primary pull-right text-center" data-ng-click="addIconMap()">
+      <i c8y-icon="plus"></i>{{ 'Add icon map' | translate }}
+    </button>
+    <table class="table table-condensed" data-ng-repeat="iconMap in iconsMap track by $index">
+      <thead>
+        <tr>
+          <th class="col-lg-9" translate>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <input
+              class="form-control"
+              type="text"
+              ng-model="iconMap.name"
+              placeholder="{{ 'e.g. My icon map' | translate }}"
+              required
+            />
+          </td>
+          <td>
+            <button
+              data-ng-disabled="iconsMap.length < 2"
+              class="btn btn-danger btn-xs showOnHover pull-right"
+              title="{{ 'Add map' | translate }}"
+              data-ng-click="onDelete(iconsMap, $index)"
+            >
+              <i c8y-icon="times"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="7">
+            <table class="table table-condensed" ng-show="iconMap.map.length">
+              <thead>
+                <tr>
+                  <th class="col-lg-3" translate>Value</th>
+                  <th class="col-lg-3" translate>Comparison</th>
+                  <th class="col-lg-3" translate>Icon</th>
+                  <th translate>Color</th>
+                  <th>
+                    <button
+                      class="btn btn-primary btn-xs pull-right text-center"
+                      data-ng-click="addMap(iconMap.map)"
+                    >
+                      <i c8y-icon="plus"></i>
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-ng-repeat="map in iconMap.map track by $index">
+                  <td>
+                    <input
+                      class="form-control"
+                      type="text"
+                      ng-model="map.value"
+                      placeholder="{{ 'e.g.' | translate }} 123"
+                      required
+                    />
+                  </td>
+                  <td class="text-center">
+                    <select
+                      class="form-control"
+                      data-ng-options="comparison for comparison in comparisons"
+                      ng-model="map.comparison"
+                      required
+                    ></select>
+                  </td>
+                  <td>
+                    <ui-select ng-model="map.icon">
+                      <ui-select-match placeholder="{{ 'Select or search icon' | translate }}">
+                        <i c8y-icon="{{ $select.selected }}"></i>
+                        {{ $select.selected }}
+                      </ui-select-match>
+                      <ui-select-choices repeat="icon in icons | filter: $select.search">
+                        <div><i c8y-icon="{{ icon }}"></i> {{ icon }}</div>
+                      </ui-select-choices>
+                    </ui-select>
+                  </td>
+                  <td>
+                    <input
+                      c8y-color-picker
+                      type="text"
+                      class="form-control"
+                      name="color"
+                      ng-model="map.color"
+                    />
+                  </td>
+                  <td>
+                    <button
+                      data-ng-disabled="iconMap.map.length < 2"
+                      class="btn btn-danger btn-xs showOnHover pull-right"
+                      title="{{ 'Add map' | translate }}"
+                      data-ng-click="onDelete(iconMap.map, $index)"
+                    >
+                      <i c8y-icon="times"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button
+      title="{{ 'Cancel' | translate }}"
+      class="btn btn-default"
+      ng-click="dismiss()"
+      translate
+    >
+      Cancel
+    </button>
+    <button
+      title="{{ 'OK' | translate }}"
+      class="btn btn-primary"
+      data-ng-disabled="addIconMapForm.$invalid"
+      ng-click="close()"
+      translate
+    >
+      OK
+    </button>
+  </div>
+</form>

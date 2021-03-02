@@ -1,0 +1,57 @@
+<c8y-login ng-if='!vm.authState.hasAuth'></c8y-login>
+<div ng-if='vm.authState.hasAuth' ng-class="{'head-open': vm.headerOpen}">
+  <c8y-ui-header nav-hidden-on-startup="vm.navHiddenOnStartup" nav-open="vm.navOpen" on-toggle="vm.headerOpen=open"></c8y-ui-header>
+  <c8y-ui-navigator nav-hidden-on-startup="vm.navHiddenOnStartup" nav-open="vm.navOpen" root-nodes="vm.rootNodes"></c8y-ui-navigator>
+  <c8y-ui-alerts nav-hidden-on-startup="vm.navHiddenOnStartup"></c8y-ui-alerts>
+
+<!--
+    Apply CSS classes in c8y-ui-tabs
+    when the following conditions are met:
+    - navigator-open: when the navigator is open
+    - page-tabs-horizontal: For displaying tabs horizontally
+    - page-tabs-vertical: For displaying tabs vertically
+    - page-tabs: when there are tabs in the view
+-->
+  <c8y-ui-tabs
+    horizontal="vm.tabsHorizontal"
+    ng-class="{ 'navigator-open': vm.navOpen,
+                'page-tabs-horizontal': vm.tabsHorizontal,
+                'page-tabs-vertical': !vm.tabsHorizontal,
+                'page-tabs': vm.hasTabs()
+              }">
+  </c8y-ui-tabs>
+
+  <!--
+    Apply CSS classes in c8y-ui-action-bar
+    when the following conditions are met:
+     - navigator-open: when the navigator is open
+     - has-tabs: when there are tabs in the view
+     - horizontal-tabs: when tabs are horizontal
+     - hidden: SET FROM INSIDE THE COMPONENT
+   -->
+  <c8y-ui-action-bar
+    ng-class="{ 'navigator-open': vm.navOpen,
+                'horizontal-tabs': vm.tabsHorizontal,
+                'has-tabs': vm.hasTabs()
+              }" class="c8y-ui-action-bar hidden" >
+  </c8y-ui-action-bar>
+
+  <!--
+    Apply CSS classes in .mcontainer
+    when the following conditions are met:
+    - horizontal-tabs: when tabs are horizontal
+    - vertical-tabs : when tabs are vertical
+    - has-tabs:  when there are tabs in the view
+    - has-action-bar: when there's actions in the action bar
+   -->
+  <div class="mcontainer"
+    ng-class="{ open: vm.navOpen,
+                'no-apps-margin': vm.navHiddenOnStartup && !vm.navOpen || !vm.rootNodes().length,
+                'horizontal-tabs': vm.tabsHorizontal,
+                'vertical-tabs': !vm.tabsHorizontal,
+                'has-tabs': vm.hasTabs(),
+                'has-action-bar': vm.hasActionBar()
+              }">
+    <div ng-view class="container-fluid"></div>
+  </div>
+</div>

@@ -1,0 +1,1 @@
+"use strict";!function(){function t(c){return{restrict:"A",link:function(t,u){u.attr("autofocus","autofocus"),c(function(){u.focus()},750,!1)}}}t.$inject=["$timeout"],angular.module("c8y.ui").directive("c8yAutofocus",t)}();

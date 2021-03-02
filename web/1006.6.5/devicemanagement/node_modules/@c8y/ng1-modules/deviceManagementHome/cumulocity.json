@@ -1,0 +1,13 @@
+{
+  "name": "Device management home",
+  "ngModules": [
+    "c8y.deviceManagement.home"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "A home dashboard for the device management application.",
+  "js": [
+    "deviceManagementHome.module.js"
+  ]
+}

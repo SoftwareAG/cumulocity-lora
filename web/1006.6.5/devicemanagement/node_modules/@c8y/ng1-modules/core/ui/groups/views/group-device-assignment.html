@@ -1,0 +1,25 @@
+<div class="modal-header" ng-show="title">
+  <h3>{{ title | translate }}</h3>
+</div>
+<div class="modal-body">
+  <c8y-device-selector
+    selected-devices="selectedDevices"
+    disabled-devices="alreadyAssignedDevices"
+  ></c8y-device-selector>
+</div>
+<div class="modal-footer">
+  <button title="{{ 'Cancel' | translate }}" class="btn btn-default" ng-click="dismiss()" translate>
+    Cancel
+  </button>
+  <button
+    class="btn btn-primary"
+    ng-disabled="selectedDevices.length == 0"
+    ng-click="assign(selectedDevices)"
+    translate
+    translate-n="selectedDevices.length"
+    translate-plural="Assign {{$count}} devices"
+    title="{{ 'Assign' | translate }}"
+  >
+    Assign 1 device
+  </button>
+</div>

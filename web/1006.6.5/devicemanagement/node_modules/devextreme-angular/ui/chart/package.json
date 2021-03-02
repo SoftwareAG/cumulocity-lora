@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-chart.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-chart.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-chart.js",
+  "esm5": "../../esm5/ui/chart/devextreme-angular-ui-chart.js",
+  "esm2015": "../../esm2015/ui/chart/devextreme-angular-ui-chart.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-chart.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-chart.js",
+  "typings": "devextreme-angular-ui-chart.d.ts",
+  "metadata": "devextreme-angular-ui-chart.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/chart"
+}

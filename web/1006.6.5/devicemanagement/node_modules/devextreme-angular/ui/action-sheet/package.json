@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-action-sheet.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-action-sheet.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-action-sheet.js",
+  "esm5": "../../esm5/ui/action-sheet/devextreme-angular-ui-action-sheet.js",
+  "esm2015": "../../esm2015/ui/action-sheet/devextreme-angular-ui-action-sheet.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-action-sheet.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-action-sheet.js",
+  "typings": "devextreme-angular-ui-action-sheet.d.ts",
+  "metadata": "devextreme-angular-ui-action-sheet.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/action-sheet"
+}

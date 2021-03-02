@@ -1,0 +1,7 @@
+<div ng-show="noReplaceConfig">
+  <div ng-include="':::PLUGIN_PATH:::/views/widget.html'"></div>
+  <div class="row">
+    <c8y-rdb-dump class="col-md-6" device-id="device.id"></c8y-rdb-dump>
+  </div>
+</div>
+<div ng-include="replaceConfigTemplate"></div>

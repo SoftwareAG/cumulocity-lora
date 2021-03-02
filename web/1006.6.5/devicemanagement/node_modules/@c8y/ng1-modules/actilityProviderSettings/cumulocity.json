@@ -1,0 +1,14 @@
+{
+  "name": "Actility connectivity settings",
+  "ngModules": [
+    "c8y.actilityConnectivitySettings"
+  ],
+  "icon": "plug",
+  "category": "Administration",
+  "description": "User can define credentials for LPWAN Services",
+  "js": [
+    "actilityProviderSettings.module.js",
+    "actilitySettings.component.js",
+    "actilitySettings.service.js"
+  ]
+}

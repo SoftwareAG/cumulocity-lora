@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8ySpellcheck",function(){return{restrict:"A",link:function(c,e,t){c.$watch(t.c8ySpellcheck,function(c){c?e.attr("spellcheck","true"):e.attr("spellcheck","false")})}}});

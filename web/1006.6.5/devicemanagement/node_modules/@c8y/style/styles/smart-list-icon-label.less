@@ -1,0 +1,55 @@
+.smart-list-icon-label {
+  display: inline-block;
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+  margin: 0 2px 10px;
+  >i {
+    display: inline-block;
+    width: auto;
+    color: @gray;
+  }
+  .dot:last-child {
+    background-color: @brand-success;
+  }
+}
+
+.card-header-actions,
+.edit-smart-rule-details {
+  .smart-list-icon-label {
+    margin: 0 10px 0 0;
+    .dot {
+      width: 30px;
+      height: 30px;
+      font-size: 14px;
+      line-height: 32px;
+    }
+  }
+}
+
+@media(min-width: @screen-sm-min) {
+  .interact-list {
+    .smart-list-icon-label {
+      margin: 0 2px;
+      .dot {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+        line-height: 36px;
+      }
+    }
+  }
+}
+
+.smart-rule-templates-list {
+  .smart-list-icon-label {
+    margin: 10px 2px;
+    .dot {
+      width: 34px;
+      height: 34px;
+      font-size: 16px;
+      line-height: 36px;
+    }
+  }
+}

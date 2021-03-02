@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-lookup.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-lookup.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-lookup.js",
+  "esm5": "../../esm5/ui/lookup/devextreme-angular-ui-lookup.js",
+  "esm2015": "../../esm2015/ui/lookup/devextreme-angular-ui-lookup.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-lookup.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-lookup.js",
+  "typings": "devextreme-angular-ui-lookup.d.ts",
+  "metadata": "devextreme-angular-ui-lookup.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/lookup"
+}

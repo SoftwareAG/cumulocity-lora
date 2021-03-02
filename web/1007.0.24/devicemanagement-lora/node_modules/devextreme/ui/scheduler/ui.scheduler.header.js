@@ -1,0 +1,215 @@
+/**
+ * DevExtreme (ui/scheduler/ui.scheduler.header.js)
+ * Version: 19.2.7
+ * Build date: Thu Mar 26 2020
+ *
+ * Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+ * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+ */
+"use strict";
+var $ = require("../../core/renderer");
+var typeUtils = require("../../core/utils/type");
+var noop = require("../../core/utils/common").noop;
+var isDefined = require("../../core/utils/type").isDefined;
+var extend = require("../../core/utils/extend").extend;
+var each = require("../../core/utils/iterator").each;
+var inArray = require("../../core/utils/array").inArray;
+var camelize = require("../../core/utils/inflector").camelize;
+var registerComponent = require("../../core/component_registrator");
+var Widget = require("../widget/ui.widget");
+var publisherMixin = require("./ui.scheduler.publisher_mixin");
+var SchedulerNavigator = require("./ui.scheduler.navigator");
+var DropDownMenu = require("../drop_down_menu");
+var Tabs = require("../tabs");
+var errors = require("../../core/errors");
+var messageLocalization = require("../../localization/message");
+var COMPONENT_CLASS = "dx-scheduler-header";
+var VIEW_SWITCHER_CLASS = "dx-scheduler-view-switcher";
+var VIEW_SWITCHER_LABEL_CLASS = "dx-scheduler-view-switcher-label";
+var STEP_MAP = {
+    day: "day",
+    week: "week",
+    workWeek: "workWeek",
+    month: "month",
+    timelineDay: "day",
+    timelineWeek: "week",
+    timelineWorkWeek: "workWeek",
+    timelineMonth: "month",
+    agenda: "agenda"
+};
+var VIEWS = ["day", "week", "workWeek", "month", "timelineDay", "timelineWeek", "timelineWorkWeek", "timelineMonth", "agenda"];
+var SchedulerHeader = Widget.inherit({
+    _getDefaultOptions: function() {
+        return extend(this.callBase(), {
+            views: [],
+            isAdaptive: false,
+            intervalCount: 1,
+            currentView: "day",
+            firstDayOfWeek: void 0,
+            currentDate: new Date,
+            min: void 0,
+            max: void 0,
+            useDropDownViewSwitcher: false,
+            _dropDownButtonIcon: "overlay"
+        })
+    },
+    _setOptionsByReference: function() {
+        this.callBase();
+        extend(this._optionsByReference, {
+            currentView: true
+        })
+    },
+    _optionChanged: function(args) {
+        var value = args.value;
+        switch (args.name) {
+            case "views":
+                this._validateViews();
+                this._viewSwitcher.option({
+                    items: value,
+                    selectedItem: this.option("currentView")
+                });
+                break;
+            case "customizeDateNavigatorText":
+                this._navigator.option(args.name, value);
+                break;
+            case "currentView":
+                this._viewSwitcher.option("selectedItem", value);
+                this._navigator.option("step", STEP_MAP[this._getCurrentViewType()]);
+                this._changeViewSwitcherLabelText();
+                break;
+            case "currentDate":
+                this._navigator.option("date", value);
+                break;
+            case "displayedDate":
+                this._navigator.option("displayedDate", value);
+                break;
+            case "min":
+            case "max":
+            case "firstDayOfWeek":
+            case "intervalCount":
+                this._navigator.option(args.name, value);
+                break;
+            case "tabIndex":
+            case "focusStateEnabled":
+                this._viewSwitcher.option(args.name, value);
+                this._navigator.option(args.name, value);
+                this.callBase(args);
+                break;
+            case "useDropDownViewSwitcher":
+                this._refreshViewSwitcher();
+                break;
+            default:
+                this.callBase(args)
+        }
+    },
+    _init: function() {
+        this.callBase();
+        this.$element().addClass(COMPONENT_CLASS)
+    },
+    _initMarkup: function() {
+        this.callBase();
+        this._renderNavigator();
+        this._renderViewSwitcher()
+    },
+    _renderNavigator: function() {
+        this._navigator = this._createComponent("<div>", SchedulerNavigator, {
+            min: this.option("min"),
+            max: this.option("max"),
+            intervalCount: this.option("intervalCount"),
+            date: this.option("currentDate"),
+            step: STEP_MAP[this._getCurrentViewType()],
+            firstDayOfWeek: this.option("firstDayOfWeek"),
+            tabIndex: this.option("tabIndex"),
+            focusStateEnabled: this.option("focusStateEnabled"),
+            observer: this.option("observer"),
+            customizeDateNavigatorText: this.option("customizeDateNavigatorText")
+        });
+        this._navigator.$element().appendTo(this.$element())
+    },
+    _renderViewSwitcher: function() {
+        this._validateViews();
+        var $viewSwitcher = $("<div>").addClass(VIEW_SWITCHER_CLASS).appendTo(this.$element());
+        this.option("useDropDownViewSwitcher") ? this._renderViewSwitcherDropDownMenu($viewSwitcher) : this._renderViewSwitcherTabs($viewSwitcher)
+    },
+    _validateViews: function() {
+        var views = this.option("views");
+        each(views, function(_, view) {
+            var isViewIsObject = typeUtils.isObject(view);
+            var viewType = isViewIsObject && view.type ? view.type : view;
+            if (inArray(viewType, VIEWS) === -1) {
+                errors.log("W0008", viewType)
+            }
+        })
+    },
+    _getCurrentViewType: function() {
+        var currentView = this.option("currentView");
+        return currentView.type || currentView
+    },
+    _renderViewSwitcherTabs: function($element) {
+        var that = this;
+        $element.addClass(Tabs.getTabsExpandedClass);
+        this._viewSwitcher = this._createComponent($element, Tabs, {
+            selectionRequired: true,
+            scrollingEnabled: true,
+            onSelectionChanged: this._updateCurrentView.bind(this),
+            items: this.option("views"),
+            itemTemplate: function(item) {
+                return $("<span>").addClass("dx-tab-text").text(that._getItemText(item))
+            },
+            selectedItem: this.option("currentView"),
+            tabIndex: this.option("tabIndex"),
+            focusStateEnabled: this.option("focusStateEnabled")
+        })
+    },
+    _getItemText: function(item) {
+        return item.name || messageLocalization.format("dxScheduler-switcher" + camelize(item.type || item, true))
+    },
+    _refreshViewSwitcher: function() {
+        this._viewSwitcher._dispose();
+        this._viewSwitcher.$element().remove();
+        delete this._viewSwitcher;
+        this._removeViewSwitcherLabel();
+        this._renderViewSwitcher()
+    },
+    _removeViewSwitcherLabel: function() {
+        if (isDefined(this._$viewSwitcherLabel)) {
+            this._$viewSwitcherLabel.detach();
+            this._$viewSwitcherLabel.remove();
+            delete this._$viewSwitcherLabel
+        }
+    },
+    _renderViewSwitcherDropDownMenu: function($element) {
+        var that = this;
+        this._$viewSwitcherLabel = $("<div>").addClass(VIEW_SWITCHER_LABEL_CLASS).appendTo(this.$element());
+        this._changeViewSwitcherLabelText();
+        this._viewSwitcher = this._createComponent($element, DropDownMenu, {
+            onItemClick: this._updateCurrentView.bind(this),
+            buttonIcon: this.option("_dropDownButtonIcon"),
+            items: this.option("views"),
+            selectionMode: this.option("isAdaptive") ? "single" : "none",
+            selectedItemKeys: [this.option("currentView")],
+            itemTemplate: function(item) {
+                return $("<span>").addClass("dx-dropdownmenu-item-text").text(that._getItemText(item))
+            }
+        })
+    },
+    _changeViewSwitcherLabelText: function() {
+        if (!isDefined(this._$viewSwitcherLabel)) {
+            return
+        }
+        var currentView = this.option("currentView");
+        var currentViewText = this._getItemText(currentView);
+        this._$viewSwitcherLabel.text(currentViewText)
+    },
+    _getCurrentViewName: function(currentView) {
+        return typeUtils.isObject(currentView) ? currentView.name || currentView.type : currentView
+    },
+    _updateCurrentView: function(e) {
+        var selectedItem = e.itemData || e.component.option("selectedItem");
+        var viewName = this._getCurrentViewName(selectedItem);
+        this.notifyObserver("currentViewUpdated", viewName)
+    },
+    _renderFocusTarget: noop
+}).include(publisherMixin);
+registerComponent("dxSchedulerHeader", SchedulerHeader);
+module.exports = SchedulerHeader;

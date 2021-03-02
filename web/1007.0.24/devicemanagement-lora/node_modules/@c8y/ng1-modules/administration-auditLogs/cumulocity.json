@@ -1,0 +1,22 @@
+{
+  "name": "Audit logs",
+  "ngModules": [
+    "c8y.auditLogs"
+  ],
+  "category": "Administration",
+  "icon": "archive",
+  "color": "#F03F0F",
+  "description": "Display audit logs.",
+  "js": [
+    "index.js",
+    "list.controller.js",
+    "filter.directive.js"
+  ],
+  "less": [
+    "style.less"
+  ],
+  "folderName": "auditLogs",
+  "appsInclude": [
+    "administration"
+  ]
+}

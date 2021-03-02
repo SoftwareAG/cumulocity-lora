@@ -1,0 +1,1071 @@
+{
+  "c8y_ModbusDeviceTypeInfo": {
+    "minFieldbusUI": 4,
+    "name": "SMARTbox_F4_IO_2100.03.1",
+    "fieldbusType": "modbus"
+  },
+  "c8y_Coils": [
+    {
+      "alarmMapping": {
+        "severity": "WARNING",
+        "text": "Switch event received",
+        "type": "c8y_Switch"
+      },
+      "number": 2,
+      "input": true,
+      "name": "Switch",
+      "fieldbusType": null,
+      "eventMapping": {
+        "text": "Switch event received",
+        "type": "c8y_Switch"
+      },
+      "category": "Switch"
+    }
+  ],
+  "c8y_Registers": [
+    {
+      "measurementMapping": {
+        "series": "U1",
+        "type": "U1"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 1,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "U1",
+      "category": "Temperatures"
+    },
+    {
+      "measurementMapping": {
+        "series": "U2",
+        "type": "U2"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 2,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "U2",
+      "category": "Temperatures"
+    },
+    {
+      "measurementMapping": {
+        "series": "U3",
+        "type": "U3"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 3,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "U3",
+      "category": "Temperatures"
+    },
+    {
+      "measurementMapping": {
+        "series": "U4",
+        "type": "U4"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 4,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "U4",
+      "category": "Temperatures"
+    },
+    {
+      "measurementMapping": {
+        "series": "U5",
+        "type": "U5"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 5,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "U5",
+      "category": "Temperatures"
+    },
+    {
+      "measurementMapping": {
+        "series": "U6",
+        "type": "U6"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 6,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "U6",
+      "category": "Temperatures"
+    },
+    {
+      "measurementMapping": {
+        "series": "U7",
+        "type": "U7"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 7,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "U7",
+      "category": "Temperatures"
+    },
+    {
+      "measurementMapping": {
+        "series": "U8",
+        "type": "U8"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 8,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "U8",
+      "category": "Temperatures"
+    },
+    {
+      "measurementMapping": {
+        "series": "U9",
+        "type": "U9"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 9,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "U9",
+      "category": "Temperatures"
+    },
+    {
+      "measurementMapping": {
+        "series": "type_U10",
+        "type": "type_U10"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 10,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "U10",
+      "category": "Temperatures"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 101,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Config_U1",
+      "category": "SensorConfig",
+      "enumValues": {
+        "0": "Inactive",
+        "1": "PT100",
+        "2": "PT1000",
+        "3": "NTC10K",
+        "4": "0-10V",
+        "5": "DI NO",
+        "6": "DI NC"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 102,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Config_U2",
+      "category": "SensorConfig",
+      "enumValues": {
+        "0": "Inactive",
+        "1": "PT100",
+        "2": "PT1000",
+        "3": "NTC10K",
+        "4": "0-10V",
+        "5": "DI NO",
+        "6": "DI NC"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 103,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Config_U3",
+      "category": "SensorConfig",
+      "enumValues": {
+        "0": "Inactive",
+        "1": "PT100",
+        "2": "PT1000",
+        "3": "NTC10K",
+        "4": "0-10V",
+        "5": "DI NO",
+        "6": "DI NC"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 104,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Config_U4",
+      "category": "SensorConfig",
+      "enumValues": {
+        "0": "Inactive",
+        "1": "PT100",
+        "2": "PT1000",
+        "3": "NTC10K",
+        "4": "0-10V",
+        "5": "DI NO",
+        "6": "DI NC"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 105,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Config_U5",
+      "category": "SensorConfig",
+      "enumValues": {
+        "0": "Inactive",
+        "1": "PT100",
+        "2": "PT1000",
+        "3": "NTC10K",
+        "4": "0-10V",
+        "5": "DI NO",
+        "6": "DI NC"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 106,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Config_U6",
+      "category": "SensorConfig",
+      "enumValues": {
+        "0": "Inactive",
+        "1": "PT100",
+        "2": "PT1000",
+        "3": "NTC10K",
+        "4": "0-10V",
+        "5": "DI NO",
+        "6": "DI NC"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 107,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Config_U7",
+      "category": "SensorConfig",
+      "enumValues": {
+        "0": "Inactive",
+        "1": "PT100",
+        "2": "PT1000",
+        "3": "NTC10K",
+        "4": "N/A",
+        "5": "DI NO",
+        "6": "DI NC"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 108,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Config_U8",
+      "category": "SensorConfig",
+      "enumValues": {
+        "0": "Inactive",
+        "1": "PT100",
+        "2": "PT1000",
+        "3": "NTC10K",
+        "4": "N/A",
+        "5": "DI NO",
+        "6": "DI NC"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 109,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Config_U9",
+      "category": "SensorConfig",
+      "enumValues": {
+        "0": "Inactive",
+        "1": "PT100",
+        "2": "PT1000",
+        "3": "NTC10K",
+        "4": "N/A",
+        "5": "DI NO",
+        "6": "DI NC"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 110,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Config_U10",
+      "category": "SensorConfig",
+      "enumValues": {
+        "0": "Inactive",
+        "1": "PT100",
+        "2": "PT1000",
+        "3": "NTC10K",
+        "4": "N/A",
+        "5": "DI NO",
+        "6": "DI NC"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 201,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -10,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset_U1",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 202,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -10,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset_U2",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 203,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -10,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset_U3",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 204,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -10,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset_U4",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 205,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -10,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset_U5",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 206,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -10,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset_U6",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 207,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -10,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset_U7",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 208,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -10,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset_U8",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 209,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -10,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset_U9",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 210,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -10,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset_U10",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "max": 65535,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 301,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DigitalCounter_U1",
+      "category": "Counter"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 302,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DigitalCounter_U2",
+      "category": "Counter"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 303,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DigitalCounter_U3",
+      "category": "Counter"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 304,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DigitalCounter_U4",
+      "category": "Counter"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 305,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DigitalCounter_U5",
+      "category": "Counter"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 306,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DigitalCounter_U6",
+      "category": "Counter"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 307,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DigitalCounter_U7",
+      "category": "Counter"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 308,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DigitalCounter_U8",
+      "category": "Counter"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 309,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DigitalCounter_U9",
+      "category": "Counter"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 310,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DigitalCounter_U10",
+      "category": "Counter"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 247,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 901,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 1,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Slave-Address",
+      "category": "DeviceConfig"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 57600,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 902,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 4800,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Baudrate",
+      "category": "DeviceConfig"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 8,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 903,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 8,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Databits",
+      "category": "DeviceConfig"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 2,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 904,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Parity",
+      "category": "DeviceConfig",
+      "enumValues": {
+        "0": "MB_PAR_NONE",
+        "1": "MB_PAR_EVEN",
+        "2": "MB_PAR_ODD"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 2,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 905,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 1,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "StopBit",
+      "category": "DeviceConfig",
+      "enumValues": {
+        "1": "MB_STOP_1",
+        "2": "MB_STOP_2"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 1,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 909,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input_Filter",
+      "category": "DeviceConfig",
+      "enumValues": {
+        "0": "Filter_Off",
+        "1": "Filter_On"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 10,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 910,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Counter_Reset",
+      "category": "DeviceConfig",
+      "enumValues": {
+        "0": "Deactivated",
+        "1": "Reset_U1",
+        "2": "Reset_U2",
+        "3": "Reset_U3",
+        "4": "Reset_U4",
+        "5": "Reset_U5",
+        "6": "Reset_U6",
+        "7": "Reset_U7",
+        "8": "Reset_U8",
+        "9": "Reset_U9",
+        "10": "Reset_U10"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "max": 55555,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 912,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "ControlRegister",
+      "category": "DeviceConfig",
+      "enumValues": {
+        "11111": "Reboot",
+        "55555": "Defaults und Reboot"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 913,
+      "input": false,
+      "divisor": 1,
+      "unit": "1030 = V1.03.0",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Firmware",
+      "category": "DeviceConfig"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "max": 2,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 914,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 1,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "DeviceType",
+      "category": "DeviceConfig",
+      "enumValues": {
+        "1": "Prototyp (NTC10K + 0-10V)",
+        "2": "Serie (NTC10K + 0-10V + PT100 + PT1000)"
+      }
+    }
+  ]
+}

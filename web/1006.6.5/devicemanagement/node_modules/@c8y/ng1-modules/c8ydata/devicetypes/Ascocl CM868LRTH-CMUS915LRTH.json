@@ -1,0 +1,319 @@
+{
+  "c8y_ModbusDeviceTypeInfo": {
+    "minFieldbusUI": 4,
+    "name": "Ascocl CM868LRTH-CMUS915LRTH",
+    "fieldbusType": "actility"
+  },
+  "c8y_MessageIdConfiguration" : {
+    "source" : "FPORT" 
+  },
+  "c8y_Coils": [],
+  "c8y_Registers": [
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 1,
+      "noBits": 7,
+      "messageTypeId": 8,
+      "name": "Battery (fport 8)",
+      "category": "Battery"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 1,
+      "noBits": 7,
+      "messageTypeId": 9,
+      "name": "Battery (fport 9)",
+      "category": "Battery"
+    },
+    {
+      "measurementMapping": {
+        "series": "status1",
+        "type": "c8y_ExternalInputStatus"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 3,
+      "noBits": 2,
+      "messageTypeId": 30,
+      "name": "External input status (fport 30)",
+      "category": "Event"
+    },
+    {
+      "alarmMapping": {
+        "severity": "WARNING",
+        "text": "Battery is low",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 5,
+      "noBits": 1,
+      "messageTypeId": 30,
+      "name": "Battery status (fport 30)",
+      "category": "Event"
+    },
+    {
+      "alarmMapping": {
+        "severity": "MAJOR",
+        "text": "Tamper detected",
+        "type": "c8y_Tamper"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 6,
+      "noBits": 1,
+      "messageTypeId": 30,
+      "name": "Tamper alarm (fport 30)",
+      "category": "Event"
+    },
+    {
+      "alarmMapping": {
+        "severity": "MAJOR",
+        "text": "Intrusion detected",
+        "type": "c8y_Intrusion"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 7,
+      "noBits": 1,
+      "messageTypeId": 30,
+      "name": "Reed sensor - intrusion (fport 30)",
+      "category": "Event"
+    },
+    {
+      "measurementMapping": {
+        "series": "openSwitchCount",
+        "type": "c8y_ReedSensor"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 8,
+      "noBits": 16,
+      "messageTypeId": 30,
+      "name": "Reed open switch counter (fport 30)",
+      "category": "OPCNT"
+    },
+    {
+      "measurementMapping": {
+        "series": "status",
+        "type": "c8y_ExternalInputStatus"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 11,
+      "noBits": 2,
+      "messageTypeId": 9,
+      "name": "External input status (fport 9)",
+      "category": "Event"
+    },
+    {
+      "alarmMapping": {
+        "severity": "WARNING",
+        "text": "Battery is low",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 13,
+      "noBits": 1,
+      "messageTypeId": 9,
+      "name": "Battery status (fport 9)",
+      "category": "Event"
+    },
+    {
+      "alarmMapping": {
+        "severity": "MAJOR",
+        "text": "Tamper detected",
+        "type": "c8y_Tamper"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 14,
+      "noBits": 1,
+      "messageTypeId": 9,
+      "name": "Tamper alarm (fport 9)",
+      "category": "Event"
+    },
+    {
+      "alarmMapping": {
+        "severity": "MAJOR",
+        "text": "Intrusion detected",
+        "type": "c8y_Intrusion"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 15,
+      "noBits": 1,
+      "messageTypeId": 9,
+      "name": "Reed sensor - intrusion (fport 9)",
+      "category": "Event"
+    },
+    {
+      "measurementMapping": {
+        "series": "T",
+        "type": "c8y_Temperature"
+      },
+      "offset": 0,
+      "multiplier": 0.01,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "C",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 32,
+      "messageTypeId": 9,
+      "name": "Temperature measurement (fport 9)",
+      "category": "Temperature"
+    },
+    {
+      "measurementMapping": {
+        "series": "T",
+        "type": "c8y_Temperature"
+      },
+      "offset": 0,
+      "multiplier": 0.01,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "C",
+      "decimalPlaces": 0,
+      "startBit": 24,
+      "noBits": 32,
+      "messageTypeId": 30,
+      "name": "Temperature measurement (fport 30)",
+      "category": "Temperature"
+    },
+    {
+      "measurementMapping": {
+        "series": "H",
+        "type": "c8y_Humidity"
+      },
+      "offset": 0,
+      "multiplier": 0.01,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 48,
+      "noBits": 32,
+      "messageTypeId": 9,
+      "name": "Relative humidity (fport 9)",
+      "category": "Humidity"
+    },
+    {
+      "measurementMapping": {
+        "series": "H",
+        "type": "c8y_Humidity"
+      },
+      "offset": 0,
+      "multiplier": 0.01,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 56,
+      "noBits": 32,
+      "messageTypeId": 30,
+      "name": "Relative humidity (fport 30)",
+      "category": "Humidity"
+    }
+  ]
+}

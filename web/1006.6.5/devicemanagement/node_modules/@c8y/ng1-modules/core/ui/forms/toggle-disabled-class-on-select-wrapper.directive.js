@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("select",function(){return{link:function(e,s,t){t.$observe("disabled",function(e){s.closest(".c8y-select-wrapper").toggleClass("disabled",e)})}}});

@@ -1,0 +1,13 @@
+{
+  "name": "Cell ID information activator",
+  "description": "Enable Cell ID info activation/deactivation action for device",
+  "category": "Device",
+  "ngModules": [
+    "c8y.cellIdInformationActivator"
+  ],
+  "js": [
+    "cell-id-information-activator.module.js",
+    "cell-id-information-activator.config.js",
+    "cell-id-information-activator.service.js"
+  ]
+}

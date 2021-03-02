@@ -1,0 +1,56 @@
+<div ng-controller="c8yDataPointTableWidgetCtrl as ctrl">
+  <c8y-realtime-button
+    ng-show="false"
+    channel="{{ ctrl.channel }}"
+    state="ctrl.realtime"
+    on-data="onData($data)"
+  >
+  </c8y-realtime-button>
+
+  <div class="flex-row sticky-top bg-white" style="z-index: 11;">
+    <div class="datepicker-container clearfix p-t-4 flex-grow">
+      <div ng-if="child.config.displayDateSelection">
+        <c8y-date-time-picker
+          ng-model-options="{ debounce: 500 }"
+          ng-model="child.config.dateFrom"
+          class="form-group-sm pull-left m-l-8 m-b-4"
+          placeholder="{{ 'From`date`' | translate }}"
+          show-weeks="false"
+          show-spinners="false"
+          append-to-body="true"
+        >
+        </c8y-date-time-picker>
+        <c8y-date-time-picker
+          ng-model-options="{ debounce: 500 }"
+          ng-model="child.config.dateTo"
+          class="form-group-sm pull-left m-l-8"
+          placeholder="{{ 'To`date`' | translate }}"
+          show-weeks="false"
+          show-spinners="false"
+          append-to-body="true"
+        >
+        </c8y-date-time-picker>
+      </div>
+    </div>
+    <label
+      class="c8y-switch m-r-8 flex-no-shrink"
+      title="{{ 'Automatically scrolls to the latest value' | translate }}"
+    >
+      <input type="checkbox" ng-init="ctrl.scrollLocked=true" ng-model="ctrl.scrollLocked" />
+      <span></span> <small>{{ 'Auto-scroll' | translate }}</small>
+    </label>
+  </div>
+
+  <c8y-data-point-table
+    datapoints="child.config.datapoints"
+    date-from="child.config.dateFrom"
+    date-to="child.config.dateTo"
+    aggregation="child.config.aggregation"
+    on-data="(onData)"
+    widget-id="child.id"
+    rows-selectable="child.config.selectable"
+    selected="child.config.selected"
+    scroll-locked="ctrl.scrollLocked"
+  >
+  </c8y-data-point-table>
+</div>

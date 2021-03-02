@@ -1,0 +1,13 @@
+{
+  "name": "Tracker models",
+  "category": "Trackers",
+  "description": "Tracker models supported by tracker agent",
+  "ngModules": [
+    "c8y.trackerModels"
+  ],
+  "js": [
+    "index.js",
+    "trackerModels.service.js"
+  ],
+  "copy": ["img/*"]
+}

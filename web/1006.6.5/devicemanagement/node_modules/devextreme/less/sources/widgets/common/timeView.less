@@ -1,0 +1,49 @@
+/**
+* DevExtreme (widgets/common/timeView.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./numberBox.less";
+@import (once) "./selectBox.less";
+@import (once) "./box.less";
+
+.dx-timeview {
+    height: 250px;
+    width: 270px;
+
+    &.dx-state-disabled,
+    .dx-state-disabled {
+        &.dx-widget,
+        .dx-widget {
+            opacity: 1;
+        }
+    }
+}
+
+.dx-timeview-clock {
+    position: relative;
+}
+
+.dx-timeview-hourarrow,
+.dx-timeview-minutearrow {
+    position: absolute;
+    left: 50%;
+    width: 30px;
+    height: 50%;
+    margin-left: -15px;
+    background-position: bottom;
+    background-repeat: no-repeat;
+    transform-origin: 50% 100%;
+    -webkit-backface-visibility: hidden; // stylelint-disable-line property-no-vendor-prefix
+}
+
+.dx-timeview-field .dx-numberbox {
+    width: 70px;
+
+    &.dx-numberbox-spin-touch-friendly {
+        width: 110px;
+    }
+}

@@ -1,0 +1,44 @@
+<div class="modal-header">
+  <h3>
+    <i c8y-icon="{{ vm.icons.simulator }}"></i>
+    <span translate>Duplicate simulator</span>
+  </h3>
+</div>
+
+<div class="modal-body">
+  <form name="simulatorCloneForm" role="form" novalidate>
+    <div class="form-group">
+      <label for="name" translate>Name</label>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        class="form-control"
+        ng-model="vm.simulator.name"
+        placeholder="{{ 'e.g. My simulator' | translate }}"
+        required
+      />
+      <c8y-error-feedback field="simulatorCloneForm.name"></c8y-error-feedback>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button
+    title="{{ 'Duplicate' | translate }}"
+    class="btn btn-primary"
+    ng-click="vm.close({$value: vm.simulator})"
+    ng-disabled="simulatorCloneForm.$invalid"
+    translate
+  >
+    Duplicate
+  </button>
+  <button
+    title="{{ 'Cancel' | translate }}"
+    class="btn btn-default"
+    ng-click="vm.dismiss()"
+    translate
+  >
+    Cancel
+  </button>
+</div>

@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.parts.oauth",[]).config(["c8yViewsProvider",function(e){e.when("/oauth",{templateUrl:":::PLUGIN_PATH:::/views/index.html"})}]);

@@ -1,0 +1,23 @@
+{
+  "name": "Administrator Event processing",
+  "ngModules": [
+    "c8y.eventProcessing"
+  ],
+  "category": "Administration",
+  "description": "Administrators can define and update realtime event processing rules. Adds items to the navigator and allows create, deletion and update of rules. Rule execution can be debugged.",
+  "js": [
+    "index.js",
+    "list/eventProcessingRulesList.component.js",
+    "details/eventProcessingRuleDetails.component.js",
+    "details/eventProcessingRuleTitle.component.js",
+    "details/eventProcessingRuleAlarms.component.js",
+    "details/eventProcessingRuleNotifications.component.js",
+    "details/eventProcessingRuleMetrics.component.js",
+    "details/eventProcessingRulesExamples.component.js",
+    "services/eventProcessing.js"
+  ],
+  "folderName": "eventProcessing",
+  "appsInclude": [
+    "administration"
+  ]
+}

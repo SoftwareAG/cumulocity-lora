@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yHscroll",function(){return{restrict:"A",link:function(t,c){t.$watch("tabs",function(){var t=c.children(),i=0;t.each(function(){i+=$(this).width()}),c.width(i)})}}});

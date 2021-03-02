@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-progress-bar.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-progress-bar.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-progress-bar.js",
+  "esm5": "../../esm5/ui/progress-bar/devextreme-angular-ui-progress-bar.js",
+  "esm2015": "../../esm2015/ui/progress-bar/devextreme-angular-ui-progress-bar.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-progress-bar.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-progress-bar.js",
+  "typings": "devextreme-angular-ui-progress-bar.d.ts",
+  "metadata": "devextreme-angular-ui-progress-bar.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/progress-bar"
+}

@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.authenticationConfiguration").component("c8ySsoUserIdConfiguration",{bindings:{fieldsConfig:"<",ssoConfiguration:"<"},templateUrl:":::PLUGIN_PATH:::/sso-configuration/user-id-configuration.html",controllerAs:"vm"});

@@ -1,0 +1,30 @@
+{
+  "id": "c8ySchema",
+  "title": "Measurements",
+  "type": "object",
+  "printFormat": "hidden",
+  "properties": {
+    "id": {
+      "title": "ID",
+      "type": "string",
+      "readonly": true
+    },
+    "source": {
+      "title": "Source",
+      "type": "integer"
+    },
+    "type": {
+      "title": "Type",
+      "type": "string"
+    },
+    "time": {
+      "title": "Time",
+      "type": "string",
+      "format": "datetime"
+    },
+    "DEVICE_NAME": {
+      "title": "Device name",
+      "type": "String"
+    }
+  }
+}

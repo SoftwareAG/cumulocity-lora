@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.parts.applications").directive("applicationAccessEditor",function(){return{restrict:"A",scope:{allowedApplications:"=",disabledEdit:"=?"},templateUrl:":::PLUGIN_PATH:::/views/applicationAccessEditor.html",controller:"applicationAccessEditorCtrl"}});

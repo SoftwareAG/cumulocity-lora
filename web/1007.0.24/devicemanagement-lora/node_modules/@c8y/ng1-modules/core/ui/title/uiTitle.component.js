@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").component("c8yUiTitle",{templateUrl:":::PLUGIN_PATH:::/ui/title/title.html",controllerAs:"vm",controller:"TitleCtrl"});

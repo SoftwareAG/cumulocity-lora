@@ -1,0 +1,1 @@
+{"version":3,"file":"favicon.js","sourceRoot":"","sources":["../../../src/webpack/config/favicon.ts"],"names":[],"mappings":";;AAGA,SAAgB,MAAM,CAAC,GAAmB;IACxC,OAAO;QACL,MAAM,EAAE;YACN,KAAK,EAAE;gBACL;oBACE,IAAI,EAAE,yBAAyB;oBAC/B,GAAG,EAAE,CAAC,EAAE,MAAM,EAAE,aAAa,EAAE,OAAO,EAAE,EAAE,IAAI,EAAE,aAAa,EAAC,EAAC,CAAC;iBACjE;aACF;SACF;KACF,CAAC;AACJ,CAAC;AAXD,wBAWC"}

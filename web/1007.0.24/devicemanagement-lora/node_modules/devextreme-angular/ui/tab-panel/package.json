@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-tab-panel.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-tab-panel.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-tab-panel.js",
+  "esm5": "../../esm5/ui/tab-panel/devextreme-angular-ui-tab-panel.js",
+  "esm2015": "../../esm2015/ui/tab-panel/devextreme-angular-ui-tab-panel.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-tab-panel.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-tab-panel.js",
+  "typings": "devextreme-angular-ui-tab-panel.d.ts",
+  "metadata": "devextreme-angular-ui-tab-panel.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/tab-panel"
+}

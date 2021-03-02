@@ -1,0 +1,40 @@
+<div class="modal-header">
+  <h3 translate>Computed property configuration</h3>
+</div>
+<div class="modal-body">
+  <h4>
+    <i c8y-icon="bolt"></i>
+    {{ computedProperty }}
+  </h4>
+
+  <form name="configForm" novalidate>
+    <div ng-if="configTemplateUrl" ng-include="configTemplateUrl"></div>
+    <c8y-schema-form
+      ng-if="configSchema"
+      schema="configSchema"
+      form="['*']"
+      model="config"
+    ></c8y-schema-form>
+  </form>
+</div>
+<div class="modal-footer">
+  <button
+    title="{{ 'Cancel' | translate }}"
+    type="button"
+    class="btn btn-default"
+    ng-click="$dismiss()"
+    translate
+  >
+    Cancel
+  </button>
+  <button
+    title="{{ 'Save' | translate }}"
+    type="button"
+    class="btn btn-primary"
+    ng-click="$close(config)"
+    ng-disabled="configForm.$invalid"
+    translate
+  >
+    Save
+  </button>
+</div>

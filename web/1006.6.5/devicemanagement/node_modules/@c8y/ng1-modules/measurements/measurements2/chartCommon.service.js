@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.core.measurements2").service("c8yChartCommon",function(){return{rotate:function(t,n,c){return"rotate(".concat(t,",").concat(n,", ").concat(c,")")},translate:function(t,n){return"translate(".concat(t,", ").concat(n,")")},TIME_FORMAT:"ddd, ll, LTS"}});

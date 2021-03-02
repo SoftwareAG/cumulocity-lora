@@ -1,0 +1,12 @@
+{
+    "name": "OPCUA v2 mappings",
+    "ngModules": [
+      "c8y.opcua-v2"
+    ],
+    "js": [
+      "opcua-v2.module.js",
+      "opcua-device-v2.provider.js",
+      "opcua-v2-create-step.component.js",
+      "opcua-v2-row-info.component.js"
+    ]
+  }

@@ -1,0 +1,1 @@
+"use strict";!function(){function i(i){i.configBlock()}i.$inject=["c8ySimulatorsUiProvider"],angular.module("c8y.simulators",[]).config(i)}();

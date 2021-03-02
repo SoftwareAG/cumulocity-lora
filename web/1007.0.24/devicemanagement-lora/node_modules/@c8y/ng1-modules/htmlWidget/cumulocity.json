@@ -1,0 +1,22 @@
+{
+  "name": "Html widget",
+  "ngModules": [
+    "c8y.parts.htmlwidget"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "A widget with the number of devices (or assets) connected.",
+  "css": [
+    "style.css"
+  ],
+  "js": [
+    "index.js",
+    "htmlWidgetConfig.controller.js",
+    "htmlWidget.controller.js",
+    "htmlWidget.directive.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

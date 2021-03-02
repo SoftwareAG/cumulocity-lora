@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "c8y-ng-add",
+  "title": "Cumulocity schematic",
+  "type": "object",
+  "properties": {}
+}

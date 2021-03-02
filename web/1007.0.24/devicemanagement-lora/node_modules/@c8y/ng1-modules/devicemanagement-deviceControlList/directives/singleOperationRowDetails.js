@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.parts.deviceControlList").directive("deviceControlSingleOperationRowDetails",function(){return{restrict:"A",replace:!0,scope:{operation:"="},templateUrl:":::PLUGIN_PATH:::/views/singleOperationRowDetails.html",controller:"deviceControlSingleOperationRowDetailsCtrl"}});

@@ -1,0 +1,1 @@
+"use strict";!function(){function n(n){n.init()}n.$inject=["infoGaugeService"],angular.module("c8y.infoGauge",[]).run(n)}();

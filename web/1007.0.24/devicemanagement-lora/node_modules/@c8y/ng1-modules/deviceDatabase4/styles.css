@@ -1,0 +1,35 @@
+.device-type-form .panel-clean label:after {
+  content: none !important;
+}
+
+.device-type-form .elements-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.device-type-form .elements-table .buttons {
+  width: 50px;
+}
+
+.device-type-form .elements-table .category-header {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.device-type-form .elements-table .info {
+  word-break: break-all;
+}
+.category-form-group .dropdown-menu {
+  width: 100%;
+}
+
+.category-form-group .dropdown-menu li a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.registerDescription {
+  margin-right: 10px;
+}

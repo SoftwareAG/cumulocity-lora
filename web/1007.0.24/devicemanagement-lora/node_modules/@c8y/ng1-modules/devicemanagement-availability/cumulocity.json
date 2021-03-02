@@ -1,0 +1,24 @@
+{
+  "name": "Device service monitoring",
+  "ngModules": [
+    "c8y.parts.availability"
+  ],
+  "category": "Administration",
+  "icon": "bell",
+  "color": "#F2DF0F",
+  "description": "Service monitoring (availability, operability) for machines over time.",
+  "imports": [
+    "core/nvd3ChartDirectives"
+  ],
+  "css": [
+    "style/style.css"
+  ],
+  "js": [
+    "index.js",
+    "controllers/availability.js"
+  ],
+  "folderName": "availability",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

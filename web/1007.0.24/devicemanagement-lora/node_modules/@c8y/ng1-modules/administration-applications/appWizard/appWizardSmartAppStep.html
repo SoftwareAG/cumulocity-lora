@@ -1,0 +1,70 @@
+<div>
+  <div class="c8y-wizard-nav">
+    <i title="{{ 'Create legacy smartapp' | translate }}" c8y-icon="code"></i>
+    <span translate>Create legacy smartapp</span>
+  </div>
+
+  <form name="smartAppForm" class="c8y-wizard-form">
+    <div class="form-group" ng-class="{'has-error': vm.invalid(smartAppForm.name)}">
+      <label for="name"><span translate>Name</span></label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        name="name"
+        ng-model="vm.wizardCtrl.data.smartApp.name"
+        placeholder="{{ 'e.g. My smart application' | translate }}"
+        required
+        ng-maxlength="120"
+        uib-tooltip="{{ vm.validationHints(smartAppForm.name) }}"
+      />
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': vm.invalid(smartAppForm.contextPath)}">
+      <label for="contextPath"><span translate>Path</span></label>
+      <div class="input-group">
+        <span class="input-group-addon">{{ vm.host }}/apps/</span>
+        <input
+          type="text"
+          class="form-control"
+          id="contextPath"
+          name="contextPath"
+          ng-model="vm.wizardCtrl.data.smartApp.contextPath"
+          placeholder="{{ 'e.g. smart-application' | translate }}"
+          required
+          ng-maxlentgh="120"
+          uib-tooltip="{{ vm.validationHints(smartAppForm.contextPath) }}"
+          c8y-application-context-path
+        />
+      </div>
+    </div>
+  </form>
+
+  <div class="c8y-wizard-footer">
+    <button
+      title="{{ 'Back' | translate }}"
+      class="btn btn-default"
+      ng-click="vm.wizardCtrl.goTo('menu')"
+      translate
+    >
+      Back
+    </button>
+    <button
+      title="{{ 'Cancel' | translate }}"
+      class="btn btn-default"
+      ng-click="vm.wizardCtrl.dismiss()"
+      translate
+    >
+      Cancel
+    </button>
+    <button
+      title="{{ 'Create' | translate }}"
+      class="btn btn-primary"
+      ng-click="vm.create()"
+      ng-disabled="smartAppForm.$invalid"
+      translate
+    >
+      Create
+    </button>
+  </div>
+</div>

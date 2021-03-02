@@ -1,0 +1,26 @@
+<div class="breadcrumbs-container"
+  ng-if="breadcrumbs.length > 0" 
+  ng-class="{open: showAll, multiple: breadcrumbs.length > 1}"
+>
+  <button ng-show="breadcrumbs.length > 1"
+    class="btn-show-all-breadcrumbs pull-left"
+    ng-click="showAll = !showAll">
+    <i ng-hide="showAll" c8y-icon="caret-right" uib-tooltip="{{'Show all breadcrumbs' | translate}}" tooltip-append-to-body="true" tooltip-placement="auto"></i>
+    <i ng-show="showAll" c8y-icon="caret-down" uib-tooltip="{{'Collapse breadcrumbs' | translate}}" tooltip-append-to-body="true" tooltip-placement="auto"></i>
+  </button>
+
+  <ul class="breadcrumbs text-muted"
+    ng-repeat="path in breadcrumbs"
+    ng-show="$first || showAll">
+    <li ng-repeat="breadcrumb in path"
+      ng-show="!$last">
+      <span ng-show="!$first"> > </span>
+      <a ng-href="{{breadcrumb.path}}"
+        class="word-break">
+        <i c8y-icon="{{breadcrumb.icon}}" ng-show="$first"></i>
+        <span ng-if="breadcrumb.translate" ng-bind="breadcrumb.label | translate"></span>
+        <span ng-if="!breadcrumb.translate" ng-bind="breadcrumb.label"></span>
+      </a>
+    </li>
+  </ul>
+</div>

@@ -1,0 +1,56 @@
+<div class="bg-gray-white">
+  <div class="c8y-wizard-body">
+    <form class="form" name="modelForm" novalidate>
+      <div class="form-group">
+        <label translate>Name</label>
+        <input
+          name="name"
+          class="form-control"
+          ng-model="vm.model.name"
+          ng-max="100"
+          placeholder="{{ 'e.g. My protocol' | translate }}"
+          required
+          ng-disabled="vm.pending"
+        />
+        <c8y-error-feedback field="modelForm.name"></c8y-error-feedback>
+      </div>
+      <div class="form-group">
+        <label translate>Description</label>
+        <textarea
+          style="height:150px"
+          class="form-control"
+          ng-model="vm.model.description"
+          ng-disabled="vm.pending"
+        ></textarea>
+      </div>
+    </form>
+  </div>
+
+  <div class="c8y-wizard-footer">
+    <button
+      title="{{ 'Back' | translate }}"
+      class="btn btn-default"
+      ng-click="vm.wizardCtrl.goToIndex(0)"
+      translate
+    >
+      Back
+    </button>
+    <button
+      title="{{ 'Cancel' | translate }}"
+      class="btn btn-default"
+      ng-click="vm.wizardCtrl.dismiss()"
+      translate
+    >
+      Cancel
+    </button>
+    <button
+      title="{{ 'Create' | translate }}"
+      class="btn btn-primary"
+      ng-click="vm.create(vm.model)"
+      translate
+      ng-disabled="modelForm.$invalid || vm.pending"
+    >
+      Create
+    </button>
+  </div>
+</div>

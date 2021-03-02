@@ -1,0 +1,24 @@
+{
+  "name": "Tracker configuration tab",
+  "ngModules": [
+    "c8y.trackerConfiguration"
+  ],
+  "category": "Device",
+  "description": "Adds tracker configuration tab to device details.",
+  "imports": [
+    "core/trackerModels"
+  ],
+  "js": [
+    "index.js",
+    "controllers/trackerConfiguration.controller.js",
+    "controllers/msisdnAlert.controller.js",
+    "directives/msisdnAlert.directive.js",
+    "services/trackerAlarms.service.js",
+    "services/trackerLocation.service.js",
+    "services/trackerRestart.service.js",
+    "services/trackerSituation.service.js",
+    "services/trackerSos.service.js",
+    "services/unitConversionHelper.service.js",
+    "services/realtimeLockup.service.js"
+  ]
+}

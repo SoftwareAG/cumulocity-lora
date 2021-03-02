@@ -1,0 +1,20 @@
+{
+  "name": "Device selector directive",
+  "ngModules": [
+    "c8y.deviceSelector"
+  ],
+  "category": "Device",
+  "description": "Device selector directive",
+  "css": [
+    "style/style.css"
+  ],
+  "js": [
+    "index.js",
+    "directives/deviceSelector.js",
+    "controllers/deviceSelectorCtrl.js",
+    "directives/deviceSelectorList.js",
+    "controllers/deviceSelectorListCtrl.js",
+    "directives/deviceSelectorCombo.js",
+    "controllers/deviceSelectorComboCtrl.js"
+  ]
+}

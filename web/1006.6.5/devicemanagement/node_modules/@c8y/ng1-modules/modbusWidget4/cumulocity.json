@@ -1,0 +1,19 @@
+{
+  "name": "Modbus widget",
+  "description": "Allows for seeing status and operating Modbus device",
+  "category": "Widgets",
+  "ngModules": [
+    "c8y.modbusWidget4"
+  ],
+  "js": [
+    "widget.module.js",
+    "constants.js",
+    "widget.config.js",
+    "modbus-widget.service.js",
+    "widget-config.component.js",
+    "widget.component.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

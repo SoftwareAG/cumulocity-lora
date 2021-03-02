@@ -1,0 +1,16 @@
+{
+  "name": "Alarms and events explorer",
+  "ngModules": [
+    "c8y.alarmsEventsExplorer"
+  ],
+  "category": "Alarms and events",
+  "description": "Explore alarms and events",
+  "imports": [],
+  "js": [
+    "index.js",
+    "alarmsEventsTimelinesChart/alarmsEventsTimelinesChart.component.js",
+    "alarmsEventsTimelinesChart/alarmsEventsTimelinesChart.service.js",
+    "alarmsEventsTimelinesConfig/alarmsEventsTimelinesConfig.component.js",
+    "alarmsEventsTimelinesConfig/alarmsEventsTimelinesConfigModal.controller.js"
+  ]
+}

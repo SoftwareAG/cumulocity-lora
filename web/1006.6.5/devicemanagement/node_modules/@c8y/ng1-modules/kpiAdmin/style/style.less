@@ -1,0 +1,44 @@
+.kpiRange {
+
+  background-color: #DDD;
+  height: 22px;
+  position: relative;
+
+  .number, .bar {
+    position: absolute;
+  }
+
+  .number {
+    top: 3px;
+    z-index: 10;
+  }
+
+  .number.min {
+    left: 3px;
+  }
+
+  .number.max {
+    right: 3px;
+  }
+
+  .bar {
+    top: 0;
+    bottom: 0;
+  }
+
+  .bar.yellow {
+    background-color: #E6E600;
+  }
+
+  .bar.red {
+    background-color: #E65C00;
+  }
+
+}
+
+.frag-series {
+  background: #FFF;
+  padding: 20px 0;
+  margin: 0 0 20px 0;
+}
+

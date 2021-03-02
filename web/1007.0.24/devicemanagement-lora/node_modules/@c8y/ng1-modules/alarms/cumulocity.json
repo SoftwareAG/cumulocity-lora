@@ -1,0 +1,21 @@
+{
+  "name": "Alarms widget",
+  "description": "A configurable component that display list of alarms depending on the type, status or device target",
+  "category": "",
+  "ngModules": [
+    "c8y.alarms"
+  ],
+  "js": [
+    "widget.module.js",
+    "widget.config.js",
+    "widget.controller.js",
+    "widget-config.controller.js",
+    "severity.directive.js"
+  ],
+  "copy": [
+    "img/*"
+  ],
+  "css": [
+    "styles.css"
+  ]
+}

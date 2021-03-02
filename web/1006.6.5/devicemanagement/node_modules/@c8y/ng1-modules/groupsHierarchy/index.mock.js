@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.groupsHierarchy",[]).constant("groupsHierarchyPluginPath",":::PLUGIN_PATH:::");

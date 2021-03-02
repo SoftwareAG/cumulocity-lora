@@ -1,0 +1,1 @@
+"use strict";!function(){function e(a,n){return{relay:function(e,t,r){var c={deviceId:e,c8y_Relay:{id:t,relayState:r?"CLOSED":"OPEN"},description:n(r?"Close relay.":"Open relay.")};return a.create(c)}}}e.$inject=["c8yDeviceControl","gettext"],angular.module("c8y.relayWidget").factory("relayWidgetSvc",e)}();

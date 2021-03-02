@@ -1,0 +1,4 @@
+.table.no-border-top > tbody > tr:first-child > th,
+.table.no-border-top > tbody > tr:first-child > td {
+  border-top: none;
+}

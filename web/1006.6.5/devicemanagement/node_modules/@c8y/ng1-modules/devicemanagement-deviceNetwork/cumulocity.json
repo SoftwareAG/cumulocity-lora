@@ -1,0 +1,19 @@
+{
+  "name": "Device network",
+  "ngModules": [
+    "c8y.deviceNetwork"
+  ],
+  "category": "Device",
+  "description": "Displays a Network tab in device detail.",
+  "css": [
+    "style/style.css"
+  ],
+  "js": [
+    "index.js",
+    "controllers/network.js"
+  ],
+  "folderName": "deviceNetwork",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+    "name": "Reporting",
+    "ngModules": [
+        "c8y.cockpit.export"
+    ],
+    "category": "",
+    "icon": "dashboard",
+    "color": "#F03F0F",
+    "description": "Report different kinds of data in CSV or XLS files.",
+    "js": [
+        "index.js",
+        "controllers/list.js",
+        "controllers/detail.js",
+        "directives/timespan.js",
+        "services/export.js",
+        "services/config.js",
+        "services/filters.js",
+        "services/api.js"
+    ],
+    "less": [
+        "style/export.less"
+    ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Sigfox connectivity settings",
+  "ngModules": [
+    "c8y.sigfoxConnectivitySettings"
+  ],
+  "icon": "plug",
+  "category": "Administration",
+  "description": "User can define credentials for Sigfox platform",
+  "js": [
+    "sigfox-provider-settings.module.js",
+    "sigfox-settings.component.js",
+    "sigfox-settings.service.js"
+  ]
+}

@@ -1,0 +1,95 @@
+<div class="cron-wrap form-horizontal" ng-form="nestedSmartRuleForm">
+  <div class="form-group smart-cron-job-every">
+    <label for="smart-cron-job-every" class="col-sm-3 control-label" translate>
+      Interval
+    </label>
+    <div class="col-sm-9">
+      <div class="c8y-select-wrapper">
+        <select id="smart-cron-job-every"
+                class="cron-select form-control"
+                ng-model="myFrequency.base"
+                ng-required="true"
+                ng-options="item.value as (item.label | translate) for item in frequency | smartRuleParamFrequency">
+        </select>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group smart-cron-job-on" ng-show="myFrequency.base == 4">
+    <label for="smart-cron-job-on" class="col-sm-3 control-label" translate>
+      Day
+    </label>
+    <div class="col-sm-9">
+      <div class="c8y-select-wrapper">
+        <select id="smart-cron-job-on"
+                class="cron-select form-control day-value"
+                ng-model="myFrequency.dayValue"
+                ng-options="(value | smartRuleParamFrequencyDayNameToDate | date: 'EEEE' ) for value in dayValue">
+        </select>
+        <span></span>
+    </div>
+    </div>
+  </div>
+
+  <div class="form-group smart-cron-job-on-the" ng-show="myFrequency.base >= 5">
+    <label for="smart-cron-job-on-the" class="col-sm-3 control-label" translate>
+      Day
+    </label>
+    <div class="col-sm-9">
+      <div class="c8y-select-wrapper">
+        <select id="smart-cron-job-on-the"
+                class="cron-select form-control day-of-month-value"
+                ng-model="myFrequency.dayOfMonthValue"
+                ng-options="value for value in dayOfMonthValue">
+        </select>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group smart-cron-job-of" ng-show="myFrequency.base  == 6">
+    <label for="smart-cron-job-of" class="col-sm-3 control-label" translate>
+      Month
+    </label>
+    <div class="col-sm-9">
+      <div class="c8y-select-wrapper">
+        <select id="smart-cron-job-of"
+                class="cron-select form-control month-value"
+                ng-model="myFrequency.monthValue"
+                ng-options="(value | smartRuleParamFrequencyMonthNameToDate | date: 'MMMM') for value in monthValue">
+        </select>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group smart-cron-job-at" ng-show="myFrequency.base >= 2">
+    <label for="smart-cron-job-at-hour" class="col-sm-3 control-label">
+      <span ng-show="myFrequency.base >= 3" translate>Time</span>
+      <span ng-hide="myFrequency.base >= 3" translate>Minutes</span>
+    </label>
+    <div class="col-sm-9">
+      <div class="form-inline">
+        <div class="c8y-select-wrapper">
+          <select id="smart-cron-job-at-hour"
+                  class="cron-select form-control hour-value"
+                  ng-show="myFrequency.base >= 3"
+                  ng-model="myFrequency.hourValue"
+                  ng-options="value for value in hourValue">
+          </select>
+          <span></span>
+        </div>
+        <span ng-show="myFrequency.base >= 3"> : </span>
+        <div class="c8y-select-wrapper">
+          <select id="smart-cron-job-at-minute"
+                  class="cron-select form-control minute-value"
+                  ng-model="myFrequency.minuteValue"
+                  ng-options="(value | smartRuleParamFrequencyMinuteValueToDate | date: 'mm') for value in minuteValue">
+          </select>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

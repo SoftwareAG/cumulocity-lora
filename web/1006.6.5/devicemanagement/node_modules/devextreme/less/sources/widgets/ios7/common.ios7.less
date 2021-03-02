@@ -1,0 +1,60 @@
+/**
+* DevExtreme (widgets/ios7/common.ios7.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@IOS7_BASE_FONT_SIZE: 1em;
+
+.dx-theme-marker {
+    font-family: @IOS7_THEME_MARKER;
+}
+
+.dx-base-typography() {
+    color: @IOS7_FONT_COLOR;
+    font-weight: normal;
+    font-size: @IOS7_BASE_FONT_SIZE;
+    font-family: @IOS7_FONT;
+
+    a {
+        color: @IOS7_FONT_COLOR;
+        text-decoration: underline;
+    }
+
+    img {
+        border-style: none;
+    }
+}
+
+.disabled-widget(@opacity: @IOS7_DISABLED_OPACITY) { // stylelint-disable-line selector-class-pattern
+    opacity: @opacity;
+    .user-select(none);
+
+    cursor: default;
+}
+
+.dx-icon {
+    background-position: 50% 50%;
+}
+
+&.dx-ios-stripes {
+    background: @IOS7_STRIPES_BACKGROUND;
+}
+
+.dx-black-background {
+    background: @IOS7_BLACK_BACKGROUND;
+}
+
+.dx-content-background {
+    background-color: @IOS7_BACKGROUND;
+}
+
+.dx-content-content {
+    background-color: @IOS7_BACKGROUND;
+}
+
+.dx-form-background {
+    background-color: @IOS7_BACKGROUND_WIDGET;
+}

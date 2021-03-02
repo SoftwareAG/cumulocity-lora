@@ -1,0 +1,16 @@
+<div class="statusContainer" >
+  <span uib-tooltip="{{status.sendStatus.tooltip | translate}}
+  {{status.pushStatus.tooltip | translate}}"
+  tooltip-append-to-body="true" tooltip-placement="auto">
+  <div ng-if="!!status.sendStatus" c8y-icon="{{status.sendStatus.icon}}" class="sendStatus"
+  ng-class="status.sendStatus.class" ></div>
+  <div ng-if="!!status.pushStatus" c8y-icon="{{status.pushStatus.icon}}" class="pushStatus"
+  ng-class="status.pushStatus.class" ></div>
+</span>
+  <div ng-if="!!status.maintenanceStatus"
+    c8y-icon="{{status.maintenanceStatus.icon}}" 
+    class="maintenanceStatus"
+    uib-tooltip="{{status.maintenanceStatus.tooltip | translate}}"
+    tooltip-append-to-body="true" tooltip-placement="auto"
+    ng-class="status.maintenanceStatus.class"></div>
+</div>

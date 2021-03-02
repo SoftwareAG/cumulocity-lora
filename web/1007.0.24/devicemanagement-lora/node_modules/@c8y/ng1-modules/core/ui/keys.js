@@ -1,0 +1,1 @@
+"use strict";!function(){var c={MAPQUESTAPI:"MgOKczqMYTkXK5jiMgEYGvjnTHf562mA"};angular.module("c8y.ui").config(["c8yKeysProvider",function(i){_.forEach(c,function(c,n){i.set(n,c)})}])}();

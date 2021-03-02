@@ -1,0 +1,67 @@
+{
+  "name": "Remote access",
+  "ngModules": [
+    "c8y.remoteAccess"
+  ],
+  "category": "Remote access",
+  "description": "Configure remote access and handle remote sessions to devices.",
+  "js": [
+    "remoteAccess.module.js",
+
+    "remoteAccess.service.js",
+    "remoteAccessUI.provider.js",
+
+    "clients/remoteAccessClients.service.js",
+
+    "remoteAccessEndpointsList/remoteAccessEndpointsList.component.js",
+    "remoteAccessEndpointModal/remoteAccessEndpointModal.component.js",
+    "remoteAccessEndpointCard/remoteAccessEndpointCard.component.js",
+
+    "remoteAccessSettings/remoteAccessSettings.component.js"
+  ],
+  "copy": [
+    "clients/remoteAccessClients.service.js",
+    "clients/vnc/*",
+    {
+      "cwd": "node_modules/noVNC/include",
+      "files": [
+        "base.css",
+        "util.js",
+        "webutil.js",
+        "base64.js",
+        "websock.js",
+        "des.js",
+        "keysymdef.js",
+        "keyboard.js",
+        "input.js",
+        "display.js",
+        "inflator.js",
+        "rfb.js",
+        "keysym.js"
+      ],
+      "output": "clients/vnc"
+    },
+    {
+      "cwd": "node_modules/lodash",
+      "files": ["lodash.min.js"],
+      "output": "clients/vnc"
+    },
+    "clients/terminal/*",
+    {
+      "cwd": "node_modules/xterm/dist",
+      "files": [
+        "xterm.css",
+        "xterm.js",
+        "addons/fit/fit.js"
+      ],
+      "output": "clients/terminal"
+    },
+    {
+      "cwd": "node_modules/fast-text-encoding",
+      "files": [
+        "text.min.js"
+      ],
+      "output": "clients/terminal"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+"use strict";!function(){function c(c){c.initUi()}c.$inject=["c8yImpactProvider"],angular.module("c8y.impact",["c8y.deviceProtocols"]).config(c)}();

@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").component("c8yUiOperationsTimelineModal",{bindings:{resolve:"<",close:"&",dismiss:"&"},templateUrl:":::PLUGIN_PATH:::/ui/operations/operations-timeline-modal.html",controllerAs:"vm"});

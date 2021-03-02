@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.smartRules").directive("smartRuleParamInputNumber",function(){return{require:"^smartRuleParamInput",scope:{rule:"=",param:"=",min:"=?",max:"=?"},restrict:"E",templateUrl:":::PLUGIN_PATH:::/views/paramInputNumber.html",link:function(e,r,t,u){e.isDefined=function(e){return!_.isUndefined(e)},e.placeholder=u.placeholder}}});

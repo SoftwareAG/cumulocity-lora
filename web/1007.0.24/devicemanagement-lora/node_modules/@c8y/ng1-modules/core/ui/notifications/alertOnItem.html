@@ -1,0 +1,11 @@
+<div class="alert alert-warning" ng-show="alertShow">
+  {{ alertText | translate }}
+  <button
+    title="{{ alertBtnText | translate }}"
+    class="btn btn-primary"
+    ng-click="alertBtnAction()"
+    ng-if="alertBtnIcon || alertBtnText"
+  >
+    <i ng-if="alertBtnIcon" c8y-icon="{{ alertBtnIcon }}"></i> {{ alertBtnText | translate }}
+  </button>
+</div>

@@ -1,0 +1,20 @@
+{
+  "name": "Help and support component",
+  "ngModules": [
+    "c8y.welcome.helpandsupport"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "A component with quick links to documentation and support",
+  "css": [
+    "style.css"
+  ],
+  "js": [
+    "index.js",
+    "helpAndSupport.controller.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

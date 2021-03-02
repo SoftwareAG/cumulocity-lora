@@ -1,0 +1,26 @@
+{
+  "name": "Data point table",
+  "ngModules": [
+    "c8y.cockpit.dataPointTable"
+  ],
+  "category": "Measurements",
+  "icon": "bell",
+  "color": "$F2DF0F",
+  "description": "Explore measurements in tabular form",
+  "imports": [
+    "core/deviceSelector",
+    "core/measurements",
+    "core/dataPointExplorer"
+  ],
+  "js": [
+    "index.js",
+    "widget.controller.js",
+    "dataPointTable.controller.js",
+    "dataPointTable.directive.js",
+    "dataPointTable.service.js",
+    "realtimeRadioButton.directive.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

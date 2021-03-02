@@ -1,0 +1,16 @@
+{
+  "name": "Group info dashboard",
+  "ngModules": [
+    "c8y.groupInfoDashboard"
+  ],
+  "category": "Groups",
+  "description": "Adds Info dashboard to group details",
+  "imports": [
+    "core/alarms",
+    "core/assetPropertyWidget",
+    "core/asset-notes"
+  ],
+  "js": [
+    "group-info-dashboard.module.js"
+  ]
+}

@@ -1,0 +1,32 @@
+<div class="card">
+  <div class="card-header">
+    <h4 class="card-title">{{ 'Groups assignment' | translate }}</h4>
+  </div>
+  <hr />
+  <div class="card-block">
+    <div c8y-device-group-selector data-group="group.selected"></div>
+    <button
+      title="{{ 'Add to group' | translate }}"
+      class="btn btn-primary"
+      ng-click="addToGroup(group.selected)"
+      ng-disabled="!group.selected"
+      translate
+    >
+      Add to group
+    </button>
+  </div>
+
+  <ul class="list-group">
+    <li class="list-group-item word-break" ng-repeat="group in currentGroups | orderBy:'name'">
+      <button
+        class="btn btn-warning btn-xs pull-right"
+        ng-click="removeFromGroup(group)"
+        title="{{ 'Unassign device' | translate }}"
+      >
+        <i c8y-icon="chain-broken"></i>
+        {{ 'Unassign' | translate }}
+      </button>
+      <a ng-href="#/group/{{ group.id }}"><i c8y-icon="c8y-group"></i> {{ group.name }}</a>
+    </li>
+  </ul>
+</div>

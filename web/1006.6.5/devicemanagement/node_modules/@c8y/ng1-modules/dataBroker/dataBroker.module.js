@@ -1,0 +1,1 @@
+"use strict";!function(){var n="connectors";angular.module("c8y.dataBroker",[]).constant("dataBrokerConstants",{CONNECTOR_BASE_URL:n,ROUTE_NEW_CONNECTOR:"".concat(n,"/new"),SUBSCRIPTION_BASE_URL:"subscriptions"})}();

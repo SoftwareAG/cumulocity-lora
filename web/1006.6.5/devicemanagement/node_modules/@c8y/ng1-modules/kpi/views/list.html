@@ -1,0 +1,53 @@
+<div ng-controller="kpiListCtrl">
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th></th>
+        <th ng-if="columnVisible(child.config.options.kpi)" translate>Label</th>
+        <th class="text-right text-nowrap" ng-if="columnVisible(child.config.options.target)" translate>Target</th>
+        <th class="text-right text-nowrap" ng-if="columnVisible(child.config.options.current)" translate>Current</th>
+        <th class="text-right text-nowrap" ng-if="columnVisible(child.config.options.diff)" translate>Diff</th>
+        <th class="text-right text-nowrap" ng-if="columnVisible(child.config.options.diffPercentage)" translate>Diff %</th>
+        <th class="text-right text-nowrap" ng-if="columnVisible(child.config.options.asset)" translate>Asset</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr ng-repeat="dp in dataPoints">
+
+        <td style="width:20px;">
+          <i c8y-icon="circle" ng-style="{color: dp.color}"></i>
+        </td>
+
+        <td ng-if="columnVisible(child.config.options.kpi)">
+          {{dp.label | translate}} <small class="text-muted">{{ dp.unit }}</small>
+        </td>
+
+        <td class="text-right" ng-if="columnVisible(child.config.options.target)">
+          <span>{{dp.target}}</span>
+        </td>
+
+        <td class="text-right" ng-if="columnVisible(child.config.options.current)">
+          <span uib-tooltip="{{ times[dp.id] | absoluteDate }}">
+            {{ measurements[dp.id].value }}
+          </span>
+        </td>
+
+        <td class="text-right" ng-if="columnVisible(child.config.options.diff)">
+          <span>{{ diff(dp) | number:2 }}</span>
+        </td>
+
+        <td class="text-right" ng-if="columnVisible(child.config.options.diffPercentage)">
+          <span>{{ diffPercent(dp) | number:2 }}</span>
+        </td>
+
+        <td class="text-right word-break" ng-if="columnVisible(child.config.options.asset)">
+          <a class="text-muted" ng-href="#/device/{{ dp.__target.id }}">
+            <small><i c8y-icon="cog"></i>{{ dp.__target.name}}</small>
+          </a>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>

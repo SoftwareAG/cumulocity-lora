@@ -1,0 +1,1 @@
+"use strict";!function(){function t(i){return{template:'<ng-transclude style="display:none"></ng-transclude>',priority:-100,transclude:!0,link:function(t,n){var e={$element:n};i.initSet(e),t.$on("$destroy",function(){return i.destroySet(e)})}}}t.$inject=["c8yActionBar"],angular.module("c8y.ui").directive("c8yUiActionBarSet",t)}();

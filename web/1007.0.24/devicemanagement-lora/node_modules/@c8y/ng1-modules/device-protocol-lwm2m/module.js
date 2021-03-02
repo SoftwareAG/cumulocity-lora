@@ -1,0 +1,1 @@
+"use strict";!function(){function i(i,o,t){i.initUi(),o.initUi(),t.initUi()}i.$inject=["c8yLwm2mProvider","c8yLwm2mPostOperationsUiProvider","c8yLwm2mBootstrapUiProvider"],angular.module("c8y.lwm2m",["c8y.lwm2m.bootstrap","c8y.deviceProtocols"]).config(i)}();

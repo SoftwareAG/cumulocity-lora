@@ -1,0 +1,1 @@
+"use strict";!function(){function i(i,t){var c=i.url("service/actility");return{deprovisionDevice:function(i){var e="".concat(c,"/deprovision/");return t.put(e+i)}}}i.$inject=["c8yBase","$http"],angular.module("c8y.deviceActility").service("deviceActility",i)}();

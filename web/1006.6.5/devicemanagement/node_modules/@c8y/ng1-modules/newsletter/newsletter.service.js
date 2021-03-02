@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e,n,t,r,c){return{download:function(){return t.current().then(function(e){return c.downloadAndSaveAs({},r.url("user/".concat(e.tenant,"/users/newsletterEmails")))})}}}e.$inject=["$http","$q","c8yUser","c8yBase","c8yBinaryCommon"],angular.module("c8y.newsletter").factory("NewsletterService",e)}();

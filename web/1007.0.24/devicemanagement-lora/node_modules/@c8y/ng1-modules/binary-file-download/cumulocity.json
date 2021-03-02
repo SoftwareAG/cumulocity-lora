@@ -1,0 +1,10 @@
+{
+  "description": "Binary file download plugin",
+  "ngModules": [
+    "c8y.binaryFileDownload"
+  ],
+  "js": [
+    "binary-file-download.config.js",
+    "binary-file-download.component.js"
+  ]
+}

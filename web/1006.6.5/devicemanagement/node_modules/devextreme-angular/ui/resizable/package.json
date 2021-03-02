@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-resizable.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-resizable.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-resizable.js",
+  "esm5": "../../esm5/ui/resizable/devextreme-angular-ui-resizable.js",
+  "esm2015": "../../esm2015/ui/resizable/devextreme-angular-ui-resizable.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-resizable.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-resizable.js",
+  "typings": "devextreme-angular-ui-resizable.d.ts",
+  "metadata": "devextreme-angular-ui-resizable.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/resizable"
+}

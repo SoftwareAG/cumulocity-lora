@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yEventList",function(){return{restrict:"EA",templateUrl:":::PLUGIN_PATH:::/ui/views/eventList.html",controller:"eventList",controllerAs:"ctrl",scope:{title:"=?",subtitle:"=?",filters:"=?",initialRealtimeState:"=?",realtime:"=?",hideHeaderActions:"=?",showPageTitles:"=?",onEventLoaded:"&",refreshLoading:"=?",hideDevice:"<?"}}});

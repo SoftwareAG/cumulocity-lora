@@ -1,0 +1,13 @@
+<div class="btn-group" style="margin-bottom:20px;" ng-repeat="(key, value) in vm.options.severity">
+  <button
+    title="{{ key | capitalizeString }}"
+    type="button"
+    class="btn btn-default"
+    ng-if="value"
+    ng-model="vm.severity[key]"
+    uib-btn-checkbox
+  >
+    <i c8y-icon="{{ vm.icon(key) }}" class="status" ng-class="key | lowercase"></i>
+    {{ key | capitalizeString }}
+  </button>
+</div>

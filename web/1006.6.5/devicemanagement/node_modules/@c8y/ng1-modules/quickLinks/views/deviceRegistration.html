@@ -1,0 +1,44 @@
+<div class="modal-header" ng-show="title">
+  <h3 ng-bind="title | translate"></h3>
+</div>
+<div class="modal-body">
+  <form name="deviceRegistrationForm" role="form" novalidate>
+    <div class="form-group">
+      <input
+        id="id"
+        name="id"
+        type="text"
+        class="form-control"
+        placeholder="{{ 'Device ID' | translate }}"
+        ng-model="newDevice.id"
+        c8y-autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        c8y-validate-url-segment
+        required
+      />
+      <c8y-error-feedback field="deviceRegistrationForm.id">
+        <span ng-message="required" translate>Device ID is required.</span>
+      </c8y-error-feedback>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button 
+    title="{{ 'Close' | translate }}" 
+    class="btn btn-default" 
+    ng-click="dismiss()" 
+    translate
+  >
+    Close
+  </button>
+  <button
+    title="{{ 'Create' | translate }}"
+    class="btn btn-primary"
+    ng-disabled="deviceRegistrationForm.$invalid"
+    ng-click="register(newDevice)"
+    translate
+  >
+    Create
+  </button>
+</div>

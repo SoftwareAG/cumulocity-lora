@@ -1,0 +1,11 @@
+<div ng-show="vm.options || vm.form && vm.form.length">
+  <ng-form
+    name="vm.ngForm"
+    ng-if="!vm.render"
+    sf-schema="vm.schema"
+    sf-form="vm.form"
+    sf-model="vm.model"
+    sf-options="vm.options"
+  >
+  </ng-form>
+</div>

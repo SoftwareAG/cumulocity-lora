@@ -1,0 +1,36 @@
+/**
+* DevExtreme (widgets/material/tooltip.material.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./popover.material.less";
+
+.dx-size-default {
+    @MATERIAL_TOOLTIP_PADDING: 6px 8px;
+}
+
+.dx-size-compact {
+    @MATERIAL_TOOLTIP_PADDING: 4px 6px;
+}
+
+.dx-tooltip-wrapper {
+    .dx-overlay-content {
+        background-color: @tooltip-bg;
+        color: @tooltip-color;
+        box-shadow: none;
+        border-radius: @tooltip-border-radius;
+        min-height: auto;
+
+        .dx-popup-content {
+            padding: @MATERIAL_TOOLTIP_PADDING;
+            font-size: 12px;
+        }
+    }
+
+    &.dx-popover-wrapper .dx-popover-arrow {
+        display: none;
+    }
+}

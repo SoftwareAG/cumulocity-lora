@@ -1,0 +1,199 @@
+<div data-ng-controller="AssetsConfigCtrl">
+  <div class="form-group" ng-show="assets.length">
+    <label class="checkbox-inline">
+      <input type="checkbox" ng-model="config.options.data.availability" translate /> Availability
+      status
+    </label>
+    <label class="checkbox-inline">
+      <input type="checkbox" ng-model="config.options.data.alarms" translate /> Alarm status
+    </label>
+    <label class="checkbox-inline">
+      <input type="checkbox" ng-model="config.options.data.communication" translate /> Last
+      communication
+    </label>
+    <label class="checkbox-inline">
+      <input type="checkbox" ng-model="config.options.data.location" translate /> Location
+    </label>
+    <label class="checkbox-inline">
+      <input type="checkbox" ng-model="config.options.data.lastValidMessage" translate /> Last valid
+      message
+    </label>
+    <label class="checkbox-inline">
+      <input type="checkbox" ng-model="config.options.data.maintenance" translate /> Maintenance
+    </label>
+  </div>
+  <div class="form-group" ng-show="assets.length">
+    <label ng-repeat="column in counterColumns" class="checkbox-inline">
+      <input
+        type="checkbox"
+        ng-model="config.options.data[column.name]"
+        ng-checked="config.options.data[column.name]"
+      />
+      <a ng-click="countConfig(column)">{{ column.label }}</a>
+    </label>
+  </div>
+
+  <table class="table table-condensed" ng-show="assets.length">
+    <thead>
+      <tr>
+        <th></th>
+        <th translate>Device</th>
+        <th ng-show="config.options.data.availability" translate>Availability status</th>
+        <th ng-show="config.options.data.alarms" translate>Alarm status</th>
+        <th ng-show="config.options.data.communication" translate>Last communication</th>
+        <th ng-show="config.options.data.location" translate>Location</th>
+        <th ng-show="config.options.data.lastValidMessage" translate>Last valid message</th>
+        <th ng-show="config.options.data.maintenance" translate>Maintenance</th>
+        <th ng-repeat="column in counterColumns" ng-show="config.options.data[column.name]">
+          {{ column.label }}
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="asset in assets">
+        <td class="text-center">
+          <input type="checkbox" ng-change="updateOptions()" ng-model="asset.__active" />
+        </td>
+        <td>{{ asset.name }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="form-group" ng-show="config.options.assets.length">
+    <label translate>Custom columns</label>
+    <button
+      title="{{ 'Add/edit icon map' | translate }}"
+      ng-if="config.options.iconsMap.length"
+      class="btn btn-primary pull-right text-center"
+      data-ng-click="addIconMap()"
+    >
+      <i c8y-icon="plus"></i> <translate>Add/edit icon map</translate>
+    </button>
+    <button
+      title="{{ 'Add custom column' | translate }}"
+      class="btn btn-default pull-right text-center"
+      data-ng-click="addCustomColumn()"
+    >
+      <i c8y-icon="plus"></i> <translate>Add custom column</translate>
+    </button>
+    <table class="table table-condensed" ng-show="config.options.customColumns.length">
+      <thead>
+        <tr>
+          <th translate>Fragment</th>
+          <th translate>Icon map</th>
+          <th translate>Label</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="column in config.options.customColumns track by $index">
+          <td>
+            <input
+              class="form-control"
+              type="text"
+              ng-model="column.fragment"
+              placeholder="{{ 'e.g.' | translate }} c8y_Position"
+              required
+            />
+          </td>
+          <td class="text-center">
+            <select
+              ng-if="config.options.iconsMap.length"
+              class="form-control"
+              ng-options="map.id as map.name for map in config.options.iconsMap"
+              ng-model="column.iconMap"
+              required
+            ></select>
+            <button
+              title="{{ 'Add icon map' | translate }}"
+              ng-if="!config.options.iconsMap.length"
+              class="btn btn-primary pull-left text-center"
+              data-ng-click="addIconMap()"
+            >
+              <i c8y-icon="plus"></i><translate> Add icon map</translate>
+            </button>
+          </td>
+          <td>
+            <input
+              class="form-control"
+              type="text"
+              ng-model="column.label"
+              placeholder="{{ 'e.g. Position' | translate }}"
+              required
+            />
+          </td>
+
+          <td>
+            <button
+              class="btn btn-danger btn-xs showOnHover"
+              title="{{ 'Delete item' | translate }}"
+              data-ng-click="onDelete(config.options.customColumns, $index)"
+            >
+              <i c8y-icon="times"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="form-group" ng-show="config.options.assets.length">
+    <label translate>Device shell operation label button</label>
+    <button
+      title="{{ 'Add device shell operation button' | translate }}"
+      class="btn btn-primary pull-right text-center"
+      data-ng-click="addDeviceShellOperationButton()"
+    >
+      <i c8y-icon="plus"></i><translate>Add device shell operation button</translate>
+    </button>
+    <table
+      class="table table-condensed"
+      ng-show="config.options.deviceShellOperationButtons.length"
+    >
+      <thead>
+        <tr>
+          <th translate>Button label</th>
+          <th translate>Selected operation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="button in config.options.deviceShellOperationButtons track by $index">
+          <td>
+            <input
+              type="text"
+              ng-model="button.label"
+              class="form-control"
+              placeholder="{{ 'e.g. update' | translate }}"
+              required
+            />
+          </td>
+          <td>
+            <span ng-if="button.operation.json" class="help-block">{{
+              button.operation.json.description
+            }}</span>
+            <span ng-if="!button.operation.json" class="help-block" translate
+              >No operation selected.</span
+            >
+          </td>
+          <td>
+            <button
+              title="{{ 'Edit' | translate }}"
+              class="btn btn-default"
+              data-ng-click="addOperation(button)"
+              data-ng-disabled="!assets.length"
+            >
+              <i c8y-icon="pencil-square-o"></i>
+            </button>
+          </td>
+          <td>
+            <button
+              title="{{ 'Delete item' | translate }}"
+              class="btn btn-danger btn-xs showOnHover"
+              data-ng-click="onDelete(config.options.deviceShellOperationButtons, $index)"
+            >
+              <i c8y-icon="times"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

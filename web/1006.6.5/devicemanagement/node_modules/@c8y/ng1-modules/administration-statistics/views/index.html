@@ -1,0 +1,112 @@
+<div ng-controller="StatisticsCtrl as ctrl" ng-init="ctrl.fetch()" class="card-group">
+  <div class="col-md-4 col-sm-6 col-xs-12" ng-if="ctrl.summary.thisMonth.show">
+    <div class="card">
+      <div class="card-header">
+        <h4 translate>Current month usage</h4>
+      </div>
+      <hr />
+      <div class="card-block text-muted">{{ ctrl.thisMonth.tooltips.month() }}</div>
+      <ul class="list-group">
+        <li class="list-group-item" ng-if="ctrl.summary.thisMonth.requestCount">
+          <span ng-bind="ctrl.summary.thisMonth.requestCount"></span>
+        </li>
+        <li class="list-group-item" ng-if="ctrl.summary.thisMonth.deviceRequestCount">
+          <span ng-bind="ctrl.summary.thisMonth.deviceRequestCount"></span>
+        </li>
+        <li
+          class="list-group-item"
+          ng-if="ctrl.summary.thisMonth.totalResourceCreateAndUpdateCount"
+        >
+          <span ng-bind="ctrl.summary.thisMonth.totalResourceCreateAndUpdateCount"></span>
+        </li>
+        <li class="list-group-item" ng-if="ctrl.summary.thisMonth.storageSize">
+          <span ng-bind="ctrl.summary.thisMonth.storageSize"></span><br />
+          <small class="text-muted">{{ ctrl.thisMonth.tooltips.storageSize() }}</small>
+        </li>
+        <li class="list-group-item" ng-if="ctrl.summary.thisMonth.storageLimit">
+          <span ng-bind="ctrl.summary.thisMonth.storageLimit"></span><br />
+          <small class="text-muted">{{
+            'The quota calculation is based on the known number of devices, as displayed below.'
+              | translate
+          }}</small>
+        </li>
+        <li class="list-group-item" ng-if="ctrl.summary.thisMonth.rootDevicesCount">
+          <span ng-bind="ctrl.summary.thisMonth.rootDevicesCount"> </span><br />
+          <small class="text-muted">{{ ctrl.thisMonth.tooltips.rootDevicesCount() }}</small>
+        </li>
+        <li class="list-group-item" ng-if="ctrl.summary.thisMonth.devicesCount">
+          <span ng-bind="ctrl.summary.thisMonth.devicesCount"> </span><br />
+          <small class="text-muted">{{ ctrl.thisMonth.tooltips.devicesCount() }}</small>
+        </li>
+        <li class="list-group-item" ng-if="ctrl.summary.thisMonth.usersCount">
+          <span ng-bind="ctrl.summary.thisMonth.usersCount"></span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-4 col-sm-6 col-xs-12" ng-if="ctrl.summary.lastMonth.show">
+    <div class="card">
+      <div class="card-header">
+        <h4 translate>Last month usage</h4>
+      </div>
+      <hr />
+      <div class="card-block text-muted">{{ ctrl.lastMonth.tooltips.month() }}</div>
+      <ul class="list-group">
+        <li
+          class="list-group-item"
+          ng-if="ctrl.summary.lastMonth.requestCount"
+          ng-bind="ctrl.summary.lastMonth.requestCount"
+        ></li>
+        <li
+          class="list-group-item"
+          ng-if="ctrl.summary.lastMonth.deviceRequestCount"
+          ng-bind="ctrl.summary.lastMonth.deviceRequestCount"
+        ></li>
+        <li
+          class="list-group-item"
+          ng-if="ctrl.summary.lastMonth.totalResourceCreateAndUpdateCount"
+        >
+          <span ng-bind="ctrl.summary.lastMonth.totalResourceCreateAndUpdateCount"></span>
+        </li>
+        <li class="list-group-item" ng-if="ctrl.summary.lastMonth.storageSize">
+          <span ng-bind="ctrl.summary.lastMonth.storageSize"></span><br />
+          <small class="text-muted">{{ ctrl.lastMonth.tooltips.storageSize() }}</small>
+        </li>
+        <li class="list-group-item" ng-if="ctrl.summary.lastMonth.rootDevicesCount">
+          <span ng-bind="ctrl.summary.lastMonth.rootDevicesCount"></span><br />
+          <small class="text-muted">{{ ctrl.lastMonth.tooltips.rootDevicesCount() }}</small>
+        </li>
+        <li class="list-group-item" ng-if="ctrl.summary.lastMonth.devicesCount">
+          <span ng-bind="ctrl.summary.lastMonth.devicesCount"></span><br />
+          <small class="text-muted">{{ ctrl.lastMonth.tooltips.devicesCount() }}</small>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-4 col-xs-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 translate>Subscribed apps</h4>
+      </div>
+      <hr />
+      <div class="list-group list-group-links">
+        <a
+          title="{{ app | humanizeAppName }}"
+          class="list-group-item flex-row"
+          target="_blank"
+          rel="noopener noreferrer"
+          ng-repeat="app in ctrl.apps"
+          ng-href="/apps/{{ app.contextPath }}/index.html"
+        >
+          <span class="list-item-icon" style="font-size:36px; min-width: 45px;"
+            ><c8y-app-icon app="::app"></c8y-app-icon
+          ></span>
+          <span class="list-item-body">
+            <span ng-bind="app | humanizeAppName"></span><br />
+            <small class="text-muted" ng-bind="app.contextPath"></small>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

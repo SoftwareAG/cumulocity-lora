@@ -1,0 +1,16 @@
+{
+  "name": "Newsletter component",
+  "ngModules": [
+    "c8y.newsletter"
+  ],
+  "category": "",
+  "description": "Allows users to subscribe for a newsletter",
+  "css": [],
+  "js": [
+    "newsletter.module.js",
+    "newsletter.config.js",
+    "subscribeNewsletter.component.js",
+    "newsletter.service.js",
+    "downloadEmailsList.component.js"
+  ]
+}

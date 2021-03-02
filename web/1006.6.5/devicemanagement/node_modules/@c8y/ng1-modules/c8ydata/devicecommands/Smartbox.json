@@ -1,0 +1,76 @@
+{
+  "name": "Smartbox Commands",
+  "syntax": "Smartbox",
+  "templates": [
+    {
+      "name": "Get operator selection info",
+      "command": "AT+COPS?",
+      "category": "Network service"
+    },
+    {
+      "name": "Serve cell information",
+      "command": "AT#SERVINFO",
+      "category": "Network service"
+    },
+    {
+      "name": "Read current network status",
+      "command": "AT#RFSTS",
+      "category": "Network service"
+    },
+    {
+      "name": "Get signal strength",
+      "command": "AT+CSQ",
+      "category": "Network service"
+    },
+    {
+      "name": "Get device chipset",
+      "command": "AT+CGMM",
+      "category": "Device"
+    },
+    {
+      "name": "Get installed firmware",
+      "command": "AT+CGMR",
+      "category": "Device"
+    },
+    {
+      "name": "Get internal temperature of chip",
+      "command": "AT#TEMPMON=1",
+      "category": "Device"
+    },
+    {
+      "name": "Get actual ADC in mV",
+      "command": "AT#ADC?",
+      "category": "GPIO"
+    },
+    {
+      "name": "Get actual date and time of RTC",
+      "command": "AT#CCLK?",
+      "category": "Device"
+    },
+    {
+      "name": "Get list of files saved on device",
+      "command": "AT#M2MLIST",
+      "category": "Device"
+    },
+    {
+      "name": "Get IMSI",
+      "command": "AT+CIMI",
+      "category": "SIM"
+    },
+    {
+      "name": "Get SIM status",
+      "command": "AT+CPIN?",
+      "category": "SIM"
+    },
+    {
+      "name": "Get GPIO status",
+      "command": "AT#GPIO?",
+      "category": "GPIO"
+    },
+    {
+      "name": "Get all module events",
+      "command": "AT# EVMONI?",
+      "category": "Device"
+    }
+  ]
+}

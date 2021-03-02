@@ -1,0 +1,15 @@
+{
+  "name": "Device permission utils",
+  "ngModules": [
+    "c8y.parts.aclManagement"
+  ],
+  "category": "Device",
+  "icon": "shield",
+  "color": "#F03F0F",
+  "description": "Set of extensions which allows to develop device permission management easier",
+   "js":[
+       "index.js",
+       "controllers/permissionEditorCtrl.js",
+       "directives/permissionEditor.js"
+   ]
+}

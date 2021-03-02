@@ -1,0 +1,13 @@
+{
+  "name": "Device details - basic",
+  "ngModules": [
+    "c8y.deviceDetailBasic"
+  ],
+  "category": "Device",
+  "icon": "bell",
+  "color": "#F2DF0F",
+  "description": "Shows detailed basic information for devices: name, type, hardware, system, mobile, connection monitoring, group assignments, notes.",
+  "js": [
+    "index.js"
+  ]
+}

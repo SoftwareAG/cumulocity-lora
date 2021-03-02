@@ -1,0 +1,36 @@
+<ng-form name="nestedSmartRuleForm">
+  <div
+    class="form-group col-lg-12"
+    ng-class="{'has-error': nestedSmartRuleForm.$dirty && nestedSmartRuleForm.$invalid}"
+  >
+    <textarea
+      c8y-code-editor="json"
+      class="form-control"
+      name="operation"
+      ng-model="operation.json"
+      ng-attr-placeholder='{"c8y_Reset": {}}'
+      uib-tooltip="{{ placeholder(param) }}"
+      ng-required="param.required"
+      style="height: 250px;"
+    ></textarea>
+  </div>
+  <div class="clearfix">
+    <div class="input-group">
+      <select
+        class="form-control"
+        ng-options="operationExample as (operationExample.description | translate) for operationExample in operationExamples"
+        ng-model="operation.example"
+      ></select>
+      <span class="input-group-btn">
+        <button
+          title="{{ 'Use this operation' | translate }}" 
+          class="btn btn-primary"
+          type="button"
+          ng-click="chooseOperationExample(operation.example)"
+        >
+          <i c8y-icon="share"></i>
+        </button>
+      </span>
+    </div>
+  </div>
+</ng-form>

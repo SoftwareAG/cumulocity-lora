@@ -1,0 +1,32 @@
+<div class="row">
+  <ng-form name="vm.nestedForm1">
+    <div class="form-group col-md-6">
+      <input
+        name="amount"
+        type="number"
+        class="form-control"
+        ng-model="vm.duration.amount"
+        min="0"
+        required
+        placeholder="{{ 'e.g.' | translate }} 15"
+      />
+      <c8y-error-feedback field="vm.nestedForm1.amount"></c8y-error-feedback>
+    </div>
+  </ng-form>
+  <ng-form name="vm.nestedForm2">
+    <div class="form-group col-md-6">
+      <div class="c8y-select-wrapper">
+        <select
+          name="unit"
+          class="form-control"
+          ng-options="unit as (unit.label | translate) for unit in vm.units"
+          ng-model="vm.duration.unit"
+          required
+          uib-tooltip="{{ 'Time unit' | translate }}"
+        ></select>
+        <span></span>
+      </div>
+      <c8y-error-feedback field="vm.nestedForm2.unit"></c8y-error-feedback>
+    </div>
+  </ng-form>
+</div>

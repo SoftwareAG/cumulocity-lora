@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-slide-out.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-slide-out.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-slide-out.js",
+  "esm5": "../../esm5/ui/slide-out/devextreme-angular-ui-slide-out.js",
+  "esm2015": "../../esm2015/ui/slide-out/devextreme-angular-ui-slide-out.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-slide-out.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-slide-out.js",
+  "typings": "devextreme-angular-ui-slide-out.d.ts",
+  "metadata": "devextreme-angular-ui-slide-out.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/slide-out"
+}

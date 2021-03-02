@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-circular-gauge.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-circular-gauge.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-circular-gauge.js",
+  "esm5": "../../esm5/ui/circular-gauge/devextreme-angular-ui-circular-gauge.js",
+  "esm2015": "../../esm2015/ui/circular-gauge/devextreme-angular-ui-circular-gauge.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-circular-gauge.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-circular-gauge.js",
+  "typings": "devextreme-angular-ui-circular-gauge.d.ts",
+  "metadata": "devextreme-angular-ui-circular-gauge.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/circular-gauge"
+}

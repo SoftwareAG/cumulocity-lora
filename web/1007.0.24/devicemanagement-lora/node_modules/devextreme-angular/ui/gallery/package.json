@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-gallery.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-gallery.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-gallery.js",
+  "esm5": "../../esm5/ui/gallery/devextreme-angular-ui-gallery.js",
+  "esm2015": "../../esm2015/ui/gallery/devextreme-angular-ui-gallery.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-gallery.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-gallery.js",
+  "typings": "devextreme-angular-ui-gallery.d.ts",
+  "metadata": "devextreme-angular-ui-gallery.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/gallery"
+}

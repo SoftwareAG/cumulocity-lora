@@ -1,0 +1,17 @@
+{
+  "name": "Tracker registration plugin",
+  "ngModules": [
+    "c8y.tracking.trackerRegistration"
+  ],
+  "category": "Trackers",
+  "description": "Allows for registration of trackers",
+  "imports": [
+    "core/trackerConfiguration"
+  ],
+  "js": [
+    "index.js",
+    "trackerRegistration.controller.js",
+    "trackerRegistration.service.js",
+    "trackerRegistrationHistory.service.js"
+  ]
+}

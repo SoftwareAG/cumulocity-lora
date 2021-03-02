@@ -1,0 +1,19 @@
+{
+  "name": "Administrator application archives management",
+  "ngModules": [
+    "c8y.parts.appArchives"
+  ],
+  "category": "Administration",
+  "icon": "c8y-group",
+  "color": "#F2DF0F",
+  "description": "An Administrator can upload, list, activate, delete built archives.",
+  "js": [
+    "index.js",
+    "list.controller.js",
+    "upload.controller.js"
+  ],
+  "folderName": "archivesEditor",
+  "appsInclude": [
+    "administration"
+  ]
+}

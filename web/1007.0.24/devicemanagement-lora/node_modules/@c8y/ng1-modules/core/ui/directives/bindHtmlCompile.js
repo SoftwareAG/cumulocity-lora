@@ -1,0 +1,1 @@
+"use strict";!function(){function n(c){return{restrict:"A",link:function(t,i,n){t.$watch(function(){return t.$eval(n.bindHtmlCompile)},function(n){i.html(n),c(i.contents())(t)})}}}n.$inject=["$compile"],angular.module("c8y.ui").directive("bindHtmlCompile",n)}();

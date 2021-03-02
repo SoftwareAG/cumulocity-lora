@@ -1,0 +1,13 @@
+{
+  "name": "Asset notes widget",
+  "ngModules": [
+    "c8y.assetNotes"
+  ],
+  "category": "Device",
+  "description": "Adds dashboard widget to manage asset notes",
+  "js": [
+    "assetNotes.module.js",
+    "assetNotes.component.js",
+    "assetNotes.service.js"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Configuration repository",
+  "ngModules": [
+    "c8y.configurationRepository"
+  ],
+  "category": "Device",
+  "description": "Managing device configuration repository.",
+  "js": [
+    "index.js",
+    "list.controller.js",
+    "configurationRepository.service.js"
+  ]
+}

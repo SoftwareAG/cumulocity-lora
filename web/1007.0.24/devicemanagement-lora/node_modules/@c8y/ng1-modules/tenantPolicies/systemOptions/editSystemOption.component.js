@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.tenantPolicies").component("c8yEditSystemOption",{templateUrl:":::PLUGIN_PATH:::/systemOptions/editSystemOption.html",controllerAs:"vm",bindings:{option:"="}});

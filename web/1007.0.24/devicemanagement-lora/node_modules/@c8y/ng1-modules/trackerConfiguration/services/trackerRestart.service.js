@@ -1,0 +1,1 @@
+"use strict";!function(){function t(n){return function(t,e,r){var c=this;c.execute=function(){return r.execute({deviceId:t.id,description:n("Restart tracker"),c8y_Restart:{}},c.execute)},c.execute.supported=e.supportedOperations.restart}}t.$inject=["gettext"],angular.module("c8y.trackerConfiguration").factory("trackerRestartSvc",t)}();

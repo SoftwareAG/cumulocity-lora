@@ -1,0 +1,20 @@
+{
+  "name": "Device info dashboard",
+  "ngModules": [
+    "c8y.deviceInfoDashboard"
+  ],
+  "category": "Device",
+  "description": "Adds Info dashboard to device details",
+  "imports": [
+    "core/alarms",
+    "core/assetPropertyWidget",
+    "core/deviceGroupAssignment",
+    "core/deviceStatusWidget",
+    "core/dataPointExplorer",
+    "core/alarmsEventsExplorer",
+    "core/asset-notes"
+  ],
+  "js": [
+    "device-info-dashboard.module.js"
+  ]
+}

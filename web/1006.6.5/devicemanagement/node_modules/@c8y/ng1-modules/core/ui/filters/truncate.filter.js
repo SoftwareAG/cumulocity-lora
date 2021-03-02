@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").filter("truncate",function(){return function(t,u){return _.truncate(t,{length:_.isNumber(u)?u:30})}});

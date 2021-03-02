@@ -1,0 +1,219 @@
+{
+  "c8y_ModbusDeviceTypeInfo": {
+    "minFieldbusUI": 4,
+    "name": "Ascocl IR868LR-IRUS915LR",
+    "fieldbusType": "actility"
+  },
+  "c8y_MessageIdConfiguration": {
+    "source": "FPORT"
+  },
+  "c8y_Coils": [],
+  "c8y_Registers": [
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 1,
+      "noBits": 7,
+      "messageTypeId": 8,
+      "name": "Battery (fport 8)",
+      "category": "Battery"
+    },
+    {
+      "measurementMapping": {
+        "series": "level",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "%",
+      "decimalPlaces": 0,
+      "startBit": 1,
+      "noBits": 7,
+      "messageTypeId": 9,
+      "name": "Battery (fport 9)",
+      "category": "Battery"
+    },
+    {
+      "alarmMapping": {
+        "severity": "WARNING",
+        "text": "Battery is low",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 5,
+      "noBits": 1,
+      "messageTypeId": 20,
+      "name": "Battery status (fport 20)",
+      "category": "Event"
+    },
+    {
+      "alarmMapping": {
+        "severity": "MAJOR",
+        "text": "Tamper detected",
+        "type": "c8y_Tamper"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 6,
+      "noBits": 1,
+      "messageTypeId": 20,
+      "name": "Tamper alarm (fport 20)",
+      "category": "Event"
+    },
+    {
+      "alarmMapping": {
+        "severity": "MAJOR",
+        "text": "Intrusion detected",
+        "type": "c8y_Intrusion"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 7,
+      "noBits": 1,
+      "messageTypeId": 30,
+      "name": "Intrusion alarm (fport 20)",
+      "category": "Event"
+    },
+    {
+      "measurementMapping": {
+        "series": "count",
+        "type": "c8y_Intrusion"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 8,
+      "noBits": 16,
+      "messageTypeId": 20,
+      "name": "Intrusion count (fport 20)",
+      "category": "OPCNT"
+    },
+    {
+      "alarmMapping": {
+        "severity": "WARNING",
+        "text": "Battery is low",
+        "type": "c8y_Battery"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 13,
+      "noBits": 1,
+      "messageTypeId": 9,
+      "name": "Battery status (fport 9)",
+      "category": "Event"
+    },
+    {
+      "alarmMapping": {
+        "severity": "MAJOR",
+        "text": "Tamper detected",
+        "type": "c8y_Tamper"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 14,
+      "noBits": 1,
+      "messageTypeId": 9,
+      "name": "Tamper alarm (fport 9)",
+      "category": "Event"
+    },
+    {
+      "alarmMapping": {
+        "severity": "MAJOR",
+        "text": "Intrusion detected",
+        "type": "c8y_Intrusion"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 15,
+      "noBits": 1,
+      "messageTypeId": 9,
+      "name": "Intrusion alarm (fport 9)",
+      "category": "Event"
+    },
+    {
+      "measurementMapping": {
+        "series": "count",
+        "type": "c8y_Intrusion"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": null,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 16,
+      "noBits": 16,
+      "messageTypeId": 9,
+      "name": "Intrusion count (fport 9)",
+      "category": "OPCNT"
+    }
+  ]
+}

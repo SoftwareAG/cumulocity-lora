@@ -1,0 +1,20 @@
+<c8y-ui-title-set title="reportName"></c8y-ui-title-set>
+<c8y-dashboard-gridstack name="{{dashboardName}}" default-children="children">
+  <edit-button>
+    <button
+      title="{{'Edit report' | translate}}"
+      class="btn btn-link"
+      ng-click="editReport()">
+      <i c8y-icon="pencil"></i> <translate>Edit</translate>
+    </button>
+  </edit-button>
+  <action-bar-more>
+      <button
+        title="{{'Delete report' | translate}}"
+        ng-click="removeReport()"
+        >
+        <i c8y-icon="trash"></i> <translate>Delete report</translate>
+      </button>
+  </action-bar-more>
+</c8y-dashboard-gridstack>
+

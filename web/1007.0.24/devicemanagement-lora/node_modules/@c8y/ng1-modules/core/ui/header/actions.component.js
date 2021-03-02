@@ -1,0 +1,1 @@
+"use strict";!function(){function n(n){var i=this;_.assign(i,{invoke:n.invoke,actions:n.registeredActions,visible:function(){return _.some(i.actions,function(n){return!n.hidden})}})}n.$inject=["c8yActions"],angular.module("c8y.ui").component("c8yUiActions",{templateUrl:":::PLUGIN_PATH:::/ui/header/actions.html",controllerAs:"vm",controller:n})}();

@@ -1,0 +1,11 @@
+{
+  "name": "Device group assignment",
+  "description": "Widget can assign device to selected group",
+  "ngModules": [
+    "c8y.deviceGroupAssignment"
+  ],
+  "js": [
+    "deviceGroupAssignment.module.js",
+    "groupAssignment.component.js"
+  ]
+}

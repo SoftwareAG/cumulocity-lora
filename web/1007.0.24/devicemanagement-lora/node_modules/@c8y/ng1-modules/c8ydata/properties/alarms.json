@@ -1,0 +1,53 @@
+{
+  "id": "c8ySchema",
+  "title": "Alarms",
+  "type": "object",
+  "printFormat": "hidden",
+  "properties": {
+    "id": {
+      "title": "ID",
+      "type": "string",
+      "readonly": true
+    },
+    "creationTime": {
+      "title": "Creation time",
+      "type": "string",
+      "format": "datetime"
+    },
+    "type": {
+      "title": "Type",
+      "type": "string"
+    },
+    "time": {
+      "title": "Time",
+      "type": "string",
+      "format": "datetime"
+    },
+    "text": {
+      "title": "Text",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string",
+      "enum": ["ACTIVE", "ACKNOWLEDGED", "CLEARED"]
+    },
+    "severity": {
+      "title": "Severity",
+      "type": "string",
+      "enum": ["CRITICAL", "MAJOR", "MINOR", "WARNING"]
+    },
+    "source": {
+      "title": "Source",
+      "type": "integer"
+    },
+    "count": {
+      "title": "Reoccurrence count",
+      "type": "number"
+    },
+    "DEVICE_NAME": {
+      "title": "Device name",
+      "type": "String"
+    }
+  }
+}

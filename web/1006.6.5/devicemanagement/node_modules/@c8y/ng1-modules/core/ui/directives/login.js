@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yLogin",function(){return{restrict:"EA",templateUrl:":::PLUGIN_PATH:::/ui/views/coreLogin.html",controllerAs:"ctrl",controller:"c8yLoginController"}});

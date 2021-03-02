@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-list.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-list.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-list.js",
+  "esm5": "../../esm5/ui/list/devextreme-angular-ui-list.js",
+  "esm2015": "../../esm2015/ui/list/devextreme-angular-ui-list.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-list.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-list.js",
+  "typings": "devextreme-angular-ui-list.d.ts",
+  "metadata": "devextreme-angular-ui-list.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/list"
+}

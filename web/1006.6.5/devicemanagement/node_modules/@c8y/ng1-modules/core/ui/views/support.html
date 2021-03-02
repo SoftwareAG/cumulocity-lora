@@ -1,0 +1,81 @@
+<div class="modal-header">
+  <h3>
+    <i c8y-icon="support"></i>
+    <span>{{ 'Support request' | translate }}</span>
+  </h3>
+</div>
+<form class="form" ng-submit="send()" name="sendform">
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-control-group col-lg-6">
+        <label for="name">{{ 'Name' | translate }}</label>
+        <input
+          type="text"
+          id="name"
+          class="form-control"
+          placeholder="{{ 'e.g. Joe`LOCALIZE`' | translate }}"
+          required
+          ng-model="formdata.name"
+        />
+      </div>
+
+      <div class="form-control-group col-lg-6">
+        <label for="email">{{ 'Email' | translate }}</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="form-control"
+          placeholder="{{ 'e.g. joe.doe@example.com`LOCALIZE`' | translate }}"
+          required
+          ng-model="formdata.email"
+        />
+      </div>
+    </div>
+
+    <div class="form-control-group">
+      <label for="subject">{{ 'Subject' | translate }}</label>
+      <input
+        type="text"
+        id="subject"
+        name="subject"
+        class="form-control"
+        placeholder="{{ 'e.g. My subject' | translate }}"
+        required
+        ng-model="formdata.subject"
+      />
+    </div>
+
+    <div class="form-control-group">
+      <label for="msg">{{ 'Message' | translate }}</label>
+      <textarea
+        name="msg"
+        id="msg"
+        cols="30"
+        rows="10"
+        class="form-control"
+        ng-model="formdata.msg"
+        placeholder="{{ 'e.g. My message' | translate }}"
+        required
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button
+      title="{{ 'Cancel' | translate }}"
+      type="button"
+      class="btn btn-default"
+      ng-click="dismiss()"
+    >
+      {{ 'Cancel' | translate }}
+    </button>
+    <button
+      title="{{ 'Send' | translate }}"
+      class="btn btn-primary"
+      ng-disabled="sendform.$invalid"
+    >
+      {{ 'Send' | translate }}
+    </button>
+  </div>
+</form>

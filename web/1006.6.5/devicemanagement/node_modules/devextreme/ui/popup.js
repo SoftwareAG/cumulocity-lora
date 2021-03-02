@@ -1,0 +1,653 @@
+/**
+ * DevExtreme (ui/popup.js)
+ * Version: 19.2.7
+ * Build date: Thu Mar 26 2020
+ *
+ * Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+ * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+ */
+"use strict";
+var $ = require("../core/renderer");
+var window = require("../core/utils/window").getWindow();
+var translator = require("../animation/translator");
+var camelize = require("../core/utils/inflector").camelize;
+var noop = require("../core/utils/common").noop;
+var getPublicElement = require("../core/utils/dom").getPublicElement;
+var each = require("../core/utils/iterator").each;
+var isDefined = require("../core/utils/type").isDefined;
+var inArray = require("../core/utils/array").inArray;
+var extend = require("../core/utils/extend").extend;
+var browser = require("../core/utils/browser");
+var compareVersions = require("../core/utils/version").compare;
+var messageLocalization = require("../localization/message");
+var devices = require("../core/devices");
+var registerComponent = require("../core/component_registrator");
+var Button = require("./button");
+var themes = require("./themes");
+var Overlay = require("./overlay");
+var EmptyTemplate = require("../core/templates/empty_template").EmptyTemplate;
+var domUtils = require("../core/utils/dom");
+var sizeUtils = require("../core/utils/size");
+var windowUtils = require("../core/utils/window");
+require("./toolbar/ui.toolbar.base");
+var POPUP_CLASS = "dx-popup";
+var POPUP_WRAPPER_CLASS = "dx-popup-wrapper";
+var POPUP_FULL_SCREEN_CLASS = "dx-popup-fullscreen";
+var POPUP_FULL_SCREEN_WIDTH_CLASS = "dx-popup-fullscreen-width";
+var POPUP_NORMAL_CLASS = "dx-popup-normal";
+var POPUP_CONTENT_CLASS = "dx-popup-content";
+var POPUP_DRAGGABLE_CLASS = "dx-popup-draggable";
+var POPUP_TITLE_CLASS = "dx-popup-title";
+var POPUP_TITLE_CLOSEBUTTON_CLASS = "dx-closebutton";
+var POPUP_BOTTOM_CLASS = "dx-popup-bottom";
+var TEMPLATE_WRAPPER_CLASS = "dx-template-wrapper";
+var POPUP_CONTENT_FLEX_HEIGHT_CLASS = "dx-popup-flex-height";
+var POPUP_CONTENT_INHERIT_HEIGHT_CLASS = "dx-popup-inherit-height";
+var ALLOWED_TOOLBAR_ITEM_ALIASES = ["cancel", "clear", "done"];
+var BUTTON_DEFAULT_TYPE = "default";
+var BUTTON_NORMAL_TYPE = "normal";
+var BUTTON_TEXT_MODE = "text";
+var BUTTON_CONTAINED_MODE = "contained";
+var IS_IE11 = browser.msie && 11 === parseInt(browser.version);
+var IS_OLD_SAFARI = browser.safari && compareVersions(browser.version, [11]) < 0;
+var HEIGHT_STRATEGIES = {
+    "static": "",
+    inherit: POPUP_CONTENT_INHERIT_HEIGHT_CLASS,
+    flex: POPUP_CONTENT_FLEX_HEIGHT_CLASS
+};
+var getButtonPlace = function(name) {
+    var device = devices.current();
+    var platform = device.platform;
+    var toolbar = "bottom";
+    var location = "before";
+    if ("ios" === platform) {
+        switch (name) {
+            case "cancel":
+                toolbar = "top";
+                break;
+            case "clear":
+                toolbar = "top";
+                location = "after";
+                break;
+            case "done":
+                location = "after"
+        }
+    } else {
+        if ("android" === platform && device.version && parseInt(device.version[0]) > 4) {
+            switch (name) {
+                case "cancel":
+                    location = "after";
+                    break;
+                case "done":
+                    location = "after"
+            }
+        } else {
+            if ("android" === platform) {
+                location = "center"
+            }
+        }
+    }
+    return {
+        toolbar: toolbar,
+        location: location
+    }
+};
+var Popup = Overlay.inherit({
+    _getDefaultOptions: function() {
+        return extend(this.callBase(), {
+            fullScreen: false,
+            title: "",
+            showTitle: true,
+            titleTemplate: "title",
+            onTitleRendered: null,
+            dragEnabled: false,
+            toolbarItems: [],
+            showCloseButton: false,
+            bottomTemplate: "bottom",
+            useDefaultToolbarButtons: false,
+            useFlatToolbarButtons: false,
+            autoResizeEnabled: true
+        })
+    },
+    _defaultOptionsRules: function() {
+        var themeName = themes.current();
+        return this.callBase().concat([{
+            device: {
+                platform: "ios"
+            },
+            options: {
+                animation: this._iosAnimation
+            }
+        }, {
+            device: {
+                platform: "android"
+            },
+            options: {
+                animation: this._androidAnimation
+            }
+        }, {
+            device: {
+                platform: "generic"
+            },
+            options: {
+                showCloseButton: true
+            }
+        }, {
+            device: function(_device) {
+                return "desktop" === devices.real().deviceType && "generic" === _device.platform
+            },
+            options: {
+                dragEnabled: true
+            }
+        }, {
+            device: function() {
+                return "desktop" === devices.real().deviceType && !devices.isSimulator()
+            },
+            options: {
+                focusStateEnabled: true
+            }
+        }, {
+            device: function() {
+                return themes.isMaterial(themeName)
+            },
+            options: {
+                useDefaultToolbarButtons: true,
+                useFlatToolbarButtons: true
+            }
+        }])
+    },
+    _iosAnimation: {
+        show: {
+            type: "slide",
+            duration: 400,
+            from: {
+                position: {
+                    my: "top",
+                    at: "bottom"
+                }
+            },
+            to: {
+                position: {
+                    my: "center",
+                    at: "center"
+                }
+            }
+        },
+        hide: {
+            type: "slide",
+            duration: 400,
+            from: {
+                opacity: 1,
+                position: {
+                    my: "center",
+                    at: "center"
+                }
+            },
+            to: {
+                opacity: 1,
+                position: {
+                    my: "top",
+                    at: "bottom"
+                }
+            }
+        }
+    },
+    _androidAnimation: function() {
+        var fullScreenConfig = {
+            show: {
+                type: "slide",
+                duration: 300,
+                from: {
+                    top: "30%",
+                    opacity: 0
+                },
+                to: {
+                    top: 0,
+                    opacity: 1
+                }
+            },
+            hide: {
+                type: "slide",
+                duration: 300,
+                from: {
+                    top: 0,
+                    opacity: 1
+                },
+                to: {
+                    top: "30%",
+                    opacity: 0
+                }
+            }
+        };
+        var defaultConfig = {
+            show: {
+                type: "fade",
+                duration: 400,
+                from: 0,
+                to: 1
+            },
+            hide: {
+                type: "fade",
+                duration: 400,
+                from: 1,
+                to: 0
+            }
+        };
+        return this.option("fullScreen") ? fullScreenConfig : defaultConfig
+    },
+    _init: function() {
+        this.callBase();
+        this.$element().addClass(POPUP_CLASS);
+        this._wrapper().addClass(POPUP_WRAPPER_CLASS);
+        this._$popupContent = this._$content.wrapInner($("<div>").addClass(POPUP_CONTENT_CLASS)).children().eq(0)
+    },
+    _render: function() {
+        var isFullscreen = this.option("fullScreen");
+        this._toggleFullScreenClass(isFullscreen);
+        this.callBase()
+    },
+    _toggleFullScreenClass: function(value) {
+        this._$content.toggleClass(POPUP_FULL_SCREEN_CLASS, value).toggleClass(POPUP_NORMAL_CLASS, !value)
+    },
+    _initTemplates: function() {
+        this.callBase();
+        this._defaultTemplates.title = new EmptyTemplate;
+        this._defaultTemplates.bottom = new EmptyTemplate
+    },
+    _renderContentImpl: function() {
+        this._renderTitle();
+        this.callBase();
+        this._renderBottom()
+    },
+    _renderTitle: function() {
+        var items = this._getToolbarItems("top");
+        var titleText = this.option("title");
+        var showTitle = this.option("showTitle");
+        if (showTitle && !!titleText) {
+            items.unshift({
+                location: devices.current().ios ? "center" : "before",
+                text: titleText
+            })
+        }
+        if (showTitle || items.length > 0) {
+            this._$title && this._$title.remove();
+            var $title = $("<div>").addClass(POPUP_TITLE_CLASS).insertBefore(this.$content());
+            this._$title = this._renderTemplateByType("titleTemplate", items, $title).addClass(POPUP_TITLE_CLASS);
+            this._renderDrag();
+            this._executeTitleRenderAction(this._$title)
+        } else {
+            if (this._$title) {
+                this._$title.detach()
+            }
+        }
+    },
+    _renderTemplateByType: function(optionName, data, $container, additionalToolbarOptions) {
+        var template = this._getTemplateByOption(optionName);
+        var toolbarTemplate = template instanceof EmptyTemplate;
+        if (toolbarTemplate) {
+            var integrationOptions = extend({}, this.option("integrationOptions"), {
+                skipTemplates: ["content", "title"]
+            });
+            var toolbarOptions = extend(additionalToolbarOptions, {
+                items: data,
+                rtlEnabled: this.option("rtlEnabled"),
+                useDefaultButtons: this.option("useDefaultToolbarButtons"),
+                useFlatButtons: this.option("useFlatToolbarButtons"),
+                integrationOptions: integrationOptions
+            });
+            this._getTemplate("dx-polymorph-widget").render({
+                container: $container,
+                model: {
+                    widget: "dxToolbarBase",
+                    options: toolbarOptions
+                }
+            });
+            var $toolbar = $container.children("div");
+            $container.replaceWith($toolbar);
+            return $toolbar
+        } else {
+            var $result = $(template.render({
+                container: getPublicElement($container)
+            }));
+            if ($result.hasClass(TEMPLATE_WRAPPER_CLASS)) {
+                $container.replaceWith($result);
+                $container = $result
+            }
+            return $container
+        }
+    },
+    _executeTitleRenderAction: function($titleElement) {
+        this._getTitleRenderAction()({
+            titleElement: getPublicElement($titleElement)
+        })
+    },
+    _getTitleRenderAction: function() {
+        return this._titleRenderAction || this._createTitleRenderAction()
+    },
+    _createTitleRenderAction: function() {
+        return this._titleRenderAction = this._createActionByOption("onTitleRendered", {
+            element: this.element(),
+            excludeValidators: ["disabled", "readOnly"]
+        })
+    },
+    _getCloseButton: function() {
+        return {
+            toolbar: "top",
+            location: "after",
+            template: this._getCloseButtonRenderer()
+        }
+    },
+    _getCloseButtonRenderer: function() {
+        return function(_, __, container) {
+            var $button = $("<div>").addClass(POPUP_TITLE_CLOSEBUTTON_CLASS);
+            this._createComponent($button, Button, {
+                icon: "close",
+                onClick: this._createToolbarItemAction(void 0),
+                integrationOptions: {}
+            });
+            $(container).append($button)
+        }.bind(this)
+    },
+    _getToolbarItems: function(toolbar) {
+        var toolbarItems = this.option("toolbarItems");
+        var toolbarsItems = [];
+        this._toolbarItemClasses = [];
+        var currentPlatform = devices.current().platform;
+        var index = 0;
+        each(toolbarItems, function(_, data) {
+            var isShortcut = isDefined(data.shortcut);
+            var item = isShortcut ? getButtonPlace(data.shortcut) : data;
+            if (isShortcut && "ios" === currentPlatform && index < 2) {
+                item.toolbar = "top";
+                index++
+            }
+            item.toolbar = data.toolbar || item.toolbar || "top";
+            if (item && item.toolbar === toolbar) {
+                if (isShortcut) {
+                    extend(item, {
+                        location: data.location
+                    }, this._getToolbarItemByAlias(data))
+                }
+                var isLTROrder = "generic" === currentPlatform;
+                if ("done" === data.shortcut && isLTROrder || "cancel" === data.shortcut && !isLTROrder) {
+                    toolbarsItems.unshift(item)
+                } else {
+                    toolbarsItems.push(item)
+                }
+            }
+        }.bind(this));
+        if ("top" === toolbar && this.option("showCloseButton") && this.option("showTitle")) {
+            toolbarsItems.push(this._getCloseButton())
+        }
+        return toolbarsItems
+    },
+    _getLocalizationKey: function(itemType) {
+        return "done" === itemType.toLowerCase() ? "OK" : camelize(itemType, true)
+    },
+    _getToolbarItemByAlias: function(data) {
+        var that = this;
+        var itemType = data.shortcut;
+        if (inArray(itemType, ALLOWED_TOOLBAR_ITEM_ALIASES) < 0) {
+            return false
+        }
+        var itemConfig = extend({
+            text: messageLocalization.format(this._getLocalizationKey(itemType)),
+            onClick: this._createToolbarItemAction(data.onClick),
+            integrationOptions: {},
+            type: that.option("useDefaultToolbarButtons") ? BUTTON_DEFAULT_TYPE : BUTTON_NORMAL_TYPE,
+            stylingMode: that.option("useFlatToolbarButtons") ? BUTTON_TEXT_MODE : BUTTON_CONTAINED_MODE
+        }, data.options || {});
+        var itemClass = POPUP_CLASS + "-" + itemType;
+        this._toolbarItemClasses.push(itemClass);
+        return {
+            template: function(_, __, container) {
+                var $toolbarItem = $("<div>").addClass(itemClass).appendTo(container);
+                that._createComponent($toolbarItem, Button, itemConfig)
+            }
+        }
+    },
+    _createToolbarItemAction: function(clickAction) {
+        return this._createAction(clickAction, {
+            afterExecute: function(e) {
+                e.component.hide()
+            }
+        })
+    },
+    _renderBottom: function() {
+        var items = this._getToolbarItems("bottom");
+        if (items.length) {
+            this._$bottom && this._$bottom.remove();
+            var $bottom = $("<div>").addClass(POPUP_BOTTOM_CLASS).insertAfter(this.$content());
+            this._$bottom = this._renderTemplateByType("bottomTemplate", items, $bottom, {
+                compactMode: true
+            }).addClass(POPUP_BOTTOM_CLASS);
+            this._toggleClasses()
+        } else {
+            this._$bottom && this._$bottom.detach()
+        }
+    },
+    _toggleClasses: function() {
+        var aliases = ALLOWED_TOOLBAR_ITEM_ALIASES;
+        each(aliases, function(_, alias) {
+            var className = POPUP_CLASS + "-" + alias;
+            if (inArray(className, this._toolbarItemClasses) >= 0) {
+                this._wrapper().addClass(className + "-visible");
+                this._$bottom.addClass(className)
+            } else {
+                this._wrapper().removeClass(className + "-visible");
+                this._$bottom.removeClass(className)
+            }
+        }.bind(this))
+    },
+    _getContainer: function() {
+        if (this.option("fullScreen")) {
+            return $(window)
+        }
+        return this.callBase()
+    },
+    _getDragTarget: function() {
+        return this.topToolbar()
+    },
+    _renderGeometryImpl: function(isDimensionChanged) {
+        if (!isDimensionChanged) {
+            this._resetContentHeight()
+        }
+        this.callBase.apply(this, arguments);
+        this._setContentHeight()
+    },
+    _resetContentHeight: function() {
+        this._$popupContent.css({
+            height: "auto"
+        })
+    },
+    _renderDrag: function() {
+        this.callBase();
+        this._$content.toggleClass(POPUP_DRAGGABLE_CLASS, this.option("dragEnabled"))
+    },
+    _renderResize: function() {
+        this.callBase();
+        this._resizable.option("onResize", function() {
+            this._setContentHeight();
+            this._actions.onResize(arguments)
+        }.bind(this))
+    },
+    _setContentHeight: function() {
+        (this.option("forceApplyBindings") || noop)();
+        var overlayContent = this.overlayContent().get(0);
+        var currentHeightStrategyClass = this._chooseHeightStrategy(overlayContent);
+        this.$content().css(this._getHeightCssStyles(currentHeightStrategyClass, overlayContent));
+        this._setHeightClasses(this.overlayContent(), currentHeightStrategyClass)
+    },
+    _heightStrategyChangeOffset: function(currentHeightStrategyClass, popupVerticalPaddings) {
+        return currentHeightStrategyClass === HEIGHT_STRATEGIES.flex ? -popupVerticalPaddings : 0
+    },
+    _chooseHeightStrategy: function(overlayContent) {
+        var isAutoWidth = "auto" === overlayContent.style.width || "" === overlayContent.style.width;
+        var currentHeightStrategyClass = HEIGHT_STRATEGIES.static;
+        if (this._isAutoHeight() && this.option("autoResizeEnabled")) {
+            if (isAutoWidth || IS_OLD_SAFARI) {
+                if (!IS_IE11) {
+                    currentHeightStrategyClass = HEIGHT_STRATEGIES.inherit
+                }
+            } else {
+                currentHeightStrategyClass = HEIGHT_STRATEGIES.flex
+            }
+        }
+        return currentHeightStrategyClass
+    },
+    _getHeightCssStyles: function(currentHeightStrategyClass, overlayContent) {
+        var cssStyles = {};
+        var contentMaxHeight = this._getOptionValue("maxHeight", overlayContent);
+        var contentMinHeight = this._getOptionValue("minHeight", overlayContent);
+        var popupHeightParts = this._splitPopupHeight();
+        var toolbarsAndVerticalOffsetsHeight = popupHeightParts.header + popupHeightParts.footer + popupHeightParts.contentVerticalOffsets + popupHeightParts.popupVerticalOffsets + this._heightStrategyChangeOffset(currentHeightStrategyClass, popupHeightParts.popupVerticalPaddings);
+        if (currentHeightStrategyClass === HEIGHT_STRATEGIES.static) {
+            if (!this._isAutoHeight() || contentMaxHeight || contentMinHeight) {
+                var overlayHeight = this.option("fullScreen") ? Math.min(overlayContent.getBoundingClientRect().height, windowUtils.getWindow().innerHeight) : overlayContent.getBoundingClientRect().height;
+                var contentHeight = overlayHeight - toolbarsAndVerticalOffsetsHeight;
+                cssStyles = {
+                    height: Math.max(0, contentHeight),
+                    minHeight: "auto",
+                    maxHeight: "auto"
+                }
+            }
+        } else {
+            var container = $(this._getContainer()).get(0);
+            var maxHeightValue = sizeUtils.addOffsetToMaxHeight(contentMaxHeight, -toolbarsAndVerticalOffsetsHeight, container);
+            var minHeightValue = sizeUtils.addOffsetToMinHeight(contentMinHeight, -toolbarsAndVerticalOffsetsHeight, container);
+            cssStyles = {
+                height: "auto",
+                minHeight: minHeightValue,
+                maxHeight: maxHeightValue
+            }
+        }
+        return cssStyles
+    },
+    _setHeightClasses: function($container, currentClass) {
+        var excessClasses = "";
+        for (var name in HEIGHT_STRATEGIES) {
+            if (HEIGHT_STRATEGIES[name] !== currentClass) {
+                excessClasses += " " + HEIGHT_STRATEGIES[name]
+            }
+        }
+        $container.removeClass(excessClasses).addClass(currentClass)
+    },
+    _isAutoHeight: function() {
+        return "auto" === this.overlayContent().get(0).style.height
+    },
+    _splitPopupHeight: function() {
+        var topToolbar = this.topToolbar();
+        var bottomToolbar = this.bottomToolbar();
+        return {
+            header: sizeUtils.getVisibleHeight(topToolbar && topToolbar.get(0)),
+            footer: sizeUtils.getVisibleHeight(bottomToolbar && bottomToolbar.get(0)),
+            contentVerticalOffsets: sizeUtils.getVerticalOffsets(this.overlayContent().get(0), true),
+            popupVerticalOffsets: sizeUtils.getVerticalOffsets(this.$content().get(0), true),
+            popupVerticalPaddings: sizeUtils.getVerticalOffsets(this.$content().get(0), false)
+        }
+    },
+    _useFixedPosition: function() {
+        return this.callBase() || this.option("fullScreen")
+    },
+    _toggleSafariFullScreen: function(value) {
+        var toggleFullScreenBeforeShown = this._useFixedPosition() && value && !this._isShown;
+        if (toggleFullScreenBeforeShown) {
+            this._bodyScrollTop = value ? window.pageYOffset : void 0
+        } else {
+            this._toggleSafariScrolling(!value)
+        }
+    },
+    _renderDimensions: function() {
+        if (this.option("fullScreen")) {
+            this._$content.css({
+                width: "100%",
+                height: "100%"
+            })
+        } else {
+            this.callBase.apply(this, arguments)
+        }
+        if (windowUtils.hasWindow()) {
+            this._renderFullscreenWidthClass()
+        }
+    },
+    _renderFullscreenWidthClass: function() {
+        this.overlayContent().toggleClass(POPUP_FULL_SCREEN_WIDTH_CLASS, this.overlayContent().outerWidth() === $(window).width())
+    },
+    refreshPosition: function() {
+        this._renderPosition()
+    },
+    _renderPosition: function() {
+        if (this.option("fullScreen")) {
+            translator.move(this._$content, {
+                top: 0,
+                left: 0
+            })
+        } else {
+            (this.option("forceApplyBindings") || noop)();
+            return this.callBase.apply(this, arguments)
+        }
+    },
+    _optionChanged: function(args) {
+        switch (args.name) {
+            case "showTitle":
+            case "title":
+            case "titleTemplate":
+                this._renderTitle();
+                this._renderGeometry();
+                break;
+            case "bottomTemplate":
+                this._renderBottom();
+                this._renderGeometry();
+                break;
+            case "onTitleRendered":
+                this._createTitleRenderAction(args.value);
+                break;
+            case "toolbarItems":
+            case "useDefaultToolbarButtons":
+            case "useFlatToolbarButtons":
+                var shouldRenderGeometry = !args.fullName.match(/^toolbarItems((\[\d+\])(\.(options|visible).*)?)?$/);
+                this._renderTitle();
+                this._renderBottom();
+                if (shouldRenderGeometry) {
+                    this._renderGeometry()
+                }
+                break;
+            case "dragEnabled":
+                this._renderDrag();
+                break;
+            case "autoResizeEnabled":
+                this._renderGeometry();
+                domUtils.triggerResizeEvent(this._$content);
+                break;
+            case "fullScreen":
+                this._toggleFullScreenClass(args.value);
+                this._toggleSafariFullScreen(args.value);
+                this._renderGeometry();
+                domUtils.triggerResizeEvent(this._$content);
+                break;
+            case "showCloseButton":
+                this._renderTitle();
+                break;
+            default:
+                this.callBase(args)
+        }
+    },
+    bottomToolbar: function() {
+        return this._$bottom
+    },
+    topToolbar: function() {
+        return this._$title
+    },
+    $content: function() {
+        return this._$popupContent
+    },
+    content: function() {
+        return getPublicElement(this._$popupContent)
+    },
+    overlayContent: function() {
+        return this._$content
+    }
+});
+registerComponent("dxPopup", Popup);
+module.exports = Popup;
+module.exports.default = module.exports;

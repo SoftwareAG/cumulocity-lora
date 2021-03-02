@@ -1,0 +1,36 @@
+<ui-select
+  ng-if="!scopeCopy.groupAsId"
+  ng-model="scopeCopy.group"
+  append-to-body="true"
+  uis-open-close="onOpenClose(isOpen, $select)"
+  ng-click="$event.stopPropagation()"
+>
+  <ui-select-match placeholder="{{ placeholder | translate }}">{{
+    $select.selected.name
+  }}</ui-select-match>
+  <ui-select-choices
+    repeat="g in getDynamicGroups($select) | filter: getFilterGroup($select.search) | orderBy:orderBy"
+    position="down"
+  >
+    <div title="{{ g.name }}">
+      <span ng-bind="g.name"></span>
+      <span ng-if="g.newGroup" class="badge badge-info" translate>New</span>
+    </div>
+  </ui-select-choices>
+</ui-select>
+<ui-select
+  ng-if="scopeCopy.groupAsId"
+  ng-model="scopeCopy.group"
+  append-to-body="true"
+  ng-click="$event.stopPropagation()"
+>
+  <ui-select-match placeholder="{{ placeholder | translate }}">{{
+    $select.selected.name
+  }}</ui-select-match>
+  <ui-select-choices
+    repeat="g.id as g in groups | filter: $select.search | orderBy:'name'"
+    position="down"
+  >
+    <div ng-bind="g.name" title="{{ g.name }}"></div>
+  </ui-select-choices>
+</ui-select>

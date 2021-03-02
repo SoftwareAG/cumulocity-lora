@@ -1,0 +1,19 @@
+{
+  "name": "Info Gauge",
+  "ngModules":[
+    "c8y.infoGauge"
+  ],
+  "category": "widgets",
+  "description": "Radial gauge and multiple label and value pairs for data points",
+  "less": [
+    "style.less"
+  ],
+  "js": [
+    "index.js",
+    "infoGauge.service.js",
+    "infoGauge.controller.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

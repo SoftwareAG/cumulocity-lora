@@ -1,0 +1,19 @@
+{
+  "name": "Image widget",
+  "ngModules": [
+    "c8y.parts.imageWidget"
+  ],
+  "category": "Widgets",
+  "icon": "home",
+  "color": "#F03F0F",
+  "description": "Allows for displaying an image on dashboard.",
+  "js": [
+    "index.js",
+    "services/imageWidgetSvc.js",
+    "controllers/imageWidget.js",
+    "controllers/imageWidgetConfig.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

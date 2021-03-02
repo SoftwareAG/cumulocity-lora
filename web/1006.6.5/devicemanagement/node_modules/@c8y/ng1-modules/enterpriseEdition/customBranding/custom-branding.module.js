@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.custom-branding",["c8y.ui-assets"]);

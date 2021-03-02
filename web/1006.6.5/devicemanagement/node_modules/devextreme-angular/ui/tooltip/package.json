@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-tooltip.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-tooltip.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-tooltip.js",
+  "esm5": "../../esm5/ui/tooltip/devextreme-angular-ui-tooltip.js",
+  "esm2015": "../../esm2015/ui/tooltip/devextreme-angular-ui-tooltip.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-tooltip.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-tooltip.js",
+  "typings": "devextreme-angular-ui-tooltip.d.ts",
+  "metadata": "devextreme-angular-ui-tooltip.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/tooltip"
+}

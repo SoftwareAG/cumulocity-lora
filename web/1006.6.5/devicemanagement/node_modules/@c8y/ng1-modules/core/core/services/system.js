@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.core").factory("c8ySystem",["$http","$q","c8yBase","$window",function(t,e,n,r){return{getBackendVersion:function(){var e=n.url("tenant/system/options/system/version");return t.get(e).then(n.getResData)},getUIVersion:function(){return e.when(r.UI_VERSION||"dev")}}}]);

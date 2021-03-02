@@ -1,0 +1,137 @@
+<div class="row" ng-controller="deviceDetailControlCtrl">
+  <div class="col-lg-4" ng-show="visible()">
+    <div ng-show="visible('trace')">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i c8y-icon="bug"></i>
+          <translate>Trace status</translate>
+        </div>
+        <div class="panel-body">
+          <p translate>
+            Send an operation to start or stop device internal tracing. Result of tracing is device
+            dependent, it can create more events or create a file inside the device.
+          </p>
+        </div>
+        <div class="panel-footer">
+          <div class="btn-group">
+            <a class="btn btn-primary" href="" ng-click="traceStatusOn(deviceDetail)" translate>
+              On`status of an option, e.g. realtime`
+            </a>
+            <a class="btn btn-default" href="" ng-click="traceStatusOff(deviceDetail)" translate>
+              Off`status of an option, e.g. realtime`
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-show="visible('restart')">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i c8y-icon="refresh"></i>
+          <translate>Restart device</translate>
+        </div>
+        <div class="panel-body">
+          <p translate>
+            Send an operation to restart the device. The process of restart can be monitored under
+            the operations of the device.
+          </p>
+        </div>
+        <div class="panel-footer">
+          <div class="controls">
+            <button class="btn btn-primary" ng-click="restart(deviceDetail)" translate>
+              Restart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-show="visible('relay')">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i c8y-icon="lightbulb-o"></i>
+          <translate>Relay</translate>
+        </div>
+        <div class="panel-body">
+          <p translate>Send an operation to switch a relay on or off.</p>
+        </div>
+        <div class="panel-footer">
+          <div class="btn-group">
+            <a
+              class="btn btn-{{ device.c8y_Relay.relayState === 'CLOSED' ? 'primary' : 'default' }}"
+              href=""
+              ng-click="relay('CLOSED')"
+              translate
+            >
+              On`status of an option, e.g. realtime`
+            </a>
+            <a
+              class="btn btn-{{ device.c8y_Relay.relayState === 'OPEN' ? 'primary' : 'default' }}"
+              href=""
+              ng-click="relay('OPEN')"
+              translate
+            >
+              Off`status of an option, e.g. realtime`
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-show="visible('relayarray')">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i c8y-icon="lightbulb-o"></i>
+          <translate>Array of Relays</translate>
+        </div>
+        <div class="panel-body">
+          <p translate>Send an operation to switch an array of relays on or off.</p>
+        </div>
+        <div class="panel-footer">
+          <div class="btn-group">
+            <a
+              ng-repeat="rl in device.c8y_RelayArray track by $index"
+              class="btn btn-{{ rl === 'CLOSED' ? 'primary' : 'default' }}"
+              ng-click="relayarray(rl==='CLOSED'?'OPEN':'CLOSED', $index)"
+              >{{ $index + 1 }}</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-show="visible('message')">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i c8y-icon="comment"></i>
+          <translate>Send message</translate>
+        </div>
+        <div class="panel-body">
+          <p translate>
+            Send an operation to show a particular message to the device. The device behavior is
+            device dependent.
+          </p>
+          <div class="form-group">
+            <input type="text" class="form-control" ng-model="str" />
+          </div>
+        </div>
+        <div class="panel-footer">
+          <button
+            title="{{ 'Send' | translate }}"
+            class="btn btn-primary"
+            ng-click="message(str)"
+            ng-disabled="!str"
+            translate
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    ng-class="{'col-lg-12': !visible(), 'col-lg-8': visible()}"
+    ng-include="'/apps/devicemanagement/deviceControlList/views/index.html'"
+  ></div>
+</div>

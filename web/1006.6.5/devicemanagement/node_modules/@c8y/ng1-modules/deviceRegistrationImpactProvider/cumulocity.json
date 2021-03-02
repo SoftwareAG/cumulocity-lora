@@ -1,0 +1,16 @@
+{
+  "name": "Device registration - IMPACT Provider",
+  "ngModules": [
+    "c8y.deviceRegistrationImpact"
+  ],
+  "import": [
+    "core/deviceRegistration"
+  ],
+  "category": "Device",
+  "description": "Provides device registration wizard functionality for IMPACT devices.",
+  "js": [
+    "deviceRegistrationImpactProvider.module.js",
+    "deviceRegistrationImpactProvider.service.js",
+    "deviceRegistrationImpact.component.js"
+  ]
+}

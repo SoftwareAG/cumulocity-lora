@@ -1,0 +1,35 @@
+.data-point-list .colorpicker-column {
+  position: relative;
+  overflow: hidden;
+}
+
+.data-point-list .colorpicker {
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: 0;
+  z-index: 10;
+}
+
+.data-point-list .input-sm {
+  font-size: 11px;
+  padding: 0 5px;
+  border-radius: 0;
+  line-height: 10px;
+  height: 20px;
+}
+
+.data-point-explorer .panel-heading {
+  padding: 0;
+}
+
+.data-point-list input.ng-invalid {
+  border-color: #a94442;
+}
+
+.data-point-explorer .top-right-control {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+}

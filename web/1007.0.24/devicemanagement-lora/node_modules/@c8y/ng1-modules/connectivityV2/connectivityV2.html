@@ -1,0 +1,38 @@
+<div class="connectivity-plugin">
+  <div class="panel panel-clean">
+    <div class="clearfix">
+      <button
+        title="{{ 'Reload' | translate }}"
+        class="btn btn-link pull-right"
+        ng-disabled="loading"
+        ng-click="vm.reload()"
+      >
+        <i c8y-icon="refresh"></i>
+        <translate>Reload</translate>
+      </button>
+    </div>
+
+    <c8y-connectivity-status
+      ng-if="vm.supportedFunctionalities.SIM_STATUS"
+      available="vm.available"
+      on-reload="vm.reload()"
+      common-data="vm.commonData"
+      provider="vm.currentProvider"
+    ></c8y-connectivity-status>
+    <c8y-connectivity-sms
+      ng-if="vm.supportedFunctionalities.SMS"
+      available="vm.available"
+      provider="vm.currentProvider"
+    ></c8y-connectivity-sms>
+    <c8y-connectivity-sessions
+      ng-if="vm.supportedFunctionalities.DATA_USAGE"
+      available="vm.available"
+      common-data="vm.commonData"
+      provider="vm.currentProvider"
+    ></c8y-connectivity-sessions>
+    <c8y-connectivity-audit-logs
+      ng-if="vm.supportedFunctionalities.AUDIT"
+      available="vm.available"
+    ></c8y-connectivity-audit-logs>
+  </div>
+</div>

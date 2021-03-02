@@ -1,0 +1,1 @@
+"use strict";!function(){function n(i){return{open:function(n){return i.open(_.set(n,"windowClass","c8y-wizard"))}}}n.$inject=["$uibModal"],angular.module("c8y.ui").factory("c8yWizardModal",n)}();

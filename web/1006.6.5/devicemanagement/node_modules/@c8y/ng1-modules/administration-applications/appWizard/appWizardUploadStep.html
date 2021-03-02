@@ -1,0 +1,41 @@
+<div>
+  <div class="c8y-wizard-nav">
+    <i c8y-icon="upload"></i>
+    <span title="{{ 'Upload file' | translate }}" translate
+      >Upload {{ vm.wizardCtrl.data.chosenMethod.expectedExtension }} file</span
+    >
+  </div>
+
+  <div class="c8y-wizard-form">
+    <file-picker
+      files="vm.wizardCtrl.data.appUpload.files"
+      multiple="false"
+      required="true"
+      data-disabled="vm.processingStatus.inProgress"
+      display-drop-zone="true"
+      drop-zone-label="'Upload file' | translate"
+      processing-status="vm.processingStatus"
+      on-file-selected="vm.createAppAndUploadArchive(vm.wizardCtrl.data.appUpload.files[0].file)"
+      allowed-file-type="vm.wizardCtrl.data.chosenMethod.supportedFileTypes">
+    </file-picker>
+  </div>
+
+  <div class="c8y-wizard-footer">
+    <button
+      title="{{ 'Back' | translate }}"
+      class="btn btn-default"
+      ng-click="vm.goTo('menu')"
+      translate
+    >
+      Back
+    </button>
+    <button
+      title="{{ 'Cancel' | translate }}"
+      class="btn btn-default"
+      ng-click="vm.wizardCtrl.dismiss()"
+      translate
+    >
+      Cancel
+    </button>
+  </div>
+</div>

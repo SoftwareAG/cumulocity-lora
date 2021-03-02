@@ -1,0 +1,17 @@
+{
+  "name": "Modbus widgets",
+  "ngModules": [
+    "c8y.modbusWidgets"
+  ],
+  "category": "Widgets",
+  "description": "Allow for operating modbus devices.",
+  "js": [
+    "index.js",
+    "controllers/widget.js",
+    "controllers/widgetConfig.js",
+    "services/modbusWidget.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

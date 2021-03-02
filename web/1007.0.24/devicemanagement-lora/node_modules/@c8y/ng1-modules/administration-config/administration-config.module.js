@@ -1,0 +1,1 @@
+"use strict";!function(){function e(e){e.provideSettingsPage()}e.$inject=["c8yRemoteAccessUIProvider"],angular.module("c8y.administrationConfig",["c8y.remoteAccess"]).config(e)}();

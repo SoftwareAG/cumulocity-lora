@@ -1,0 +1,1 @@
+"use strict";!function(){function n(r){var c=["c8yInventory"];_.forEach(["childDevices","childAssets"],function(n){var e="".concat(n,"Count"),t=function(n){var e=n.type;return function(){return function(n){return n[e].references.length}}}({type:n});t.$inject=c,r.register(e,t)})}n.$inject=["c8yComputedPropertiesProvider"],angular.module("c8y.ui").config(n)}();

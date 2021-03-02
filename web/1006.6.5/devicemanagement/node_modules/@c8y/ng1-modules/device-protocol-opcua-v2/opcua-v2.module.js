@@ -1,0 +1,1 @@
+"use strict";!function(){function c(c){c.initUi()}c.$inject=["c8yOPCUADeviceV2Provider"],angular.module("c8y.opcua-v2",["c8y.deviceProtocols"]).config(c)}();

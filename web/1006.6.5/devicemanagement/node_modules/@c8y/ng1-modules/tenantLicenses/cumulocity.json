@@ -1,0 +1,12 @@
+{
+  "name": "License management",
+  "ngModules": [
+    "c8y.tenantLicenses"
+  ],
+  "category": "Platform",
+  "description": "Allows for administration of licenses for tenants",
+  "js": [
+    "index.js",
+    "licenseManagement.component.js"
+  ]
+}

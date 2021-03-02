@@ -1,0 +1,14 @@
+{
+  "name": "Device detail",
+  "ngModules": ["c8y.deviceDetail"],
+  "category": "Device",
+  "icon": "bell",
+  "color": "#F2DF0F",
+  "description": "Shows detailed information for devices: service monitoring, basic info, configuration, control, firmware, groups, hardware, identity.",
+  "imports": [
+    "core/deviceDetailBasic",
+    "core/deviceDetailControl",
+    "core/deviceDetailIdentity"
+  ],
+  "js": ["index.js"]
+}

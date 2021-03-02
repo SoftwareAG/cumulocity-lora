@@ -1,0 +1,1 @@
+"use strict";!function(){function o(o){_.assign(this,o.VIEW_CONFIG)}o.$inject=["c8yDeviceProtocolUi"],angular.module("c8y.deviceProtocols").component("c8yDeviceProtocolBreadcrumb",{templateUrl:":::PLUGIN_PATH:::/deviceProtocolBreadcrumb.html",controllerAs:"vm",controller:o})}();

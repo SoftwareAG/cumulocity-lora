@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-filter-builder.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-filter-builder.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-filter-builder.js",
+  "esm5": "../../esm5/ui/filter-builder/devextreme-angular-ui-filter-builder.js",
+  "esm2015": "../../esm2015/ui/filter-builder/devextreme-angular-ui-filter-builder.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-filter-builder.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-filter-builder.js",
+  "typings": "devextreme-angular-ui-filter-builder.d.ts",
+  "metadata": "devextreme-angular-ui-filter-builder.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/filter-builder"
+}

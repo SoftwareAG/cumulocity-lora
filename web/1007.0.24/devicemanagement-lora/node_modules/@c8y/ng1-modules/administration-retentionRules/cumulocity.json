@@ -1,0 +1,18 @@
+{
+  "name": "Retention rules",
+  "ngModules": [
+    "c8y.parts.retentionRules"
+  ],
+  "category": "Administration",
+  "icon": "home",
+  "color": "#F03F0F",
+  "description": "Manages retention rules.",
+  "js": [
+    "index.js",
+    "list.controller.js"
+  ],
+  "folderName": "retentionRules",
+  "appsInclude": [
+    "administration"
+  ]
+}

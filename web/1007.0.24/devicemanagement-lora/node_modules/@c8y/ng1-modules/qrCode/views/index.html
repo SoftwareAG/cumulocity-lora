@@ -1,0 +1,11 @@
+<div class="row" ng-controller="qrCodeCtrl">
+  <div c8y-display-qr-code data="data" template="qrCodeTemplate"></div>
+  <button
+    title="{{ 'Print QR code' | translate }}"
+    class="btn btn-primary"
+    ng-click="print()"
+    translate
+  >
+    Print QR code
+  </button>
+</div>

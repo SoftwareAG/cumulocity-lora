@@ -1,0 +1,13 @@
+{
+  "name": "nvd3 chart directives",
+  "list": false,
+  "description": "Angular directives for nvd3 charts.",
+  "js": [
+    "node_modules/nvd3/nv.d3.js",
+    "node_modules/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.js",
+    "override.js"
+  ],
+  "css": [
+    "nv.d3.css"
+  ]
+}

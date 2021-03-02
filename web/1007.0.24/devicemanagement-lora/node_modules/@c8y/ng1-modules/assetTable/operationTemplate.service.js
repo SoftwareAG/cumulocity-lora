@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.assets").factory("c8yOperationTemplate",["$q","gettext",function(n,r){return{setTemplate:function(t,e){return n.when({description:r(t),c8y_Command:{text:r(e)}})}}}]);

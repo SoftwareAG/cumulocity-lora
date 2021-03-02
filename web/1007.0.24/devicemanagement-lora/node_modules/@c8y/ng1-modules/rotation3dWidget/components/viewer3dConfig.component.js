@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.rotation3d").component("rotation3dConfig",{templateUrl:":::PLUGIN_PATH:::/views/rotation3dConfig.html",bindings:{config:"="},controller:function(){var o=this;_.assign(o,{$onInit:function(){_.defaults(o.config,{objectModel:"box.min.json",isWireframe:!0,cameraType:"PC"})}})},controllerAs:"vm"});

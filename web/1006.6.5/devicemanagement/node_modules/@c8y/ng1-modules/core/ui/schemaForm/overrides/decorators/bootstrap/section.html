@@ -1,0 +1,20 @@
+<fieldset ng-disabled="form.readonly" class=" row schema-form-fieldset {{ form.htmlClass }}">
+  <div class="col-sm-3 col-md-2 p-t-16" ng-show="showTitle()">
+    <h4 class="hidden-xs text-right" style="margin-top: -1px;">{{ form.title | translate }}</h4>
+    <h4 class="visible-xs text-center ">{{ form.title | translate }}</h4>
+    <div
+      class="help-block hidden-xs text-right"
+      ng-show="form.description"
+      ng-bind-html="form.description | translate"
+    ></div>
+    <div
+      class="help-block visible-xs"
+      ng-show="form.description"
+      ng-bind-html="form.description | translate"
+    ></div>
+  </div>
+  <div class="col-sm-9 col-md-8 p-t-16">
+    <sf-decorator ng-repeat="item in form.items" form="item"></sf-decorator>
+  </div>
+</fieldset>
+<hr />

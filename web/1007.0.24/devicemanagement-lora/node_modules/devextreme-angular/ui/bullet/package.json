@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-bullet.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-bullet.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-bullet.js",
+  "esm5": "../../esm5/ui/bullet/devextreme-angular-ui-bullet.js",
+  "esm2015": "../../esm2015/ui/bullet/devextreme-angular-ui-bullet.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-bullet.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-bullet.js",
+  "typings": "devextreme-angular-ui-bullet.d.ts",
+  "metadata": "devextreme-angular-ui-bullet.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/bullet"
+}

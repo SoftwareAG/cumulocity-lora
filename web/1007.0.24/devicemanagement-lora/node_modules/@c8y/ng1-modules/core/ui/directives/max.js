@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yMax",["$parse",function(c){return{restrict:"A",require:"c8yNumber",link:function(n,e,u,r){var a;function i(e){var r=c(u.c8yMax)(n),i=Number(_.isUndefined(r)?NaN:r);return _.isNaN(i)?!a:e<=i}u.$observe("required",function(){a=!_.isUndefined(u.required)&&"false"!==u.required}),r.validator("c8yMax",i)}}}]);

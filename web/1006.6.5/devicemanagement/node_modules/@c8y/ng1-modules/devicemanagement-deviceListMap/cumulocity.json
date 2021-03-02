@@ -1,0 +1,19 @@
+{
+  "name": "Device list map",
+  "ngModules": [
+    "c8y.parts.deviceListMap"
+  ],
+  "category": "Device",
+  "icon": "bell",
+  "color": "#F2DF0F",
+  "list": false,
+  "description": "Map overview of every device.",
+  "js": [
+    "index.js",
+    "controllers/deviceListMap.js"
+  ],
+  "folderName": "deviceListMap",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

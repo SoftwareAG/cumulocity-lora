@@ -1,0 +1,63 @@
+
+    <c8y-sso-request-configuration
+      request-name="'Authorization request' | translate"
+      request-type="'authorizationRequest'"
+      configuration='vm.ssoConfiguration.authorizationRequest'
+      on-change="vm.onPartialChange(ssoConfigurationPartial)"
+      class="clearfix">
+    </c8y-sso-request-configuration>
+    <hr>
+    <c8y-sso-request-configuration
+      request-name="'Token request' | translate"
+      request-type="'tokenRequest'"
+      configuration='vm.ssoConfiguration.tokenRequest'
+      on-change="vm.onPartialChange(ssoConfigurationPartial)"
+      class="clearfix">
+    </c8y-sso-request-configuration>
+    <hr>
+    <c8y-sso-request-configuration
+      request-name="'Refresh request' | translate"
+      request-type="'refreshRequest'"
+      configuration='vm.ssoConfiguration.refreshRequest'
+      on-change="vm.onPartialChange(ssoConfigurationPartial)"
+      class="clearfix">
+    </c8y-sso-request-configuration>
+    <hr>
+    <c8y-sso-request-configuration
+      request-name="'Logout request' | translate"
+      request-type="'logoutRequest'"
+      configuration='vm.ssoConfiguration.logoutRequest'
+      on-change="vm.onPartialChange(ssoConfigurationPartial)"
+      data-required="false"
+      class="clearfix">
+    </c8y-sso-request-configuration>
+    <hr>
+    <c8y-sso-basic-configuration
+      fields-config="vm.fieldsConfig"
+      sso-configuration="vm.ssoConfiguration"
+      on-change="vm.onPartialChange(ssoConfigurationPartial)"
+      class="clearfix">
+    </c8y-sso-basic-configuration>
+    <hr>
+    <c8y-sso-access-mapping
+      fields-config="vm.fieldsConfig"
+      sso-configuration="vm.ssoConfiguration"
+      on-change="vm.onPartialChange(ssoConfigurationPartial)"
+      apps="vm.apps"
+      groups="vm.groups"
+      class="clearfix">
+    </c8y-sso-access-mapping>
+    <hr>
+    <c8y-sso-user-id-configuration
+      fields-config="vm.fieldsConfig"
+      sso-configuration="vm.ssoConfiguration"
+      class="clearfix">
+    </c8y-sso-user-id-configuration>
+    <hr>
+    <c8y-sso-signature-configuration
+      fields-config="vm.fieldsConfig"
+      sso-configuration="vm.ssoConfiguration"
+      on-change="vm.onPartialChange(ssoConfigurationPartial)"
+      class="clearfix">
+    </c8y-sso-signature-configuration>
+    <hr>

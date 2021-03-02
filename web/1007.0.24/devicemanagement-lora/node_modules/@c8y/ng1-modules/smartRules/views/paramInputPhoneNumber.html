@@ -1,0 +1,16 @@
+<ng-form name="nestedSmartRuleForm">
+  <div
+    class="form-group property-{{param.property}}"
+    ng-class="{'has-error': nestedSmartRuleForm.$dirty && nestedSmartRuleForm.$invalid}">
+    <input 
+      type="text" 
+      class="form-control" 
+      ng-model="rule.config[param.property]" 
+      ng-maxlength="254"
+      ng-required="param.required"
+      uib-tooltip="{{placeholder(param)}}"
+      placeholder="{{placeholder(param)}}"
+      c8y-phone-number
+      c8y-phone-number-allow-multiple="param.allowMultiple">
+  </div>
+</ng-form>

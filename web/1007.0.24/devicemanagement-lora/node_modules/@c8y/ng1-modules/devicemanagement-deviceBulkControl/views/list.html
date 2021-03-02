@@ -1,0 +1,36 @@
+<div ng-controller="bulkOperationsListCtrl"
+  class="bulk-operations-list">
+  <c8y-ui-action-bar-set>
+    <button type="button"
+      class="btn btn-link c8y-realtime"
+      title="{{'Toggle realtime' | translate}}"
+      ng-click="realtime.toggle()">
+      <span class="c8y-pulse" ng-class="{active: realtime.state(), inactive: !realtime.state()}"></span>
+      {{'Realtime' | translate}}
+    </button>
+
+    <c8y-refresh-btn></c8y-refresh-btn>
+  </c8y-ui-action-bar-set>
+
+  <div class="c8y-empty-state text-center"
+    ng-show="operations.length == 0">
+    <h1 class="c8y-icon c8y-icon-energy c8y-icon-duocolor"></h1>
+    <h3 translate>No bulk operations found.</h3>
+  </div>
+
+  <div class="list-group">
+    <div class="list-group-item "
+      ng-class="{'bg-gray-white expanded': operationDisplayOptions[op.id].showDetails}"
+      ng-repeat="op in operations">
+      <div device-control-bulk-operation-row-summary
+        operation="op"
+        display-options="operationDisplayOptions[op.id]"
+        on-edited="refresh()"></div>
+      <div ng-if="operationDisplayOptions[op.id].showDetails"
+        device-control-bulk-operation-row-details
+        operation="op"></div>
+    </div>
+  </div>
+
+  <c8y-load-more change-page-size></c8y-load-more>
+</div>

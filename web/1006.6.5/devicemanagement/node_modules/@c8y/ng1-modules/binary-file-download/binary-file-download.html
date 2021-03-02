@@ -1,0 +1,29 @@
+<div class="modal-header">
+  <h3 translate>File download</h3>
+</div>
+<div class="modal-body">
+  <div ng-if="vm.errorData.message" class="alert alert-danger">
+    {{ vm.errorData.message | translate }}
+  </div>
+  <p translate ng-hide="!vm.downloadBtnEnabled">
+    File "{{ vm.details.name }}" is ready for download.
+  </p>
+</div>
+<div class="modal-footer">
+  <button
+    title="{{ 'Cancel' | translate }}"
+    class="btn btn-default"
+    ng-click="vm.cancel()"
+    translate
+  >
+    Cancel
+  </button>
+  <button
+    title="{{ 'Download' | translate }}"
+    class="btn btn-primary"
+    ng-click="vm.download()"
+    ng-disabled="!vm.downloadBtnEnabled"
+  >
+    <i c8y-icon="download"></i> {{ 'Download' | translate }}
+  </button>
+</div>

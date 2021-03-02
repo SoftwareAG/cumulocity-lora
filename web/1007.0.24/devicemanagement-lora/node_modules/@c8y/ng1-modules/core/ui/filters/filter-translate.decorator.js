@@ -1,0 +1,1 @@
+"use strict";!function(){function t(c,i){return function(e,t,r,n){var u=i.getTranslatedArray(e),a=c(u,t,r,n);return _.map(a,function(t){return _.get(e,t.__idx)})}}t.$inject=["$delegate","c8yLocales"],angular.module("c8y.ui").decorator("filterFilter",t)}();

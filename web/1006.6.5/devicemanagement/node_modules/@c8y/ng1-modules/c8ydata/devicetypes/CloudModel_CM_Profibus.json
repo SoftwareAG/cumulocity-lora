@@ -1,0 +1,738 @@
+{
+  "c8y_ModbusDeviceTypeInfo": {
+    "name": "SPI_Profibus",
+    "minFieldbusUI": 4,
+    "fieldbusType": "profibus"
+  },
+  "c8y_Coils": [],
+  "c8y_Registers": [
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_1",
+        "type": "Profibus_Register_1"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 1,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_1",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_2",
+        "type": "Profibus_Register_2"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 2,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_2",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_3",
+        "type": "Profibus_Register_3"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 3,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_3",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_4",
+        "type": "Profibus_Register_4"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 4,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_4",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_5",
+        "type": "Profibus_Register_5"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 5,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_5",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_6",
+        "type": "Profibus_Register_6"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 6,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_6",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_7",
+        "type": "Profibus_Register_7"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 7,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_7",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_8",
+        "type": "Profibus_Register_8"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 8,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_8",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_9",
+        "type": "Profibus_Register_9"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 9,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_9",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_10",
+        "type": "Profibus_Register_10"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 10,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_10",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_11",
+        "type": "Profibus_Register_11"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 11,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_11",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_12",
+        "type": "Profibus_Register_12"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 12,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_12",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_13",
+        "type": "Profibus_Register_13"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 13,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_13",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_14",
+        "type": "Profibus_Register_14"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 14,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_14",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_15",
+        "type": "Profibus_Register_15"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 15,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_15",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "measurementMapping": {
+        "series": "Profibus_Register_16",
+        "type": "Profibus_Register_16"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": true,
+      "number": 16,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Register_16",
+      "category": "ProfibusReadBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 17,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register1",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65525,
+      "multiplier": 1,
+      "signed": false,
+      "number": 18,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register2",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 19,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register3",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 20,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register4",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 21,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register5",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 22,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register6",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 23,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register7",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 24,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register8",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 25,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register9",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 26,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register10",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 27,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register11",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 28,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register12",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 29,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register13",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 30,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register14",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 31,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register15",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 32,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register16",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 33,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register17",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 65535,
+      "multiplier": 1,
+      "signed": false,
+      "number": 34,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Write_Register18",
+      "category": "ProfibusWriteBytes"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": false,
+      "number": 10001,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "ProfibusStatus"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 254,
+      "multiplier": 1,
+      "signed": false,
+      "number": 10005,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "ProfibusSlave_Address"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "signed": false,
+      "number": 10006,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Profibus_Baudrate"
+    }
+  ]
+}

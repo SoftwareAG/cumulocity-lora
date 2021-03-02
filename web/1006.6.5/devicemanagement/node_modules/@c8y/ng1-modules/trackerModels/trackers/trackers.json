@@ -1,0 +1,323 @@
+[
+  {
+    "name": "AMPAROS GPS-S4",
+    "description": "Car tracking",
+    "image": ":::PLUGIN_PATH:::/img/amparos-s4.jpg",
+    "IMEILength": 10,
+    "supportedOperations": {
+      "restart": true,
+      "setSosNumber": true,
+      "armAlarms": {
+        "vibration": true,
+        "noise": true,
+        "door": false,
+        "sos": false
+      },
+      "updateSituation": true,
+      "getSingleLocation": true,
+      "registerBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true
+        },
+        "messages": [
+          {
+            "requiresFeedback": true,
+            "text": "tracker.trackerPassword + ',sos1,' + tracker.userPhoneNumber + '#'"
+          },
+          {
+            "text": "'lag,2#'"
+          },
+          {
+            "text": "'ip,52.28.163.9,port,9090#'"
+          }
+        ]
+      },
+      "updateBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true
+        },
+        "messages": [
+          {
+            "text": "'ip,52.28.163.9,port,9090#'"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "AMPAROS GPS-S6",
+    "description": "Personal tracking",
+    "image": ":::PLUGIN_PATH:::/img/amparos-s6.jpg",
+    "IMEILength": 10,
+    "supportedOperations": {
+      "restart": true,
+      "setSosNumber": true,
+      "armAlarms": {
+        "vibration": false,
+        "noise": false,
+        "door": false,
+        "sos": false
+      },
+      "updateSituation": true,
+      "getSingleLocation": true,
+      "registerBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true
+        },
+        "messages": [
+          {
+            "requiresFeedback": true,
+            "text": "tracker.trackerPassword + ',sos1,' + tracker.userPhoneNumber + '#'"
+          },
+          {
+            "text": "'lag,2#'"
+          },
+          {
+            "text": "'ip,52.28.163.9,port,9090#'"
+          }
+        ]
+      },
+      "updateBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true
+        },
+        "messages": [
+          {
+            "text": "'ip,52.28.163.9,port,9090#'"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "AMPAROS GPS-S9",
+    "description": "Pet tracking",
+    "image": ":::PLUGIN_PATH:::/img/amparos-s9.jpg",
+    "IMEILength": 10,
+    "supportedOperations": {
+      "restart": true,
+      "setSosNumber": true,
+      "armAlarms": {
+        "vibration": true,
+        "noise": true,
+        "door": false,
+        "sos": false
+      },
+      "updateSituation": true,
+      "getSingleLocation": true,
+      "registerBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true
+        },
+        "messages": [
+          {
+            "requiresFeedback": true,
+            "text": "'pw,' + tracker.trackerPassword + ',center,' + tracker.userPhoneNumber + '#'"
+          },
+          {
+            "text": "'lag,2#'"
+          },
+          {
+            "text": "'ip,52.28.163.9,9090#'"
+          }
+        ]
+      },
+      "updateBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true
+        },
+        "messages": [
+          {
+            "text": "'ip,52.28.163.9,9090#'"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "AMPAROS GPS-S71",
+    "description": "Travelers tracking",
+    "image": ":::PLUGIN_PATH:::/img/amparos-s71.jpg",
+    "IMEILength": 10,
+    "supportedOperations": {
+      "restart": true,
+      "setSosNumber": true,
+      "armAlarms": {
+        "vibration": true,
+        "noise": true,
+        "door": true,
+        "sos": false
+      },
+      "updateSituation": true,
+      "getSingleLocation": true,
+      "registerBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true
+        },
+        "messages": [
+          {
+            "requiresFeedback": true,
+            "text": "tracker.trackerPassword + ',sos1,' + tracker.userPhoneNumber + '#'"
+          },
+          {
+            "text": "'lag,2#'"
+          },
+          {
+            "text": "'ip,52.28.163.9,port,9090#'"
+          }
+        ]
+      },
+      "updateBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true
+        },
+        "messages": [
+          {
+            "text": "'ip,52.28.163.9,port,9090#'"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "M-Serie",
+    "description": "",
+    "image": ":::PLUGIN_PATH:::/img/m-serie.jpg",
+    "IMEILength": 15,
+    "supportedOperations": {
+      "restart": false,
+      "setSosNumber": false,
+      "armAlarms": {
+        "vibration": false,
+        "noise": false,
+        "door": false,
+        "sos": false
+      },
+      "updateSituation": false,
+      "getSingleLocation": false,
+      "updateBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true
+        },
+        "messages": [
+          {
+            "text": "'ip,52.28.163.9,port,9090#'"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "QUECLINK GL300",
+    "description": "",
+    "image": ":::PLUGIN_PATH:::/img/queclink-gl300.jpg",
+    "IMEILength": 15,
+    "supportedOperations": {
+      "restart": false,
+      "setSosNumber": false,
+      "armAlarms": {
+        "vibration": false,
+        "noise": false,
+        "door": false,
+        "sos": false
+      },
+      "updateSituation": false,
+      "getSingleLocation": false,
+      "reportIntervalNoMotion": true,
+      "reportIntervalOnMotion": true,
+      "motionTracking": true,
+      "registerBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true,
+          "trackerAPN": true,
+          "trackerDomainName": true
+        },
+        "defaults": {
+          "trackerPassword": "gl300"
+        },
+        "messages": [
+          {
+            "requiresFeedback": true,
+            "text": "'AT+GTQSS=' + tracker.trackerPassword + ',' + tracker.trackerAPN + ',,,3,,1,' + tracker.trackerDomainName + ',9090,,,,15,0,,,FFFF$'"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "QUECLINK GL505",
+    "description": "",
+    "image": ":::PLUGIN_PATH:::/img/queclink-gl505.jpg",
+    "IMEILength": 15,
+    "supportedOperations": {
+      "restart": false,
+      "setSosNumber": false,
+      "armAlarms": {
+        "vibration": false,
+        "noise": false,
+        "door": false,
+        "sos": false
+      },
+      "updateSituation": false,
+      "getSingleLocation": false,
+      "reportIntervalNoMotion": true,
+      "reportIntervalOnMotion": true,
+      "motionTracking": true,
+      "registerBySMS": {
+        "variables": {
+          "trackerPassword": true,
+          "userPhoneNumber": true,
+          "trackerIMEI": true,
+          "trackerPhoneNumber": true,
+          "trackerAPN": true,
+          "trackerDomainName": true
+        },
+        "defaults": {
+          "trackerPassword": "gl500"
+        },
+        "messages": [
+          {
+            "requiresFeedback": true,
+            "text": "'AT+GTQSS=' + tracker.trackerPassword + ',' + tracker.trackerAPN + ',,,3,,1,' + tracker.trackerDomainName + ',9090,,,,15,0,,,FFFF$'"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "QUECLINK GV75",
+    "description": "Vehicle tracking device",
+    "image": ":::PLUGIN_PATH:::/img/queclink-gv75.png",
+    "IMEILength": 15
+  }
+]

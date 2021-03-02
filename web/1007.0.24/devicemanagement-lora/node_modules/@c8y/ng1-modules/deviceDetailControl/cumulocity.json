@@ -1,0 +1,14 @@
+{
+  "name": "Device details - control",
+  "ngModules": [
+    "c8y.deviceDetailControl"
+  ],
+  "category": "Device",
+  "icon": "bell",
+  "color": "#F2DF0F",
+  "description": "Shows detailed control information for devices.",
+  "js": [
+    "index.js",
+    "controllers/control.js"
+  ]
+}

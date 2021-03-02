@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.trackerConfiguration").factory("RealtimeLockupSvc",function(){var n={},c={block:function(n,c){return _.assign(n,{blocked:!!c})},infoChange:function(n,c){return _.assign(n,{changedInfo:!!c})},clearLockup:function(n){return _.assign(n,{blocked:!1},{changedInfo:!1})},getBlock:function(n){if(n)return n.blocked}};return n.RTLU=c,n});

@@ -1,0 +1,21 @@
+{
+  "name": "SmartREST 2.0 templates editor",
+  "ngModules": [
+    "c8y.smartRestEditor"
+  ],
+  "category": "SmartREST",
+  "description": "Define SmartREST 2.0 templates for communication of IoT devices with Cumulocity.",
+  "js": [
+    "index.js",
+    "list.controller.js",
+    "details.controller.js",
+    "addTemplate/addTemplate.component.js",
+    "importTemplate/importTemplate.component.js",
+    "requestEditor/requestEditor.component.js",
+    "responseEditor/responseEditor.component.js",
+    "csvPreviewer/csvPreviewer.component.js",
+    "valueInput/valueInput.directive.js",
+    "validators/validateUniqueMsgIdInTemplate.directive.js",
+    "validators/validateCustomFieldKeyInRequestTemplate.directive.js"
+  ]
+}

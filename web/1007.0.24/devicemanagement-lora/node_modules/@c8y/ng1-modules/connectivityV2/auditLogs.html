@@ -1,0 +1,48 @@
+<div class="card">
+  <div class="card-header">
+    <h4 class="card-title">{{'Audit logs' | translate }}</h4>
+  </div>
+  <hr>
+    <div class="c8y-empty-state" ng-if="vm.auditLogs.length === 0">
+      <p class="text-center" translate>
+        No audit logs found.
+      </p>
+    </div>
+  <div class="card-block" ng-if="vm.auditLogs.length > 0">
+    <div class="timeline-list list-condensed">
+      <div class="timeline-list-item flex-row" ng-repeat="auditLog in vm.auditLogs">
+        <small class="timeline-item-date">
+          {{auditLog.dateTime | absoluteDate}}
+        </small>
+        <div class="timeline-item-content flex-row wrap">
+          <div class="list-item-icon">
+            <i c8y-icon="archive"></i>
+          </div>
+          <div class="list-item-body">
+            <div class="row">
+              <div class="col-sm-5">
+                <label class="small" translate>Changed</label>
+                <span ng-bind="auditLog.change"></span>
+                <br>
+                <label class="small" translate>Who</label>
+                <span ng-bind="auditLog.triggeredBy"></span>
+              </div>
+              <div class="col-sm-5">
+                <label class="small" translate>From`old-value`</label>
+                <span ng-bind="auditLog.from"></span>
+                <br>
+                <label class="small" translate>To`new-value`</label>
+                <span ng-bind="auditLog.to"></span>
+              </div>
+              <div class="col-sm-2">
+                <label class="small" translate>Status</label>
+                <span ng-bind="auditLog.status"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

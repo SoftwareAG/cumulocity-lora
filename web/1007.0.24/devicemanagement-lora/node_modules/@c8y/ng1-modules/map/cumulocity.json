@@ -1,0 +1,20 @@
+{
+  "name": "Device map",
+  "ngModules": [
+    "c8y.cockpit.map"
+  ],
+  "category": "Device",
+  "description": "Renders a map with all devices with geo information.",
+  "css": [
+    "styles.css"
+  ],
+  "js": [
+    "index.js",
+    "controllers/map.js",
+    "controllers/geofenceEdit.js",
+    "services/geofence.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

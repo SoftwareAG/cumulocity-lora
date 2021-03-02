@@ -1,0 +1,233 @@
+{
+  "name": "Tixi Commands",
+  "syntax" : "TiXML",
+  "templates" : [{
+    "name" : "Query Hardware",
+    "command": "[<Get ver=\"v\"/>]",
+    "category": "Device Info"
+  }, {
+    "name" : "Query GSM state",
+    "command": "[<Get _=\"/GSM/\" ver=\"v\"/>]",
+    "category": "Device Info"
+  }, {
+    "name" : "Query Ethernet state",
+    "command": "[<Get _=\"/Ethernet/\" ver=\"v\"/>]",
+    "category": "Device Info"
+  }, {
+    "name" : "Query WLAN state",
+    "command": "[<Get _=\"/WLAN/\" ver=\"v\"/>]",
+    "category": "Device Info"
+  }, {
+    "name" : "Query Firmware Version",
+    "command": "[<Get _=\"/Firmware/Version\" ver=\"v\"/>]",
+    "category": "Device Info"
+  }, {
+    "name" : "Query Enabled Services",
+    "command": "[<EnableServices ver=\"v\"/>]",
+    "category": "Device Info"
+  }, {
+    "name" : "Set Time",
+    "command": "[<SetTime _=\"%s\" ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "Get Time",
+    "command": "[<GetTime ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "Reset",
+    "command": "[<Reset _=\"Keep\" ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "Factory Reset",
+    "command": "[<Reset _=\"Factory\" ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "Reset Update",
+    "command": "[<Reset _=\"Update\" ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "Query Active Jobs",
+    "command": "[<GetJob ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "Delete Active Jobs",
+    "command": "[<GetJob del=\"y\" ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "LogIn",
+    "command": "[<Login _=\"PAP\" user=\"\" password=\"\" ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "LogIn CHAP",
+    "command": "[<Login _=\"CHAP\" user=\"\" ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "LogIn CHAP Response",
+    "command": "[<Login _=\"Response\" id=\"\" md5=\"\" ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "LogOut",
+    "command": "[<Logout ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "Switch to ModemMode",
+    "command": "[<Switch _=\"ModemMode\" ver=\"v\"/>]",
+    "category": "Device Control"
+  }, {
+    "name" : "Read Logfile",
+    "command": "[<ReadLog _=\"Datalogging_0\" range=\"#10-\" ver=\"v\"/>]",
+    "category": "Data logging"
+  }, {
+    "name" : "Read Event-Log",
+    "command": "[<ReadLog _=\"Event\" range=\"#10-\" ver=\"v\"/>]",
+    "category": "Data logging"
+  }, {
+    "name" : "Read Job-Report",
+    "command": "[<ReadLog _=\"JobReport\" range=\"#10-\" ver=\"v\"/>]",
+    "category": "Data logging"
+  }, {
+    "name" : "Read IncomingMessage-Log",
+    "command": "[<ReadLog _=\"IncomingMessage\" range=\"#10-\" ver=\"v\"/>]",
+    "category": "Data logging"
+  }, {
+    "name" : "Read FailedIncomingCall-Log",
+    "command": "[<ReadLog _=\"FailedIncomingCall\" range=\"#10-\" ver=\"v\"/>]",
+    "category": "Data logging"
+  }, {
+    "name" : "Read SupportLog",
+    "command": "[<ReadLog _=\"SupportLog\" range=\"#10-\" ver=\"v\"/>]",
+    "category": "Data logging"
+  }, {
+    "name" : "Read Login-Log",
+    "command": "[<ReadLog _=\"Login\" range=\"#10-\" ver=\"v\"/>]",
+    "category": "Data logging"
+  }, {
+    "name" : "Read Log Counter",
+    "command": "[<Get _=\"/LogCounter/\" ver=\"v\"/>]",
+    "category": "Data logging"
+  }, {
+    "name" : "Clear All Logfiles",
+    "command": "[<Clear Log=\"*\" ver=\"v\"/>]",
+    "category": "Data logging"
+  }, {
+    "name" : "Clear System Logfiles",
+    "command": "[<Clear Log=\"Event,JobReport,IncomingMessage,FailedIncomingCall,Login,SupportLog\" ver=\"v\"/>]",
+    "category": "Data logging"
+  }, {
+    "name" : "TransMode",
+    "command": "[<TransMode baud=\"9600\" format=\"8N1\" com=\"C0\" keep=\"15s\" ver=\"v\"/>]",
+    "category": "Remote Control"
+  }, {
+    "name" : "Get Config",
+    "command": "[<GetConfig _=\"&_Path_&\" ver=\"v\">\n</GetConfig>",
+    "category": "Project data"
+  }, {
+    "name" : "Set Config",
+    "command": "[<SetConfig _=\"&_Path_&\" ver=\"v\">\n</SetConfig>",
+    "category": "Project data"
+  }, {
+    "name" : "Get USER Database",
+    "command": "[<GetConfig _=\"USER\" ver=\"v\"/>]",
+    "category": "Project data"
+  }, {
+    "name" : "Get ISP Database",
+    "command": "[<GetConfig _=\"ISP\" ver=\"v\"/>]",
+    "category": "Project data"
+  }, {
+    "name" : "Get EVENTS Database",
+    "command": "[<GetConfig _=\"EVENTS\" ver=\"v\"/>]",
+    "category": "Project data"
+  }, {
+    "name" : "Get TEMPLATE Database",
+    "command": "[<GetConfig _=\"TEMPLATE\" ver=\"v\"/>]",
+    "category": "Project data"
+  }, {
+    "name" : "Get PROCCFG Database",
+    "command": "[<GetConfig _=\"PROCCFG\" ver=\"v\"/>]",
+    "category": "Project data"
+  }, {
+    "name" : "Get SCHEDULE Database",
+    "command": "[<GetConfig _=\"SCHEDULE\" ver=\"v\"/>]",
+    "category": "Project data"
+  }, {
+    "name" : "Get LOG Database",
+    "command": "[<GetConfig _=\"LOG\" ver=\"v\"/>]",
+    "category": "Project data"
+  }, {
+    "name" : "Get PARAM Database",
+    "command": "[<GetConfig _=\"PARAM\" ver=\"v\"/>]",
+    "category": "Project data"
+  }, {
+    "name" : "Event (with Parameter)",
+    "command": "[<DoOn _=\"EventName\" ver=\"v\">\n  <Param _=\"Value\"/>\n</DoOn>]",
+    "category": "Testing"
+  }, {
+    "name" : "Event (no Parameter)",
+    "command": "[<DoOn _=\"EventName\"  ver=\"v\"/>]",
+    "category": "Testing"
+  }, {
+    "name" : "Start Process",
+    "command": "[<Set _=\"/Process/Program/Mode\" value=\"Run\" ver=\"v\"/>]",
+    "category": "Testing"
+  }, {
+    "name" : "Stop Process",
+    "command": "[<Set _=\"/Process/Program/Mode\" value=\"Stop\" ver=\"v\"/>]",
+    "category": "Testing"
+  }, {
+    "name" : "Set TestMode",
+    "command": "[<Set _=\"/Process/Program/Mode\" value=\"Test\" ver=\"v\"/>]",
+    "category": "Testing"
+  }, {
+    "name" : "Test Scheduler",
+    "command": "[<ScheduleTest _=\"\" max=\"100\" ver=\"v\"/>]",
+    "category": "Testing"
+  }, {
+    "name" : "Test Sequencer",
+    "command": "[<SequenceTest _=\"\" max=\"100\" ver=\"v\"/>]",
+    "category": "Testing"
+  }, {
+    "name" : "ScanWLAN",
+    "command": "[<ScanWLAN ver=\"v\"/>]",
+    "category": "Testing"
+  }, {
+    "name" : "Query Inputs Hutline",
+    "command": "[<Get _=\"/Process/MB/IO/I/\" ver=\"v\"/>]",
+    "category": "I/O and PLC"
+  }, {
+    "name" : "Query Outputs Hutline",
+    "command": "[<Get _=\"/Process/MB/IO/Q/\" ver=\"v\"/>]",
+    "category": "I/O and PLC"
+  }, {
+    "name" : "Query Analog Input Hutline",
+    "command": "[<Get _=\"/Process/MB/A/AI/P0\" ver=\"v\"/>]",
+    "category": "I/O and PLC"
+  }, {
+    "name" : "Set Output Hutline",
+    "command": "[<Set _=\"/Process/MB/IO/Q/P0\" value=\"1\" ver=\"v\"/>]",
+    "category": "I/O and PLC"
+  }, {
+    "name" : "Set SignalLED",
+    "command": "[<Set _=\"/Process/MB/SignalLED\" value=\"1\" ver=\"v\"/>]",
+    "category": "I/O and PLC"
+  }, {
+    "name" : "Query Stations Bus",
+    "command": "[<Get _=\"/Process/Bus1/\" ver=\"v\"/>]",
+    "category": "I/O and PLC"
+  }, {
+    "name" : "Query ProcessVars",
+    "command": "[<Get _=\"/Process/PV/\" ver=\"v\"/>]",
+    "category": "I/O and PLC"
+  }, {
+    "name" : "Set Variable Bus",
+    "command": "[<Set _=\"/Process/Bus1/Device_0/Variable_0\" value=\"1\" ver=\"v\"/>]",
+    "category": "I/O and PLC"
+  }, {
+    "name" : "Set Variable PV",
+    "command": "[<Set _=\"/Process/PV/Variable\" value=\"1\" ver=\"v\"/>]",
+    "category": "I/O and PLC"
+  }, {
+    "name" : "Scan M-Bus",
+    "command": "[<ScanDevices _=\"COM3\" protocol=\"meterbus\" ver=\"v\"/>]",
+    "category": "I/O and PLC"
+  }]
+}

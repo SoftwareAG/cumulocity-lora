@@ -1,0 +1,16 @@
+{
+  "name": "Key Performance Indicators",
+  "ngModules": [
+    "c8y.parts.kpiAdmin"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "KPI",
+  "imports": [],
+  "js": [
+    "index.js",
+    "controllers/listCtrl.js",
+    "controllers/detailCtrl.js"
+  ]
+}

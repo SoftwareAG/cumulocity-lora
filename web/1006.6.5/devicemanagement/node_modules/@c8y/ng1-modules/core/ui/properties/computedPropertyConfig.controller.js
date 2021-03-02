@@ -1,0 +1,1 @@
+"use strict";!function(){function n(n,o,t){_.assign(n,t),_.assign(n,o)}n.$inject=["$scope","$uibModalInstance","options"],angular.module("c8y.ui").controller("ComputedPropertyConfigCtrl",n)}();

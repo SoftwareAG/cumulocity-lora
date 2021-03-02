@@ -1,0 +1,27 @@
+/**
+* DevExtreme (widgets/common/draggable.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@MAX_INTEGER: 2147483647;
+
+.dx-draggable {
+    left: 0;
+    cursor: pointer;
+    .user-select(none);
+
+    &.dx-state-disabled,
+    .dx-state-disabled & {
+        cursor: default;
+    }
+}
+
+.dx-draggable-clone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: @MAX_INTEGER;
+}

@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.cockpit.map").factory("geofenceSvc",["c8yModal","gettextCatalog",function(t,n){return{showEditUI:function(e){return t({title:n.getString("Edit geofence"),templateUrl:":::PLUGIN_PATH:::/views/geofenceEdit.html",controller:"GeofenceEditCtrl",size:"lg",resolve:{geofenceLatLngs:function(){return _.cloneDeep(e)}}})}}}]);

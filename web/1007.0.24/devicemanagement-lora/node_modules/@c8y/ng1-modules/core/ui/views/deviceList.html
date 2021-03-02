@@ -1,0 +1,60 @@
+<c8y-ui-action-bar-set>
+  <li ng-show="!ctrl.parentDeviceId()" action-bar-position="left">
+    <a
+      title="{{ 'Clear filters' | translate }}"
+      ng-disabled="ctrl.clearInProgress || ctrl.reloadInProgress"
+      class="btn btn-link"
+      ng-click="ctrl.clearColumnsConfig()"
+    >
+      <i c8y-icon="times"></i> <translate>Clear filters</translate>
+    </a>
+  </li>
+
+  <li>
+    <c8y-realtime-switch
+      ng-if="ctrl.parentDeviceId()"
+      get-state="ctrl.rtState()"
+      on-start="ctrl.rtStart()"
+      on-stop="ctrl.rtStop()"
+    >
+    </c8y-realtime-switch>
+  </li>
+
+  <li ng-show="!ctrl.parentDeviceId()">
+    <a
+      title="{{ 'Configure columns' | translate }}"
+      class="btn btn-link"
+      ng-click="ctrl.configureColumns()"
+    >
+      <i c8y-icon="columns"></i> <span translate>Configure columns</span>
+    </a>
+  </li>
+
+  <li ng-show="!dynamicGroupId() && !ctrl.parentDeviceId()">
+    <a
+      title="{{ 'Create smart group' | translate }}"
+      ng-disabled="ctrl.clearInProgress || ctrl.reloadInProgress"
+      class="btn btn-link"
+      ng-click="ctrl.createSmartGroup()"
+    >
+      <i c8y-icon="c8y-group-smart"></i> <translate>Create smart group</translate>
+    </a>
+  </li>
+
+  <li ng-show="!ctrl.parentDeviceId()">
+    <c8y-refresh-btn></c8y-refresh-btn>
+  </li>
+</c8y-ui-action-bar-set>
+
+<c8y-filtered-sorted-list
+  columns="ctrl.columns"
+  columns-config="ctrl.columnsConfig"
+  on-columns-config-changed="ctrl.onColumnsConfigChanged(columnsConfig)"
+  disable-columns-config="!!parentDeviceId()"
+  items="ctrl.devices"
+  no-items-message="ctrl.noItemsMessage"
+  show-load-more="!!paging.next"
+  on-load-more="ctrl.onLoadMore()"
+  loading="paging.loading"
+>
+</c8y-filtered-sorted-list>

@@ -1,0 +1,20 @@
+{
+  "name": "Asset count component",
+  "ngModules": [
+    "c8y.cockpit.assetcount"
+  ],
+  "category": "Device",
+  "description": "Displays the count of the asset numbers",
+  "js": [
+    "index.js",
+    "services/assetCount.js",
+    "controllers/AssetCount.js"
+  ],
+  "copy": [
+    "img/*"
+  ],
+  "folderName": "assetCount",
+  "appsInclude": [
+    "cockpit"
+  ]
+}

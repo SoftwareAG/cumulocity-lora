@@ -1,0 +1,29 @@
+<div>
+  <div class="modal-header">
+    <h3 translate>Get measurements</h3>
+  </div>
+
+  <div class="modal-body">
+    <c8y-schema-form schema="schema" model="params"></c8y-schema-form>
+  </div>
+
+  <div class="modal-footer">
+    <button
+      title="{{ 'Cancel' | translate }}"
+      class="btn btn-default"
+      ng-click="dismiss()"
+      translate
+    >
+      Cancel
+    </button>
+    <button
+      title="{{ 'Get measurements' | translate }}"
+      class="btn btn-primary"
+      ng-click="getMeasurements()"
+      ng-disabled="getMeasurementsForm.$invalid"
+      translate
+    >
+      Get measurements
+    </button>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+{
+  "name": "Predefined Ascolc IR868LR-IRUS915LR",
+  "syntax": "HEX",
+  "templates": [
+    {
+      "name": "Enquire presentation info",
+      "command": "05456E715F:5",
+      "category": "Device info"
+    },
+    {
+      "name": "Enquire serial number",
+      "command": "05456E715F:6",
+      "category": "Device info"
+    },
+    {
+      "name": "Enquire device release info",
+      "command": "05456E715F:7",
+      "category": "Device info"
+    },
+    {
+      "name": "Enquire battery level info",
+      "command": "05456E715F:8",
+      "category": "Device info"
+    },
+    {
+      "name": "Set ALIVE interval",
+      "command": "04{TMALIVE2Bytes}{Checksum}:9",
+      "category": "Report"
+    },
+    {
+      "name": "Set INHIBTIME interval",
+      "command": "05{INHIBTIME3Bytes}{Checksum}:11",
+      "category": "Device config"
+    },
+    {
+      "name": "Set MODE",
+      "command": "{TotalPayloadLength}{MODE}{CNFGRGST2Bytes}{CNTELPS2Bytes}{TMELPS2Bytes}{Checksum}:12",
+      "category": "Device config"
+    },
+    {
+      "name": "Set FLAGS",
+      "command": "04{FLAGS2Bytes}{Checksum}:13",
+      "category": "Device config"
+    }
+  ]
+}

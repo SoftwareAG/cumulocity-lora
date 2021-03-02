@@ -1,0 +1,11 @@
+<span ng-switch="property.printFormat">
+  <span ng-switch-when="hidden">-</span>
+  <span ng-switch-when="datetime">
+    <a ng-if="link" ng-href="{{link}}" ng-bind="value | absoluteDateShort"></a>
+    <span ng-if="!link" ng-bind="value | absoluteDateShort"></span>
+  </span>
+  <span ng-switch-default>
+    <a ng-if="link" ng-href="{{link}}" ng-bind="value"></a>
+    <span ng-if="!link" ng-bind="value"></span>
+  </span>
+</span>

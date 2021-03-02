@@ -1,0 +1,16 @@
+{
+  "name": "TFA Settings",
+  "ngModules": [
+    "c8y.parts.tfaSettings"
+  ],
+  "category": "Administration",
+  "description": "Configure TFA settings via UI",
+  "js": [
+    "index.js",
+    "tfa-settings.component.js"
+  ],
+  "folderName": "tfaSettings",
+  "appsInclude": [
+    "administration"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Predefined ED1608 General Sensor",
+  "syntax": "HEX",
+  "templates": [
+    {
+      "name": "Change parameter",
+      "command": "{CmdSeq}{Cmd}{NewValue}",
+      "category": "Device config"
+    }
+  ]
+}

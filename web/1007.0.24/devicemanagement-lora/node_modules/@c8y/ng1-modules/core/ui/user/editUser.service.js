@@ -1,0 +1,1 @@
+"use strict";!function(){function t(e,r){return{disconnectRoutesExportingService:function(t){return e.post(r.url("service/export-route/disconnect"),{exporter:t})}}}t.$inject=["$http","c8yBase"],angular.module("c8y.ui").factory("c8yEditUser",t)}();

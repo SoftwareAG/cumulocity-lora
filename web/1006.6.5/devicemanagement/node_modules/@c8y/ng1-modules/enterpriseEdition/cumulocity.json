@@ -1,0 +1,32 @@
+{
+  "name": "Enterprise edition configuration management",
+  "ngModules": [
+    "c8y.enterpriseEdition"
+  ],
+  "category": "Administration",
+  "description": "Manage enterprise edition configuration",
+  "js": [
+    "createFile.js",
+    "ui-assets/index.js",
+    "ui-assets/ui-assets.service.js",
+    "ui-assets/public-options.service.js",
+    "ui-assets/static-assets.service.js",
+
+    "enterpriseEdition.module.js",
+    "enterpriseEditionAvailability.service.js",
+
+    "customBranding/custom-branding.module.js",
+    "customBranding/microservice.value.js",
+    "customBranding/brandingConfigurationUi.provider.js",
+    "customBranding/brandingConfigurationForm.component.js",
+    "customBranding/brandingConfiguration.service.js",
+    "customBranding/brandingDeploy.service.js",
+    "customBranding/brandingProcessExecution.component.js",
+
+    "sslCertificate/manageCertificate.component.js",
+    "sslCertificate/manageCertificate.service.js",
+    "sslCertificate/certificateActivation.component.js",
+    "sslCertificate/certificateDeactivation.component.js",
+    "sslCertificate/countDownRedirect.component.js"
+  ]
+}

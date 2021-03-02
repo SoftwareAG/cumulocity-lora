@@ -1,0 +1,164 @@
+<div ng-controller="kpiEditCtrl">
+  <form name="editKpi" role="form" ng-submit="save()">
+    <div class="row" ng-if="false">
+      <div class="form-group col-lg-6">
+        <label>{{ 'Fragment' | translate }}</label>
+        <input
+          class="form-control"
+          name="fragment"
+          ng-model="kpi.fragment"
+          placeholder="{{ 'e.g.' | translate }} c8y_Temperature"
+          required
+          disabled
+        />
+      </div>
+      <div class="form-group col-lg-6">
+        <label>{{ 'Series' | translate }}</label>
+        <input
+          class="form-control"
+          name="series"
+          ng-model="kpi.series"
+          placeholder="{{ 'e.g.' | translate }} T"
+          required
+          disabled
+        />
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-lg-6" ng-class="{'has-error': isFieldInvalid('label')}">
+        <label>{{ 'Label' | translate }}</label>
+        <input
+          class="form-control"
+          name="label"
+          ng-model="kpi.label"
+          placeholder="{{ 'e.g. Temperature' | translate }}"
+          required
+          uib-tooltip="{{ getFieldValidationHints('label') }}"
+        />
+      </div>
+      <div class="form-group col-lg-6" ng-class="{'has-error': isFieldInvalid('color')}">
+        <label>{{ 'Color' | translate }}</label>
+        <input
+          c8y-color-picker
+          type="text"
+          class="form-control"
+          name="color"
+          ng-model="kpi.color"
+          required
+          uib-tooltip="{{ getFieldValidationHints('color') }}"
+        />
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-lg-3" ng-class="{'has-error': isFieldInvalid('unit')}">
+        <label>{{ 'Unit' | translate }}</label>
+        <input
+          class="form-control"
+          name="unit"
+          ng-model="kpi.unit"
+          uib-tooltip="{{ getFieldValidationHints('unit') }}"
+        />
+      </div>
+      <div class="form-group col-lg-3" ng-class="{'has-error': isFieldInvalid('target')}">
+        <label>{{ 'Target' | translate }}</label>
+        <input
+          type="number"
+          step="any"
+          class="form-control"
+          name="target"
+          ng-model="kpi.target"
+          uib-tooltip="{{ getFieldValidationHints('target') }}"
+        />
+      </div>
+      <div class="form-group col-lg-3" ng-class="{'has-error': isFieldInvalid('min')}">
+        <label>{{ 'Minimum' | translate }} *</label>
+        <input
+          type="number"
+          step="any"
+          class="form-control"
+          name="min"
+          ng-model="kpi.min"
+          uib-tooltip="{{ getFieldValidationHints('min') }}"
+        />
+      </div>
+      <div class="form-group col-lg-3" ng-class="{'has-error': isFieldInvalid('max')}">
+        <label>{{ 'Maximum' | translate }} *</label>
+        <input
+          type="number"
+          step="any"
+          class="form-control"
+          name="max"
+          ng-model="kpi.max"
+          uib-tooltip="{{ getFieldValidationHints('max') }}"
+        />
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-lg-3" ng-class="{'has-error': isFieldInvalid('yellowRangeMin')}">
+        <label>{{ 'Yellow range' | translate }}</label>
+        <input
+          type="number"
+          step="any"
+          class="form-control"
+          name="yellowRangeMin"
+          ng-model="kpi.yellowRangeMin"
+          placeholder="{{ 'Min' | translate }}"
+          uib-tooltip="{{ getFieldValidationHints('yellowRangeMin') }}"
+        />
+      </div>
+      <div class="form-group col-lg-3" ng-class="{'has-error': isFieldInvalid('yellowRangeMax')}">
+        <label>&nbsp;</label>
+        <input
+          type="number"
+          step="any"
+          class="form-control"
+          name="yellowRangeMax"
+          ng-model="kpi.yellowRangeMax"
+          placeholder="{{ 'Max' | translate }}"
+          uib-tooltip="{{ getFieldValidationHints('yellowRangeMax') }}"
+        />
+      </div>
+      <div class="form-group col-lg-3" ng-class="{'has-error': isFieldInvalid('redRangeMin')}">
+        <label>{{ 'Red range' | translate }}</label>
+        <input
+          type="number"
+          step="any"
+          class="form-control"
+          name="redRangeMin"
+          ng-model="kpi.redRangeMin"
+          placeholder="{{ 'Min' | translate }}"
+          uib-tooltip="{{ getFieldValidationHints('redRangeMin') }}"
+        />
+      </div>
+      <div class="form-group col-lg-3" ng-class="{'has-error': isFieldInvalid('redRangeMax')}">
+        <label>&nbsp;</label>
+        <input
+          type="number"
+          step="any"
+          class="form-control"
+          name="redRangeMax"
+          ng-model="kpi.redRangeMax"
+          placeholder="{{ 'Max' | translate }}"
+          uib-tooltip="{{ getFieldValidationHints('redRangeMax') }}"
+        />
+      </div>
+    </div>
+    <button 
+      title="{{ 'Cancel' | translate }}" 
+      class="btn" 
+      ng-click="cancel()" 
+      translate
+    >
+      Cancel
+    </button>
+    <button
+      title="{{ 'Save' | translate }}"
+      class="btn btn-primary"
+      type="submit"
+      ng-disabled="!isFormValid()"
+      translate
+    >
+      Save
+    </button>
+  </form>
+</div>

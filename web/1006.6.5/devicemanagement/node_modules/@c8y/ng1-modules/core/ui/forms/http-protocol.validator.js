@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yHttpProtocol",function(){return{require:"ngModel",link:function(t,o,c,r){r.$validators.c8yHttpProtocol=function(t){var o=new RegExp("^(https?)://.*$","is"),r=c.c8yHttpProtocol?new RegExp(c.c8yHttpProtocol):o;return _.isEmpty(t)||r.test(t)}}}});

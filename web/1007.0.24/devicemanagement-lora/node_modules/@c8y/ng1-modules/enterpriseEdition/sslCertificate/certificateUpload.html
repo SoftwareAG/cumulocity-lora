@@ -1,0 +1,32 @@
+<div class="modal-header" ng-show="title">
+  <h3>{{ title | translate }}</h3>
+</div>
+<div class="modal-body">
+  <form role="form" name="filesUploadForm" class="panel-body" novalidate>
+    <div class="form-group">
+      <file-picker files="files" multiple="false" required="true"></file-picker>
+      <small class="text-muted" translate
+        >Upload a PKCS #12 (.pk12) file containing the private key and certificate.</small
+      >
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button
+    title="{{ 'Cancel' | translate }}"
+    class="btn btn-default"
+    ng-click="$dismiss()"
+    translate
+  >
+    Cancel
+  </button>
+  <button
+    title="{{ 'Upload' | translate }}"
+    class="btn btn-primary"
+    ng-click="vm.saveCertificate(files[0].file, this)"
+    ng-disabled="filesUploadForm.$invalid"
+  >
+    <span translate>Upload</span>
+  </button>
+</div>

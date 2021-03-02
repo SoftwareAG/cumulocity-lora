@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-autocomplete.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-autocomplete.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-autocomplete.js",
+  "esm5": "../../esm5/ui/autocomplete/devextreme-angular-ui-autocomplete.js",
+  "esm2015": "../../esm2015/ui/autocomplete/devextreme-angular-ui-autocomplete.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-autocomplete.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-autocomplete.js",
+  "typings": "devextreme-angular-ui-autocomplete.d.ts",
+  "metadata": "devextreme-angular-ui-autocomplete.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/autocomplete"
+}

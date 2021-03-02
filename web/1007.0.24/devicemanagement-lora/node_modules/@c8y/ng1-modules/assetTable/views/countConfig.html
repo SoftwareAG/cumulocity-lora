@@ -1,0 +1,25 @@
+<div class="modal-header" ng-show="title">
+  <h3>{{ title | translate }}</h3>
+</div>
+<div class="modal-body">
+  <label>{{ 'Type' | translate }}:</label>
+  <input type="text" ng-model="type" />
+</div>
+<div class="modal-footer">
+  <button 
+    title="{{ 'Cancel' | translate }}" 
+    class="btn btn-default" 
+    ng-click="dismiss()" 
+    translate
+  >
+    Cancel
+  </button>
+  <button
+    title="{{ 'Save' | translate }}"
+    class="btn btn-primary"
+    ng-click="$close(type)"
+    translate
+  >
+    Save
+  </button>
+</div>

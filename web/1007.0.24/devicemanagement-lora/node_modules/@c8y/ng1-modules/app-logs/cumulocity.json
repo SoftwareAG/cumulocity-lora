@@ -1,0 +1,15 @@
+{
+  "name": "Application logs",
+  "ngModules": [
+    "c8y.appLogs"
+  ],
+  "category": "Administration",
+  "description": "Allows to check logs of the application",
+  "js": [
+    "index.js",
+    "app-logs.service.js",
+    "app-logs/app-logs.component.js",
+    "app-logs/download-logs.component.js",
+    "app-instance-logs/app-instance-logs.component.js"
+  ]
+}

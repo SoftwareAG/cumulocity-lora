@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yAudits",function(){return{restrict:"E",link:function(){},scope:{source:"="},templateUrl:":::PLUGIN_PATH:::/ui/views/audits.html"}});

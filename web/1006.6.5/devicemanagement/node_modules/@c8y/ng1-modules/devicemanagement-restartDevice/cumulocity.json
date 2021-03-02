@@ -1,0 +1,14 @@
+{
+  "name": "Device restart",
+  "description": "Adds the option to restart a device to the cog wheel",
+  "ngModules": [
+    "c8y.restartDevice"
+  ],
+  "js": [
+    "index.js"
+  ],
+  "folderName": "restartDevice",
+  "appsInclude": [
+    "devicemanagement"
+  ]
+}

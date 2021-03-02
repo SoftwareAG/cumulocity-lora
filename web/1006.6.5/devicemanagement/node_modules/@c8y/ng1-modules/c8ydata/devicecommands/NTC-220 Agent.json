@@ -1,0 +1,386 @@
+{
+  "name": "NTC-220 commands",
+  "syntax": "NTC-220",
+  "templates": [
+    {
+      "name": "Get command template",
+      "command": "get <parameter>",
+      "category": "Template"
+    },
+    {
+      "name": "Set command template",
+      "command": "set <parameter>=<value>",
+      "category": "Template"
+    },
+    {
+      "name": "Execute command template",
+      "command": "execute <command>",
+      "category": "Template"
+    },
+    {
+      "name": "Get firmware and hardware version",
+      "command": "get sw.version; get hw.version",
+      "category": "Device"
+    },
+    {
+      "name": "Get Device Serial Number",
+      "command": "get uboot.sn",
+      "category": "Device"
+    },
+    {
+      "name": "Get current receiver number",
+      "command": "get service.cumulocity.sms.receiver",
+      "category": "SMS"
+    },
+    {
+      "name": "Set receiver number for SMS mode",
+      "command": "set service.cumulocity.sms.receiver=<number>",
+      "category": "SMS"
+    },
+    {
+      "name": "Get GPIO notify mode",
+      "command": "get service.cumulocity.gpio.<N>.notify",
+      "category": "GPIO"
+    },
+    {
+      "name": "Set GPIO notify mode",
+      "command": "set service.cumulocity.gpio.<N>.notify=<alarm|measurement>",
+      "category": "GPIO"
+    },
+    {
+      "name": "Configure debouncing interval for GPIO <N> (in seconds)",
+      "command": "set service.cumulocity.gpio.<N>.debounce.interval=<number>",
+      "category": "Alarm"
+    },
+    {
+      "name": "Configure debouncing alarm text",
+      "command": "set service.cumulocity.gpio.<N>.alarm.text=<text>",
+      "category": "Alarm"
+    },
+    {
+      "name": "Configure interval for status report in SMS mode (in seconds)",
+      "command": "set service.cumulocity.sms.report.interval=<number>",
+      "category": "SMS"
+    },
+    {
+      "name": "Cycle data connection status",
+      "command": "execute pdpcycle",
+      "category": "Connection"
+    },
+    {
+      "name": "Reboot device",
+      "command": "execute reboot",
+      "category": "Device"
+    },
+    {
+      "name": "Factory reset",
+      "command": "set service.system.factory=1",
+      "category": "Device"
+    },
+    {
+      "name": "Get power source and voltage",
+      "command": "get sys.sensors.info.powersource; get sys.sensors.io.vin.adc",
+      "category": "Device"
+    },
+    {
+      "name": "Get SIM PIN",
+      "command": "get wwan.0.sim.pin",
+      "category": "Cellular WAN"
+    },
+    {
+      "name": "Set SIM PIN",
+      "command": "set wwan.0.sim.pin=<pin>",
+      "category": "Cellular WAN"
+    },
+    {
+      "name": "Get SIM protection",
+      "command": "get wwan.0.sim.status.pin_enabled",
+      "category": "Cellular WAN"
+    },
+    {
+      "name": "Set SIM protection",
+      "command": "set wwan.0.sim.status.pin_enabled=<Diabled or Enabled>",
+      "category": "Cellular WAN"
+    },
+    {
+      "name": "Get reconnect delay (in seconds)",
+      "command": "get link.profile.<x>.reconnect_delay",
+      "category": "WAN Profile"
+    },
+    {
+      "name": "Set reconnect delay (in seconds)",
+      "command": "set link.profile.<x>.reconnect_delay=<delay>",
+      "category": "WAN Profile"
+    },
+    {
+      "name": "Get reconnect retries",
+      "command": "get link.profile.<x>.reconnect_retries",
+      "category": "WAN Profile"
+    },
+    {
+      "name": "Set reconnect retries",
+      "command": "set link.profile.<x>.reconnect_retries=<retries>",
+      "category": "WAN Profile"
+    },
+    {
+      "name": "Get Metric",
+      "command": "get link.profile.<x>.defaultroutemetric",
+      "category": "WAN Profile"
+    },
+    {
+      "name": "Set Metric",
+      "command": "set link.profile.<x>.defaultroutemetric=<metric>",
+      "category": "WAN Profile"
+    },
+    {
+      "name": "Get MTU",
+      "command": "get system.config.mtu",
+      "category": "WAN Profile"
+    },
+    {
+      "name": "Set MTU",
+      "command": "set system.config.mtu=<mtu>",
+      "category": "WAN Profile"
+    },
+    {
+      "name": "Get DHCP lease time (in seconds)",
+      "command": "get service.dhcp.lease.0",
+      "category": "DHCP Server"
+    },
+    {
+      "name": "Set DHCP lease time (in seconds)",
+      "command": "set service.dhcp.lease.0=<time>",
+      "category": "DHCP Server"
+    },
+    {
+      "name": "Get GPS enable",
+      "command": "get sensors.gps.0.enable",
+      "category": "GPS"
+    },
+    {
+      "name": "Set GPS enable",
+      "command": "set sensors.gps.0.enable=<1 or 0>",
+      "category": "GPS"
+    },
+    {
+      "name": "Get pullup voltage (in volts)",
+      "command": "get sys.sensors.iocfg.pull_up_voltage",
+      "category": "GPIO"
+    },
+    {
+      "name": "Set pullup voltage (in volts)",
+      "command": "set sys.sensors.iocfg.pull_up_voltage=<3.3 or 8.2>",
+      "category": "GPIO"
+    },
+    {
+      "name": "Get I/O pin capability",
+      "command": "get sys.sensors.io.<x>.cap",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Get I/O pin analogue input (in volts)",
+      "command": "get sys.sensors.io.<x>.adc",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Get I/O pin analogue raw voltage (in volts)",
+      "command": "get sys.sensors.io.<x>.adc_raw",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Get I/O pin scale",
+      "command": "get sys.sensors.io.<x>.scale",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Set I/O pin scale",
+      "command": "set sys.sensors.io.<x>.scale=<scale>",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Get I/O pin mode",
+      "command": "get sys.sensors.io.<x>.mode",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Set I/O pin mode",
+      "command": "set sys.sensors.io.<x>.mode=<mode>",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Get I/O pin digital input",
+      "command": "get sys.sensors.io.<x>.d_in",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Get I/O pin digital input threshold",
+      "command": "get sys.sensors.io.<x>.d_in_threshold",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Get I/O pin hardware gain",
+      "command": "get sys.sensors.io.<x>.hardware_gain",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Set I/O pin hardware gain",
+      "command": "set sys.sensors.io.<x>.hardware_gain=<gain>",
+      "category": "GPIO Pin"
+    },
+    {
+      "name": "Get agent status",
+      "command": "get service.cumulocity.agent.status",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get agent connection server",
+      "command": "get service.cumulocity.connection.server",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set agent connection server",
+      "command": "set service.cumulocity.connection.server=<server>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get agent enable",
+      "command": "get service.cumulocity.enable",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set agent enable",
+      "command": "set service.cumulocity.enable=<0 or 1>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get agent log level",
+      "command": "get service.cumulocity.log.level",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set agent log level",
+      "command": "set service.cumulocity.log.level=<1 ... 8>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get agent connection timeout (in seconds)",
+      "command": "get service.cumulocity.network.connectTimeout",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set agent connection timeout (in seconds)",
+      "command": "set service.cumulocity.network.connectTimeout=<time>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get agent reconnect interval (in seconds)",
+      "command": "get service.cumulocity.network.reconnectInterval",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set agent reconnect interval (in seconds)",
+      "command": "set service.cumulocity.network.reconnectInterval=<time>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get agent network timeout (in seconds)",
+      "command": "get service.cumulocity.network.timeout",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set agent network timeout (in seconds)",
+      "command": "set service.cumulocity.network.timeout=<time>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get agent modbus serial port",
+      "command": "get service.cumulocity.modbus.serial.port",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set agent modbus serial port",
+      "command": "set service.cumulocity.modbus.serial.port=<port>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get agent signal strength measurement interval (in seconds)",
+      "command": "get service.cumulocity.signal.interval",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set agent signal strength measurement interval (in seconds)",
+      "command": "set service.cumulocity.signal.interval=<interval>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get agent GPIO interval (in seconds)",
+      "command": "get service.cumulocity.gpio.interval",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set agent GPIO interval (in seconds)",
+      "command": "set service.cumulocity.gpio.interval=<interval>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get agent GPS interval (in seconds)",
+      "command": "get service.cumulocity.gps.interval",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set agent GPS interval (in seconds)",
+      "command": "set service.cumulocity.gps.interval=<interval>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get serial port mode",
+      "command": "get serial.iomode.default",
+      "category": "Modbus-RTU config"
+    },
+    {
+      "name": "Set serial port mode",
+      "command": "set serial.iomode.default=<rs232|rs422|rs485>",
+      "category": "Modbus-RTU config"
+    },
+    {
+      "name": "Get system resources measurement interval (in seconds)",
+      "command": "get service.cumulocity.system_resources.interval",
+      "category": "Agent config"
+    },
+    {
+      "name": "Set system resources measurement interval (in seconds)",
+      "command": "set service.cumulocity.system_resources.interval=<interval>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Clear device credentials",
+      "command": "set service.cumulocity.connection.username=; set service.cumulocity.connection.password=",
+      "category": "Agent config"
+    },
+    {
+      "name": "Get device user",
+      "command": "get service.cumulocity.connection.username",
+      "category": "Agent config"
+    },
+    {
+      "name": "Check MQTT enablement",
+      "command": "get service.cumulocity.mqtt.enable",
+      "category": "Agent config"
+    },
+    {
+      "name": "Enable/disable MQTT communication",
+      "command": "set service.cumulocity.mqtt.enable=<0|1>",
+      "category": "Agent config"
+    },
+    {
+      "name": "Check MQTT keepalive interval",
+      "command": "get service.cumulocity.mqtt.keepalive",
+      "category": "Agent config"
+    },
+    {
+      "name": "Config MQTT keepalive interval (in seconds)",
+      "command": "set service.cumulocity.mqtt.keepalive=<number>",
+      "category": "Agent config"
+    }
+  ]
+}

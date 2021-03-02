@@ -1,0 +1,25 @@
+<div ng-show="!fragment.editMode">
+  <label>
+    <input type="checkbox" value="" ng-model="fragment.selected" ng-change="updateFields()" />
+    {{ fragment.name }}
+  </label>
+  <a
+    title="{{ 'Edit' | translate }}"
+    href=""
+    ng-click="edit(fragment)"
+    class="btn btn-xs showOnHover"
+  >
+    <i c8y-icon="pencil"></i> <translate>Edit</translate>
+  </a>
+</div>
+<div ng-show="fragment.editMode">
+  <input type="text" ng-model="fragment.name" />
+  <a
+    title="{{ 'OK' | translate }}"
+    href=""
+    ng-click="edit(fragment); updateFields();"
+    class="btn btn-xs showOnHover"
+  >
+    <i c8y-icon="check"></i> <translate>OK</translate>
+  </a>
+</div>

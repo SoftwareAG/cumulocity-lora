@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.deviceSelector").directive("c8yDeviceSelector",function(){return{restrict:"E",templateUrl:":::PLUGIN_PATH:::/views/deviceSelector.html",controller:"deviceSelectorCtrl",scope:{selectedDevices:"=",disabledDevices:"="}}});

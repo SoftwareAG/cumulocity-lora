@@ -1,0 +1,6 @@
+<button type="button" class="btn btn-xs btn-default flex-item-right" ng-if="vm.getOperationsCount()" ng-click="vm.openOperationsModal()">
+    <i c8y-icon="list"></i>
+    <span class="badge" uib-tooltip-html="vm.getOperationsTooltip()" tooltip-placement="left" ng-class="vm.getOperationsBadgeClass()">
+        {{vm.getOperationsCount()}}
+    </span>
+</button>

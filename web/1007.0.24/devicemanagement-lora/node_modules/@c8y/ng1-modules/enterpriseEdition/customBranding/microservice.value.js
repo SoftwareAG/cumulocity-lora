@@ -1,0 +1,1 @@
+"use strict";!function(){var c;try{c=!__WEBPACK__}catch(a){c=!1}angular.module("c8y.custom-branding").value("USE_BRANDING_MICROSERVICE",c)}();

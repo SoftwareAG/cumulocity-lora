@@ -1,0 +1,24 @@
+{
+  "name": "SCADA Widget",
+  "ngModules": [
+    "c8y.parts.scadaWidget"
+  ],
+  "category": "Widgets",
+  "icon": "home",
+  "color": "#F03F0F",
+  "description": "Allows for displaying a customizable SCADA widget.",
+  "js": [
+    "index.js",
+    "svg.directive.js",
+    "mapping.directive.js",
+    "config.controller.js",
+    "widget.controller.js",
+    "util.service.js"
+  ],
+  "imports": [
+    "core/deviceDatabase4"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

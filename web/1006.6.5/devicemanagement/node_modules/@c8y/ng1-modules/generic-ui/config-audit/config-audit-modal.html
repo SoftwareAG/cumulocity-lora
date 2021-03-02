@@ -1,0 +1,31 @@
+<div class="modal-header bg-primary">
+  <h3>{{ vm.title | translate }}</h3>
+  <small>{{ vm.subTitle | translate }}</small>
+</div>
+
+<c8y-config-audit
+  context="vm.managedObject"
+  on-reference-device="vm.referenceDevice = device"
+  on-selected="vm.selected = selected"
+>
+</c8y-config-audit>
+
+<div class="modal-footer">
+  <button
+    title="{{ 'Cancel' | translate }}"
+    class="btn btn-default"
+    ng-click="vm.dismiss()"
+    translate
+  >
+    Cancel
+  </button>
+  <button
+    title="{{ 'Sync selected properties' | translate }}"
+    class="btn btn-primary"
+    ng-click="vm.synchronize()"
+    ng-disabled="!vm.selected.length || vm.syncing"
+    translate
+  >
+    Sync selected properties
+  </button>
+</div>

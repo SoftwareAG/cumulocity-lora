@@ -1,0 +1,14 @@
+{
+  "name": "Modbus configuration",
+  "description": "Allow for configuring modbus device",
+  "category": "Device",
+  "ngModules": [
+    "c8y.modbusConfiguration4"
+  ],
+  "js": [
+    "modbus-configuration-4.module.js",
+    "modbus-configuration-4.config.js",
+    "fieldbus-device-list.component.js",
+    "fieldbus-config.component.js"
+  ]
+}

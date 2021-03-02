@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").provider("c8yComponents",function(){var u=[];function t(n){u.push(n)}return{add:t,$get:["$q","c8yUiUtil",function(n,i){return{add:t,list:function(){var t=[];return _.each(u,function(n){t.push(i.configureVisibility(n))}),n.all(t).then(function(n){return _.filter(n,"show")})}}}]}});

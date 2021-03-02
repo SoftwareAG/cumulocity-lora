@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-drawer.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-drawer.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-drawer.js",
+  "esm5": "../../esm5/ui/drawer/devextreme-angular-ui-drawer.js",
+  "esm2015": "../../esm2015/ui/drawer/devextreme-angular-ui-drawer.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-drawer.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-drawer.js",
+  "typings": "devextreme-angular-ui-drawer.d.ts",
+  "metadata": "devextreme-angular-ui-drawer.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/drawer"
+}

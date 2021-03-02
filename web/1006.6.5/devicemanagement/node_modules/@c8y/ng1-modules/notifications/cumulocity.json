@@ -1,0 +1,11 @@
+{
+  "name": "Notifications",
+  "category": "",
+  "ngModules": [
+    "c8y.notifications"
+  ],
+  "description": "Notifications displayed to the user",
+  "js": [
+    "index.js"
+  ]
+}

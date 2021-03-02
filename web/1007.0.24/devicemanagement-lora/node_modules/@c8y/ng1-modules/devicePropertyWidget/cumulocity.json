@@ -1,0 +1,23 @@
+{
+  "name": "Device properties widget",
+  "ngModules": [
+    "c8y.parts.devicePropertyWidget"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "Show device properties in a dashboard widget",
+  "css": [
+    "style.css"
+  ],
+  "js": [
+    "index.js",
+    "controllers/config.js",
+    "controllers/widget.js",
+    "directives/fragmentCheckboxList.js",
+    "services/moRealTimeDetails.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

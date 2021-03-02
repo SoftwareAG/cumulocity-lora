@@ -1,0 +1,1338 @@
+{
+  "c8y_ModbusDeviceTypeInfo": {
+    "minFieldbusUI": 4,
+    "name": "SMARTbox_CubeIO",
+    "fieldbusType": "modbus"
+  },
+  "c8y_Coils": [],
+  "c8y_Registers": [
+    {
+      "measurementMapping": {
+        "series": "Input#1",
+        "type": "Input#1"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 1,
+      "input": false,
+      "divisor": 1,
+      "unit": "RAW DATA",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input#1",
+      "category": "Value"
+    },
+    {
+      "measurementMapping": {
+        "series": "Input#2",
+        "type": "Input#2"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 2,
+      "input": false,
+      "divisor": 1,
+      "unit": "RAW DATA",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input#2",
+      "category": "Value"
+    },
+    {
+      "measurementMapping": {
+        "series": "Input#3",
+        "type": "Input#3"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 3,
+      "input": false,
+      "divisor": 1,
+      "unit": "RAW DATA",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input#3",
+      "category": "Value"
+    },
+    {
+      "measurementMapping": {
+        "series": "Input#4",
+        "type": "Input#4"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 4,
+      "input": false,
+      "divisor": 1,
+      "unit": "RAW DATA",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input#4",
+      "category": "Value"
+    },
+    {
+      "measurementMapping": {
+        "series": "Input#5",
+        "type": "Input#5"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 5,
+      "input": false,
+      "divisor": 1,
+      "unit": "RAW DATA",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input#5",
+      "category": "Value"
+    },
+    {
+      "measurementMapping": {
+        "series": "Input#6",
+        "type": "Input#6"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 6,
+      "input": false,
+      "divisor": 1,
+      "unit": "RAW DATA",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input#6",
+      "category": "Value"
+    },
+    {
+      "measurementMapping": {
+        "series": "Input#7",
+        "type": "Input#7"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 7,
+      "input": false,
+      "divisor": 1,
+      "unit": "RAW DATA",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input#7",
+      "category": "Value"
+    },
+    {
+      "measurementMapping": {
+        "series": "Input#8",
+        "type": "Input#8"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 8,
+      "input": false,
+      "divisor": 1,
+      "unit": "RAW DATA",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input#8",
+      "category": "Value"
+    },
+    {
+      "measurementMapping": {
+        "series": "Input#9",
+        "type": "Input#9"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 9,
+      "input": false,
+      "divisor": 1,
+      "unit": "RAW DATA",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input#9",
+      "category": "Value"
+    },
+    {
+      "measurementMapping": {
+        "series": "Input#10",
+        "type": "Input#10"
+      },
+      "statusMapping": {
+        "status": "read"
+      },
+      "offset": 0,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 10,
+      "input": false,
+      "divisor": 1,
+      "unit": "RAW DATA",
+      "decimalPlaces": 2,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Input#10",
+      "category": "Value"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "measurementMapping": {
+        "series": "Linearized Input#1",
+        "type": "Linearized Input#1"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 11,
+      "input": false,
+      "divisor": 1,
+      "unit": "bar",
+      "decimalPlaces": 2,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearized Input#1",
+      "category": "Linearized"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "measurementMapping": {
+        "series": "Linearized Input#2",
+        "type": "Linearized Input#2"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 12,
+      "input": false,
+      "divisor": 1,
+      "unit": "bar",
+      "decimalPlaces": 2,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearized Input#2",
+      "category": "Linearized"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "measurementMapping": {
+        "series": "Linearized Input#3",
+        "type": "Linearized Input#3"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 13,
+      "input": false,
+      "divisor": 1,
+      "unit": "bar",
+      "decimalPlaces": 2,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearized Input#3",
+      "category": "Linearized"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "measurementMapping": {
+        "series": "Linearized Input#4",
+        "type": "Linearized Input#4"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 14,
+      "input": false,
+      "divisor": 1,
+      "unit": "bar",
+      "decimalPlaces": 2,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearized Input#4",
+      "category": "Linearized"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "measurementMapping": {
+        "series": "Linearized Input#5",
+        "type": "Linearized Input#5"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 15,
+      "input": false,
+      "divisor": 1,
+      "unit": "bar",
+      "decimalPlaces": 2,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearized Input#5",
+      "category": "Linearized"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "measurementMapping": {
+        "series": "Linearized Input#6",
+        "type": "Linearized Input#6"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 16,
+      "input": false,
+      "divisor": 1,
+      "unit": "bar",
+      "decimalPlaces": 2,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearized Input#6",
+      "category": "Linearized"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "measurementMapping": {
+        "series": "Linearized Input#7",
+        "type": "Linearized Input#7"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 17,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearized Input#7",
+      "category": "Linearized"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "measurementMapping": {
+        "series": "Linearized Input#8",
+        "type": "Linearized Input#8"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 18,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearized Input#8",
+      "category": "Linearized"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "measurementMapping": {
+        "series": "Linearized Input#9",
+        "type": "Linearized Input#9"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 19,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearized Input#9",
+      "category": "Linearized"
+    },
+    {
+      "statusMapping": {
+        "status": "read"
+      },
+      "measurementMapping": {
+        "series": "Linearized Input#10",
+        "type": "Linearized Input#10"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 20,
+      "input": false,
+      "divisor": 1,
+      "unit": "°C",
+      "decimalPlaces": 2,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearized Input#10",
+      "category": "Linearized"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 11,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 21,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Configuration Input#1",
+      "category": "Configuration",
+      "enumValues": {
+        "0": "Off",
+        "1": "Digital - LowSide Input Normal",
+        "2": "Digital - LowSide Input Invert",
+        "3": "Digital - HighSide Input Normal",
+        "4": "Digital - HighSide Input Invert",
+        "5": "Analog - Current Input 0..20mA",
+        "6": "Analog - Current Input 4..20mA",
+        "9": "Analog - Voltage Input 0..10V",
+        "10": "Analog - Voltage Input 2..10V",
+        "11": "Analog - Voltage Input 0..5V"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 11,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 22,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Configuration Input#2",
+      "category": "Configuration",
+      "enumValues": {
+        "0": "OFF",
+        "1": "Digital Low-Side Input Normal",
+        "2": "Digital Low-Side Input Invert",
+        "3": "Digital High-Side Input Normal",
+        "4": "Digital High-Side Input Invert",
+        "5": "Analog Current Input 0…20mA",
+        "6": "Analog Current Input 4…20mA",
+        "9": "Analog Voltage Input 0…10V",
+        "10": "Analog Voltage Input 2…10V",
+        "11": "Analog Voltage Input 0…5V"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 23,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Configuration Input#3",
+      "category": "Configuration",
+      "enumValues": {
+        "0": "OFF",
+        "1": "Digital Low-Side Input Normal",
+        "2": "Digital Low-Side Input Invert",
+        "5": "Analog Current Input 0…20mA",
+        "6": "Analog Current Input 4…20mA"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 24,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Configuration Input#4",
+      "category": "Configuration",
+      "enumValues": {
+        "0": "OFF",
+        "1": "Digital Low-Side Input Normal",
+        "2": "Digital Low-Side Input Invert",
+        "5": "Analog Current Input 0…20mA",
+        "6": "Analog Current Input 4…20mA"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 25,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Configuration Input#5",
+      "category": "Configuration",
+      "enumValues": {
+        "0": "OFF",
+        "1": "Digital Low-Side Input Normal",
+        "2": "Digital Low-Side Input Invert",
+        "5": "Analog Current Input 0…20mA",
+        "6": "Analog Current Input 4…20mA"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 6,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 26,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Configuration Input#6",
+      "category": "Configuration",
+      "enumValues": {
+        "0": "OFF",
+        "1": "Digital Low-Side Input Normal",
+        "2": "Digital Low-Side Input Invert",
+        "5": "Analog Current Input 0…20mA",
+        "6": "Analog Current Input 4…20mA"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 14,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 27,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Configuration Input#7",
+      "category": "Configuration",
+      "enumValues": {
+        "0": "OFF",
+        "14": "Analog PT1000 2-Wire"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 14,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 28,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Configuration Input#8",
+      "category": "Configuration",
+      "enumValues": {
+        "0": "OFF",
+        "14": "Analog - PT1000 2Wire"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 14,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 29,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Configuration Input#9",
+      "category": "Configuration",
+      "enumValues": {
+        "0": "OFF",
+        "14": "Analog PT1000 2-Wire"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 14,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 30,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Configuration Input#10",
+      "category": "Configuration",
+      "enumValues": {
+        "0": "OFF",
+        "14": "Analog PT1000 2-Wire"
+      }
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 327.67,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 31,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -327.68,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset Input#1",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 327.67,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 32,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -327.68,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset Input#2",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 327.67,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 33,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -327.68,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset Input#3",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 327.67,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 34,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -327.68,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset Input#4",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 327.67,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 35,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -327.68,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset Input#5",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 327.67,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 36,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -327.68,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset Input#6",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 327.67,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 37,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -327.68,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset Input#7",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 327.67,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 38,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -327.68,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset Input#8",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 327.67,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 39,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -327.68,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset Input#9",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 327.67,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": true,
+      "number": 40,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 2,
+      "min": -327.68,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Offset Input#10",
+      "category": "Offset"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 41,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization Low Input#1",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 42,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization High Input#1",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 43,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization Low Input#2",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 44,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization High Input#2",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 45,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization Low Input#3",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 46,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization High Input#3",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 47,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization Low Input#4",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 48,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization High Input#4",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 49,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization Low Input#5",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 50,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization High Input#5",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 51,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization Low Input#6",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 52,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization High Input#6",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 53,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization Low Input#7",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 54,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization High Input#7",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 55,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization Low Input#8",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 56,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization High Input#8",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 57,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization Low Input#9",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 58,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization High Input#9",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 59,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization Low Input#10",
+      "category": "Linearization"
+    },
+    {
+      "statusMapping": {
+        "status": "write"
+      },
+      "offset": 0,
+      "max": 10000,
+      "multiplier": 1,
+      "fieldbusType": null,
+      "signed": false,
+      "number": 60,
+      "input": false,
+      "divisor": 1,
+      "unit": "",
+      "decimalPlaces": 0,
+      "min": 0,
+      "startBit": 0,
+      "noBits": 16,
+      "name": "Linearization High Input#10",
+      "category": "Linearization"
+    }
+  ]
+}

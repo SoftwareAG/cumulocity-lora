@@ -1,0 +1,29 @@
+{
+  "name": "SRT 360i Sample Commands",
+  "syntax" : "SRT#",
+  "templates" : [{
+    "name" : "Switch motion detector on",
+    "command": "#C10*<nn>:0IAM1",
+    "category": "Motion detector"
+  }, {
+    "name" : "Switch motion detector off",
+    "command": "#C10*<nn>:0IAM0",
+    "category": "Motion detector"
+  }, {
+    "name" : "Switch vibration detector on",
+    "command": "#C10*<nn>:0VAM1",
+    "category": "Vibration detector"
+  }, {
+    "name" : "Switch vibration detector off",
+    "command": "#C10*<nn>:0VAM0",
+    "category": "Vibration detector"
+  }, {
+    "name" : "Switch sound detector on",
+    "command": "#C10*<nn>:0SAM1",
+    "category": "Sound detector"
+  }, {
+    "name" : "Switch sound detector off",
+    "command": "#C10*<nn>:0SAM0",
+    "category": "Sound detector"
+  }]
+}

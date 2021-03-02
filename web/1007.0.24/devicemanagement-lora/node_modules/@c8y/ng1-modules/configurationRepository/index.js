@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.configurationRepository",[]).config(["c8yViewsProvider",function(i){i.when("/configuration-legacy",{templateUrl:":::PLUGIN_PATH:::/views/list.html"})}]);

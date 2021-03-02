@@ -1,0 +1,1 @@
+"use strict";!function(){function e(){return(0<arguments.length&&void 0!==arguments[0]?arguments[0]:String(Math.random()).substr(2)).toLowerCase().replace(/\s+/g,"_")}angular.module("c8y.ui").constant("c8yPathUtils",{buildSegment:e,appendSegment:function(t,n){return"".concat(t,"/").concat(e(n))}})}();

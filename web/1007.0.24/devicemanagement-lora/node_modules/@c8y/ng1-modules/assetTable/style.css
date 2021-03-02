@@ -1,0 +1,15 @@
+.table-header {
+  float: left;
+  line-height: 23px;
+}
+
+.spin-up, a.spin-down {
+  height: 5px;
+  display: block;
+  color: #999;
+}
+
+.icon-sort-down {
+  position: relative;
+  top: -9px;
+}

@@ -1,0 +1,44 @@
+/**
+* DevExtreme (widgets/ios7/pager.ios7.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./selectBox.ios7.less";
+@import (once) "./numberBox.ios7.less";
+
+.dx-pager {
+    &.dx-light-mode {
+        .dx-page-sizes {
+            min-width: 34px;
+        }
+
+        .dx-page-index {
+            min-width: 19px;
+        }
+    }
+
+    .dx-pages {
+        .dx-prev-button {
+            .dx-icon-chevronleft;
+        }
+
+        .dx-next-button {
+            .dx-icon-chevronright;
+        }
+
+        .dx-prev-button,
+        .dx-next-button {
+            .dx-icon-font-centered-sizing(22px);
+        }
+    }
+
+    .dx-pages,
+    .dx-page-sizes {
+        .dx-selection {
+            background-color: @IOS7_PAGER_SELECTION_BACKGROUND;
+        }
+    }
+}

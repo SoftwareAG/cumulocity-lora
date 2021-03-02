@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-tree-list.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-tree-list.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-tree-list.js",
+  "esm5": "../../esm5/ui/tree-list/devextreme-angular-ui-tree-list.js",
+  "esm2015": "../../esm2015/ui/tree-list/devextreme-angular-ui-tree-list.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-tree-list.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-tree-list.js",
+  "typings": "devextreme-angular-ui-tree-list.d.ts",
+  "metadata": "devextreme-angular-ui-tree-list.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/tree-list"
+}

@@ -1,0 +1,21 @@
+.tracking-marker {
+  width: 250px;
+}
+
+.tracking-marker .btn[btn-checkbox]::before {
+  z-index: inherit;
+}
+
+.tracking-marker .btn[btn-checkbox]::after {
+  z-index: inherit;
+}
+
+.tracking-marker .btn[btn-checkbox] {
+  width: 100%;
+  margin-right: 0;
+}
+
+.tracking-marker .btn[btn-checkbox] span {
+  z-index: 3;
+  position: relative;
+}

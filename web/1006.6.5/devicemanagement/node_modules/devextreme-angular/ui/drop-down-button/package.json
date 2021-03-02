@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-drop-down-button.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-drop-down-button.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-drop-down-button.js",
+  "esm5": "../../esm5/ui/drop-down-button/devextreme-angular-ui-drop-down-button.js",
+  "esm2015": "../../esm2015/ui/drop-down-button/devextreme-angular-ui-drop-down-button.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-drop-down-button.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-drop-down-button.js",
+  "typings": "devextreme-angular-ui-drop-down-button.d.ts",
+  "metadata": "devextreme-angular-ui-drop-down-button.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/drop-down-button"
+}

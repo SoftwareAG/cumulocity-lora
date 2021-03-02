@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.cockpit.map").controller("MapComponentCtrl",["$scope",function(n){n.cssClass="widget-map",n.mapConfig={centerPoint:{lat:51.235267210116255,lng:6.7144811153411865,zoom:11}};var e=_.get(n,"child.config.markerTemplate");n.markerTemplate=e?function(){return"<div ng-include=\"'".concat(e,"'\"></div>")}:null}]);

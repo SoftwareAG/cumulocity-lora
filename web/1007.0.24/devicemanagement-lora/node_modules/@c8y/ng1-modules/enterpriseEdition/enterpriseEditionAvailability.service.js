@@ -1,0 +1,1 @@
+"use strict";!function(){function i(i){return{isAvailable:i.isEnterpriseEditionTenant}}i.$inject=["c8yTenant"],angular.module("c8y.enterpriseEdition").factory("c8yEnterpriseEditionAvailability",i)}();

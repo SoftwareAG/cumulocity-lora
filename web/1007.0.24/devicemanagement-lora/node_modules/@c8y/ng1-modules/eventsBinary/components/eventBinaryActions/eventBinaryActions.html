@@ -1,0 +1,21 @@
+<div class="col col-12">
+  <div ng-if="vm.checkControlAvailable('download')" class="form-group">
+    <button
+      title="{{ 'Download' | translate }}"
+      class="btn btn-primary btn-xs"
+      ng-click="vm.download()"
+    >
+      <i c8y-icon="download"></i><span translate>Download</span>
+    </button>
+  </div>
+  <div ng-if="vm.checkControlAvailable('upload')" class="form-group">
+    <input type="file" c8y-on-change="vm.onNewImageSelected(event)" />
+    <button
+      title="{{ 'Upload' | translate }}"
+      class="btn btn-primary btn-xs"
+      ng-click="vm.upload()"
+    >
+      <i c8y-icon="upload"></i><span translate>Upload</span>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+{
+  "name": "Device message sending control",
+  "ngModules": [
+    "c8y.deviceControl.message"
+  ],
+  "category": "Device",
+  "description": "Device message sending control",
+  "imports": [
+  ],
+  "js": [
+    "index.js",
+    "controllers/deviceControlMessageWidget.js"
+  ],
+  "copy": ["img/*"]
+}

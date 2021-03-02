@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").controller("McontainerCtrl",["$scope","c8yNavigator","c8yApplication","c8yBase",function(o,t,n,a){o.rootNodes=t.rootNodes,n.currentAppCached().then(function(){o.tabsHorizontal=a.appOption("tabsHorizontal")})}]);

@@ -1,0 +1,29 @@
+<c8y-ui-title-set title="'Configuration' | translate"></c8y-ui-title-set>
+<div class="card">
+  <div class="card-block platform-configuration">
+    <form name="platformConfigurationForm" novalidate>
+      <c8y-schema-form
+        schema="vm.schema"
+        form="vm.form"
+        model="vm.configuration"
+        options="vm.options"
+      >
+      </c8y-schema-form>
+    </form>
+  </div>
+
+  <div class="page-footer text-center">
+    <c8y-ui-button-footer changed="platformConfigurationForm.$dirty">
+      <button
+        title="{{ 'Save configuration' | translate }}"
+        class="btn btn-primary"
+        type="button"
+        ng-click="vm.save()"
+        ng-disabled="!vm.canSave() || !platformConfigurationForm.$dirty"
+        translate
+      >
+        Save configuration
+      </button>
+    </c8y-ui-button-footer>
+  </div>
+</div>

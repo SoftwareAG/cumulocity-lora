@@ -1,0 +1,5 @@
+<div ng-controller="measurementsCtrl">
+  <div ng-repeat="m in supportedMeasurements" ng-init="filters[$index] = {}">
+    <div c8y-measurement-line-chart measurement-type="{{m}}" device-id="{{deviceId}}" data-date-from="filters[$index].dateFrom" data-date-to="filters[$index].dateTo"></div>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+<div class="modal-header" data-ng-show="title">
+  <h3>{{ title | translate }}</h3>
+</div>
+<div class="modal-body">
+  <form name="forms.userForm" role="form" novalidate>
+    <c8y-ui-edit-user
+      user="user"
+      forms="forms"
+      password="password"
+      hide-active="true"
+      hide-custom-properties="true"
+      hide-tfa-option="true"
+      hide-owner="true"
+      hide-delegate="true"
+      hide-password-reset="true"
+    >
+    </c8y-ui-edit-user>
+    <div class="form-group" ng-repeat="block in userSettingsBlocks | orderBy:'priority'">
+      <hr />
+      <label>{{ block.label | translate }}</label>
+      <div class="clearfix"></div>
+      <div ng-repeat="component in block.items | orderBy:'priority'">
+        <div ng-style="component.ngStyle" bind-html-compile="component.template"></div>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button title="{{ 'Cancel' | translate }}" class="btn btn-default" ng-click="dismiss()">
+    {{ 'Cancel' | translate }}
+  </button>
+  <button
+    title="{{ 'Save' | translate }}"
+    data-ng-disabled="forms.userForm.$invalid"
+    class="btn btn-primary"
+    ng-click="checkPassword(user)"
+  >
+    {{ 'Save' | translate }}
+  </button>
+</div>

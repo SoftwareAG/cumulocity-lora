@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.parts.aclManagement").directive("c8yDevicePermission",function(){return{restrict:"E",scope:{scope:"=",permissionType:"=",access:"=",device:"="},templateUrl:":::PLUGIN_PATH:::/views/permissionEditor.html",controller:"permissionEditorCtrl",controllerAs:"$ctrl"}});

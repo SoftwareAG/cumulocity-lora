@@ -1,0 +1,15 @@
+<nav class="navigator" ng-class="{open: vm.navOpen, minheight: !vm.rootNodes().length, 'nav-hidden-on-startup': vm.navHiddenOnStartup}">
+  <header class="title">
+    <div class="tenant-brand"></div> 
+    <c8y-app-icon app="vm.app" ></c8y-app-icon>
+    <span>{{vm.app | humanizeAppName}}</span>
+  </header>
+
+  <div class="navigatorContent" ng-show="vm.showNavigator()">
+    <c8y-ui-navigator-node node="vm.rootNode" is-root="true" visibility-check="vm.showNode"></c8y-ui-navigator-node>
+  </div>
+
+  <div class="powered-by" ng-if="!vm.hidePowered">
+    <p uib-tooltip="backend: {{vm.backendVersion}} , ui: {{vm.uiVersion}}">powered by Cumulocity</p>
+  </div>
+</nav>

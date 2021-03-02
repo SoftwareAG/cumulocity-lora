@@ -1,0 +1,14 @@
+{
+  "name": "Alarm for assets",
+  "ngModules": [
+    "c8y.cockpit.alarmassets"
+  ],
+  "category": "Device",
+  "description": "Display the active alarms for each asset",
+  "js": [
+    "index.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

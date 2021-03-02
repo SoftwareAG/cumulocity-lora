@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.deviceBulkControl").directive("deviceControlBulkOperationRowDetails",function(){return{restrict:"A",replace:!0,scope:{operation:"=",onChange:"&?"},templateUrl:":::PLUGIN_PATH:::/views/bulkOperationRowDetails.html",controller:"deviceControlBulkOperationRowDetailsCtrl"}});

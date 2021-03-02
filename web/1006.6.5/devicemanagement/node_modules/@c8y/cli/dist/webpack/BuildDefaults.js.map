@@ -1,0 +1,1 @@
+{"version":3,"file":"BuildDefaults.js","sourceRoot":"","sources":["../../src/webpack/BuildDefaults.ts"],"names":[],"mappings":";;AAAA,wCAAqC;AACrC;;GAEG;AACU,QAAA,cAAc,GAAG;IAC5B,aAAa,EAAE,iBAAO,CAAC,oBAAoB;IAC3C,qBAAqB,EAAE,iBAAO,CAAC,qBAAqB,CAAC;IACrD,YAAY,EAAE,iBAAO,CAAC,oBAAoB,CAAC;IAC3C,mBAAmB,EAAG,iBAAO,CAAC,2BAA2B,CAAC;IAC1D,WAAW,EAAG,iBAAO,CAAC,mBAAmB,CAAC;CAC3C,CAAC"}

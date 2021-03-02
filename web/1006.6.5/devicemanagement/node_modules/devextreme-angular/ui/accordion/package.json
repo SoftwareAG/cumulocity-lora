@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-accordion.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-accordion.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-accordion.js",
+  "esm5": "../../esm5/ui/accordion/devextreme-angular-ui-accordion.js",
+  "esm2015": "../../esm2015/ui/accordion/devextreme-angular-ui-accordion.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-accordion.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-accordion.js",
+  "typings": "devextreme-angular-ui-accordion.d.ts",
+  "metadata": "devextreme-angular-ui-accordion.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/accordion"
+}

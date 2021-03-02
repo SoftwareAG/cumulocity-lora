@@ -1,0 +1,1 @@
+"use strict";!function(){function n(n){n.config()}n.$inject=["c8yTenantPoliciesConfigProvider"],angular.module("c8y.tenantPolicies",[]).config(n)}();

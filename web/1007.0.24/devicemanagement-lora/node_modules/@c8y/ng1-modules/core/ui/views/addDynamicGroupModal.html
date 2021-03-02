@@ -1,0 +1,28 @@
+<div class="modal-header">
+  <i c8y-icon="times" class="btn-modal-close pull-right interact" ng-click="cancel()"></i>
+  <h3 translate>Create smart group</h3>
+</div>
+<div class="modal-body">
+  <form name="groupForm" placeholder-no-required-hint novalidate>
+    <c8y-schema-form
+      schema="dynamicGroupFormDefinition.schema"
+      form="dynamicGroupFormDefinition.form"
+      model="dynamicGroup"
+    >
+    </c8y-schema-form>
+  </form>
+</div>
+<div class="modal-footer">
+  <button 
+    title="{{ 'Cancel' | translate }}" class="btn btn-danger" ng-click="cancel()">
+    <translate>Cancel</translate>
+  </button>
+  <button
+    title="{{ 'Create' | translate }}" 
+    class="btn btn-primary"
+    ng-click="create()"
+    ng-disabled="!groupForm.$dirty || groupForm.$invalid"
+  >
+    <translate>Create</translate>
+  </button>
+</div>

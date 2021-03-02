@@ -1,0 +1,21 @@
+{
+  "name": "Predefined Adeunis LoRaWan Pulse",
+  "syntax": "HEX",
+  "templates": [
+    {
+      "name": "Device setting",
+      "command": "03{DeviceType}{TransmitPeriod2Bytes}{ChannelStatus}{ChannelType1}{ChannelType2}{PulseType}",
+      "category": "Device config"
+    },
+    {
+      "name": "Pulse 1 setting",
+      "command": "04{Pulse1Width2Bytes}{Pulse1MIndex4Bytes}{0to12}",
+      "category": "Device config"
+    },
+    {
+      "name": "Pulse 2 setting",
+      "command": "05{Pulse2Width2Bytes}{Pulse2MIndex4Bytes}{0to12}",
+      "category": "Device config"
+    }
+  ]
+}

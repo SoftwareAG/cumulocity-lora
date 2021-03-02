@@ -1,0 +1,39 @@
+/**
+* DevExtreme (widgets/generic/radioGroup.generic.less)
+* Version: 19.2.7
+* Build date: Thu Mar 26 2020
+*
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
+*/
+@import (once) "./radioButton.generic.less";
+
+.dx-radio-value-container {
+    padding-left: 0;
+}
+
+.dx-radiogroup {
+    .dx-radiobutton,
+    .dx-radiobutton-icon {
+        margin: 1px 0;
+    }
+
+    &.dx-state-readonly {
+        .dx-radiobutton-icon:before {
+            border-color: @radiogroup-readonly-border-color;
+            background-color: @radiogroup-readonly-bg;
+        }
+    }
+}
+
+.dx-radiogroup-horizontal {
+    .dx-radiobutton {
+        margin-right: 17px;
+
+        .dx-rtl &,
+        .dx-rtl& {
+            margin-right: 0;
+            margin-left: 17px;
+        }
+    }
+}

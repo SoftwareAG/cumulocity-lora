@@ -1,0 +1,1 @@
+"use strict";!function(){function t(t){t.config.options=t.config.options||{kpi:!0,target:!0,current:!0,diff:!0,diffPercentage:!0,asset:!0,dataPoints:[]}}t.$inject=["$scope"],angular.module("c8y.parts.kpi").controller("listConfigCtrl",t)}();

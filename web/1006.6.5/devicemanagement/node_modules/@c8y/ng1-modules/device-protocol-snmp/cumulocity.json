@@ -1,0 +1,10 @@
+{
+    "name": "SNMP mappings",
+    "ngModules": [
+      "c8y.snmp"
+    ],
+    "js": [
+      "snmp.module.js",
+      "snmp-device.provider.js"
+    ]
+  }

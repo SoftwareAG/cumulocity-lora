@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yAlertOnItem",function(){return{restrict:"EA",templateUrl:":::PLUGIN_PATH:::/ui/notifications/alertOnItem.html",replace:!1,scope:{alertText:"@",alertShow:"=?",alertBtnText:"@",alertBtnAction:"&",alertBtnIcon:"@"}}});

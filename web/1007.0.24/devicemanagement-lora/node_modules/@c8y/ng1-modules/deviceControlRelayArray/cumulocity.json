@@ -1,0 +1,18 @@
+{
+  "name": "Device relay array control",
+  "ngModules": [
+    "c8y.deviceControl.relayArray"
+  ],
+  "category": "Device",
+  "description": "Device relay array control",
+  "imports": [],
+  "js": [
+    "index.js",
+    "widget.controller.js",
+    "relayArrayControl/relayArrayControl.directive.js",
+    "relayArrayControl/relayArrayControl.controller.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

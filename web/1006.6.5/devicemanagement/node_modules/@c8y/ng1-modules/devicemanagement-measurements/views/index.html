@@ -1,0 +1,31 @@
+<div ng-controller="measurementsCtrl as ctrl">
+  <c8y-ui-action-bar-set>
+    <c8y-realtime-switch state="ctrl.realtime"></c8y-realtime-switch>
+  </c8y-ui-action-bar-set>
+
+  <c8y-list-pagination items="supportedMeasurements" page-size="10">
+    <c8y-list-pagination-control></c8y-list-pagination-control>
+
+    <div class="card"
+      ng-repeat="m in pag.items | limitTo:pagination.pageSize:pagination.options[pagination.page-1].startFrom"
+      ng-init="filters[$index] = {}">
+      <div class="card-header">
+        <h4 class="card-title">{{m | humanize2}}</h4>
+      </div>
+      <hr>
+      <div class="card-block measurements-tab">
+        <c8y-measurements-fragment-chart
+          fragment="m"
+          device="deviceId"
+          date-from="filters[$index].dateFrom"
+          date-to="filters[$index].dateTo"
+          realtime="ctrl.realtime"
+          hide-realtime-button="true"
+        >
+        </c8y-measurements-fragment-chart>
+      </div>
+    </div>
+
+    <c8y-list-pagination-control></c8y-list-pagination-control>
+  </c8y-list-pagination>
+</div>

@@ -1,0 +1,78 @@
+<div class="modal-header">
+  <i
+    title="{{ 'Cancel' | translate }}"
+    c8y-icon="times"
+    class="btn-modal-close pull-right interact"
+    ng-click="cancel()"
+  ></i>
+  <h3 translate>Filter options</h3>
+</div>
+
+<div class="modal-body">
+  <form name="filterForm" novalidate>
+    <div class="row">
+      <div class="col-lg-12">
+        <c8y-schema-form
+          schema="column.filtering.schema"
+          form="column.filtering.form"
+          model="column.config.filtering"
+        ></c8y-schema-form>
+      </div>
+    </div>
+    <div class="form-group" ng-show="column.sorting">
+      <label translate>And sort</label>
+      <div class="form-control-static">
+        <div class="btn-group">
+          <button
+            title="{{ 'Ascending' | translate }}"
+            type="button"
+            class="btn btn-default"
+            ng-model="column.config.sorting.order"
+            uib-btn-radio="SORTING_ORDER.ASCENDING.value"
+          >
+            <i c8y-icon="sort-alpha-asc"></i> <translate>Ascending</translate>
+          </button>
+          <button
+            title="{{ 'Descending' | translate }}"
+            type="button"
+            class="btn btn-default"
+            ng-model="column.config.sorting.order"
+            uib-btn-radio="SORTING_ORDER.DESCENDING.value"
+          >
+            <i c8y-icon="sort-alpha-desc"></i> <translate>Descending</translate>
+          </button>
+          <button
+            title="{{ 'Don\'t sort' | translate }}"
+            type="button"
+            class="btn btn-default"
+            ng-model="column.config.sorting.order"
+            uib-btn-radio="SORTING_ORDER.NONE.value"
+          >
+            <translate>Don't sort</translate>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button title="{{ 'Cancel' | translate }}" class="btn btn-default" ng-click="cancel()" translate>
+    Cancel
+  </button>
+  <button
+    title="{{ 'Reset' | translate }}"
+    class="btn btn-danger"
+    ng-click="clearConfig(column.config)"
+  >
+    <i c8y-icon="times"></i> <translate>Reset</translate>
+  </button>
+  <button
+    title="{{ 'Apply' | translate }}"
+    class="btn btn-primary"
+    ng-click="applyConfig(column.config)"
+    ng-disabled="filterForm.$invalid"
+  >
+    <i c8y-icon="filter"></i> <translate>Apply</translate>
+  </button>
+</div>

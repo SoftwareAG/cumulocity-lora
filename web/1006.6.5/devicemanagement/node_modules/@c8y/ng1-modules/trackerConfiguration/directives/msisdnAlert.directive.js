@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.trackerConfiguration").directive("c8yMsisdnAlert",function(){return{restrict:"EA",templateUrl:":::PLUGIN_PATH:::/views/msisdnAlert.html",controller:"msisdnAlertCtrl",controllerAs:"$ctrl",bindToController:{device:"="}}});

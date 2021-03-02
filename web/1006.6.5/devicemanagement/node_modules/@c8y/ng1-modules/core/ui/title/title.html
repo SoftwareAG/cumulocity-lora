@@ -1,0 +1,14 @@
+<div class="c8y-ui-title">
+
+  <div ng-show="vm.displayMode === 'component'" class="transclude-main-container"></div>
+
+  <div ng-if="vm.displayMode === 'template'">
+    <div ng-include="vm.templateUrl"></div>
+  </div>
+
+  <h1 ng-show="!vm.displayMode && (vm.title || vm.subtitle)" class="text-truncate">
+    {{vm.title | translate}}
+    <small>{{vm.subtitle | translate}}</small>
+  </h1>
+
+</div>

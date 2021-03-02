@@ -1,0 +1,10 @@
+{
+    "name": "ACTILITY mappings",
+    "ngModules": [
+      "c8y.actility"
+    ],
+    "js": [
+      "actility.module.js",
+      "actility-device.provider.js"
+    ]
+  }

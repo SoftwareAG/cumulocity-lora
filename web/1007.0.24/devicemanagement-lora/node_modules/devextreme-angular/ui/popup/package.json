@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-popup.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-popup.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-popup.js",
+  "esm5": "../../esm5/ui/popup/devextreme-angular-ui-popup.js",
+  "esm2015": "../../esm2015/ui/popup/devextreme-angular-ui-popup.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-popup.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-popup.js",
+  "typings": "devextreme-angular-ui-popup.d.ts",
+  "metadata": "devextreme-angular-ui-popup.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/popup"
+}

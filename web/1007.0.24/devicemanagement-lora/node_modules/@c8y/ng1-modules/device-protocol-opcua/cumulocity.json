@@ -1,0 +1,10 @@
+{
+    "name": "OPCUA mappings",
+    "ngModules": [
+      "c8y.opcua"
+    ],
+    "js": [
+      "opcua.module.js",
+      "opcua-device.provider.js"
+    ]
+  }

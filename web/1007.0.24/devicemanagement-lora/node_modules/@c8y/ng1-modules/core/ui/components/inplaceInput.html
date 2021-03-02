@@ -1,0 +1,48 @@
+<span ng-if="!vm.editMode" class="editable" ng-click="vm.edit()">
+  <span ng-bind="vm.value"></span>
+</span>
+
+<span ng-if="vm.editMode" class="edit-group">
+  <form name="inplaceInputForm" novalidate>
+    <ng-transclude ng-transclude-slot="edit">
+      <div class="form-group">
+        <input
+          id="{{ vm.id }}"
+          name="value"
+          type="text"
+          class="form-control"
+          ng-model="vm.value"
+          ng-model-options="{ allowInvalid: true }"
+          placeholder="{{ vm.placeholder }}"
+          ng-maxlength="{{ vm.maxlength }}"
+          ng-required="vm.required"
+          ng-change="vm.onValueChange()"
+        />
+        <span class="text-sizer"></span>
+        <c8y-error-feedback
+          field="inplaceInputForm.value"
+          check-on-dirty="true"
+        ></c8y-error-feedback>
+      </div>
+    </ng-transclude>
+
+    <span class="input-group-btn" ng-transclude="buttons">
+      <button
+        type="button"
+        title="{{ 'Cancel' | translate }}"
+        class="btn btn-link text-danger"
+        ng-click="vm.cancel()"
+      >
+        <i c8y-icon="times"></i>
+      </button>
+      <button
+        class="btn btn-link text-complementary"
+        ng-click="vm.save()"
+        title="{{ 'Save' | translate }}"
+        ng-disabled="inplaceInputForm.$invalid"
+      >
+        <i c8y-icon="check"></i>
+      </button>
+    </span>
+  </form>
+</span>

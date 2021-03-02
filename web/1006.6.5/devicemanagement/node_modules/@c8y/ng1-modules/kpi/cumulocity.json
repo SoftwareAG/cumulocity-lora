@@ -1,0 +1,35 @@
+{
+  "name": "Key performance indicators",
+  "ngModules": [
+    "c8y.parts.kpi"
+  ],
+  "category": "",
+  "icon": "dashboard",
+  "color": "#F03F0F",
+  "description": "KPI",
+  "imports": [
+    "core/nvd3ChartDirectives",
+    "core/smartRules",
+    "core/dataPointExplorer",
+    "core/measurements"
+  ],
+  "js": [
+    "index.js",
+    "services/kpi.js",
+    "services/mostRecentKpi.js",
+    "services/baseWidget.js",
+    "controllers/deprecated/edit.js",
+    "controllers/deprecated/graph.js",
+    "controllers/deprecated/multipleKpiConfig.js",
+    "controllers/deprecated/setup.js",
+    "controllers/list.js",
+    "controllers/listConfig.js",
+    "controllers/gauge.js",
+    "controllers/kpiConfig.js",
+    "controllers/pieChart.js",
+    "controllers/pieChartConfig.js"
+  ],
+  "copy": [
+    "img/*"
+  ]
+}

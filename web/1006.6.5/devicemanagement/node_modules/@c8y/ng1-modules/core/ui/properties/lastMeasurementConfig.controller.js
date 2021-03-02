@@ -1,0 +1,1 @@
+"use strict";!function(){function e(t,e){try{angular.module("c8y.cockpit.dataPointExplorer")}catch(e){t.noDataPointExplorer=!0}t.resultTypes=e.RESULT_TYPES,_.defaults(t.config,{resultType:t.resultTypes.VALUE.value})}e.$inject=["$scope","lastMeasurementComputedProperty"],angular.module("c8y.ui").controller("ComputedPropertyMeasurementLastConfigCtrl",e)}();

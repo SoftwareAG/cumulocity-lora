@@ -1,0 +1,19 @@
+{
+  "name": "ngx-bootstrap/component-loader",
+  "version": "5.1.2",
+  "description": "Native Angular Bootstrap Components",
+  "private": true,
+  "main": "bundles/ngx-bootstrap-component-loader.umd.js",
+  "module": "fesm5/ngx-bootstrap-component-loader.js",
+  "es2015": "fesm2015/ngx-bootstrap-component-loader.js",
+  "esm5": "esm5/ngx-bootstrap-component-loader.js",
+  "esm2015": "esm2015/ngx-bootstrap-component-loader.js",
+  "fesm5": "fesm5/ngx-bootstrap-component-loader.js",
+  "fesm2015": "fesm2015/ngx-bootstrap-component-loader.js",
+  "typings": "ngx-bootstrap-component-loader.d.ts",
+  "metadata": "ngx-bootstrap-component-loader.metadata.json",
+  "sideEffects": false,
+  "dependencies": {
+    "tslib": "^1.9.0"
+  }
+}

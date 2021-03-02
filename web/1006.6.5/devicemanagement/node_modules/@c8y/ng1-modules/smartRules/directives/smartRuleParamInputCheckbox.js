@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.smartRules").directive("smartRuleParamInputCheckbox",function(){return{require:"^smartRuleParamInput",scope:{rule:"=",param:"="},restrict:"E",templateUrl:":::PLUGIN_PATH:::/views/paramInputCheckbox.html",link:function(e,r,t,a){e.placeholder=a.placeholder}}});

@@ -1,0 +1,768 @@
+{
+  "name": "Predefined MachineLink commands",
+  "syntax": "MachineLink",
+  "templates": [
+    {
+      "name": "Class 0 ping",
+      "command": "class0 ping",
+      "category": "Device ping",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get a parameter",
+      "command": "get <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get a parameter (password protected)",
+      "command": "<password> get <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set a parameter",
+      "command": "set <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set a parameter (password protected)",
+      "command": "<password> set <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Execute",
+      "command": "execute <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Execute (password protected)",
+      "command": "<password> execute <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Reboot`verb`",
+      "command": "reboot",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Reboot`verb` (password protected)",
+      "command": "<password> reboot",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "pdpcycle",
+      "command": "pdpcycle",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "pdpcycle (password protected)",
+      "command": "<password> pdpcycle",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "pdpdown",
+      "command": "pdpdown",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "pdpdown (password protected)",
+      "command": "<password> pdpdown",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "pdpup",
+      "command": "pdpup",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "pdpup (password protected)",
+      "command": "<password> pdpup",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "codconnect",
+      "command": "codconnect",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "codconnect (password protected)",
+      "command": "<password> codconnect",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "coddisconnect",
+      "command": "coddisconnect",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "coddisconnect (password protected)",
+      "command": "<password> coddisconnect",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "SSH genkeys",
+      "command": "ssh.genkeys",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "SSH genkeys (password protected)",
+      "command": "<password> ssh.genkeys",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "SSH clearkeys",
+      "command": "ssh.clearkeys",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "SSH clearkeys (password protected)",
+      "command": "<password> ssh.clearkeys",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get status",
+      "command": "get status",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get status (password protected)",
+      "command": "<password> get status",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get session history",
+      "command": "get sessionhistory",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get session history (password protected)",
+      "command": "<password> get sessionhistory",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set syslogserver",
+      "command": "set syslogserver <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set syslogserver (password protected)",
+      "command": "<password> set syslogserver <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set cod",
+      "command": "set cod <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set cod (password protected)",
+      "command": "<password> set cod <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get cod",
+      "command": "get cod",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get cod (password protected)",
+      "command": "<password> get cod",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codstatus",
+      "command": "get codstatus",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codstatus (password protected)",
+      "command": "<password> get codstatus",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set coddialport",
+      "command": "set coddialport <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set coddialport (password protected)",
+      "command": "<password> set coddialport <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get coddialport",
+      "command": "get coddialport",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get coddialport (password protected)",
+      "command": "<password> get coddialport",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codonline",
+      "command": "set codonline <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codonline (password protected)",
+      "command": "<password> set codonline <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codonline",
+      "command": "get codonline",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codonline (password protected)",
+      "command": "<password> get codonline",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codminonline",
+      "command": "set codminonline <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codminonline (password protected)",
+      "command": "<password> set codminonline <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codminonline",
+      "command": "get codminonline",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codminonline (password protected)",
+      "command": "<password> get codminonline",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codredial",
+      "command": "set codredial <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codredial (password protected)",
+      "command": "<password> set codredial <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codredial",
+      "command": "get codredial",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codredial (password protected)",
+      "command": "<password> get codredial",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set coddisconnect",
+      "command": "set coddisconnect <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set coddisconnect (password protected)",
+      "command": "<password> set coddisconnect <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get coddisconnect",
+      "command": "get coddisconnect",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get coddisconnect (password protected)",
+      "command": "<password> get coddisconnect",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codconnectreg",
+      "command": "set codconnectreg <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codconnectreg (password protected)",
+      "command": "<password> set codconnectreg <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codconnectreg",
+      "command": "get codconnectreg",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codconnectreg (password protected)",
+      "command": "<password> get codconnectreg",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codrandomtime",
+      "command": "set codrandomtime <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codrandomtime (password protected)",
+      "command": "<password> set codrandomtime <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codrandomtime",
+      "command": "get codrandomtime",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codrandomtime (password protected)",
+      "command": "<password> get codrandomtime",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codverbose",
+      "command": "set codverbose <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codverbose (password protected)",
+      "command": "<password> set codverbose <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codverbose",
+      "command": "get codverbose",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codverbose (password protected)",
+      "command": "<password> get codverbose",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.icmp",
+      "command": "set codignore.icmp <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.icmp (password protected)",
+      "command": "<password> set codignore.icmp <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.icmp",
+      "command": "get codignore.icmp",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.icmp (password protected)",
+      "command": "<password> get codignore.icmp",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.tcp",
+      "command": "set codignore.tcp <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.tcp (password protected)",
+      "command": "<password> set codignore.tcp <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.tcp",
+      "command": "get codignore.tcp",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.tcp (password protected)",
+      "command": "<password> get codignore.tcp",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.udp",
+      "command": "set codignore.udp <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.udp (password protected)",
+      "command": "<password> set codignore.udp <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.udp",
+      "command": "get codignore.udp",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.udp (password protected)",
+      "command": "<password> get codignore.udp",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.dns",
+      "command": "set codignore.dns <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.dns (password protected)",
+      "command": "<password> set codignore.dns <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.dns",
+      "command": "get codignore.dns",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.dns (password protected)",
+      "command": "<password> get codignore.dns",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.ntp",
+      "command": "set codignore.ntp <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.ntp (password protected)",
+      "command": "<password> set codignore.ntp <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.ntp",
+      "command": "get codignore.ntp",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.ntp (password protected)",
+      "command": "<password> get codignore.ntp",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.ncsi",
+      "command": "set codignore.ncsi <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set codignore.ncsi (password protected)",
+      "command": "<password> set codignore.ncsi <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.ncsi",
+      "command": "get codignore.ncsi",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get codignore.ncsi (password protected)",
+      "command": "<password> get codignore.ncsi",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get plmnscan",
+      "command": "get plmnscan",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get plmnscan (password protected)",
+      "command": "<password> get plmnscan",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set forceplmn",
+      "command": "set forceplmn <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set forceplmn (password protected)",
+      "command": "<password> set forceplmn <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get forceplmn",
+      "command": "get forceplmn",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get forceplmn (password protected)",
+      "command": "<password> get forceplmn",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set PPPoE",
+      "command": "set pppoe <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set PPPoE (password protected)",
+      "command": "<password> set pppoe <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get PPPoE",
+      "command": "get pppoe",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get PPPoE (password protected)",
+      "command": "<password> get pppoe",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set ledmode",
+      "command": "set ledmode <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set ledmode (password protected)",
+      "command": "<password> set ledmode <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get ledmode",
+      "command": "get ledmode",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get ledmode (password protected)",
+      "command": "<password> get ledmode",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set ssh.proto",
+      "command": "set ssh.proto <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set ssh.proto (password protected)",
+      "command": "<password> set ssh.proto <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get ssh.proto",
+      "command": "get ssh.proto",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get ssh.proto (password protected)",
+      "command": "<password> get ssh.proto",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set ssh.passauth",
+      "command": "set ssh.passauth <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set ssh.passauth (password protected)",
+      "command": "<password> set ssh.passauth <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get ssh.passauth",
+      "command": "get ssh.passauth",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get ssh.passauth (password protected)",
+      "command": "<password> get ssh.passauth",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set ssh.keyauth",
+      "command": "set ssh.keyauth <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set ssh.keyauth (password protected)",
+      "command": "<password> set ssh.keyauth <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get ssh.keyauth",
+      "command": "get ssh.keyauth",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get ssh.keyauth (password protected)",
+      "command": "<password> get ssh.keyauth",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set download timeout",
+      "command": "set download.timeout <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set download timeout (password protected)",
+      "command": "<password> set download.timeout <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get download timeout",
+      "command": "get download.timeout",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get download timeout (password protected)",
+      "command": "<password> get download.timeout",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set install timeout",
+      "command": "set install.timeout <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Set install timeout (password protected)",
+      "command": "<password> set install.timeout <command_parameters>",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get install timeout",
+      "command": "get install.timeout",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get install timeout (password protected)",
+      "command": "<password> get install.timeout",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get sw.version",
+      "command": "get sw.version",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    },
+    {
+      "name": "Get sw.version (password protected)",
+      "command": "<password> get sw.version",
+      "category": "Device config",
+      "deliveryTypes": ["SMS"]
+    }
+  ]
+}

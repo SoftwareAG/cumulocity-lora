@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-responsive-box.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-responsive-box.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-responsive-box.js",
+  "esm5": "../../esm5/ui/responsive-box/devextreme-angular-ui-responsive-box.js",
+  "esm2015": "../../esm2015/ui/responsive-box/devextreme-angular-ui-responsive-box.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-responsive-box.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-responsive-box.js",
+  "typings": "devextreme-angular-ui-responsive-box.d.ts",
+  "metadata": "devextreme-angular-ui-responsive-box.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/responsive-box"
+}

@@ -1,0 +1,167 @@
+<form name="infoForm" novalidate>
+  <div class="card-group">
+    <div class="col-md-6 col-xs-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title" translate>
+            Device profile
+          </h4>
+        </div>
+        <hr />
+        <div class="card-block">
+          <div class="form-group">
+            <label for="device-name">{{ 'Name' | translate }}</label>
+            <input id="device-name" type="text" class="form-control" ng-model="device.name" />
+          </div>
+
+          <div class="form-group">
+            <label for="device-type">{{ 'Type' | translate }}</label>
+            <input
+              id="device-type"
+              type="text"
+              class="form-control"
+              ng-model="device.type"
+              ng-disabled="device.c8y_IsDeviceGroup"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="device-notes">{{ 'Notes' | translate }}</label>
+            <textarea
+              id="device-notes"
+              rows="3"
+              class="form-control"
+              ng-model="device.c8y_Notes"
+            ></textarea>
+          </div>
+
+          <div class="legend form-block">
+            {{ 'System' | translate }}
+          </div>
+          <div class="form-inline">
+            <label class="noicon" translate>ID</label>
+            <p class="form-control-static">{{ device.id }}</p>
+          </div>
+          <div class="form-inline">
+            <label class="noicon" translate>Owner</label>
+            <p class="form-control-static">{{ device.owner }}</p>
+            <small class="text-danger" ng-if="ownerError">{{ ownerError }}</small>
+            <button
+              class="btn btn-danger btn-xs"
+              ng-show="canActivateDevice && owner.enabled"
+              title="{{ 'Disable owner' | translate }}"
+              ng-click="deactivate(owner)"
+              translate
+            >
+              Disable`owner`
+            </button>
+            <button
+              class="btn btn-primary btn-xs"
+              ng-show="canActivateDevice && !owner.enabled"
+              title="{{ 'Enable owner' | translate }}"
+              ng-click="activate(owner)"
+              translate
+            >
+              Enable`owner`
+            </button>
+          </div>
+          <div class="form-inline">
+            <label class="noicon" translate>Last updated</label>
+            <p class="form-control-static">{{ device.lastUpdated | absoluteDate }}</p>
+          </div>
+        </div>
+      </div>
+      <!-- /.card -->
+    </div>
+    <div
+      c8y-device-detail-basic-availability
+      class="col-md-6 col-xs-12"
+      device="device"
+      display="display"
+    ></div>
+  </div>
+
+  <div class="card-group" ng-show="device.c8y_IsDevice" style="margin-top: -30px;">
+    <div class="col-md-6 col-xs-12">
+      <div
+        class="card"
+        ng-include="':::PLUGIN_PATH:::/ui/views/deviceDetailBasic/hardware.html'"
+      ></div>
+    </div>
+    <div class="col-md-6 col-xs-12">
+      <div
+        class="card"
+        ng-include="':::PLUGIN_PATH:::/ui/views/deviceDetailBasic/mobile.html'"
+      ></div>
+    </div>
+    <div class="col-md-6 col-xs-12" ng-if="device.c8y_Firmware">
+      <div
+        class="card"
+        ng-include="':::PLUGIN_PATH:::/ui/views/deviceDetailBasic/firmware.html'"
+      ></div>
+    </div>
+    <div class="col-md-6 col-xs-12" ng-if="device.c8y_Network">
+      <div
+        class="card"
+        ng-include="':::PLUGIN_PATH:::/ui/views/deviceDetailBasic/network.html'"
+      ></div>
+    </div>
+    <div c8y-device-detail-basic-group class="col-md-6 col-xs-12"></div>
+
+    <!-- For cchdemo   -->
+    <div class="col-xs-12" ng-if="showTerritory">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title" translate>Location</h4>
+        </div>
+        <hr />
+        <div class="card-block">
+          <div class="row">
+            <div class="col-sm-4">
+              <label for="device-territory">Territory</label>
+              <input
+                id="device-territory"
+                type="text"
+                class="form-control"
+                ng-model="device.c8y_Address.territory"
+              />
+            </div>
+            <div class="col-sm-4">
+              <label for="device-region">Region</label>
+              <input
+                id="device-region"
+                type="text"
+                class="form-control"
+                ng-model="device.c8y_Address.region"
+              />
+            </div>
+            <div class="col-sm-4">
+              <label for="device-country">Country</label>
+              <input
+                id="device-country"
+                type="text"
+                class="form-control"
+                ng-model="device.c8y_Address.country"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer text-center">
+    <hr />
+    <c8y-ui-button-footer changed="infoForm.$dirty">
+      <button
+        title="{{ 'Save' | translate }}" 
+        type="button"
+        class="btn btn-primary btn-lg btn-wide"
+        ng-click="save(device)"
+        ng-disabled="infoForm.$invalid || !infoForm.$dirty"
+        translate
+      >
+        Save
+      </button>
+    </c8y-ui-button-footer>
+  </div>
+</form>

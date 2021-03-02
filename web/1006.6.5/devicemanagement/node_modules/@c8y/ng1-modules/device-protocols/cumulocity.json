@@ -1,0 +1,18 @@
+{
+  "name": "Device protocols",
+  "ngModules": [
+    "c8y.deviceProtocols"
+  ],
+  "js": [
+    "module.js",
+    "deviceProtocolUi.provider.js",
+    "deviceProtocolView.component.js",
+    "device-protocol-import-button.component.js",
+    "deviceProtocolList.component.js",
+    "deviceProtocolWizard.component.js",
+    "deviceProtocolSelect.component.js",
+    "deviceProtocolBreadcrumb.component.js",
+    "object-mappings.service.js",
+    "object-mapping.component.js"
+  ]
+}

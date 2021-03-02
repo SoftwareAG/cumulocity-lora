@@ -1,0 +1,1 @@
+"use strict";angular.module("c8y.ui").directive("c8yRegularExpression",function(){return{require:"ngModel",link:function(r,n,e,u){u.$validators.c8yRegularExpression=function(r,n){var e=r||n;return function(r){var n=!0;try{new RegExp(r)}catch(r){n=!1}return n}(e)}}}});

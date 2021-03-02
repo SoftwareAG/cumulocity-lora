@@ -1,0 +1,18 @@
+{
+  "name": "Traffic light widget",
+  "ngModules": [
+    "c8y.trafficLightWidget"
+  ],
+  "category": "Widgets",
+  "description": "Visualizes traffic light based on the states of a device",
+  "js": [
+    "index.js",
+    "traffic-light.component.js",
+    "states-mapping.component.js"
+  ],
+  "imports": [
+    "core/scada",
+    "core/deviceDatabase4"
+  ],
+  "copy": [ "img/*" ]
+}

@@ -1,0 +1,13 @@
+{
+  "main": "../../bundles/devextreme-angular-ui-funnel.umd.js",
+  "module": "../../fesm5/devextreme-angular-ui-funnel.js",
+  "es2015": "../../fesm2015/devextreme-angular-ui-funnel.js",
+  "esm5": "../../esm5/ui/funnel/devextreme-angular-ui-funnel.js",
+  "esm2015": "../../esm2015/ui/funnel/devextreme-angular-ui-funnel.js",
+  "fesm5": "../../fesm5/devextreme-angular-ui-funnel.js",
+  "fesm2015": "../../fesm2015/devextreme-angular-ui-funnel.js",
+  "typings": "devextreme-angular-ui-funnel.d.ts",
+  "metadata": "devextreme-angular-ui-funnel.metadata.json",
+  "sideEffects": false,
+  "name": "devextreme-angular/ui/funnel"
+}

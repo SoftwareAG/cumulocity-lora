@@ -1,0 +1,1 @@
+"use strict";!function(){function i(i){i.init()}i.$inject=["c8yRolesUiProvider"],angular.module("c8y.roles",[]).config(i)}();

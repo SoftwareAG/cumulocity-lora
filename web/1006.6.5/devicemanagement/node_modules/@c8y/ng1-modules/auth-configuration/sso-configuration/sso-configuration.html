@@ -1,0 +1,49 @@
+<c8y-ui-title-set title="'Single sign-on' | translate"></c8y-ui-title-set>
+
+<c8y-ui-action-bar-set>
+  <li class="navbar-form hidden-xs" action-bar-position="left">
+    <div title="{{ 'Template' | translate }}" class="form-group">
+      <label class="control-label">
+        {{ 'Template' | translate }}
+      </label>
+      <div class="c8y-select-wrapper">
+        <select
+          class="form-control"
+          ng-model="vm.ssoConfiguration.template"
+          ng-options="templateType.value as (templateType.label | translate) for templateType in vm.templateTypes.values()"
+          required
+        >
+        </select>
+        <span></span>
+      </div>
+    </div>
+  </li>
+</c8y-ui-action-bar-set>
+
+<form class="card" name="vm.ssoConfigurationForm" novalidate>
+  <div class="card-block">
+    <c8y-ui-component
+      component-name="vm.templateTypes[vm.ssoConfiguration.template].componentName"
+      sso-configuration="vm.ssoConfiguration"
+      on-change="vm.onConfigurationChange(configuration)"
+      apps="vm.apps"
+      groups="vm.groups"
+    >
+    </c8y-ui-component>
+  </div>
+
+  <div class="page-footer text-center">
+    <c8y-ui-button-footer changed="vm.ssoConfigurationForm.$dirty">
+      <button
+        title="{{ 'Save' | translate }}"
+        class="btn btn-primary btn-lg btn-wide"
+        type="button"
+        ng-click="vm.save()"
+        ng-disabled="vm.ssoConfigurationForm.$invalid || vm.ssoConfigurationForm.$pristine"
+        translate
+      >
+        Save
+      </button>
+    </c8y-ui-button-footer>
+  </div>
+</form>

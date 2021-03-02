@@ -1,0 +1,19 @@
+{
+  "name": "ngx-bootstrap/modal",
+  "version": "5.1.2",
+  "description": "Native Angular Bootstrap Components",
+  "private": true,
+  "main": "bundles/ngx-bootstrap-modal.umd.js",
+  "module": "fesm5/ngx-bootstrap-modal.js",
+  "es2015": "fesm2015/ngx-bootstrap-modal.js",
+  "esm5": "esm5/ngx-bootstrap-modal.js",
+  "esm2015": "esm2015/ngx-bootstrap-modal.js",
+  "fesm5": "fesm5/ngx-bootstrap-modal.js",
+  "fesm2015": "fesm2015/ngx-bootstrap-modal.js",
+  "typings": "ngx-bootstrap-modal.d.ts",
+  "metadata": "ngx-bootstrap-modal.metadata.json",
+  "sideEffects": false,
+  "dependencies": {
+    "tslib": "^1.9.0"
+  }
+}

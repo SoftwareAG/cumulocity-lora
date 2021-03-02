@@ -1,0 +1,33 @@
+
+<ng-form name="tenantOptionsForm">
+  <div class="form-group">
+    <label>{{'Category' | translate}}</label>
+    <input
+      class="form-control"
+      name="category"
+      ng-model="vm.option.category"
+      placeholder="{{'e.g.' | translate}} two-factor-authentication"
+      required>
+      <c8y-error-feedback field="tenantOptionsForm.category"></c8y-error-feedback>
+  </div>
+  <div class="form-group">
+    <label>{{'Key' | translate}}</label>
+    <input
+      class="form-control"
+      name="key"
+      ng-model="vm.option.key"
+      placeholder="{{'e.g.' | translate}} enabled"
+      required>
+      <c8y-error-feedback field="tenantOptionsForm.key"></c8y-error-feedback>
+  </div>
+  <div class="form-group">
+    <label>{{'Value' | translate}}</label>
+    <input
+      class="form-control"
+      name="value"
+      ng-model="vm.option.value"
+      placeholder="{{'e.g.' | translate}} true"
+      required>
+      <c8y-error-feedback field="tenantOptionsForm.value"></c8y-error-feedback>
+  </div>
+</ng-form>
