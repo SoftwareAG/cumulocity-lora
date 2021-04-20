@@ -68,7 +68,7 @@ public class PyrescomCodec extends DeviceCodec {
 				c8yData.addMeasurement(mor, "c8y_Battery", "level", "%", battery, new DateTime());
 				mor.setLastUpdatedDateTime(null);
 				mor.setProperty("battery", battery);
-				c8yData.setMorToUpdate(mor);
+				c8yData.updateRootDevice(mor);
 				buffer.get();
 				c8yData.addMeasurement(mor, "Humidity", "H", "%RH", BigDecimal.valueOf(buffer.get()), new DateTime());
 				c8yData.addMeasurement(mor, "Pressure", "P", "hPa", BigDecimal.valueOf(buffer.getShort()), new DateTime());
@@ -78,7 +78,7 @@ public class PyrescomCodec extends DeviceCodec {
 				c8yData.addMeasurement(mor, "Max Temperature", "T", "°C", BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(10)), new DateTime());
 				c8yData.addMeasurement(mor, "Signal Quality", "SQ", "dB", BigDecimal.valueOf(buffer.getShort()), new DateTime());
 				mor.set(new RequiredAvailability(60));
-				c8yData.setMorToUpdate(mor);
+				c8yData.updateRootDevice(mor);
 			}
 		}
 		

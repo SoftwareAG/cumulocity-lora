@@ -69,11 +69,4 @@ public class NKECodec extends DeviceCodec {
 	public Map<String, DeviceOperation> getAvailableOperations(String model) {
 		return new HashMap<String, DeviceOperation>();
 	}
-
-	@Override
-	protected Map<String, String> getChildDevicesNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

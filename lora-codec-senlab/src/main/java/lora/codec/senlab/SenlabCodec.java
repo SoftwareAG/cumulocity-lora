@@ -25,7 +25,6 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.collect.Lists;
 import com.google.common.io.BaseEncoding;
 
 import lora.codec.C8YData;
@@ -171,7 +170,7 @@ public class SenlabCodec extends DeviceCodec {
 							unit = "%";
 							mor.setLastUpdatedDateTime(null);
 							mor.setProperty("battery", measure.get("value").decimalValue());
-							c8yData.setMorToUpdate(mor);
+							c8yData.updateRootDevice(mor);
 						}
 					} else {
 						logger.error("Unknown measure: {}, will use id with no unit", measure.get("id"));

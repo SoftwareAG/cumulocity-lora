@@ -3,26 +3,21 @@ package lora.codec.ttn;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 import lora.codec.C8YData;
 import lora.codec.DeviceCodec;
-import lora.codec.DeviceOperation;
-import lora.codec.DeviceOperationParam;
-import lora.codec.DeviceOperationParam.ParamType;
 import lora.codec.DownlinkData;
 
 @Component
@@ -83,7 +78,7 @@ public class TTNCodec extends DeviceCodec {
 	}
 
 	@Override
-	public List<String> getModels() {
+	public Map<String, String> getModels() {
 		return models;
 	}
 
@@ -105,21 +100,4 @@ public class TTNCodec extends DeviceCodec {
 	public DownlinkData askDeviceConfig(String devEui) {
 		return null;
 	}
-
-
-	@Override
-	public Map<String, DeviceOperation> getAvailableOperations(String model) {
-		Map<String, DeviceOperation> result = new HashMap<String, DeviceOperation>();
-		
-		List<DeviceOperationParam> params = new ArrayList<DeviceOperationParam>();
-		
-		return result;
-	}
-
-	@Override
-	protected Map<String, String> getChildDevicesNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
