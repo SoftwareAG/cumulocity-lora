@@ -1,9 +1,8 @@
 package lora.codec;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
@@ -49,18 +48,18 @@ public abstract class DeviceCodec implements Component {
     @Autowired
     protected MicroserviceSubscriptionsService subscriptionsService;
 
-	final protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 		
-	protected List<String> models = new ArrayList<>();
+	protected Map<String, String> models = new HashMap<>();
 	protected Map<String, String> childrenNames = new HashMap<>();
 	protected Map<String, Map<String, DeviceOperation>> operations = new HashMap<>();
 
 	public static final String CODEC_TYPE = "Device Codec";
 	public static final String CODEC_ID = "Codec ID";
 	
-    abstract protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload);
-	abstract protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation);
-	public List<String> getModels() {
+    protected abstract C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload);
+	protected abstract DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation);
+	public Map<String, String> getModels() {
 		return models;
 	}
 	public abstract DownlinkData askDeviceConfig(String devEui);
@@ -73,7 +72,7 @@ public abstract class DeviceCodec implements Component {
 	
 	@EventListener
 	private void registerCodec(MicroserviceSubscriptionAddedEvent event) {
-		c8yUtils.findExternalId(this.getId(), CODEC_ID).map(extId -> {
+		ManagedObjectRepresentation codec = c8yUtils.findExternalId(this.getId(), CODEC_ID).map(extId -> {
 			ManagedObjectRepresentation mor = extId.getManagedObject();
 			mor.set(new DeviceCodecRepresentation(this));
 			return inventoryApi.update(mor);
@@ -89,6 +88,8 @@ public abstract class DeviceCodec implements Component {
 
 			return mor;
 		});
+
+		logger.info("Codec successfully initialized: {}", codec.getName());
 	}
 
 	protected void clearAlarm(ManagedObjectRepresentation device, String alarmType) {
@@ -121,9 +122,13 @@ public abstract class DeviceCodec implements Component {
 		}
 		if (c8yData.updateRootDeviceRequired()) {
 			c8yData.getRootDevice().setLastUpdatedDateTime(null);
-			logger.info("Upadating root device {}", c8yData.getRootDevice().toJSON());
+			logger.info("Updating root device {}", c8yData.getRootDevice().toJSON());
 			inventoryApi.update(c8yData.getRootDevice());
 		}
+		processChildDevices(deveui, rootDevice, c8yData);
+	}
+
+	private void processChildDevices(String deveui, ManagedObjectRepresentation rootDevice, C8YData c8yData) {
 		for (String childPath : c8yData.getChildMeasurements().keySet()) {
 			ManagedObjectRepresentation childDevice = getChildDevice(deveui, rootDevice, childPath);
 
@@ -163,7 +168,7 @@ public abstract class DeviceCodec implements Component {
 
 		String currentChild = "";
 		for (String childId : childIds) {
-			currentChild +=  (currentChild.isEmpty() ? "" : "/") + childId;
+			currentChild = currentChild.concat((currentChild.isEmpty() ? "" : "/")).concat(childId);
 			logger.info("Getting device {}.", currentChild);
 			currentDevice = c8yUtils.getChildDevice(currentChild).orElse(
 				c8yUtils.createChildDevice(currentDevice, deveui + "/" + currentChild, getChildDevicesNames().getOrDefault(currentChild, currentChild))
@@ -174,16 +179,21 @@ public abstract class DeviceCodec implements Component {
 	}
     
 	public Result<String> decode(Decode data) {
-		Result<String> result = new Result<String>(true, "Payload parsed with success", "OK");
+		Result<String> result = new Result<>(true, "Payload parsed with success", "OK");
 		try {
-			ManagedObjectRepresentation mor = c8yUtils.getDevice(data.getDeveui()).get();
-			byte[] payload = BaseEncoding.base16().decode(data.getPayload().toUpperCase());
-			C8YData c8yData = decode(mor, data.getModel(), data.getfPort(), new DateTime(data.getUpdateTime()), payload);
-			logger.info("Processing payload {} from port {} for device {}", data.getPayload(), data.getfPort(), data.getDeveui());
-			processData(data.getDeveui(), mor, c8yData);
+			Optional<ManagedObjectRepresentation> device = c8yUtils.getDevice(data.getDeveui());
+			if (device.isPresent()) {
+				ManagedObjectRepresentation mor = device.get();
+				byte[] payload = BaseEncoding.base16().decode(data.getPayload().toUpperCase());
+				C8YData c8yData = decode(mor, data.getModel(), data.getfPort(), new DateTime(data.getUpdateTime()), payload);
+				logger.info("Processing payload {} from port {} for device {}", data.getPayload(), data.getfPort(), data.getDeveui());
+				processData(data.getDeveui(), mor, c8yData);
+			} else {
+				result = new Result<>(false, "Couldn't find device " + data.getDeveui(), "NOK");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			result = new Result<String>(false, e.getMessage(), "Couldn't process " + data.toString());
+			result = new Result<>(false, e.getMessage(), "Couldn't process " + data.toString());
 		}
 		return result;
 	}
@@ -192,32 +202,42 @@ public abstract class DeviceCodec implements Component {
 		Result<DownlinkData> result = null;
 		try {
 			DownlinkData data = null;
-			ManagedObjectRepresentation mor = c8yUtils.getDevice(encode.getDevEui()).get();
-	
-			logger.info("Processing operation {} for device {}", encode.getOperation(), encode.getDevEui());
-			
-			if (encode.getOperation().startsWith("raw ")) {
-				String[] tokens = encode.getOperation().split(" ");
-				try {
-					data = new DownlinkData(encode.getDevEui(), Integer.parseInt(tokens[1]), tokens[2]);
-				} catch (Exception e) {
-					e.printStackTrace();
-					logger.error("Can't process {}. Expected syntax is \"raw <port number> <hex payload>\"", encode.getOperation());
+			Optional<ManagedObjectRepresentation> device = c8yUtils.getDevice(encode.getDevEui());
+			if (device.isPresent()) {
+				ManagedObjectRepresentation mor = device.get();
+		
+				logger.info("Processing operation {} for device {}", encode.getOperation(), encode.getDevEui());
+				
+				if (encode.getOperation().startsWith("raw ")) {
+					data = encodeRaw(encode, data);
+				} else if (encode.getOperation().contains("get config")) {
+					data = askDeviceConfig(encode.getDevEui());
+				} else {
+					data = encode(mor, encode.getModel(), encode.getOperation());
+					if (data != null) {
+						data.setDevEui(encode.getDevEui());
+					}
 				}
-			} else if (encode.getOperation().contains("get config")) {
-				data = askDeviceConfig(encode.getDevEui());
+				logger.info("Will send to LNS {}", data);
+				result = new Result<>(true, "Operation parsed successfully", data);
 			} else {
-				data = encode(mor, encode.getModel(), encode.getOperation());
-				if (data != null) {
-					data.setDevEui(encode.getDevEui());
-				}
+				result = new Result<>(true, "Couldn't find device " + encode.getDevEui(), data);
 			}
-			logger.info("Will send to LNS {}", data);
-			result = new Result<DownlinkData>(true, "Operation parsed successfully", data);
 		} catch (Exception e) {
-			result = new Result<DownlinkData>(false, "Couldn't process " + encode.toString(), null);
+			result = new Result<>(false, "Couldn't process " + encode.toString(), null);
 		}
 		
 		return result;
+	}
+
+	private DownlinkData encodeRaw(Encode encode, DownlinkData data) {
+		String[] tokens = encode.getOperation().split(" ");
+		try {
+			data = new DownlinkData(encode.getDevEui(), Integer.parseInt(tokens[1]), tokens[2]);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Can't process {}. Expected syntax is \"raw <port number> <hex payload>\"", encode.getOperation());
+		}
+		return data;
 	}
 }
