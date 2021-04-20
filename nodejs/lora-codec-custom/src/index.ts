@@ -14,9 +14,9 @@ class CustomDeviceCodec extends DeviceCodec {
     getVersion(): string {
         return "1.0";
     }
-    getModels(client: Client): string[] {
-        let models: string[] = [];
-        this.customCodecs.get(client).forEach(c => {models.push(c.name)});
+    getModels(client: Client): Map<string, string> {
+        let models: Map<string, string> = new Map<string, string>();
+        this.customCodecs.get(client).forEach(c => {models.set(c.name, c.name)});
         return models;
     }
     askDeviceConfig(devEui: string): DownlinkData {

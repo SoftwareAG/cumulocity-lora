@@ -31,7 +31,7 @@ public class C8YData {
 	private ManagedObjectRepresentation rootDevice;
 	private boolean updateRootDevice = false;
 
-    final private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public Number extractValue(ByteBuffer buffer, int size) {
 		Number result = null;
@@ -44,6 +44,8 @@ public class C8YData {
 			break;
 		case 4:
 			result = buffer.getInt();
+			break;
+		default:
 			break;
 		}
 		
@@ -93,10 +95,7 @@ public class C8YData {
 	}
 	
 	public void addChildMeasurement(String childPath, MeasurementRepresentation m) {
-		if (!childMeasurements.containsKey(childPath)) {
-			childMeasurements.put(childPath, new ArrayList<>());
-		}
-		childMeasurements.get(childPath).add(m);
+		childMeasurements.computeIfAbsent(childPath, x -> new ArrayList<>()).add(m);
 	}
 
 	private EventRepresentation createEvent(ManagedObjectRepresentation mor, String eventType, String eventText, Map<String, Object> properties, DateTime dateTime) {
@@ -119,15 +118,12 @@ public class C8YData {
         events.add(createEvent(mor, eventType, eventText, properties, dateTime));
     }
 	
-	public void addEvent(ManagedObjectRepresentation mor, EventRepresentation locationUpdate) {
+	public void addEvent(EventRepresentation locationUpdate) {
 		events.add(locationUpdate);
 	}
 
 	public void addChildEvent(String childPath, String eventType, String eventText, Map<String, Object> properties, DateTime dateTime) {
-		if (!childEvents.containsKey(childPath)) {
-			childEvents.put(childPath, new ArrayList<>());
-		}
-		childEvents.get(childPath).add(createEvent(null, eventType, eventText, properties, dateTime));
+		childEvents.computeIfAbsent(childPath, x -> new ArrayList<>()).add(createEvent(null, eventType, eventText, properties, dateTime));
 	}
 
 	private AlarmRepresentation createAlarm(ManagedObjectRepresentation mor, String alarmType, String alarmText, CumulocitySeverities severity, DateTime dateTime) {
@@ -146,10 +142,7 @@ public class C8YData {
 	}
 
 	public void addChildAlarm(String childPath, String alarmType, String alarmText, CumulocitySeverities severity, DateTime dateTime) {
-		if (!childAlarms.containsKey(childPath)) {
-			childAlarms.put(childPath, new ArrayList<>());
-		}
-		childAlarms.get(childPath).add(createAlarm(null, alarmType, alarmText, severity, dateTime));
+		childAlarms.computeIfAbsent(childPath, x -> new ArrayList<>()).add(createAlarm(null, alarmType, alarmText, severity, dateTime));
 	}
 
 	public void clearAlarm(String alarmType) {
@@ -157,21 +150,7 @@ public class C8YData {
 	}
 
 	public void clearChildAlarm(String childPath, String alarmType) {
-		if (!childAlarmsToClear.containsKey(childPath)) {
-			childAlarmsToClear.put(childPath, new ArrayList<>());
-		}
-		childAlarmsToClear.get(childPath).add(alarmType);
-	}
-
-	@Deprecated
-	public ManagedObjectRepresentation getMorToUpdate() {
-		return rootDevice;
-	}
-
-	@Deprecated
-	public void setMorToUpdate(ManagedObjectRepresentation morToUpdate) {
-		this.rootDevice = morToUpdate;
-		updateRootDevice = true;
+		childAlarmsToClear.computeIfAbsent(childPath, x -> new ArrayList<>()).add(alarmType);
 	}
 
 	public ManagedObjectRepresentation getRootDevice() {

@@ -24,7 +24,7 @@ export class DevicesComponent implements OnInit {
     errorModalRef: BsModalRef;
     codecs: IManagedObject[];
     codecMap: {};
-    models: [];
+    models: Map<string, string>;
     unprocessedPayloads: IEvent[];
 
 
@@ -109,11 +109,11 @@ export class DevicesComponent implements OnInit {
             try {
                 this.models = await response.json();
             } catch(e) {
-                this.models = [];
+                this.models = new Map<string, string>();
             }
         }
         else {
-            this.models = [];
+            this.models = new Map<string, string>();
         }
     }
 

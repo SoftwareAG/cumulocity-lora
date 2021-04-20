@@ -32,7 +32,7 @@ export class LoraDevicesComponent {
     lnsInstances: IManagedObject[];
     proxyMap: {};
     instanceMap: {};
-    models: [];
+    models: Map<string, string>;
     codecMap: {};
     devEUIs: {};
     informationText: string;
@@ -337,11 +337,11 @@ export class LoraDevicesComponent {
             try {
                 this.models = await response.json();
             } catch (e) {
-                this.models = [];
+                this.models = new Map<string, string>();
             }
         }
         else {
-            this.models = [];
+            this.models = new Map<string, string>();
         }
     }
 

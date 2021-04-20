@@ -9,15 +9,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
+
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import c8y.RequiredAvailability;
 import lora.codec.C8YData;
@@ -34,9 +34,9 @@ public class PyrescomCodec extends DeviceCodec {
 	
 	private static final String CLASS_AIR = "Class'Air";
 	
-	private List<String> models = new ArrayList<String>();
+	private Map<String, String> models = new HashMap<>();
 	{
-		models.add(CLASS_AIR);
+		models.put(CLASS_AIR, CLASS_AIR);
 	}
 
 	@Override
@@ -64,19 +64,19 @@ public class PyrescomCodec extends DeviceCodec {
 			byte status = payload[2];
 			byte header = buffer.get();
 			if (header == 0x56) {
-				BigDecimal battery = new BigDecimal(buffer.get());
+				BigDecimal battery = BigDecimal.valueOf(buffer.get());
 				c8yData.addMeasurement(mor, "c8y_Battery", "level", "%", battery, new DateTime());
 				mor.setLastUpdatedDateTime(null);
 				mor.setProperty("battery", battery);
 				c8yData.setMorToUpdate(mor);
 				buffer.get();
-				c8yData.addMeasurement(mor, "Humidity", "H", "%RH", new BigDecimal(buffer.get()), new DateTime());
-				c8yData.addMeasurement(mor, "Pressure", "P", "hPa", new BigDecimal(buffer.getShort()), new DateTime());
-				c8yData.addMeasurement(mor, "Mean CO2 Moyen", "C", "ppm", new BigDecimal(buffer.getShort()), new DateTime());
-				c8yData.addMeasurement(mor, "Mean Temperature", "T", "°C", new BigDecimal(buffer.getShort()).divide(new BigDecimal(10)), new DateTime());
-				c8yData.addMeasurement(mor, "Max CO2 Moyen", "C", "ppm", new BigDecimal(buffer.getShort()), new DateTime());
-				c8yData.addMeasurement(mor, "Max Temperature", "T", "°C", new BigDecimal(buffer.getShort()).divide(new BigDecimal(10)), new DateTime());
-				c8yData.addMeasurement(mor, "Signal Quality", "SQ", "dB", new BigDecimal(buffer.getShort()), new DateTime());
+				c8yData.addMeasurement(mor, "Humidity", "H", "%RH", BigDecimal.valueOf(buffer.get()), new DateTime());
+				c8yData.addMeasurement(mor, "Pressure", "P", "hPa", BigDecimal.valueOf(buffer.getShort()), new DateTime());
+				c8yData.addMeasurement(mor, "Mean CO2 Moyen", "C", "ppm", BigDecimal.valueOf(buffer.getShort()), new DateTime());
+				c8yData.addMeasurement(mor, "Mean Temperature", "T", "°C", BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(10)), new DateTime());
+				c8yData.addMeasurement(mor, "Max CO2 Moyen", "C", "ppm", BigDecimal.valueOf(buffer.getShort()), new DateTime());
+				c8yData.addMeasurement(mor, "Max Temperature", "T", "°C", BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(10)), new DateTime());
+				c8yData.addMeasurement(mor, "Signal Quality", "SQ", "dB", BigDecimal.valueOf(buffer.getShort()), new DateTime());
 				mor.set(new RequiredAvailability(60));
 				c8yData.setMorToUpdate(mor);
 			}
@@ -86,7 +86,7 @@ public class PyrescomCodec extends DeviceCodec {
 	}
 
 	@Override
-	public List<String> getModels() {
+	public Map<String, String> getModels() {
 		return models;
 	}
 

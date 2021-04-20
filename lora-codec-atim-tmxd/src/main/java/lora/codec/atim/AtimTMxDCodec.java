@@ -3,7 +3,6 @@ package lora.codec.atim;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
@@ -32,8 +31,8 @@ public class AtimTMxDCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				createTemperatures(c8yData, mor, t1, t2, dateTime);
 			}
 		},
@@ -42,7 +41,7 @@ public class AtimTMxDCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				createTemperatures(c8yData, mor, t1, null, dateTime);
 			}
 		},
@@ -51,8 +50,8 @@ public class AtimTMxDCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "LowTemperature", "Temperature is too low: " + t1.toString() + " °C, " + t2.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 			}
 		},
@@ -69,8 +68,8 @@ public class AtimTMxDCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "HighTemperature", "Temperature is too high: " + t1.toString() + " °C, " + t2.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 			}
 		},
@@ -87,7 +86,7 @@ public class AtimTMxDCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "LowTemperature", "Temperature is too low: " + t1.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 			}
 		},
@@ -104,7 +103,7 @@ public class AtimTMxDCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "HighTemperature", "Temperature is too high: " + t1.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 			}
 		},
@@ -187,7 +186,7 @@ public class AtimTMxDCodec extends DeviceCodec {
 	}
 
 	@Override
-	public List<String> getModels() {
+	public Map<String, String> getModels() {
 		// TODO Auto-generated method stub
 		return null;
 	}

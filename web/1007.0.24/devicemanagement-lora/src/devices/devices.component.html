@@ -22,7 +22,7 @@
                     <label for="model">Model:</label>
                     <select class="form-control" [(ngModel)]="model">
                         <option value="-">Please select a model</option>
-                        <option *ngFor="let m of models" [value]="m">{{m}}</option>
+                        <option *ngFor="let m of models | keyvalue" [value]="m.key">{{m.value}}</option>
                     </select>
                 </div>
             </div>

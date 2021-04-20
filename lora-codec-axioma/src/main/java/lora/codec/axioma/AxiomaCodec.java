@@ -166,7 +166,7 @@ public class AxiomaCodec extends DeviceCodec {
 		
 		Configuration configuration = new Configuration(Hex.encodeHexString(payload) + "\n" + deviceConfig.toString());
 		mor.set(configuration);
-		c8yData.setMorToUpdate(mor);
+		c8yData.updateRootDevice(mor);
 	}
 
 	private void readData(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload) {
@@ -194,7 +194,7 @@ public class AxiomaCodec extends DeviceCodec {
 				logger.info("Period: {}s", period);
 				RequiredAvailability requiredAvailability = new RequiredAvailability(period / 60 + 1);
 				mor.set(requiredAvailability);
-				c8yData.setMorToUpdate(mor);
+				c8yData.updateRootDevice(mor);
 				break;
 			}
 		}
@@ -208,7 +208,7 @@ public class AxiomaCodec extends DeviceCodec {
 			c++;
 			currentMap = ((Map<?, ?>)currentMap).get(bytes[position + c]);
 		}
-		if (currentMap != null && currentMap instanceof VIF) {
+		if (currentMap instanceof VIF) {
 			vif = (VIF)currentMap;
 		}
 		return vif;
@@ -243,12 +243,14 @@ public class AxiomaCodec extends DeviceCodec {
 		case 103:
 			readAlarm(c8yData, mor, payload);
 			break;
+		default:
+			break;
 		}
 		return null;
 	}
 
 	@Override
-	public List<String> getModels() {
+	public Map<String, String> getModels() {
 		// TODO Auto-generated method stub
 		return null;
 	}

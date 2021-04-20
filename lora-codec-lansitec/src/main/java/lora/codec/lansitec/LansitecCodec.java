@@ -34,13 +34,37 @@ import lora.codec.DownlinkData;
 @Component
 public class LansitecCodec extends DeviceCodec {
 
+	/**
+	 *
+	 */
+	private static final String SET_CONFIG = "set config";
+
+	/**
+	 *
+	 */
+	private static final String DEVICE_REQUEST = "device request";
+
+	/**
+	 *
+	 */
+	private static final String REGISTER_REQUEST = "register request";
+
+	/**
+	 *
+	 */
+	private static final String POSITION_REQUEST = "position request";
+
+	/**
+	 *
+	 */
+	private static final String GET_CONFIG = "get config";
+
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static final String ASSET_TRACKER = "Asset Tracker";
 
-	private List<String> models = new ArrayList<String>();
 	{
-		models.add(ASSET_TRACKER);
+		models.put(ASSET_TRACKER, ASSET_TRACKER);
 	}
 
 	enum MODE {
@@ -126,21 +150,21 @@ public class LansitecCodec extends DeviceCodec {
 				byte power = (byte) (buffer.get() >> 4);
 				byte cfg = buffer.get();
 				String dr = "DR" + (byte) (cfg >> 4);
-				String breakpoint = (cfg & 8) != 0 ? "Enable" : "Disable";
-				String selfadapt = (cfg & 4) != 0 ? "Enable" : "Disable";
-				String oneoff = (cfg & 2) != 0 ? "Enable" : "Disable";
-				String alreport = (cfg & 1) != 0 ? "Enable" : "Disable";
+				String breakpoint = (cfg & 8) != 0 ? ENABLE : DISABLE;
+				String selfadapt = (cfg & 4) != 0 ? ENABLE : DISABLE;
+				String oneoff = (cfg & 2) != 0 ? ENABLE : DISABLE;
+				String alreport = (cfg & 1) != 0 ? ENABLE : DISABLE;
 				int pos = buffer.getShort() * 10;
 				int hb = buffer.get() / 2;
 				short crc = buffer.getShort();
 
 				Configuration config = new Configuration(String.format(
-						"ADR: %s\nMODE: %s\nSMODE: %s\nPOWER: %ddBm\nDR: %s\nBREAKPOINT: %s\nSELFADAPT: %s\nONEOFF: %s\nALREPORT: %s\nPOS: %ds\nHB: %dmn\nCRC: %d",
+						"ADR: %s%nMODE: %s%nSMODE: %s%nPOWER: %ddBm%nDR: %s%nBREAKPOINT: %s%nSELFADAPT: %s%nONEOFF: %s%nALREPORT: %s%nPOS: %ds%nHB: %dmn%nCRC: %d",
 						adr, mode.name(), String.join(",", supportedModes), power, dr, breakpoint, selfadapt, oneoff,
 						alreport, pos, hb, crc));
 				mor.set(config);
 				mor.set(new RequiredAvailability(hb));
-				c8yData.setMorToUpdate(mor);
+				c8yData.updateRootDevice(mor);
 			}
 		},
 		HEARTBEAT((byte) 0x20) {
@@ -176,14 +200,14 @@ public class LansitecCodec extends DeviceCodec {
 				p.setLat(BigDecimal.valueOf(lat));
 				p.setLng(BigDecimal.valueOf(lng));
 				mor.set(p);
-				c8yData.setMorToUpdate(mor);
+				c8yData.updateRootDevice(mor);
 				EventRepresentation locationUpdate = new EventRepresentation();
 				locationUpdate.setSource(mor);
 				locationUpdate.setType("c8y_LocationUpdate");
 				locationUpdate.set(p);
 				locationUpdate.setText("Location updated");
 				locationUpdate.setDateTime(new DateTime(time));
-				c8yData.addEvent(mor, locationUpdate);
+				c8yData.addEvent(locationUpdate);
 			}
 		},
 		ON_DEMAND_POSITION((byte) 0x40) {
@@ -197,14 +221,14 @@ public class LansitecCodec extends DeviceCodec {
 				p.setLat(BigDecimal.valueOf(lat));
 				p.setLng(BigDecimal.valueOf(lng));
 				mor.set(p);
-				c8yData.setMorToUpdate(mor);
+				c8yData.updateRootDevice(mor);
 				EventRepresentation locationUpdate = new EventRepresentation();
 				locationUpdate.setSource(mor);
 				locationUpdate.setType("c8y_LocationUpdate");
 				locationUpdate.set(p);
 				locationUpdate.setText("Location updated");
 				locationUpdate.setDateTime(new DateTime(time));
-				c8yData.addEvent(mor, locationUpdate);
+				c8yData.addEvent(locationUpdate);
 			}
 		},
 		HISTORY_POSITION((byte) 0x50) {
@@ -265,9 +289,17 @@ public class LansitecCodec extends DeviceCodec {
 			@Override
 			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
 				mor.set(new Configuration("Configuration requested..."));
-				c8yData.setMorToUpdate(mor);
+				c8yData.updateRootDevice(mor);
 			}
 		};
+		/**
+		 *
+		 */
+		private static final String DISABLE = "Disable";
+		/**
+		 *
+		 */
+		private static final String ENABLE = "Enable";
 		byte type;
 
 		private TYPE(byte type) {
@@ -325,13 +357,8 @@ public class LansitecCodec extends DeviceCodec {
 	}
 
 	@Override
-	public List<String> getModels() {
-		return models;
-	}
-
-	@Override
 	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
-		if (operation.contains("get config")) {
+		if (operation.contains(GET_CONFIG)) {
 			return askDeviceConfig(null);
 		}
 		String payload = null;
@@ -339,13 +366,13 @@ public class LansitecCodec extends DeviceCodec {
 		try {
 			JsonNode root = mapper.readTree(operation);
 			String command = root.fieldNames().next();
-			if (command.equals("position request")) {
+			if (command.equals(POSITION_REQUEST)) {
 				payload = "A1FF";
-			} else if (command.equals("register request")) {
+			} else if (command.equals(REGISTER_REQUEST)) {
 				payload = "A2FF";
-			} else if (command.equals("device request")) {
+			} else if (command.equals(DEVICE_REQUEST)) {
 				payload = "A3FF";
-			} else if (command.equals("set config")) {
+			} else if (command.equals(SET_CONFIG)) {
 				JsonNode params = root.get(command);
 				ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN);
 				byte breakpoint = params.get("breakpoint").asBoolean() ? (byte) 8 : 0;
@@ -370,20 +397,20 @@ public class LansitecCodec extends DeviceCodec {
 
 	@Override
 	public Map<String, DeviceOperation> getAvailableOperations(String model) {
-		Map<String, DeviceOperation> result = new HashMap<String, DeviceOperation>();
+		Map<String, DeviceOperation> result = new HashMap<>();
 
-		result.put("get config", new DeviceOperation("get config", "get config", null));
-		result.put("position request", new DeviceOperation("position request", "Position request", null));
-		result.put("register request", new DeviceOperation("register request", "Register request", null));
-		result.put("device request", new DeviceOperation("device request", "Device request", null));
-		List<DeviceOperationParam> params = new ArrayList<DeviceOperationParam>();
+		result.put(GET_CONFIG, new DeviceOperation(GET_CONFIG, GET_CONFIG, null));
+		result.put(POSITION_REQUEST, new DeviceOperation(POSITION_REQUEST, "Position request", null));
+		result.put(REGISTER_REQUEST, new DeviceOperation(REGISTER_REQUEST, "Register request", null));
+		result.put(DEVICE_REQUEST, new DeviceOperation(DEVICE_REQUEST, "Device request", null));
+		List<DeviceOperationParam> params = new ArrayList<>();
 		params.add(new DeviceOperationParam("breakpoint", "Breakpoint", ParamType.BOOL, false));
 		params.add(new DeviceOperationParam("selfadapt", "Selfadapt", ParamType.BOOL, false));
 		params.add(new DeviceOperationParam("oneoff", "OneOff", ParamType.BOOL, false));
 		params.add(new DeviceOperationParam("alreport", "Alreport", ParamType.BOOL, false));
 		params.add(new DeviceOperationParam("pos", "Position report", ParamType.INTEGER, null));
 		params.add(new DeviceOperationParam("hb", "Heartbeat", ParamType.INTEGER, null));
-		result.put("set config", new DeviceOperation("set config", "Set config", params));
+		result.put(SET_CONFIG, new DeviceOperation(SET_CONFIG, "Set config", params));
 
 		return result;
 	}

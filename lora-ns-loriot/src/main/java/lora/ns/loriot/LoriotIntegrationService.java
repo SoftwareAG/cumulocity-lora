@@ -55,12 +55,12 @@ public class LoriotIntegrationService extends LNSIntegrationService<LoriotConnec
 				Map<String, MeasurementValue> measurementValueMap = new HashMap<>();
 
 				MeasurementValue mv = new MeasurementValue();
-				mv.setValue(new BigDecimal(rssi));
+				mv.setValue(BigDecimal.valueOf(rssi));
 				mv.setUnit("dBm");
 				measurementValueMap.put("rssi", mv);
 
 				mv = new MeasurementValue();
-				mv.setValue(new BigDecimal(snr));
+				mv.setValue(BigDecimal.valueOf(snr));
 				mv.setUnit("dB");
 				measurementValueMap.put("snr", mv);
 

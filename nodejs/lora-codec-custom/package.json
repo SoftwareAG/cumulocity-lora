@@ -14,8 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@c8y/client": "^1005.7.11",
-    "c8y-codec-interface": "^1.0.14",
+    "@c8y/client": "^1007.0.34",
+    "c8y-codec-interface": "^1.0.16",
     "vm2": "^3.9.2"
   },
   "devDependencies": {

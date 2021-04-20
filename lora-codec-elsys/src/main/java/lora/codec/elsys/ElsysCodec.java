@@ -141,11 +141,6 @@ public class ElsysCodec extends DeviceCodec {
 	}
 
 	@Override
-	public List<String> getModels() {
-		return models;
-	}
-
-	@Override
 	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
 		String payload = null;
 		ObjectMapper mapper = new ObjectMapper();

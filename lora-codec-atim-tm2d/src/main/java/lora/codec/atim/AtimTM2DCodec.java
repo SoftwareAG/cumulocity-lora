@@ -3,7 +3,6 @@ package lora.codec.atim;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
@@ -34,11 +33,11 @@ public class AtimTM2DCodec extends DeviceCodec {
 				buffer.get();
 				short supplyVoltageIDLE = buffer.getShort();
 				short supplyVoltageTX = buffer.getShort();
-				c8yData.addMeasurement(mor, "SupplyVoltageIDLE", "V", "V", new BigDecimal(supplyVoltageIDLE), dateTime);
+				c8yData.addMeasurement(mor, "SupplyVoltageIDLE", "V", "V", BigDecimal.valueOf(supplyVoltageIDLE), dateTime);
 				if (supplyVoltageIDLE < 2900) {
 					c8yData.addAlarm(mor, "LowBattery", "Supply Voltage IDLE is below 2.9V", CumulocitySeverities.MAJOR, dateTime);
 				}
-				c8yData.addMeasurement(mor, "SupplyVoltageTX", "V", "V", new BigDecimal(supplyVoltageTX), dateTime);
+				c8yData.addMeasurement(mor, "SupplyVoltageTX", "V", "V", BigDecimal.valueOf(supplyVoltageTX), dateTime);
 				if (supplyVoltageIDLE < 2900) {
 					c8yData.addAlarm(mor, "LowBattery", "Supply Voltage TX is below 2.9V", CumulocitySeverities.MAJOR, dateTime);
 				}
@@ -50,7 +49,7 @@ public class AtimTM2DCodec extends DeviceCodec {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
 				byte counter = buffer.get();
-				c8yData.addMeasurement(mor, "Counter", "C", "", new BigDecimal(counter), dateTime);
+				c8yData.addMeasurement(mor, "Counter", "C", "", BigDecimal.valueOf(counter), dateTime);
 			}
 		},
 		TEMP_2(0x57) {
@@ -58,8 +57,8 @@ public class AtimTM2DCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				createTemperatures(c8yData, mor, t1, t2, dateTime);
 			}
 		},
@@ -68,8 +67,8 @@ public class AtimTM2DCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "LowTemperature1", "Temperature 1 is too low: " + t1.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				c8yData.addAlarm(mor, "LowTemperature2", "Temperature 2 is too low: " + t2.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				createTemperatures(c8yData, mor, t1, t2, dateTime);
@@ -80,8 +79,8 @@ public class AtimTM2DCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "LowTemperature1", "Temperature 1 is too low: " + t1.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				createTemperatures(c8yData, mor, t1, t2, dateTime);
 			}
@@ -91,8 +90,8 @@ public class AtimTM2DCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "LowTemperature1", "Temperature 1 is too low: " + t1.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				c8yData.addAlarm(mor, "HighTemperature2", "Temperature 2 is too high: " + t2.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				createTemperatures(c8yData, mor, t1, t2, dateTime);
@@ -103,8 +102,8 @@ public class AtimTM2DCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "LowTemperature2", "Temperature 2 is too low: " + t2.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				createTemperatures(c8yData, mor, t1, t2, dateTime);
 			}
@@ -114,8 +113,8 @@ public class AtimTM2DCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "HighTemperature2", "Temperature 2 is too high: " + t2.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				createTemperatures(c8yData, mor, t1, t2, dateTime);
 			}
@@ -125,8 +124,8 @@ public class AtimTM2DCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "HighTemperature1", "Temperature 1 is too high: " + t1.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				c8yData.addAlarm(mor, "LowTemperature2", "Temperature 2 is too low: " + t2.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				createTemperatures(c8yData, mor, t1, t2, dateTime);
@@ -137,8 +136,8 @@ public class AtimTM2DCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "HighTemperature1", "Temperature 1 is too high: " + t1.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				createTemperatures(c8yData, mor, t1, t2, dateTime);
 			}
@@ -148,8 +147,8 @@ public class AtimTM2DCodec extends DeviceCodec {
 			void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime) {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
-				BigDecimal t1 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
-				BigDecimal t2 = new BigDecimal(buffer.getShort()).multiply(new BigDecimal(0.0625));
+				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
+				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				c8yData.addAlarm(mor, "HighTemperature1", "Temperature 1 is too high: " + t1.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				c8yData.addAlarm(mor, "HighTemperature2", "Temperature 2 is too high: " + t2.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
 				createTemperatures(c8yData, mor, t1, t2, dateTime);
@@ -226,7 +225,7 @@ public class AtimTM2DCodec extends DeviceCodec {
 	}
 
 	@Override
-	public List<String> getModels() {
+	public Map<String, String> getModels() {
 		// TODO Auto-generated method stub
 		return null;
 	}

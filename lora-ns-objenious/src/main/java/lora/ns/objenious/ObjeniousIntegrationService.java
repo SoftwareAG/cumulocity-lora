@@ -59,27 +59,27 @@ public class ObjeniousIntegrationService extends LNSIntegrationService<Objenious
     		Map<String, MeasurementValue> measurementValueMap = new HashMap<>();
     		
     		MeasurementValue mv = new MeasurementValue();
-    		mv.setValue(new BigDecimal(rssi));
+    		mv.setValue(BigDecimal.valueOf(rssi));
     		mv.setUnit("dBm");
     		measurementValueMap.put("rssi", mv);
     		
     		mv = new MeasurementValue();
-    		mv.setValue(new BigDecimal(noise));
+    		mv.setValue(BigDecimal.valueOf(noise));
     		mv.setUnit("dBm");
     		measurementValueMap.put("noise", mv);
     		
     		mv = new MeasurementValue();
-    		mv.setValue(new BigDecimal(signal));
+    		mv.setValue(BigDecimal.valueOf(signal));
     		mv.setUnit("dBm");
     		measurementValueMap.put("signal", mv);
 
     		mv = new MeasurementValue();
-    		mv.setValue(new BigDecimal(snr));
+    		mv.setValue(BigDecimal.valueOf(snr));
     		mv.setUnit("dB");
     		measurementValueMap.put("snr", mv);
 
     		mv = new MeasurementValue();
-    		mv.setValue(new BigDecimal(sf));
+    		mv.setValue(BigDecimal.valueOf(sf));
     		mv.setUnit("");
     		measurementValueMap.put("sf", mv);
 
@@ -95,7 +95,7 @@ public class ObjeniousIntegrationService extends LNSIntegrationService<Objenious
 //    			}
 //    		}
 
-    		data = new DeviceData(name, deviceEui, null, null, fPort, payload, updateTime, measurements, lat != null ? new BigDecimal(lat) : null, lng != null ? new BigDecimal(lng) : null);
+    		data = new DeviceData(name, deviceEui, null, null, fPort, payload, updateTime, measurements, lat != null ? BigDecimal.valueOf(lat) : null, lng != null ? BigDecimal.valueOf(lng) : null);
         } catch (Exception e) {
         	e.printStackTrace();
             logger.error("Error on Mapping LoRa payload to Cumulocity", e);

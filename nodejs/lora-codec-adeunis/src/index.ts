@@ -1,5 +1,5 @@
 import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionService, DeviceOperation } from 'c8y-codec-interface';
-import { IManagedObject, FetchClient, BasicAuth } from '@c8y/client';
+import { Client, IManagedObject } from '@c8y/client';
 const codec = require('@adeunis/codecs');
 require('source-map-support').install();
 
@@ -17,7 +17,7 @@ class AdeunisCodec extends DeviceCodec {
     getVersion(): string {
         return "1.0";
     }
-    getModels(): string[] {
+    getModels(client: Client): string[] {
         let models: string[] = [];
         for (var model in codec.DecoderProducts) {
             models.push(model);
@@ -27,12 +27,12 @@ class AdeunisCodec extends DeviceCodec {
     askDeviceConfig(devEui: string): DownlinkData {
         return {devEui: devEui, fport: 1, payload: "01"};
     }
-    getAvailableOperations(model: string): Map<string, DeviceOperation> {
+    getAvailableOperations(client: Client, model: string): Map<string, DeviceOperation> {
         let operations: Map<string, DeviceOperation> = new Map<string, DeviceOperation>();
         operations.set("get config", {id: "get config", name: "get config", params: null});
         return operations;
     }
-    protected _decode(mo: IManagedObject, model: string, fport: number, time: Date, payload: string): C8YData {
+    protected _decode(client: Client, mo: IManagedObject, model: string, fport: number, time: Date, payload: string): C8YData {
         let c8yData: C8YData = new C8YData();
         this.decoder.setDeviceType(model);
         let result = this.decoder.decode(payload);
@@ -71,9 +71,11 @@ class AdeunisCodec extends DeviceCodec {
         }
         return c8yData;
     }
-    protected _encode(mo: IManagedObject, model: string, operation: string): DownlinkData {
+    protected _encode(client: Client, mo: IManagedObject, model: string, operation: string): DownlinkData {
         return operation.includes("get config") ? this.askDeviceConfig(null) : null;
     }
 }
 
-new CodecApp(new AdeunisCodec(new MicroserviceSubscriptionService()));
+let microserviceSubscriptionService: MicroserviceSubscriptionService = new MicroserviceSubscriptionService();
+
+new CodecApp(new AdeunisCodec(microserviceSubscriptionService), microserviceSubscriptionService);

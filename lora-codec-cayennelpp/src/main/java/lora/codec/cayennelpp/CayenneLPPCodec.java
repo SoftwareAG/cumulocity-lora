@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
@@ -32,65 +31,64 @@ public class CayenneLPPCodec extends DeviceCodec {
 		DIGITAL_INPUT((byte)0x00) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal value = new BigDecimal(0xff & buffer.get());
-				c8yData.addMeasurement(mor, "data_" + channel, this.name().toLowerCase(), "", value, dateTime);
+				BigDecimal value = BigDecimal.valueOf(0xff & buffer.get());
+				c8yData.addMeasurement(mor, DATA + channel, this.name().toLowerCase(), "", value, dateTime);
 			}
 		},
 		DIGITAL_OUTPUT((byte)0x01) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal value = new BigDecimal(0xff & buffer.get());
-				c8yData.addMeasurement(mor, "data_" + channel, this.name().toLowerCase(), "", value, dateTime);
+				BigDecimal value = BigDecimal.valueOf(0xff & buffer.get());
+				c8yData.addMeasurement(mor, DATA + channel, this.name().toLowerCase(), "", value, dateTime);
 			}
 		},
 		ANALOG_INPUT((byte)0x02) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal value = new BigDecimal(0xffff & buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(100.0));
-				c8yData.addMeasurement(mor, "data_" + channel, this.name().toLowerCase(), "", value, dateTime);
+				BigDecimal value = BigDecimal.valueOf(0xffff & buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(100.0));
+				c8yData.addMeasurement(mor, DATA + channel, this.name().toLowerCase(), "", value, dateTime);
 			}
 		},
 		ANALOG_OUTPUT((byte)0x03) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal value = new BigDecimal(0xffff & buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(100.0));
-				c8yData.addMeasurement(mor, "data_" + channel, this.name().toLowerCase(), "", value, dateTime);
+				BigDecimal value = BigDecimal.valueOf(0xffff & buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(100.0));
+				c8yData.addMeasurement(mor, DATA + channel, this.name().toLowerCase(), "", value, dateTime);
 			}
 		},
 		ILLUMINANCE_SENSOR((byte)0x65) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal value = new BigDecimal(0xffff & buffer.order(ByteOrder.LITTLE_ENDIAN).getShort());
-				c8yData.addMeasurement(mor, "data_" + channel, this.name().toLowerCase(), "", value, dateTime);
+				BigDecimal value = BigDecimal.valueOf(0xffff & buffer.order(ByteOrder.LITTLE_ENDIAN).getShort());
+				c8yData.addMeasurement(mor, DATA + channel, this.name().toLowerCase(), "", value, dateTime);
 			}
 		},
 		PRESENCE_SENSOR((byte)0x66) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal value = new BigDecimal(0xff & buffer.get());
-				c8yData.addMeasurement(mor, "data_" + channel, this.name().toLowerCase(), "", value, dateTime);
+				BigDecimal value = BigDecimal.valueOf(0xff & buffer.get());
+				c8yData.addMeasurement(mor, DATA + channel, this.name().toLowerCase(), "", value, dateTime);
 			}
 		},
 		TEMPERATURE_SENSOR((byte)0x67) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal value = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(10.0));
+				BigDecimal value = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(10.0));
 				c8yData.addMeasurement(mor, "Temperature_" + channel, "T", "°C", value, dateTime);
 			}
 		},
 		HUMIDITY_SENSOR((byte)0x68) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal value = new BigDecimal(0xff & buffer.get()).divide(new BigDecimal(2.0));
-				c8yData.addMeasurement(mor, "Humidity_" + channel, "h", "%RH", value, dateTime);
+				c8yData.addMeasurement(mor, "Humidity_" + channel, "h", "%RH", BigDecimal.valueOf(0xff & buffer.get()).divide(BigDecimal.valueOf(2.0)), dateTime);
 			}
 		},
 		ACCELEROMETER((byte)0x71) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal x = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(1000.0));
-				BigDecimal y = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(1000.0));
-				BigDecimal z = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(1000.0));
+				BigDecimal x = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(1000.0));
+				BigDecimal y = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(1000.0));
+				BigDecimal z = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(1000.0));
 
 				MeasurementRepresentation m = new MeasurementRepresentation();
 	    		Map<String, MeasurementValue> measurementValueMap = new HashMap<>();
@@ -119,9 +117,9 @@ public class CayenneLPPCodec extends DeviceCodec {
 		MAGNETOMETER((byte)0x72) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal x = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(1000.0));
-				BigDecimal y = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(1000.0));
-				BigDecimal z = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(1000.0));
+				BigDecimal x = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(1000.0));
+				BigDecimal y = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(1000.0));
+				BigDecimal z = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(1000.0));
 
 				MeasurementRepresentation m = new MeasurementRepresentation();
 	    		Map<String, MeasurementValue> measurementValueMap = new HashMap<>();
@@ -151,16 +149,16 @@ public class CayenneLPPCodec extends DeviceCodec {
 		BAROMETER((byte)0x73) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal value = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(10.0));
+				BigDecimal value = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(10.0));
 				c8yData.addMeasurement(mor, "Pressure_" + channel, "P", "Pa", value, dateTime);
 			}
 		},
 		GYROMETER((byte)0x86) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal x = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(100.0));
-				BigDecimal y = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(100.0));
-				BigDecimal z = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(100.0));
+				BigDecimal x = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(100.0));
+				BigDecimal y = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(100.0));
+				BigDecimal z = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(100.0));
 
 				MeasurementRepresentation m = new MeasurementRepresentation();
 	    		Map<String, MeasurementValue> measurementValueMap = new HashMap<>();
@@ -190,8 +188,8 @@ public class CayenneLPPCodec extends DeviceCodec {
 		GPS_LOCATION((byte)0x88) {
 			@Override
 			void process(byte channel, C8YData c8yData, ManagedObjectRepresentation mor, ByteBuffer buffer, DateTime dateTime) {
-				BigDecimal lat = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getInt()).divide(new BigDecimal(10000.0));
-				BigDecimal lng = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getInt()).divide(new BigDecimal(10000.0));
+				BigDecimal lat = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getInt()).divide(BigDecimal.valueOf(10000.0));
+				BigDecimal lng = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getInt()).divide(BigDecimal.valueOf(10000.0));
 				
 				Position p = new Position();
 				p.setLat(lat);
@@ -199,11 +197,16 @@ public class CayenneLPPCodec extends DeviceCodec {
 				
 				mor.set(p);
 				
-				c8yData.setMorToUpdate(mor);
+				c8yData.updateRootDevice(mor);
 			}
 		};
 		
-		public byte value;
+		/**
+		 *
+		 */
+		private static final String DATA = "data_";
+
+		byte value;
 		
 		private static final Map<Byte, LPP_TYPE> BY_VALUE = new HashMap<>();
 		
@@ -265,39 +268,42 @@ public class CayenneLPPCodec extends DeviceCodec {
 			break;
 		case 3:
 			channel = buffer.get();
-			BigDecimal lat = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getInt()).divide(new BigDecimal(10000.0));
-			BigDecimal lng = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getInt()).divide(new BigDecimal(10000.0));
-			BigDecimal alt = new BigDecimal(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(new BigDecimal(10000.0));
+			BigDecimal lat = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getInt()).divide(BigDecimal.valueOf(10000.0));
+			BigDecimal lng = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getInt()).divide(BigDecimal.valueOf(10000.0));
+			BigDecimal alt = BigDecimal.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getShort()).divide(BigDecimal.valueOf(10000.0));
 			Position p = new Position();
 			p.setLat(lat);
 			p.setLng(lng);
 			p.setAlt(alt);
 			mor.set(p);
-			c8yData.setMorToUpdate(mor);
+			c8yData.updateRootDevice(mor);
 			break;
 		case 11:
 			short mask = buffer.getShort();
 			if ((mask & 0x01) > 0) {
-				DateTime utcTime = new DateTime(new Long(buffer.order(ByteOrder.BIG_ENDIAN).getInt()) * 1000L);
+				DateTime utcTime = new DateTime(Long.valueOf(buffer.order(ByteOrder.BIG_ENDIAN).getInt()) * 1000L);
 				logger.info("Current device time is {}", utcTime);
 			}
 			if ((mask & 0x02) > 0) {
 				int period = buffer.order(ByteOrder.BIG_ENDIAN).getInt();
 				RequiredAvailability requiredAvailability = new RequiredAvailability(period / 60 + 1);
 				mor.set(requiredAvailability);
-				c8yData.setMorToUpdate(mor);
+				c8yData.updateRootDevice(mor);
 			}
 			if ((mask & 0x04) > 0) {
 				int readingPeriod = buffer.order(ByteOrder.BIG_ENDIAN).getInt();
 				logger.info("Device reading period is {} minutes", readingPeriod / 60);
 			}
+			break;
+		default:
+			break;
 		}
 		
 		return c8yData;
 	}
 
 	@Override
-	public List<String> getModels() {
+	public Map<String, String> getModels() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -37,7 +37,7 @@
                     <label for="model">Model:</label>
                     <select class="form-control" #model>
                         <option value="-">Please select a model</option>
-                        <option *ngFor="let model of models" [value]="model">{{model}}</option>
+                        <option *ngFor="let model of models | keyvalue" [value]="model.key">{{model.value}}</option>
                     </select>
                 </div>
             </div>

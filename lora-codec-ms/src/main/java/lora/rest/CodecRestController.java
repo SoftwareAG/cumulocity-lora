@@ -41,7 +41,7 @@ public class CodecRestController {
     }
     
     @GetMapping(value = "/models", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<String> getModels() {
+    public Map<String, String> getModels() {
     	return deviceCodec.getModels();
     }
     

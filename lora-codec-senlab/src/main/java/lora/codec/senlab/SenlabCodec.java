@@ -40,17 +40,16 @@ public class SenlabCodec extends DeviceCodec {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	private Map<String, String> models = new HashMap<>();
 	{
-		models.put("Senlab 4-20mA", "SenlabA");
-		models.put("Senlab Digital", "SenlabD");
-		models.put("Senlab humidity", "SenlabH");
-		models.put("Senlab Meter", "SenlabM");
-		models.put("Senlab occupancy", "SenlabO");
-		models.put("Senlab Passage", "SenlabP");
+		models.put("SenlabA", "Senlab 4-20mA");
+		models.put("SenlabD", "Senlab Digital");
+		models.put("SenlabH", "Senlab humidity");
+		models.put("SenlabM", "Senlab Meter");
+		models.put("SenlabO", "Senlab occupancy");
+		models.put("SenlabP", "Senlab Passage");
 		models.put("SenlabR", "SenlabR");
-		models.put("Senlab temperature", "SenlabT");
-		models.put("Senlab Valve", "SenlabV");
+		models.put("SenlabT", "Senlab temperature");
+		models.put("SenlabV", "Senlab Valve");
 	}
 
 	private static final Map<String, Map<String, Map<String, Map<String, String>>>> modelDescs = new HashMap<>();
@@ -61,8 +60,7 @@ public class SenlabCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String _model, String operation) {
-		final String model = models.containsKey(_model) ? models.get(_model) : _model;
+	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
 		DownlinkData data = new DownlinkData();
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root;
@@ -127,11 +125,9 @@ public class SenlabCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String _model, int fport, DateTime updateTime,
+	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime,
 			byte[] payload) {
 		C8YData c8yData = new C8YData();
-
-		final String model = models.containsKey(_model) ? models.get(_model) : _model;
 
 		String spayload = BaseEncoding.base16().encode(payload);
 		String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get()
@@ -234,19 +230,13 @@ public class SenlabCodec extends DeviceCodec {
 	}
 
 	@Override
-	public List<String> getModels() {
-		return Lists.newArrayList(models.keySet());
-	}
-
-	@Override
 	public DownlinkData askDeviceConfig(String devEui) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Map<String, DeviceOperation> getAvailableOperations(String _model) {
-		final String model = models.containsKey(_model) ? models.get(_model) : _model;
+	public Map<String, DeviceOperation> getAvailableOperations(String model) {
 		Map<String, DeviceOperation> result = new HashMap<String, DeviceOperation>();
 		JsonNode desc = getModelDetails(model);
 		ArrayNode operations = (ArrayNode) desc.get("operations");

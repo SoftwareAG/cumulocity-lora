@@ -18,7 +18,7 @@ export abstract class DeviceCodec implements Component {
 
     protected abstract _decode(client: Client, mo: IManagedObject, model: string, fport: number, time: Date, payload: string): C8YData;
     protected abstract _encode(client: Client, mo: IManagedObject, model: string, operation: string): DownlinkData;
-    abstract getModels(client: Client): Array<string>;
+    abstract getModels(client: Client): Map<string, string>;
     abstract askDeviceConfig(devEui: string): DownlinkData;
     abstract getAvailableOperations(client: Client, model: string): Map<string, DeviceOperation>;
 

@@ -206,7 +206,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 		int battery = 100 - buffer.get();
 		c8yData.addMeasurement(mor, "c8y_Battery", "level", "%", BigDecimal.valueOf(battery), time);
 		logger.info("Battery level: {}%", battery);
-		BigDecimal temperature = BigDecimal.valueOf(buffer.getShort()).divide(new BigDecimal(256));
+		BigDecimal temperature = BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(256));
 		c8yData.addMeasurement(mor, "Temperature", "T", "°C", temperature, time);
 		logger.info("Temperature: {}°C", temperature);
 	}
@@ -222,7 +222,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 	private void extractDataV2(ByteBuffer buffer, ManagedObjectRepresentation mor, C8YData c8yData, DateTime time,
 			SOURCE_CONFIG sourceConfiguration) {
 		extractDataV1(buffer, mor, c8yData, time);
-		BigDecimal humidity = BigDecimal.valueOf(buffer.getShort()).divide(new BigDecimal(256));
+		BigDecimal humidity = BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(256));
 		c8yData.addMeasurement(mor, "Humidity", "H", "%RH", humidity, time);
 		logger.info("Humidity: {}%RH", humidity);
 		short x = buffer.getShort();
