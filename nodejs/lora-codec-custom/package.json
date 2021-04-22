@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@c8y/client": "^1007.0.34",
-    "c8y-codec-interface": "^1.0.16",
+    "c8y-codec-interface": "1.0.22",
     "vm2": "^3.9.2"
   },
   "devDependencies": {

@@ -17,13 +17,18 @@ class CustomDeviceCodec extends DeviceCodec {
     getModels(client: Client): Map<string, string> {
         let models: Map<string, string> = new Map<string, string>();
         this.customCodecs.get(client).forEach(c => {models.set(c.name, c.name)});
+        console.log(models);
         return models;
     }
     askDeviceConfig(devEui: string): DownlinkData {
         return {devEui: devEui, fport: 1, payload: "01"};
     }
     getAvailableOperations(client: Client, model: string): Map<string, DeviceOperation> {
-        return this.operations.get(client).get(model);
+        if (this.operations && this.operations.has(client) && this.operations.get(client).has(model)) {
+            return this.operations.get(client).get(model);
+        } else {
+            return new Map<string, DeviceOperation>();
+        }
     }
     protected _decode(client: Client, mo: IManagedObject, model: string, fport: number, time: Date, payload: string): C8YData {
         return this.customCodecs.get(client).get(model).decode(mo, fport, time, payload);

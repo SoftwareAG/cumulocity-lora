@@ -105,16 +105,19 @@ export class DevicesComponent implements OnInit {
     async loadModels(codec) {
         console.log("Loading models for codec " + codec);
         const response = await this.fetch.fetch('service/lora-codec-' + codec + '/models');
+        console.log(response);
         if (response) {
             try {
                 this.models = await response.json();
             } catch(e) {
+                console.log(e);
                 this.models = new Map<string, string>();
             }
         }
         else {
             this.models = new Map<string, string>();
         }
+        console.log(this.models);
     }
 
     updateDeviceCodec() {

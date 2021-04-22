@@ -26,8 +26,9 @@ export abstract class DeviceCodec implements Component {
         let result: Result<string>;
         try {
             console.log(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`);
-            let mor: IManagedObject = await this.getDevice(client, decode.deveui);
+            let mor: IManagedObject = await this.getDevice(client, decode.deveui.toLowerCase());
             let c8yData: C8YData = this._decode(client, mor, decode.model, decode.fPort, decode.time, decode.payload);
+            console.log(c8yData);
             this.processData(client, c8yData);
             result = {success: true, message: `Successfully processed payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`, response: "OK"};
         } catch(e) {
@@ -40,7 +41,7 @@ export abstract class DeviceCodec implements Component {
         let result: Result<DownlinkData>;
         try {
             let data: DownlinkData = null;
-            let mor: IManagedObject = await this.getDevice(client, encode.devEui);
+            let mor: IManagedObject = await this.getDevice(client, encode.devEui.toLowerCase());
 
             console.log(`Processing operation ${encode.operation} for device ${encode.devEui}`);
 
