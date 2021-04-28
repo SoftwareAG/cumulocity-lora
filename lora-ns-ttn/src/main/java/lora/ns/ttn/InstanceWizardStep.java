@@ -10,7 +10,6 @@ public class InstanceWizardStep implements LNSConnectorWizardStep {
 	protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 	{
 		propertyDescriptions.add(new PropertyDescription("address", "Address", true, null, null, null, null, null, null, null, PropertyType.TEXT, false));
-		propertyDescriptions.add(new PropertyDescription("port", "Port", true, null, null, null, null, null, null, null, PropertyType.INTEGER, false));
 		propertyDescriptions.add(new PropertyDescription("apikey", "API Key", true, null, null, null, null, null, null, null, PropertyType.PASSWORD, true));
 		propertyDescriptions.add(new PropertyDescription("appid", "Application ID", true, null, null, null, null, null, null, null, PropertyType.TEXT, true));
 	}

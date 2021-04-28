@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
+import javax.net.ssl.SSLException;
+
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.google.common.io.BaseEncoding;
 import com.google.protobuf.ByteString;
@@ -16,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.grpc.ManagedChannel;
+import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
@@ -56,6 +59,11 @@ import ttn.lorawan.v3.NsEndDeviceRegistryGrpc.NsEndDeviceRegistryBlockingStub;
 
 public class TTNConnector extends LNSAbstractConnector {
 
+	/**
+	 *
+	 */
+	private static final String APPID = "appid";
+
 	private ManagedChannel managedChannel;
 
 	private BearerToken token;
@@ -72,16 +80,21 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	@Override
 	protected void init() {
-		managedChannel = NettyChannelBuilder.forAddress(properties.getProperty("address"), Integer.parseInt(properties.getProperty("port")))
-			.usePlaintext().build();
+		try {
+			managedChannel = NettyChannelBuilder.forAddress(properties.getProperty("address"), 8884)
+				.sslContext(GrpcSslContexts.forClient().ciphers(null).build()).build();
+		} catch (SSLException e) {
+			e.printStackTrace();
+			logger.error("Can't initiate TLS connection, falling back to plain text", e);
+			managedChannel = NettyChannelBuilder.forAddress(properties.getProperty("address"), 1884)
+				.usePlaintext().build();
+		}
 		token = new BearerToken(properties.getProperty("apikey"));
 	}
 
 	@Override
 	public List<EndDevice> getDevices() {
-		List<EndDevice> result = new ArrayList<EndDevice>();
-
-		return result;
+		return new ArrayList<>();
 	}
 
 	private EndDeviceIdentifiers getDeviceIds(String devEui) {
@@ -141,7 +154,7 @@ public class TTNConnector extends LNSAbstractConnector {
 		ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = ttn.lorawan.v3.EndDeviceOuterClass.EndDevice.newBuilder()
 			.setName(deviceProvisioning.getName())
 			.setIds(EndDeviceIdentifiers.newBuilder()
-				.setApplicationIds(ApplicationIdentifiers.newBuilder().setApplicationId(properties.getProperty("appid")).build())
+				.setApplicationIds(ApplicationIdentifiers.newBuilder().setApplicationId(properties.getProperty(APPID)).build())
 				.setDevEui(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getDevEUI())))
 				.setJoinEui(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getAppEUI())))
 				.build())
@@ -165,12 +178,12 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	@Override
 	public void configureRoutings(String url, String tenant, String login, String password) {
-		logger.info("Configuring routings to: {} with credentials: {}:{} on TTN app", url, login, password, properties.getProperty("appid"));
+		logger.info("Configuring routings to: {} with credentials: {}:{} on TTN app {}", url, login, password, properties.getProperty(APPID));
 		ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
 		ApplicationWebhook webhook = ApplicationWebhook.newBuilder()
 			.setIds(ApplicationWebhookIdentifiers.newBuilder()
 				.setWebhookId(this.getId())
-				.setApplicationIds(ApplicationIdentifiers.newBuilder().setApplicationId(properties.getProperty("appid")).build())
+				.setApplicationIds(ApplicationIdentifiers.newBuilder().setApplicationId(properties.getProperty(APPID)).build())
 				.build())
 			.setBaseUrl(url)
 			.setUplinkMessage(Message.newBuilder().setPath("/uplink").build())
@@ -237,15 +250,8 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	public List<Application> getApplications() {
 		logger.info("Fetching list of available applications from TTN...");
-		List<Application> result = new ArrayList<>();
-
 		ApplicationRegistryBlockingStub service = ApplicationRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
 		Applications apps = service.list(ListApplicationsRequest.newBuilder().build());
-		result = apps.getApplicationsList();
-		for (Application app : result) {
-			logger.info(app.getName());
-		}
-
-		return result;
+		return apps.getApplicationsList();
 	}
 }
