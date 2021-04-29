@@ -79,10 +79,7 @@
                     </pluginArtifact>
 					<additionalProtoPathElements>
 						<additionalProtoPathElement>
-							/home/sag/go/src/
-						</additionalProtoPathElement>
-						<additionalProtoPathElement>
-							/home/sag/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+							${user.home}/go/src/
 						</additionalProtoPathElement>
 					</additionalProtoPathElements>
                 </configuration>
