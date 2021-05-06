@@ -187,27 +187,27 @@ public class DeviceProvisioning implements Validator {
 		boolean result = true;
 		String reason = "";
 
-		if (devEUI == null || devEUI.isBlank() || devEUI.isEmpty()) {
+		if (devEUI == null || devEUI.trim().isEmpty()) {
 			result = false;
 			reason += "\ndevEUI is required.";
 		}
-		if (appEUI == null || appEUI.isBlank() || appEUI.isEmpty()) {
+		if (appEUI == null || appEUI.trim().isEmpty()) {
 			result = false;
 			reason += "\nappEUI is required.";
 		}
 		switch(provisioningMode) {
 			case OTAA:
-			if (appKey == null || appKey.isBlank() || appKey.isEmpty()) {
+			if (appKey == null || appKey.trim().isEmpty()) {
 				result = false;
 				reason += "\nappKey is required for OTAA registration.";
 			}
 			break;
 			case ABP:
-			if (appSKey == null || appSKey.isBlank() || appSKey.isEmpty()) {
+			if (appSKey == null || appSKey.trim().isEmpty()) {
 				result = false;
 				reason += "\nappSKey is required for ABP registration.";
 			}
-			if (nwkSKey == null || nwkSKey.isBlank() || nwkSKey.isEmpty()) {
+			if (nwkSKey == null || nwkSKey.trim().isEmpty()) {
 				result = false;
 				reason += "\nnwkSKey is required for ABP registration.";
 			}
