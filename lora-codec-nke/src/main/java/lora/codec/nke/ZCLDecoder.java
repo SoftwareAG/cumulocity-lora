@@ -93,7 +93,7 @@ public class ZCLDecoder {
 			@Override
 			void createMeasurement(ManagedObjectRepresentation device, int endpoint, C8YData c8yData, byte[] bytes, int index, DateTime time) {
 				ByteBuffer buffer = ByteBuffer.wrap(bytes, index, 2);
-				c8yData.addChildMeasurement("endpoint " + endpoint, "Temperature", "T", "°C", BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(100)), time);
+				c8yData.addChildMeasurement("endpoint " + endpoint, "Humidity", "RH", "%RH", BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(100)), time);
 			}
 		};
 
@@ -131,7 +131,7 @@ public class ZCLDecoder {
 
 		if (port == 125) {
 			// batch
-			boolean isBatch = (bytes[0] & 0x01) == 0x01;
+			boolean isBatch = (bytes[0] & 0x01) == 0x00;
 
 			// trame standard
 			if (!isBatch) {
@@ -144,14 +144,19 @@ public class ZCLDecoder {
 				// endpoint
 				int endpoint = ((bytes[0] & 0xE0) >> 5) | ((bytes[0] & 0x06) << 2);
 				// command ID
-				cmdID = bytes[1];
+				cmdID = bytes[1]&0xff;
 				// Cluster ID
-				clusterdID = bytes[2] * 256 + bytes[3];
+				clusterdID = (bytes[2]&0xff) * 256 + (bytes[3]&0xff);
+				
+				logger.info("Endpoint: {}", endpoint);
+				logger.info("CmdID: {}", cmdID);
+				logger.info("ClusterID: {}", clusterdID);
 
 				// decode report and read attribute response
 				if ((cmdID == 0x0a) || (cmdID == 0x8a) || (cmdID == 0x01)) {
 					// Attribut ID
-					attributID = bytes[4] * 256 + bytes[5];
+					attributID = (bytes[4]&0xff) * 256 + (bytes[5]&0xff);
+					logger.info("AttributeID: {}", attributID);
 
 					if (cmdID == 0x8a)
 						isAlarm = true;
@@ -212,7 +217,7 @@ public class ZCLDecoder {
 						buffer = ByteBuffer.wrap(bytes, index, 4);
 						c8yData.addMeasurement(device, SIMPLE_METERING, "ActiveEnergy", "Wh", BigDecimal.valueOf(buffer.getInt() & 0xffffff), time);
 						buffer = ByteBuffer.wrap(bytes, index + 3, 10);
-						c8yData.addMeasurement(device, SIMPLE_METERING, "RectiveEnergy", "varh", BigDecimal.valueOf(buffer.getInt() & 0xffffff), time);
+						c8yData.addMeasurement(device, SIMPLE_METERING, "ReactiveEnergy", "varh", BigDecimal.valueOf(buffer.getInt() & 0xffffff), time);
 						c8yData.addMeasurement(device, SIMPLE_METERING, "NbSamples", "", BigDecimal.valueOf(buffer.getShort()), time);
 						c8yData.addMeasurement(device, SIMPLE_METERING, "ActivePower", "W", BigDecimal.valueOf(buffer.getShort()), time);
 						c8yData.addMeasurement(device, SIMPLE_METERING, "ReactivePower", "var", BigDecimal.valueOf(buffer.getShort()), time);
@@ -240,20 +245,24 @@ public class ZCLDecoder {
 					if ((clusterdID == 0x0050) && (attributID == 0x0006)) {
 						int index2 = index + 3;
 						buffer = ByteBuffer.wrap(bytes, index2, bytes.length - index2);
-						BigDecimal value = BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(1000));
 						if ((bytes[index + 2] & 0x01) == 0x01) {
+							BigDecimal value = BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(1000));
 							changeDeviceState(device, c8yData, POWER_CONFIGURATION, "Main or external voltage is " + value, "mainOrExternalVoltage", value, time);
 						}
 						if ((bytes[index + 2] & 0x02) == 0x02) {
+							BigDecimal value = BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(1000));
 							changeDeviceState(device, c8yData, POWER_CONFIGURATION, "Rechargeable battery voltage is " + value, "rechargeableBatteryVoltage", value, time);
 						}
 						if ((bytes[index + 2] & 0x04) == 0x04) {
+							BigDecimal value = BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(1000));
 							changeDeviceState(device, c8yData, POWER_CONFIGURATION, "Disposable battery voltage is " + value, "disposableBatteryVoltage", value, time);
 						}
 						if ((bytes[index + 2] & 0x08) == 0x08) {
+							BigDecimal value = BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(1000));
 							changeDeviceState(device, c8yData, POWER_CONFIGURATION, "Solar harvesting voltage is " + value, "solarHarvestingVoltage", value, time);
 						}
 						if ((bytes[index + 2] & 0x10) == 0x10) {
+							BigDecimal value = BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(1000));
 							changeDeviceState(device, c8yData, POWER_CONFIGURATION, "TIC harvesting voltage is " + value, "ticHarvestingVoltage", value, time);
 						}
 					}
