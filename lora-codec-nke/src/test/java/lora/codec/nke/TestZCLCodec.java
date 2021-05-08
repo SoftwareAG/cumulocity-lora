@@ -25,10 +25,12 @@ public class TestZCLCodec {
 	@Test
 	void testDecodePayload() {
 		byte[] payload = BaseEncoding.base16().decode("110a005000064107010536d80e4e01a059022ee0000001".toUpperCase());
+		//byte[] payload = BaseEncoding.base16().decode("118A040500002114C390D1B2".toUpperCase());
 		//byte[] payload = BaseEncoding.base16().decode("118A040200002901C298D2".toUpperCase());
 		ZCLDecoder decoder = new ZCLDecoder();
 		ManagedObjectRepresentation device = new ManagedObjectRepresentation();
 		C8YData result = decoder.decode(device, payload, 125, null, new DateTime());
+		logger.info(result.toString());
 		assertEquals(3.662, ((BigDecimal)device.get("disposableBatteryVoltage")).doubleValue());
 		assertEquals(14.04, ((BigDecimal)device.get("mainOrExternalVoltage")).doubleValue());
 	}
@@ -38,6 +40,7 @@ public class TestZCLCodec {
 		byte[] payload = BaseEncoding.base16().decode("2285408380A80272B46F400A0108D009A44A76B302".toUpperCase());
 		ZCLDecoder decoder = new ZCLDecoder();
 		C8YData result = decoder.decode(new ManagedObjectRepresentation(), payload, 125, "50-70-053", new DateTime());
+		logger.info(result.toString());
 		assertNotNull(result.getMeasurements());
 		//assertEquals(2760, result.batchRecord.dataset[0].data.value);
 	}
