@@ -17,10 +17,10 @@ class AdeunisCodec extends DeviceCodec {
     getVersion(): string {
         return "1.0";
     }
-    getModels(client: Client): string[] {
-        let models: string[] = [];
+    getModels(client: Client): Map<string,string> {
+        let models: Map<string, string> = new Map<string, string>();
         for (var model in codec.DecoderProducts) {
-            models.push(model);
+            models.set(model,model);
         }
         return models;
     }

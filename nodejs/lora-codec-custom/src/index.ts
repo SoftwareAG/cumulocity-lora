@@ -61,37 +61,53 @@ class CustomCodecApp extends CodecApp {
     constructor(codec: CustomDeviceCodec, subscriptionService: MicroserviceSubscriptionService) {
         super(codec, subscriptionService);
         this.app.post("/model", async (req: Request, res: Response, next: NextFunction) => {
-            let client: Client = subscriptionService.getClient(req);
-            let mo: IManagedObject = (await client.inventory.create({type: 'CustomCodec', name: req.body.name})).data;
-            if (!codec.customCodecs.has(client)) {
-                codec.customCodecs.set(client, new Map<string, CustomCodec>());
-            }
-            codec.customCodecs.get(client).set(mo.name, new CustomCodec(mo));
-            res.json(mo);
+            subscriptionService.getClient(req).then(async client => {
+                let mo: IManagedObject = (await client.inventory.create({type: 'CustomCodec', name: req.body.name})).data;
+                if (!codec.customCodecs.has(client)) {
+                    codec.customCodecs.set(client, new Map<string, CustomCodec>());
+                }
+                codec.customCodecs.get(client).set(mo.name, new CustomCodec(mo));
+                res.json(mo);
+            }).catch(e => {
+                res.json({error: e.message});
+                res.status(500);
+            });
         });
         this.app.delete("/model/:name", async (req: Request, res: Response, next: NextFunction) => {
-            let client: Client = subscriptionService.getClient(req);
-            await client.inventory.delete(codec.customCodecs.get(client).get(req.params.name).id);
-            codec.customCodecs.get(client).delete(req.params.name);
-            res.json({message: 'deteted'});
-            res.status(204);
+            subscriptionService.getClient(req).then(async client => {
+                await client.inventory.delete(codec.customCodecs.get(client).get(req.params.name).id);
+                codec.customCodecs.get(client).delete(req.params.name);
+                res.json({message: 'deteted'});
+                res.status(204);
+            }).catch(e => {
+                res.json({error: e.message});
+                res.status(500);
+            });
         });
         this.app.post("/model/decoder", async (req: Request, res: Response, next: NextFunction) => {
-            let client: Client = subscriptionService.getClient(req);
-            let mo: IManagedObject = (await client.inventory.detail(req.body.id)).data;
-            codec.customCodecs.get(client).get(mo.name).decodeString = req.body.decodeString;
-            res.json(await client.inventory.update({id: req.body.id, decodeString: req.body.decodeString}));
+            subscriptionService.getClient(req).then(async client => {
+                let mo: IManagedObject = (await client.inventory.detail(req.body.id)).data;
+                codec.customCodecs.get(client).get(mo.name).decodeString = req.body.decodeString;
+                res.json(await client.inventory.update({id: req.body.id, decodeString: req.body.decodeString}));
+            }).catch(e => {
+                res.json({error: e.message});
+                res.status(500);
+            });
         });
         this.app.post("/model/operation", async (req: Request, res: Response, next: NextFunction) => {
-            let client: Client = subscriptionService.getClient(req);
-            let mo: IManagedObject = (await client.inventory.detail(req.body.id)).data;
-            codec.operations.get(client).get(mo.name).set(req.body.operationName, req.body.operation);
-            let operations: Map<string, DeviceOperation> = mo.operations || new Map<string, DeviceOperation>();
-            let encodeStrings : Map<string, string> = mo.encodeStrings || new Map<string, string>();
-            operations.set(req.body.operationName, req.body.operation);
-            encodeStrings.set(req.body.operationName, req.body.encodeString);
-            codec.customCodecs.get(client).get(mo.name).addEncodeString(req.body.operation, req.body.encodeString);
-            res.json(await client.inventory.update({id: mo.id, operations: operations, encodeStrings: encodeStrings}));
+            subscriptionService.getClient(req).then(async client => {
+                let mo: IManagedObject = (await client.inventory.detail(req.body.id)).data;
+                codec.operations.get(client).get(mo.name).set(req.body.operationName, req.body.operation);
+                let operations: Map<string, DeviceOperation> = mo.operations || new Map<string, DeviceOperation>();
+                let encodeStrings : Map<string, string> = mo.encodeStrings || new Map<string, string>();
+                operations.set(req.body.operationName, req.body.operation);
+                encodeStrings.set(req.body.operationName, req.body.encodeString);
+                codec.customCodecs.get(client).get(mo.name).addEncodeString(req.body.operation, req.body.encodeString);
+                res.json(await client.inventory.update({id: mo.id, operations: operations, encodeStrings: encodeStrings}));
+            }).catch(e => {
+                res.json({error: e.message});
+                res.status(500);
+            });
         });
     }
 }
