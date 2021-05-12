@@ -23,16 +23,38 @@ export abstract class DeviceCodec implements Component {
     abstract getAvailableOperations(client: Client, model: string): Map<string, DeviceOperation>;
 
     async decode(client: Client, decode: Decode): Promise<Result<string>> {
-        let result: Result<string>;
+        let result: Result<string> = {success: true, message: "", response: null};
         try {
-            console.log(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`);
+            console.log(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui} with time ${new Date(decode.time)}`);
+            if (!decode.payload) {
+                console.error("Payload is empty!");
+                result.success = false;
+                result.message += "Payload is empty!<br>";
+            }
+            var isHexa = decode.payload.match(/^[0-9a-fA-F]+$/);
+            if (!isHexa || isHexa.length == 0) {
+                console.error("Payload is not in hexadecimal format!");
+                result.success = false;
+                result.message += "Payload is not in hexadecimal format!<br>";
+            }
             let mor: IManagedObject = await this.getDevice(client, decode.deveui.toLowerCase());
-            let c8yData: C8YData = this._decode(client, mor, decode.model, decode.fPort, decode.time, decode.payload);
-            console.log(c8yData);
-            this.processData(client, c8yData);
-            result = {success: true, message: `Successfully processed payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`, response: "OK"};
+            if (result.success) {
+                if (!mor) {
+                    console.error(`There is no device with DevEUI ${decode.deveui}`);
+                    result.success = false;
+                    result.message += `There is no device with DevEUI ${decode.deveui}`;
+                } else {
+                    let c8yData: C8YData = this._decode(client, mor, decode.model, decode.fPort, new Date(decode.time), decode.payload);
+                    console.log(c8yData);
+                    this.processData(client, c8yData);
+                    result.message = `Successfully processed payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`;
+                    result.response = "OK";
+                }
+            }
         } catch(e) {
-            result = {success: false, message: e.message, response: null};
+            //result = {success: false, message: e.message, response: null};
+            result.success = false;
+            result.message += e.message;
         }
         return result;
     }

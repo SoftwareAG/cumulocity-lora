@@ -52,10 +52,17 @@ export class MicroserviceSubscriptionService extends EventEmitter {
         return this.clients;
     }
 
-    getClient(request: Request): Client {
+    getClient(request: Request): Promise<Client> {
         console.log("Authorization: " + request.headers.authorization);
         let currentTenant: string = Buffer.from(request.headers.authorization.split(" ")[1], 'base64').toString('binary').split("/")[0];
         console.log("Current Tenant: " + currentTenant);
-        return this.clients.get(currentTenant);
+        let client: Client = this.clients.get(currentTenant);
+        return new Promise<Client>((resolve, reject) => {
+            if (client) {
+                resolve(client);
+            } else {
+                reject(new Error(`Tenant ${currentTenant} didn't subsribe to this microservice!`));
+            }
+        });
     }
 }
