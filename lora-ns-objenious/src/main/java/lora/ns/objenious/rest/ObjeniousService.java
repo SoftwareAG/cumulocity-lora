@@ -30,7 +30,7 @@ public interface ObjeniousService {
 	Call<ScenarioRouting> createHttpRouting(@Body ScenarioRoutingCreateUpdate routing);
 	
 	@GET("scenarios/routing")
-	Call<List<ScenarioRouting>> getRouting();
+	Call<List<ScenarioRoutingReader>> getRouting();
 	
 	@DELETE("scenarios/routing/{id}")
 	Call<ResponseBody> deleteRouting(@Path("id") Integer id);
