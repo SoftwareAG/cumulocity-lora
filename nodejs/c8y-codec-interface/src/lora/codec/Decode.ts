@@ -2,6 +2,6 @@ export class Decode {
     deveui: string;
     fPort: number;
     payload: string;
-    time: number;
+    updateTime: number;
     model: string;
 }

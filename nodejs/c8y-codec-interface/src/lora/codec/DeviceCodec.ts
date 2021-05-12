@@ -25,7 +25,22 @@ export abstract class DeviceCodec implements Component {
     async decode(client: Client, decode: Decode): Promise<Result<string>> {
         let result: Result<string> = {success: true, message: "", response: null};
         try {
-            console.log(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui} with time ${new Date(decode.time)}`);
+            console.log(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui} with time ${decode.updateTime}`);
+            let datetime: Date;
+            if (!decode.updateTime) {
+                console.log("No timestamp received, server timestamp will be used instead.");
+                datetime = new Date();
+            } else {
+                if (typeof decode.updateTime == "number") {
+                    datetime = new Date(decode.updateTime);
+                } else {
+                    console.error("Bad type for time fields: " + typeof decode.updateTime);
+                    if (typeof decode.updateTime == "string") {
+                        console.log("Will try to parse time field to a number.");
+                        datetime = new Date(parseInt(decode.updateTime));
+                    }
+                }
+            }
             if (!decode.payload) {
                 console.error("Payload is empty!");
                 result.success = false;
@@ -44,7 +59,7 @@ export abstract class DeviceCodec implements Component {
                     result.success = false;
                     result.message += `There is no device with DevEUI ${decode.deveui}`;
                 } else {
-                    let c8yData: C8YData = this._decode(client, mor, decode.model, decode.fPort, new Date(decode.time), decode.payload);
+                    let c8yData: C8YData = this._decode(client, mor, decode.model, decode.fPort, datetime, decode.payload);
                     console.log(c8yData);
                     this.processData(client, c8yData);
                     result.message = `Successfully processed payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`;

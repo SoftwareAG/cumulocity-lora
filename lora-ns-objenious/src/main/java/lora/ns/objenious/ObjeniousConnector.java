@@ -1,6 +1,8 @@
 package lora.ns.objenious;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -32,6 +34,7 @@ import lora.ns.objenious.rest.Profile;
 import lora.ns.objenious.rest.RoutingHttp;
 import lora.ns.objenious.rest.ScenarioRouting;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate;
+import lora.ns.objenious.rest.ScenarioRoutingReader;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate.FormatTypeEnum;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate.MessageTypeEnum;
 import okhttp3.Interceptor;
@@ -52,6 +55,16 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		@Override
 		public Response intercept(Chain chain) throws IOException {
 			Request request = chain.request();
+
+			String host = properties.getProperty("proxy-host");
+			String port = properties.getProperty("proxy-port");
+
+			if (host != null && !host.trim().isEmpty() && port != null && !port.trim().isEmpty()) {
+				System.setProperty("http.proxyHost", host);
+				System.setProperty("https.proxyHost", host);
+				System.setProperty("http.proxyPort", port);
+				System.setProperty("https.proxyPort", port);
+			}
 
 			request = request.newBuilder().header("apikey", properties.getProperty("apikey"))
 					.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
@@ -208,7 +221,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			MessageTypeEnum messageType) {
 		assert objeniousService != null : "objeniousService is not initialized";
 		try {
-			List<ScenarioRouting> routings = objeniousService.getRouting().execute().body();
+			List<ScenarioRoutingReader> routings = objeniousService.getRouting().execute().body();
 			if (routings != null) {
 				routings.stream().filter(routing -> routing.getName().equals(name)).forEach(routing -> {
 					try {
@@ -259,7 +272,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 	private void removeRouting(String name) {
 		try {
-			List<ScenarioRouting> routings = objeniousService.getRouting().execute().body();
+			List<ScenarioRoutingReader> routings = objeniousService.getRouting().execute().body();
 			if (routings != null) {
 				routings.stream().filter(routing -> routing.getName().equals(name)).forEach(routing -> {
 					try {
