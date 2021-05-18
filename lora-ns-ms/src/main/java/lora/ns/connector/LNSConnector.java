@@ -20,7 +20,7 @@ public interface LNSConnector {
 	String sendDownlink(DownlinkData downlinkData);
 	boolean provisionDevice(DeviceProvisioning deviceProvisioning);
 	void configureRoutings(String url, String tenant, String login, String password);
-	void removeRoutings();
+	void removeRoutings(String tenant);
 	boolean deprovisionDevice(String deveui);
 	List<Gateway> getGateways();
 }

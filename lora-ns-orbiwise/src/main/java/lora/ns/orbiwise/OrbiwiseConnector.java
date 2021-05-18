@@ -216,7 +216,7 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public void removeRoutings() {
+	public void removeRoutings(String tenant) {
 		try {
 			orbiwiseService.stopRouting().execute();
 		} catch (

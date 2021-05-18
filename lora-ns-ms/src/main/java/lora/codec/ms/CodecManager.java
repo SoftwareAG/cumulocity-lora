@@ -2,6 +2,7 @@ package lora.codec.ms;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.codec.binary.Hex;
 import org.joda.time.DateTime;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.ID;
@@ -31,16 +33,26 @@ import com.cumulocity.sdk.client.inventory.ManagedObjectCollection;
 import c8y.Command;
 import c8y.Hardware;
 import lora.codec.Decode;
-import lora.codec.DeviceCodec;
 import lora.codec.DeviceCodecRepresentation;
 import lora.codec.DeviceOperationParam;
 import lora.codec.DownlinkData;
 import lora.codec.Encode;
 import lora.codec.Result;
+import lora.common.C8YUtils;
 import lora.ns.DeviceData;
 
 @Service
 public class CodecManager {
+
+	/**
+	 *
+	 */
+	private static final String PROPERTY_PROCESSED = "processed";
+
+	/**
+	 *
+	 */
+	private static final String PROPERTY_CODEC = "codec";
 
 	@Autowired
 	private EventApi eventApi;
@@ -57,16 +69,16 @@ public class CodecManager {
     @Autowired
     private MicroserviceSubscriptionsService subscriptionsService;
 
-	final private Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	final private static String LORA_DEVICE_COMMAND_ERROR = "LoRa device command error";
-	final private static String LORA_DEVICE_PAYLOAD_ERROR = "LoRa device payload decoding error";
+	private static final String LORA_DEVICE_COMMAND_ERROR = "LoRa device command error";
+	private static final String LORA_DEVICE_PAYLOAD_ERROR = "LoRa device payload decoding error";
 
 	private Map<String, CodecProxy> codecInstances = new HashMap<>();
 
 	@EventListener
 	private void updateCodecsList(MicroserviceSubscriptionAddedEvent event) {
-		InventoryFilter filter = new InventoryFilter().byType(DeviceCodec.CODEC_TYPE);
+		InventoryFilter filter = new InventoryFilter().byType(C8YUtils.CODEC_TYPE);
 		ManagedObjectCollection col = inventoryApi.getManagedObjectsByFilter(filter);
 		for (ManagedObjectRepresentation mor : col.get().allPages()) {
 			DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
@@ -93,7 +105,7 @@ public class CodecManager {
 	public CodecProxy getCodec(String id) {
 		CodecProxy result = codecInstances.get(id);
 		if (result == null) {
-			ExternalIDRepresentation extId = findExternalId(id, DeviceCodec.CODEC_ID);
+			ExternalIDRepresentation extId = findExternalId(id, C8YUtils.CODEC_ID);
 			if (extId != null) {
 				ManagedObjectRepresentation mor = inventoryApi.get(extId.getManagedObject().getId());
 				DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
@@ -102,6 +114,29 @@ public class CodecManager {
 					codecInstances.put(id, result);
 				}
 			}
+		}
+		return result;
+	}
+
+	private Optional<CodecProxy> getCodec(ManagedObjectRepresentation device) {
+		CodecProxy codec = null;
+		Optional<CodecProxy> result = Optional.empty();
+		if (device.hasProperty(PROPERTY_CODEC)) {
+			codec = getCodec(device.getProperty(PROPERTY_CODEC).toString());
+			Optional<MicroserviceCredentials> credentials = subscriptionsService.getCredentials(subscriptionsService.getTenant());
+			if (codec != null && credentials.isPresent()) {
+				String authentication = credentials.get().toCumulocityCredentials().getAuthenticationString();
+				codec.setAuthentication(authentication);
+				result = Optional.of(codec);
+			} else {
+				if (codec == null) {
+					logger.error("Codec {} does not exist.", device.getProperty(PROPERTY_CODEC));
+				} else {
+					logger.error("Could not retrieve microservice credentials.");
+				}
+			}
+		} else {
+        	logger.info("Device has no codec information. Payload will be stored for later parsing when Codec will be provided.");
 		}
 		return result;
 	}
@@ -115,84 +150,72 @@ public class CodecManager {
 		eventRepresentation.setProperty("payload", Hex.encodeHexString(event.getPayload()));
 		eventRepresentation.setProperty("port", event.getfPort());
 		logger.info("Device details: {}", mor.toJSON());
-		if (mor.hasProperty("codec")) {
-			logger.info("Codec {} will be used with device {} for decoding payload {} on port {}", mor.getProperty("codec"), event.getDevEui(), event.getPayload(), event.getfPort());
-			CodecProxy codec = getCodec(mor.getProperty("codec").toString());
-			if (codec != null) {
-				String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get().toCumulocityCredentials().getAuthenticationString();
-				codec.setAuthentication(authentication);
-				Result<String> result = codec.decode(new Decode(event));
-				if (result.isSuccess()) {
-					eventRepresentation.setProperty("processed", true);
-				} else {
-					eventRepresentation.setProperty("processed", false);
-					AlarmRepresentation alarm = new AlarmRepresentation();
-					alarm.setSource(mor);
-					alarm.setType(LORA_DEVICE_PAYLOAD_ERROR);
-					alarm.setText(result.getMessage() != null ? result.getMessage() : result.getResponse());
-					alarm.setDateTime(new DateTime());
-					alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
-					alarmApi.create(alarm);
-				}
+		eventRepresentation.setProperty(PROPERTY_PROCESSED, false);
+		getCodec(mor).ifPresent(codec -> {
+			logger.info("Codec {} will be used with device {} for decoding payload {} on port {}", mor.getProperty(PROPERTY_CODEC), event.getDevEui(), event.getPayload(), event.getfPort());
+			Result<String> result = codec.decode(new Decode(event));
+			if (result.isSuccess()) {
+				eventRepresentation.setProperty(PROPERTY_PROCESSED, true);
 			} else {
-				eventRepresentation.setProperty("processed", false);
-				logger.error("Codec {} does not exist.", mor.getProperty("codec"));
+				eventRepresentation.setProperty(PROPERTY_PROCESSED, false);
+				AlarmRepresentation alarm = new AlarmRepresentation();
+				alarm.setSource(mor);
+				alarm.setType(LORA_DEVICE_PAYLOAD_ERROR);
+				alarm.setText(result.getMessage() != null ? result.getMessage() : result.getResponse());
+				alarm.setDateTime(new DateTime());
+				alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
+				alarmApi.create(alarm);
 			}
-		} else {
-        	logger.info("Device has no codec information. Payload will be stored for later parsing when Codec will be provided.");
-            eventRepresentation.setProperty("processed", false);
-		}
+		});
 		eventApi.create(eventRepresentation);
 	}
 	
 	public DownlinkData encode(String devEui, OperationRepresentation operation) {
-		DownlinkData data = null;
+		DownlinkData[] data = {null};
 		ManagedObjectRepresentation mor = inventoryApi.get(operation.getDeviceId());
-		if (mor.hasProperty("codec")) {
-			logger.info("Codec {} will be used with device {} for encoding operation {}", mor.getProperty("codec"), devEui, operation.toJSON());
-			CodecProxy codec = getCodec(mor.getProperty("codec").toString());
-			if (codec != null) {
-				String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get().toCumulocityCredentials().getAuthenticationString();
-				codec.setAuthentication(authentication);
-				Hardware hardware = mor.get(Hardware.class);
-				Result<DownlinkData> result = codec.encode(new Encode(devEui, operation.get(Command.class).getText(), hardware != null ? hardware.getModel() : null));
-				if (result.isSuccess()) {
-					if (result.getResponse() != null) {
-						logger.info("Result of command \"{}\" is payload {}", operation.get(Command.class).getText(), result.getResponse().getPayload());
-					} else {
-						logger.info("Result of command \"{}\" is empty", operation.get(Command.class).getText());
-					}
-					data = result.getResponse();
+		getCodec(mor).ifPresent(codec -> {
+			logger.info("Codec {} will be used with device {} for encoding operation {}", mor.getProperty(PROPERTY_CODEC), devEui, operation.toJSON());
+			Hardware hardware = mor.get(Hardware.class);
+			Result<DownlinkData> result = codec.encode(new Encode(devEui, operation.get(Command.class).getText(), hardware != null ? hardware.getModel() : null));
+			if (result.isSuccess()) {
+				if (result.getResponse() != null) {
+					logger.info("Result of command \"{}\" is payload {}", operation.get(Command.class).getText(), result.getResponse().getPayload());
 				} else {
-					AlarmRepresentation alarm = new AlarmRepresentation();
-					alarm.setSource(mor);
-					alarm.setType(LORA_DEVICE_COMMAND_ERROR);
-					alarm.setText(result.getMessage());
-					alarm.setDateTime(new DateTime());
-					alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
-					alarmApi.create(alarm);
+					logger.info("Result of command \"{}\" is empty", operation.get(Command.class).getText());
 				}
+				data[0] = result.getResponse();
 			} else {
-				logger.error("Codec {} does not exist.", mor.getProperty("codec"));
+				AlarmRepresentation alarm = new AlarmRepresentation();
+				alarm.setSource(mor);
+				alarm.setType(LORA_DEVICE_COMMAND_ERROR);
+				alarm.setText(result.getMessage());
+				alarm.setDateTime(new DateTime());
+				alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
+				alarmApi.create(alarm);
 			}
-		} else {
-        	logger.info("Device has no codec information. Operation will be processed when Codec will be provided.");
-		}
-		return data;
+		});
+		return data[0];
 	}
 	
 	public Map<String, DeviceOperationParam> getAvailableOperations(ManagedObjectRepresentation mor) {
 		Map<String, DeviceOperationParam> result = null;
-		if (mor.hasProperty("codec")) {
-			CodecProxy codec = getCodec(mor.getProperty("codec").toString());
-			if (codec != null) {
-				String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get().toCumulocityCredentials().getAuthenticationString();
+		if (mor.hasProperty(PROPERTY_CODEC)) {
+			CodecProxy codec = getCodec(mor.getProperty(PROPERTY_CODEC).toString());
+			Optional<MicroserviceCredentials> credentials = subscriptionsService.getCredentials(subscriptionsService.getTenant());
+			if (codec != null && credentials.isPresent()) {
+				String authentication = credentials.get().toCumulocityCredentials().getAuthenticationString();
 				codec.setAuthentication(authentication);
 				String model = null;
 				if (mor.get(Hardware.class) != null) {
 					model = mor.get(Hardware.class).getModel();
 				}
 				result = codec.getAvailableOperations(model);
+			} else {
+				if (codec == null) {
+					logger.error("Codec {} does not exist.", mor.getProperty(PROPERTY_CODEC));
+				} else {
+					logger.error("Could not retrieve microservice credentials.");
+				}
 			}
 		}		
 		return result;

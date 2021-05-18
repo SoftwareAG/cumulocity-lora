@@ -296,7 +296,7 @@ public class KerlinkConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public void removeRoutings() {
+	public void removeRoutings(String tenant) {
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -309,7 +309,7 @@ public class KerlinkConnector extends LNSAbstractConnector {
 						})
 				.getBody();
 		for (PushConfigurationDto pushConfigurationDto : pushConfigurationDtos.getList()) {
-			if (pushConfigurationDto.getName().equals(this.getId())) {
+			if (pushConfigurationDto.getName().equals(tenant + "-" + this.getId())) {
 				restTemplate.exchange(baseUrl + "/pushConfigurations/" + pushConfigurationDto.getId(),
 						HttpMethod.DELETE, new HttpEntity<String>("", headers), String.class);
 			}

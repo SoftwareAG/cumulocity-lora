@@ -53,9 +53,6 @@ public abstract class DeviceCodec implements Component {
 	protected Map<String, String> models = new HashMap<>();
 	protected Map<String, String> childrenNames = new HashMap<>();
 	protected Map<String, Map<String, DeviceOperation>> operations = new HashMap<>();
-
-	public static final String CODEC_TYPE = "Device Codec";
-	public static final String CODEC_ID = "Codec ID";
 	
     protected abstract C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload);
 	protected abstract DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation);
@@ -72,7 +69,7 @@ public abstract class DeviceCodec implements Component {
 	
 	@EventListener
 	private void registerCodec(MicroserviceSubscriptionAddedEvent event) {
-		ManagedObjectRepresentation codec = c8yUtils.findExternalId(this.getId(), CODEC_ID).map(extId -> {
+		ManagedObjectRepresentation codec = c8yUtils.findExternalId(this.getId(), C8YUtils.CODEC_ID).map(extId -> {
 			ManagedObjectRepresentation mor = extId.getManagedObject();
 			mor.set(new DeviceCodecRepresentation(this));
 			return inventoryApi.update(mor);
@@ -80,11 +77,11 @@ public abstract class DeviceCodec implements Component {
 			logger.info("Codec '{}' will be initialized in current tenant.", this.getId());
 			ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
 			mor.set(new DeviceCodecRepresentation(this));
-			mor.setType(CODEC_TYPE);
+			mor.setType(C8YUtils.CODEC_TYPE);
 			mor.setName(getName());
 			mor = inventoryApi.create(mor);
 			
-			c8yUtils.createExternalId(mor, this.getId(), CODEC_ID);
+			c8yUtils.createExternalId(mor, this.getId(), C8YUtils.CODEC_ID);
 
 			return mor;
 		});

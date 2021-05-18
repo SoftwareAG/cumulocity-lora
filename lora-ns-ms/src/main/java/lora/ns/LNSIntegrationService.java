@@ -13,7 +13,6 @@ import java.util.Properties;
 
 import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
-import com.cumulocity.microservice.subscription.repository.MicroserviceRepository;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.model.idtype.GId;
@@ -26,7 +25,6 @@ import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.cumulocity.rest.representation.operation.OperationCollectionRepresentation;
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.cumulocity.rest.representation.tenant.OptionRepresentation;
-import com.cumulocity.sdk.client.Param;
 import com.cumulocity.sdk.client.QueryParam;
 import com.cumulocity.sdk.client.alarm.AlarmApi;
 import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
@@ -116,10 +114,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	@Autowired
 	private LNSGatewayManager lnsGatewayManager;
 
-	@Autowired
-	private MicroserviceRepository microserviceRepository;
-
-	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<LNSConnectorWizardStep>();
+	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<>();
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -165,13 +160,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		ManagedObjectCollection col = inventoryApi.getManagedObjectsByFilter(filter);
 		QueryParam queryParam = null;
 		try {
-			queryParam = new QueryParam(new Param() {
-				@Override
-				public String getName() {
-					return "query";
-				}
-			}, URLEncoder.encode(LNS_TYPE + " eq " + this.getType() + " and type eq '" + LNS_CONNECTOR_TYPE + "'",
-					"utf8"));
+			queryParam = new QueryParam(() -> "query", URLEncoder.encode(LNS_TYPE + " eq " + this.getType() + " and type eq '" + LNS_CONNECTOR_TYPE + "'",
+			"utf8"));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -204,33 +194,30 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	public void updateOperation(String event, String lnsInstanceId) {
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
-		if (connector.isPresent()) {
-			logger.info("LNS instance {} of type {} is known", lnsInstanceId, getType());
-			OperationData data = processDownlinkEvent(event);
-			if (data.getStatus() != OperationStatus.FAILED) {
-				OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
-						data.getCommandId());
-				if (operation != null) {
-					operation.setStatus(data.getStatus().toString());
-					deviceControlApi.update(operation);
-					if (data.getStatus() == OperationStatus.SUCCESSFUL) {
-						lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
-					}
-				} else {
-					logger.error("Unknown operation {} from LNS", data.getCommandId());
+		logger.info("LNS instance {} of type {} is known", lnsInstanceId, getType());
+		OperationData data = processDownlinkEvent(event);
+		if (data.getStatus() != OperationStatus.FAILED) {
+			OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
+					data.getCommandId());
+			if (operation != null) {
+				operation.setStatus(data.getStatus().toString());
+				deviceControlApi.update(operation);
+				if (data.getStatus() == OperationStatus.SUCCESSFUL) {
+					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
 				}
 			} else {
-				if (data.getCommandId() != null) {
-					OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
-							data.getCommandId());
-					operation.setStatus(OperationStatus.FAILED.toString());
-					operation.setFailureReason(data.getErrorMessage());
-					deviceControlApi.update(operation);
-					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
-				} else {
-					logger.error("Unknown operation");
-				}
+				logger.error("Unknown operation {} from LNS", data.getCommandId());
+			}
+		} else {
+			if (data.getCommandId() != null) {
+				OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
+						data.getCommandId());
+				operation.setStatus(OperationStatus.FAILED.toString());
+				operation.setFailureReason(data.getErrorMessage());
+				deviceControlApi.update(operation);
+				lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
+			} else {
+				logger.error("Unknown operation");
 			}
 		}
 	}
@@ -386,11 +373,13 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		subscriptionsService.runForEachTenant(() -> {
 			C8YData c8yData = new C8YData();
 			DateTime now = new DateTime();
-			c8yData.addMeasurement(agentService.getAgent(), "Memory", "Max Memory", "bytes",
+			String memoryFragment = "Memory";
+			String bytesUnit = "bytes";
+			c8yData.addMeasurement(agentService.getAgent(), memoryFragment, "Max Memory", bytesUnit,
 					BigDecimal.valueOf(Runtime.getRuntime().maxMemory()), now);
-			c8yData.addMeasurement(agentService.getAgent(), "Memory", "Free Memory", "bytes",
+			c8yData.addMeasurement(agentService.getAgent(), memoryFragment, "Free Memory", bytesUnit,
 					BigDecimal.valueOf(Runtime.getRuntime().freeMemory()), now);
-			c8yData.addMeasurement(agentService.getAgent(), "Memory", "Total Memory", "bytes",
+			c8yData.addMeasurement(agentService.getAgent(), memoryFragment, "Total Memory", bytesUnit,
 					BigDecimal.valueOf(Runtime.getRuntime().totalMemory()), now);
 			for (MeasurementRepresentation m : c8yData.getMeasurements()) {
 				measurementApi.create(m);
@@ -406,7 +395,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	public void removeLNSInstance(String lnsInstanceId) {
-		lnsConnectorManager.getConnector(lnsInstanceId).get().removeRoutings();
+		lnsConnectorManager.getConnector(lnsInstanceId).get().removeRoutings(subscriptionsService.getTenant());
 		inventoryApi.delete(new GId(lnsInstanceId));
 	}
 
