@@ -81,8 +81,15 @@ public class AgentService {
 			inventoryApi.update(agent);
 		}
 		agents.put(subscriptionsService.getTenant(), agent);
-		deviceControlApi.getNotificationsSubscriber().subscribe(agent.getId(),
-				new OperationDispatcherSubscriptionListener(subscriptionsService.getTenant()));
+		// We don't want the event listener to crash just because we can't subscribe to operation
+		// (we're polling them anyway)
+		try {
+			deviceControlApi.getNotificationsSubscriber().subscribe(agent.getId(),
+					new OperationDispatcherSubscriptionListener(subscriptionsService.getTenant()));
+		} catch(Exception e) {
+			//logger.error("Can't subscribe to operation", e);
+			e.printStackTrace();
+		}
 	}
 	
 	public ManagedObjectRepresentation getAgent() {

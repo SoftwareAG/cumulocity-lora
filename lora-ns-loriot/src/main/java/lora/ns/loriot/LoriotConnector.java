@@ -268,7 +268,7 @@ public class LoriotConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public void removeRoutings() {
+	public void removeRoutings(String tenant) {
 		// TODO
 	}
 

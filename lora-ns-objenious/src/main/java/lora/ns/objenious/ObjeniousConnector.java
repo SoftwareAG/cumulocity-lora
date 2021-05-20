@@ -1,8 +1,6 @@
 package lora.ns.objenious;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -10,11 +8,11 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import lora.codec.DownlinkData;
 import lora.ns.DeviceProvisioning;
@@ -34,9 +32,9 @@ import lora.ns.objenious.rest.Profile;
 import lora.ns.objenious.rest.RoutingHttp;
 import lora.ns.objenious.rest.ScenarioRouting;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate;
-import lora.ns.objenious.rest.ScenarioRoutingReader;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate.FormatTypeEnum;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate.MessageTypeEnum;
+import lora.ns.objenious.rest.ScenarioRoutingReader;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -55,16 +53,6 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		@Override
 		public Response intercept(Chain chain) throws IOException {
 			Request request = chain.request();
-
-			String host = properties.getProperty("proxy-host");
-			String port = properties.getProperty("proxy-port");
-
-			if (host != null && !host.trim().isEmpty() && port != null && !port.trim().isEmpty()) {
-				System.setProperty("http.proxyHost", host);
-				System.setProperty("https.proxyHost", host);
-				System.setProperty("http.proxyPort", port);
-				System.setProperty("https.proxyPort", port);
-			}
 
 			request = request.newBuilder().header("apikey", properties.getProperty("apikey"))
 					.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
@@ -95,6 +83,19 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	@Override
 	protected void init() {
 		// logger.info("Initializing Retrofit client to Objenious API");
+
+		String host = properties.getProperty("proxy-host");
+		String port = properties.getProperty("proxy-port");
+
+		if (host != null && !host.trim().isEmpty() && port != null && !port.trim().isEmpty()) {
+			System.setProperty("http.proxyHost", host);
+			System.setProperty("https.proxyHost", host);
+			System.setProperty("http.proxyPort", port);
+			System.setProperty("https.proxyPort", port);
+			System.setProperty("http.nonProxyHosts", "cumulocity");
+			System.setProperty("https.nonProxyHosts", "cumulocity");
+		}
+
 		OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new APIKeyInterceptor()).build();
 
 		Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).baseUrl("https://api.objenious.com/v1/")
@@ -220,20 +221,8 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	public void configureRouting(String url, String tenant, String login, String password, String name,
 			MessageTypeEnum messageType) {
 		assert objeniousService != null : "objeniousService is not initialized";
-		try {
-			List<ScenarioRoutingReader> routings = objeniousService.getRouting().execute().body();
-			if (routings != null) {
-				routings.stream().filter(routing -> routing.getName().equals(name)).forEach(routing -> {
-					try {
-						objeniousService.deleteRouting(routing.getId()).execute();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				});
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+
+		removeRouting(name);
 
 		RoutingHttp routingHttp = new RoutingHttp();
 		routingHttp.setUrl(url);
@@ -288,9 +277,9 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public void removeRoutings() {
-		removeRouting(this.getId() + "-uplink");
-		removeRouting(this.getId() + "-downlink");
+	public void removeRoutings(String tenant) {
+		removeRouting(tenant + "-" + this.getId() + "-uplink");
+		removeRouting(tenant + "-" + this.getId() + "-downlink");
 	}
 
 	public List<Group> getGroups() {

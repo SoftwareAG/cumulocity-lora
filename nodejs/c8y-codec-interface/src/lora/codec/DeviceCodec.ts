@@ -52,16 +52,16 @@ export abstract class DeviceCodec implements Component {
                 result.success = false;
                 result.message += "Payload is not in hexadecimal format!<br>";
             }
-            let mor: IManagedObject = await this.getDevice(client, decode.deveui.toLowerCase());
+            let device: IManagedObject = await this.getDevice(client, decode.deveui.toLowerCase());
             if (result.success) {
-                if (!mor) {
+                if (!device) {
                     console.error(`There is no device with DevEUI ${decode.deveui}`);
                     result.success = false;
                     result.message += `There is no device with DevEUI ${decode.deveui}`;
                 } else {
-                    let c8yData: C8YData = this._decode(client, mor, decode.model, decode.fPort, datetime, decode.payload);
+                    let c8yData: C8YData = this._decode(client, device, decode.model, decode.fPort, datetime, decode.payload);
                     console.log(c8yData);
-                    this.processData(client, c8yData);
+                    this.processData(client, device, c8yData);
                     result.message = `Successfully processed payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`;
                     result.response = "OK";
                 }
@@ -155,7 +155,7 @@ export abstract class DeviceCodec implements Component {
         });
     }
 
-    protected processData(client: Client, c8yData: C8YData) {
+    protected processData(client: Client, device: IManagedObject, c8yData: C8YData) {
         c8yData.measurements.forEach(m => {
             client.measurement.create(m);
         })
@@ -166,7 +166,7 @@ export abstract class DeviceCodec implements Component {
             client.alarm.create(a);
         })
         c8yData.alarmsToClear.forEach(a => {
-            this.clearAlarm(client, a);
+            this.clearAlarm(client, device, a);
         })
         if (c8yData.morToUpdate) {
             client.inventory.update(c8yData.morToUpdate);
@@ -191,11 +191,21 @@ export abstract class DeviceCodec implements Component {
         }
     }
 
-    protected async clearAlarm(client: Client, alarmType: string) {
-        (await client.alarm.list({ byType: alarmType, byStatus: AlarmStatus.ACTIVE })).data.forEach(alarm => {
-            alarm.status = AlarmStatus.CLEARED;
-            client.alarm.update(alarm);
-        });
+    protected async clearAlarm(client: Client, device: IManagedObject, alarmType: string) {
+        console.log("Will clear alarms of type " + alarmType + " on device " + device.name);
+        let alarms: IResultList<IAlarm> = await client.alarm.list({ source: device.id, type: alarmType, status: AlarmStatus.ACTIVE });
+        if (alarms && alarms.data && alarms.data.length > 0) {
+            alarms.data.forEach(async alarm => {
+                console.log("Found alarm:");
+                console.log(alarm);
+                await client.alarm.update({
+                    id: alarm.id,
+                    status: AlarmStatus.CLEARED
+                });
+            });
+        } else {
+            console.log("No alarms to update with type " + alarmType + " on device " + device.name);
+        }
     }
 
 }

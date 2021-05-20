@@ -182,7 +182,7 @@ public class TTNConnector extends LNSAbstractConnector {
 		ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
 		ApplicationWebhook webhook = ApplicationWebhook.newBuilder()
 			.setIds(ApplicationWebhookIdentifiers.newBuilder()
-				.setWebhookId(this.getId())
+				.setWebhookId(tenant + "-" + this.getId())
 				.setApplicationIds(ApplicationIdentifiers.newBuilder().setApplicationId(properties.getProperty(APPID)).build())
 				.build())
 			.setBaseUrl(url)
@@ -220,10 +220,10 @@ public class TTNConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public void removeRoutings() {
+	public void removeRoutings(String tenant) {
 		ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
 
-		app.delete(ApplicationWebhookIdentifiers.newBuilder().setWebhookId(this.getId()).build());
+		app.delete(ApplicationWebhookIdentifiers.newBuilder().setWebhookId(tenant + "-" + this.getId()).build());
 	}
 
 	@Override

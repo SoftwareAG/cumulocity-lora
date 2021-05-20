@@ -38,6 +38,9 @@ public class C8YUtils {
 
 	public static final String DEVEUI_TYPE = "LoRa devEUI";
 	public static final String CHILD_DEVICE_TYPE = "LoRa child device ID";
+
+	public static final String CODEC_TYPE = "Device Codec";
+	public static final String CODEC_ID = "Codec ID";
 	
     public Optional<ExternalIDRepresentation> findExternalId(String externalId, String type) {
         ID id = new ID();
