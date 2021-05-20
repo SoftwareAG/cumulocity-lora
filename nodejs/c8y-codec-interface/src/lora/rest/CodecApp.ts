@@ -52,7 +52,7 @@ export class CodecApp {
         operations.forEach((value, key) => {
           jsonObject[key] = value
         });
-        res.json(operations);
+        res.json(jsonObject);
       }).catch(e => {
         res.json({success: false, message: e.message, response: null});
       })
