@@ -74,6 +74,12 @@
                             <label for="{{parameter.id}}">{{parameter.name}}:</label>
                             <input name="{{parameter.id}}" #{{parameter.id}}="ngModel" ngModel required />
                         </div>
+                        <div class="form-group" *ngIf="parameter.type === 'ENUM'">
+                            <label for="{{parameter.id}}">{{parameter.name}}:</label>
+                            <select name="{{parameter.id}}" #{{parameter.id}}="ngModel" ngModel required>
+                                <option *ngFor="let option of parameter.value" [value]="option">{{option}}</option>
+                            </select>
+                        </div>
                         <div class="form-group" *ngIf="parameter.type === 'INTEGER'">
                             <label for="{{parameter.id}}">{{parameter.name}}:</label>
                             <input type="number" name="{{parameter.id}}" #{{parameter.id}}="ngModel" ngModel required />

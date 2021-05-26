@@ -39,7 +39,7 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
             JsonNode rootNode = mapper.readTree(event);
             String deviceEui = rootNode.get("end_device_ids").get("dev_eui").asText();
             int fPort = rootNode.get("uplink_message").get("f_port").asInt();
-            double rssi = rootNode.get("uplink_message").get("rx_metadata").get(0).get("rssi").asDouble();
+            Double rssi = rootNode.get("uplink_message").get("rx_metadata").get(0).has("rssi") ? rootNode.get("uplink_message").get("rx_metadata").get(0).get("rssi").asDouble() : null;
             double snr = rootNode.get("uplink_message").get("rx_metadata").get(0).get("snr").asDouble();
             logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
             byte[] payload = Base64.getDecoder().decode(rootNode.get("uplink_message").get("frm_payload").asText());
@@ -58,9 +58,11 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
     		Map<String, MeasurementValue> measurementValueMap = new HashMap<>();
     		
     		MeasurementValue mv = new MeasurementValue();
-    		mv.setValue(BigDecimal.valueOf(rssi));
-    		mv.setUnit("dBm");
-    		measurementValueMap.put("rssi", mv);
+			if (rssi != null) {
+				mv.setValue(BigDecimal.valueOf(rssi));
+				mv.setUnit("dBm");
+				measurementValueMap.put("rssi", mv);
+			}
 
     		mv = new MeasurementValue();
     		mv.setValue(BigDecimal.valueOf(snr));
