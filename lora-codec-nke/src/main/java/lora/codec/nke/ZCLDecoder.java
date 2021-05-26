@@ -45,22 +45,78 @@ public class ZCLDecoder {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private ScriptEngine engine;
 
-	private Map<String, String> models = new HashMap<>();
+	private Map<String, NKEBatch> dataTypes = new HashMap<>();
 	{
-		models.put("50-70-053",
-				"2,[{taglbl: 0,resol: 1,sampletype: 7},{taglbl: 1,resol: 1,sampletype: 6},{taglbl: 2,resol: 1,sampletype: 6}]");
-		models.put("50-70-085", "2,[{taglbl: 0,resol: 1,sampletype: 7},{taglbl: 2,resol: 1,sampletype: 6}]");
-		models.put("50-70-043", "1,[{taglbl: 0,resol: 1,sampletype: 7},{taglbl: 1,resol: 1,sampletype: 6}]");
-		models.put("50-70-014",
-				"4,[{taglbl: 0,resol: 1,sampletype: 10},{taglbl: 1,resol: 1,sampletype: 10},{taglbl: 2,resol: 1,sampletype: 10},{taglbl: 3,resol: 1,sampletype: 1},{taglbl: 4,resol: 1,sampletype: 1},{taglbl: 5,resol: 1,sampletype: 1},{taglbl: 6,resol: 1,sampletype: 6},{taglbl: 7,resol: 1,sampletype: 6}]");
-		models.put("50-70-072",
-				"4,[{taglbl: 0,resol: 1,sampletype: 10},{taglbl: 1,resol: 1,sampletype: 10},{taglbl: 2,resol: 1,sampletype: 10},{taglbl: 3,resol: 1,sampletype: 1},{taglbl: 4,resol: 1,sampletype: 1},{taglbl: 5,resol: 1,sampletype: 1},{taglbl: 6,resol: 1,sampletype: 6},{taglbl: 7,resol: 1,sampletype: 6}]]");
-		models.put("50-70-016",
-				"3,[{taglbl: 0,resol: 0.004,sampletype: 12},{taglbl: 1,resol: 1,sampletype: 12},{taglbl: 2,resol: 1,sampletype: 6},{taglbl: 3,resol: 1,sampletype: 6}]");
-		models.put("50-70-008",
-				"1,[{taglbl: 0,resol: 1,sampletype: 6}]");
-		models.put("50-70-080",
-				"2,[{taglbl: 0,resol: 1,sampletype: 7},{taglbl: 1,resol: 1,sampletype: 6},{taglbl: 2,resol: 1,sampletype: 6}]");
+		dataTypes.put("50-70-011",
+			new NKEBatch("3,[{taglbl: 0,resol: 1,sampletype: 4},{taglbl: 1,resol: 1, sampletype: 11},{taglbl: 2,resol: 1,sampletype: 5},{taglbl: 3,resol: 1,sampletype: 5}]")
+			.add(new C8YEvent().eventType("Status"))
+			.add(new C8YMeasurement().fragment("Index").series("i").unit(""))
+			.add(new C8YMeasurement().fragment("Flow").series("MinFlow").unit(""))
+			.add(new C8YMeasurement().fragment("Flow").series("MaxFlow").unit(""))
+		);
+		dataTypes.put("50-70-053",
+			new NKEBatch("2,[{taglbl: 0,resol: 10,sampletype: 7},{taglbl: 1,resol: 100,sampletype: 6},{taglbl: 2,resol: 1,sampletype: 6},{taglbl: 3,resol: 1,sampletype: 1}]")
+			.add(new C8YMeasurement().fragment("Temperature").series("T").unit("°C").divisor(100))
+			.add(new C8YMeasurement().fragment("Humidity").series("RH").unit("%RH").divisor(100))
+			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
+			.add(new C8YEvent().eventType("OpenCase").setAsDeviceProperty("OpenCase"))
+		);
+		dataTypes.put("50-70-085",
+			new NKEBatch("2,[{taglbl: 0,resol: 10,sampletype: 7},{taglbl: 2,resol: 1,sampletype: 6},{taglbl: 3,resol: 1,sampletype: 1}]")
+			.add(new C8YMeasurement().fragment("Temperature").series("T").unit("°C").divisor(100))
+			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
+			.add(new C8YEvent().eventType("OpenCase").setAsDeviceProperty("OpenCase"))
+		);
+		dataTypes.put("50-70-043",
+			new NKEBatch("1,[{taglbl: 0,resol: 10,sampletype: 7},{taglbl: 1,resol: 100,sampletype: 6}]")
+			.add(new C8YMeasurement().fragment("Temperature").series("T").unit("°C").divisor(100))
+			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
+		);
+		dataTypes.put("50-70-014",
+			new NKEBatch("4,[{taglbl: 0,resol: 1,sampletype: 10},{taglbl: 1,resol: 1,sampletype: 10},{taglbl: 2,resol: 1,sampletype: 10},{taglbl: 3,resol: 1,sampletype: 1},{taglbl: 4,resol: 1,sampletype: 1},{taglbl: 5,resol: 1,sampletype: 1},{taglbl: 6,resol: 1,sampletype: 6},{taglbl: 7,resol: 1,sampletype: 6}]")
+			.add(new C8YMeasurement().fragment("Index").series("i1").unit(""))
+			.add(new C8YMeasurement().fragment("Index").series("i2").unit(""))
+			.add(new C8YMeasurement().fragment("Index").series("i3").unit(""))
+			.add(new C8YEvent().eventType("State1"))
+			.add(new C8YEvent().eventType("State2"))
+			.add(new C8YEvent().eventType("State3"))
+			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
+			.add(new C8YEvent().eventType("MultiState"))
+		);
+		dataTypes.put("50-70-016",
+			new NKEBatch("3,[{taglbl: 0,resol: 0.004,sampletype: 12},{taglbl: 1,resol: 1,sampletype: 12},{taglbl: 2,resol: 100,sampletype: 6},{taglbl: 3,resol: 100,sampletype: 6},{taglbl: 4,resol: 1,sampletype: 10}]")
+			.add(new C8YMeasurement().fragment("Intensity").series("I").unit("mA"))
+			.add(new C8YMeasurement().fragment("Tension").series("T").unit("V"))
+			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
+			.add(new C8YMeasurement().fragment("ExternalPowerLevel").series("P").unit("W"))
+			.add(new C8YMeasurement().fragment("Index").series("i").unit(""))
+		);
+		dataTypes.put("50-70-101",
+			new NKEBatch("3,[{taglbl: 0,resol: 1,sampletype: 7},{taglbl: 1,resol: 1,sampletype: 7},{taglbl: 2,resol: 1,sampletype: 7},{taglbl: 3,resol: 1,sampletype: 6},{taglbl: 4,resol: 10,sampletype: 7},{taglbl: 5,resol: 1,sampletype: 7},{taglbl: 6,resol: 1,sampletype: 10},{taglbl: 7,resol: 1,sampletype: 1}]")
+			.add(new C8YMeasurement().fragment("Pressure").series("Mean differential pressure since last report").unit("Pa"))
+			.add(new C8YMeasurement().fragment("Pressure").series("Max differential pressure since last report").unit("Pa"))
+			.add(new C8YMeasurement().fragment("Pressure").series("Min differential pressure since last report").unit("Pa"))
+			.add(new C8YMeasurement().fragment("Pressure").series("Differential pressure").unit("Pa"))
+			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
+			.add(new C8YMeasurement().fragment("Temperature").series("T").unit("°C").divisor(100))
+			.add(new C8YMeasurement().fragment("Index").series("i").unit(""))
+			.add(new C8YEvent().eventType("Status"))
+		);
+		dataTypes.put("50-70-108",
+			new NKEBatch("3,[{taglbl: 0,resol: 0.004,sampletype: 12},{taglbl: 1,resol: 1,sampletype: 12},{taglbl: 2,resol: 1,sampletype: 6},{taglbl: 3,resol: 1,sampletype: 6}]")
+			.add(new C8YEvent().eventType("OpenClose").setAsDeviceProperty("OpenClose"))
+			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
+		);
+		dataTypes.put("50-70-139",
+			new NKEBatch("3,[{taglbl: 0,resol: 10,sampletype: 7},{taglbl: 1,resol: 10,sampletype: 7}]")
+			.add(new C8YMeasurement().fragment("Temperature").series("T1").unit("°C").divisor(100))
+			.add(new C8YMeasurement().fragment("Temperature").series("T2").unit("°C").divisor(100))
+		);
+		/*dataTypes.put("50-70-143",
+			new NKEBatch("3,[{taglbl: 0,resol: 10,sampletype: 7},{taglbl: 1,resol: 10,sampletype: 7}")
+			.add(0, new C8YMeasurement().fragment("Temperature").series("T1").unit("°C").divisor(100))
+			.add(1, new C8YMeasurement().fragment("Temperature").series("T2").unit("°C").divisor(100))
+		);*/
 		ScriptEngineManager manager = new ScriptEngineManager();
 		engine = manager.getEngineByName("nashorn");
 		try {
@@ -209,8 +265,10 @@ public class ZCLDecoder {
 						changeDeviceState(device, c8yData, "PIN 10", STATUS_CHANGED_TO + ((bytes[index] & 0x02) == 0x02), "pinState10", ((bytes[index] & 0x02) == 0x02), time);
 					}
 					// analog input
-					if ((clusterdID == 0x000c) && (attributID == 0x0055))
+					if ((clusterdID == 0x000c) && (attributID == 0x0055)) {
+						buffer = ByteBuffer.wrap(bytes, index, 4);
 						c8yData.addMeasurement(device, "analog", "a", "", BigDecimal.valueOf(buffer.getFloat()), time);
+					}
 
 					// simple metering
 					if ((clusterdID == 0x0052) && (attributID == 0x0000)) {
@@ -342,25 +400,18 @@ public class ZCLDecoder {
 				if (model != null) {
 					try {
 						logger.info("Model detected: {}", model);
-						String js = "record = brUncompress(" + models.get(model) + ",\""
-								+ BaseEncoding.base16().encode(bytes) + "\");";
-						logger.info("Will use these args: {}", js);
-						engine.eval(js);
-						if (model.equals("50-70-053") || model.equals("50-70-085")) {
-							BatchRecord record = (BatchRecord) engine.get("record");
-							for (BatchDataSet dataset : record.dataset) {
-								DateTime datasettime = time.plus((dataset.data_relative_timestamp - record.batch_relative_timestamp) * 1000);
-								if (dataset.data.label == 0) {
-									c8yData.addMeasurement(device, "Temperature", "T", "°C", BigDecimal.valueOf(dataset.data.value).divide(BigDecimal.valueOf(100)), datasettime);
-								}
-								if (dataset.data.label == 1) {
-									c8yData.addMeasurement(device, "Humidity", "H", "%RH", BigDecimal.valueOf(dataset.data.value).divide(BigDecimal.valueOf(100)), datasettime);
-								}
-								if (dataset.data.label == 2) {
-									BigDecimal battery = BigDecimal.valueOf(dataset.data.value).divide(BigDecimal.valueOf(100));
-									c8yData.addMeasurement(device, "c8y_Battery", "level", "%", battery, datasettime);
-									device.setProperty("battery", battery);
-									c8yData.updateRootDevice(device);
+						if (dataTypes.containsKey(model)) {
+							String js = "record = brUncompress(" + dataTypes.get(model).getAttributes() + ",\""
+									+ BaseEncoding.base16().encode(bytes) + "\");";
+							logger.info("Will use these args: {}", js);
+							engine.eval(js);
+							BatchRecord batchRecord = (BatchRecord) engine.get("record");
+							for (BatchDataSet dataset : batchRecord.dataset) {
+								DateTime datasettime = time.plus((dataset.data_relative_timestamp - batchRecord.batch_relative_timestamp) * 1000);
+								if (dataTypes.get(model).isLabelDefined(dataset.data.label)) {
+									dataTypes.get(model).get(dataset.data.label).sendToCumulocity(device, c8yData, dataset.data.value, datasettime);
+								} else {
+									logger.error("Label {} is not defined.", dataset.data.label);
 								}
 							}
 						} else {
