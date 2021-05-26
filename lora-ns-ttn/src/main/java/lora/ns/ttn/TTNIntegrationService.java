@@ -46,6 +46,13 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
             Long updateTime = new DateTime(rootNode.get("uplink_message").get("received_at").asText()).getMillis();
             logger.info("Update time is: {}", updateTime);
 
+			Double lat = null;
+			Double lng = null;
+			if (rootNode.get("uplink_message").has("locations")) {
+				lat = rootNode.get("uplink_message").get("locations").get("user").get("latitude").asDouble();
+				lng = rootNode.get("uplink_message").get("locations").get("user").get("longitude").asDouble();
+			}
+
             List<MeasurementRepresentation> measurements = new ArrayList<>();
     		MeasurementRepresentation m = new MeasurementRepresentation();
     		Map<String, MeasurementValue> measurementValueMap = new HashMap<>();
@@ -65,7 +72,7 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
     		m.setDateTime(new DateTime(updateTime));
     		measurements.add(m);
 
-    		data = new DeviceData(deviceEui, deviceEui, null, null, fPort, payload, updateTime, measurements, null, null);
+    		data = new DeviceData(deviceEui, deviceEui, null, null, fPort, payload, updateTime, measurements, lat != null ? BigDecimal.valueOf(lat) : null, lng != null ? BigDecimal.valueOf(lng) : null);
         } catch (Exception e) {
         	e.printStackTrace();
             logger.error("Error on Mapping LoRa payload to Cumulocity", e);

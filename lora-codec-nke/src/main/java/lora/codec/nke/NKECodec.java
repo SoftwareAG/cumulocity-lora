@@ -18,15 +18,16 @@ import lora.codec.DownlinkData;
 public class NKECodec extends DeviceCodec {
 	
 	{
-		models.put("50-70-053", "TH (50-70-053)");
-		models.put("50-70-085", "T (50-70-085)");
-		models.put("50-70-043", "Remote temperature (50-70-043)");
-		models.put("50-70-014", "Pulse Sens'O (50-70-014)");
-		models.put("50-70-072", "Pulse Sens'O (50-70-072)");
+		models.put("50-70-011", "Sens'O (50-70-011)");
+		models.put("50-70-014", "Pulse Sens'O (50-70-014/039/051/072/079/160)");
 		models.put("50-70-016", "Press'O (50-70-016)");
-		models.put("50-70-008", "50-70-008");
-		models.put("50-70-080", "50-70-080");
-		models.put("50-70-143", "Skydome");
+		models.put("50-70-043", "Remote temperature (50-70-043/142)");
+		models.put("50-70-053", "TH (50-70-053/080)");
+		models.put("50-70-085", "T (50-70-085/167)");
+		models.put("50-70-101", "Ventil'O (50-70-101/166)");
+		models.put("50-70-108", "Clos'O (50-70-108)");
+		models.put("50-70-139", "Remote temperature 2CTN (50-70-139/163)");
+		//models.put("50-70-143", "Skydome (50-70-143)");
 	}
 	
 	@Autowired
