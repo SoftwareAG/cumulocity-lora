@@ -2,6 +2,7 @@ import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionS
 import { Client, IManagedObject } from '@c8y/client';
 import { Request, Response, NextFunction } from "express";
 import { CustomCodec } from './CustomCodec';
+import { DeviceOperationParam, ParamType } from 'c8y-codec-interface/dist/lora/codec/DeviceOperationParam';
 
 class CustomDeviceCodec extends DeviceCodec {
 
@@ -51,6 +52,26 @@ class CustomDeviceCodec extends DeviceCodec {
             }
             (await client.inventory.list({type: 'CustomCodec'})).data.forEach(mo => {
                 this.customCodecs.get(client).set(mo.name, new CustomCodec(mo));
+                if (!mo.operations) {
+                    mo.operations = new Map<string, DeviceOperation>();
+                }
+                if (mo.operations.size == 0) {
+                    mo.operations.set("test", {
+                        id: "test",
+                        name: "Sample operation",
+                        params: [{
+                            id: "param1",
+                            name: "Param 1",
+                            type: ParamType.STRING,
+                            value: null
+                        },{
+                            id: "param2",
+                            name: "Param 2",
+                            type: ParamType.INTEGER,
+                            value: null
+                        }]
+                    });
+                }
                 this.operations.get(client).set(mo.name, mo.operations);
             })
         });
