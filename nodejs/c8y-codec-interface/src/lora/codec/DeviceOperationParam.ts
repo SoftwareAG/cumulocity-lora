@@ -6,5 +6,5 @@ export class DeviceOperationParam {
 }
 
 export enum ParamType {
-    STRING, INTEGER, FLOAT, BOOL, DATE, ENUM
+    STRING = "STRING", INTEGER = "INTEGER", FLOAT = "FLOAT", BOOL = "BOOL", DATE = "DATE", ENUM = "ENUM"
 }
