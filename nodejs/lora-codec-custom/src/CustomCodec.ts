@@ -54,9 +54,15 @@ export class CustomCodec {
     }
 
     public encode(device: IManagedObject, operation: string): DownlinkData {
+        let result: DownlinkData = null;
         let operationJson: any = JSON.parse(operation);
         let command: string = Object.keys(operationJson)[0];
-        console.log(`Will call command ${command} with parameters ${operation}`);
-        return this.vm.run(this.encodeScripts.get(command))(device, operationJson);
+        console.log(`Will call command ${command} with parameters ${operationJson[command]}`);
+        if (this.encodeScripts.get(command)) {
+            result = this.vm.run(this.encodeScripts.get(command))(device, operationJson);
+        } else {
+            result = {fport: 1, payload: "000000", devEui: null};
+        }
+        return result;
     }
 }
