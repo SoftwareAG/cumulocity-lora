@@ -101,7 +101,7 @@ public class TTNConnector extends LNSAbstractConnector {
 		EndDeviceRegistryBlockingStub service = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
                 .withCallCredentials(token);
         GetEndDeviceIdentifiersForEUIsRequest request = GetEndDeviceIdentifiersForEUIsRequest.newBuilder()
-                .setDevEui(ByteString.copyFrom(BaseEncoding.base16().lowerCase().decode(devEui)))
+                .setDevEui(ByteString.copyFrom(BaseEncoding.base16().decode(devEui.toUpperCase())))
                 .build();
 
 		return service.getIdentifiersForEUIs(request);
