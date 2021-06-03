@@ -49,10 +49,13 @@ public class ObjeniousIntegrationService extends LNSIntegrationService<Objenious
             Double lat = rootNode.has("lat") ? rootNode.get("lat").asDouble() : null;
             Double lng = rootNode.has("lng") ? rootNode.get("lng").asDouble() : null;
             logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
-            byte[] payload = BaseEncoding.base16().decode(rootNode.get("payload_cleartext").asText().toUpperCase());
+			JsonNode payloadNode = rootNode.get("payload_cleartext");
+			byte[] payload = new byte[0];
+			if (payloadNode != null && !payloadNode.isNull()) {
+				payload = BaseEncoding.base16().decode(payloadNode.asText().toUpperCase());
+			}
             Long updateTime = new DateTime(rootNode.get("timestamp").asText()).getMillis();
-            //String model = null;
-            logger.info("Update time is: " + updateTime);
+            logger.info("Update time is: {}", updateTime);
 
             List<MeasurementRepresentation> measurements = new ArrayList<>();
     		MeasurementRepresentation m = new MeasurementRepresentation();

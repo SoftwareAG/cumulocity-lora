@@ -377,7 +377,7 @@ export class LoraDevicesComponent {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(deviceProvisioning)
+            body: JSON.stringify({...deviceProvisioning, provisioningMode: "OTAA"})
         })).json()).data;
     }
 
