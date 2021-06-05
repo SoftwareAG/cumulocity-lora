@@ -30,6 +30,31 @@ LNS Connectors as well as codecs are multitenant microservices that can fully sc
 
 ![](architecture.png)
 
+The diagram shows the general architecture of the framework. The assumption is that the physical LoRaWAN devices are connected to LoRaWAN gateways that are connected to a LoRaWAN Network Server (LNS). All integration will be through the APIs of that LNS used by an LNS Integration Microservice hosted inside Cumulocity IoT. Each new LNS requires its own integration microservice. The LNS Integration Microservice interacts with Device Codec Microservices that translate the device-specific data formats into the Cumulocity data model of measurements, events, and alarms. A Device Codec Microservice will typically support multiple models from the same device vendor.
+
+To allow users to configure connections to new LNS and add new devices, the standard Cumulocity IoT Device Management application is extended with:
+* Configuration screens to manage LNS and LoRaWAN devices
+* A custom codec screen with a source code editor to allow for ad-hoc implementation of new codecs
+* A LoRa tab for the individual devices to manage these devices
+
+## Build & Deployment
+
+The individual device codecs and LNS integrations are build as individual microservices. The build & deployment instructions for each can be found in the individual sub-projects. For the Java microservices, the common sub-projects on which the microservices are based need to be installed into either a local or remote repository:
+
+```
+mvn install --projects lora-interface,lora-codec-ms,lora-ns-ms
+```
+
+The user interface is an extended version of the Device Management application of Cumulocity IoT and it can be built and deployed like any other Cumulocity IoT web application. The custom Device Management application is built using npm and c8ycli (https://cumulocity.com/guides/web/development-tools/#c8y-cli) . The "web" sub-folder contains the versions for different Cumulocity IoT releases. To build it run the following commands (the first step is only required after the dependencies have been changed):
+
+```
+npm install
+npm run-script build
+c8ycli deploy
+```
+
+The last command will prompt for the tenant to deploy to and your credentials.
+
 ## How to create a new connector
 
 You'll need the following Maven dependency to start writing a new connector:
