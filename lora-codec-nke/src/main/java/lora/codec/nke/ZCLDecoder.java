@@ -1,14 +1,11 @@
 package lora.codec.nke;
 
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -16,9 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import lora.codec.C8YData;
-
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-import com.google.common.io.BaseEncoding;
 
 @Service
 public class ZCLDecoder {
@@ -43,37 +37,36 @@ public class ZCLDecoder {
 	 */
 	private static final String POWER_CONFIGURATION = "Power Configuration";
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	private ScriptEngine engine;
 
 	private Map<String, NKEBatch> dataTypes = new HashMap<>();
 	{
 		dataTypes.put("50-70-011",
-			new NKEBatch("3,[{taglbl: 0,resol: 1,sampletype: 4},{taglbl: 1,resol: 1, sampletype: 11},{taglbl: 2,resol: 1,sampletype: 5},{taglbl: 3,resol: 1,sampletype: 5}]")
+			new NKEBatch(3, new BatchRecord.Arg[]{new BatchRecord.Arg(0,1,4),new BatchRecord.Arg(1,1,11),new BatchRecord.Arg(2,1,5),new BatchRecord.Arg(3,1,5)})
 			.add(new C8YEvent().eventType("Status"))
 			.add(new C8YMeasurement().fragment("Index").series("i").unit(""))
 			.add(new C8YMeasurement().fragment("Flow").series("MinFlow").unit(""))
 			.add(new C8YMeasurement().fragment("Flow").series("MaxFlow").unit(""))
 		);
 		dataTypes.put("50-70-053",
-			new NKEBatch("2,[{taglbl: 0,resol: 10,sampletype: 7},{taglbl: 1,resol: 100,sampletype: 6},{taglbl: 2,resol: 1,sampletype: 6},{taglbl: 3,resol: 1,sampletype: 1}]")
+			new NKEBatch(2,new BatchRecord.Arg[]{new BatchRecord.Arg(0,10,7),new BatchRecord.Arg(1,100,6),new BatchRecord.Arg(2,1,6),new BatchRecord.Arg(3,1,1)})
 			.add(new C8YMeasurement().fragment("Temperature").series("T").unit("°C").divisor(100))
 			.add(new C8YMeasurement().fragment("Humidity").series("RH").unit("%RH").divisor(100))
 			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
 			.add(new C8YEvent().eventType("OpenCase").setAsDeviceProperty("OpenCase"))
 		);
 		dataTypes.put("50-70-085",
-			new NKEBatch("2,[{taglbl: 0,resol: 10,sampletype: 7},{taglbl: 2,resol: 1,sampletype: 6},{taglbl: 3,resol: 1,sampletype: 1}]")
+			new NKEBatch(2,new BatchRecord.Arg[]{new BatchRecord.Arg(0,10,7),new BatchRecord.Arg(2,1,6),new BatchRecord.Arg(3,1,1)})
 			.add(new C8YMeasurement().fragment("Temperature").series("T").unit("°C").divisor(100))
 			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
 			.add(new C8YEvent().eventType("OpenCase").setAsDeviceProperty("OpenCase"))
 		);
 		dataTypes.put("50-70-043",
-			new NKEBatch("1,[{taglbl: 0,resol: 10,sampletype: 7},{taglbl: 1,resol: 100,sampletype: 6}]")
+			new NKEBatch(1,new BatchRecord.Arg[]{new BatchRecord.Arg(0,10,7),new BatchRecord.Arg(1,100,6)})
 			.add(new C8YMeasurement().fragment("Temperature").series("T").unit("°C").divisor(100))
 			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
 		);
 		dataTypes.put("50-70-014",
-			new NKEBatch("4,[{taglbl: 0,resol: 1,sampletype: 10},{taglbl: 1,resol: 1,sampletype: 10},{taglbl: 2,resol: 1,sampletype: 10},{taglbl: 3,resol: 1,sampletype: 1},{taglbl: 4,resol: 1,sampletype: 1},{taglbl: 5,resol: 1,sampletype: 1},{taglbl: 6,resol: 1,sampletype: 6},{taglbl: 7,resol: 1,sampletype: 6}]")
+			new NKEBatch(4,new BatchRecord.Arg[]{new BatchRecord.Arg(0,1,10),new BatchRecord.Arg(1,1,10),new BatchRecord.Arg(2,1,10),new BatchRecord.Arg(3,1,1),new BatchRecord.Arg(4,1,1),new BatchRecord.Arg(5,1,1),new BatchRecord.Arg(6,1,6),new BatchRecord.Arg(7,1,6)})
 			.add(new C8YMeasurement().fragment("Index").series("i1").unit(""))
 			.add(new C8YMeasurement().fragment("Index").series("i2").unit(""))
 			.add(new C8YMeasurement().fragment("Index").series("i3").unit(""))
@@ -84,7 +77,7 @@ public class ZCLDecoder {
 			.add(new C8YEvent().eventType("MultiState"))
 		);
 		dataTypes.put("50-70-016",
-			new NKEBatch("3,[{taglbl: 0,resol: 0.004,sampletype: 12},{taglbl: 1,resol: 1,sampletype: 12},{taglbl: 2,resol: 100,sampletype: 6},{taglbl: 3,resol: 100,sampletype: 6},{taglbl: 4,resol: 1,sampletype: 10}]")
+			new NKEBatch(3,new BatchRecord.Arg[]{new BatchRecord.Arg(0,0.004f,12),new BatchRecord.Arg(1,1,12),new BatchRecord.Arg(2,100,6),new BatchRecord.Arg(3,100,6),new BatchRecord.Arg(4,1,10)})
 			.add(new C8YMeasurement().fragment("Intensity").series("I").unit("mA"))
 			.add(new C8YMeasurement().fragment("Tension").series("T").unit("V"))
 			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
@@ -92,7 +85,7 @@ public class ZCLDecoder {
 			.add(new C8YMeasurement().fragment("Index").series("i").unit(""))
 		);
 		dataTypes.put("50-70-101",
-			new NKEBatch("3,[{taglbl: 0,resol: 1,sampletype: 7},{taglbl: 1,resol: 1,sampletype: 7},{taglbl: 2,resol: 1,sampletype: 7},{taglbl: 3,resol: 1,sampletype: 6},{taglbl: 4,resol: 10,sampletype: 7},{taglbl: 5,resol: 1,sampletype: 7},{taglbl: 6,resol: 1,sampletype: 10},{taglbl: 7,resol: 1,sampletype: 1}]")
+			new NKEBatch(3,new BatchRecord.Arg[]{new BatchRecord.Arg(0,1,7),new BatchRecord.Arg(1,1,7),new BatchRecord.Arg(2,1,7),new BatchRecord.Arg(3,1,6),new BatchRecord.Arg(4,10,7),new BatchRecord.Arg(5,1,7),new BatchRecord.Arg(6,1,10),new BatchRecord.Arg(7,1,1)})
 			.add(new C8YMeasurement().fragment("Pressure").series("Mean differential pressure since last report").unit("Pa"))
 			.add(new C8YMeasurement().fragment("Pressure").series("Max differential pressure since last report").unit("Pa"))
 			.add(new C8YMeasurement().fragment("Pressure").series("Min differential pressure since last report").unit("Pa"))
@@ -103,12 +96,12 @@ public class ZCLDecoder {
 			.add(new C8YEvent().eventType("Status"))
 		);
 		dataTypes.put("50-70-108",
-			new NKEBatch("3,[{taglbl: 0,resol: 0.004,sampletype: 12},{taglbl: 1,resol: 1,sampletype: 12},{taglbl: 2,resol: 1,sampletype: 6},{taglbl: 3,resol: 1,sampletype: 6}]")
+			new NKEBatch(3,new BatchRecord.Arg[]{new BatchRecord.Arg(0,0.004f,12),new BatchRecord.Arg(1,1,12),new BatchRecord.Arg(2,1,6),new BatchRecord.Arg(3,1,6)})
 			.add(new C8YEvent().eventType("OpenClose").setAsDeviceProperty("OpenClose"))
 			.add(new C8YMeasurement().fragment("Battery").series("T").unit("mV").setAsDeviceProperty("Battery"))
 		);
 		dataTypes.put("50-70-139",
-			new NKEBatch("3,[{taglbl: 0,resol: 10,sampletype: 7},{taglbl: 1,resol: 10,sampletype: 7}]")
+			new NKEBatch(3,new BatchRecord.Arg[]{new BatchRecord.Arg(0,10,7),new BatchRecord.Arg(1,10,7)})
 			.add(new C8YMeasurement().fragment("Temperature").series("T1").unit("°C").divisor(100))
 			.add(new C8YMeasurement().fragment("Temperature").series("T2").unit("°C").divisor(100))
 		);
@@ -117,13 +110,6 @@ public class ZCLDecoder {
 			.add(0, new C8YMeasurement().fragment("Temperature").series("T1").unit("°C").divisor(100))
 			.add(1, new C8YMeasurement().fragment("Temperature").series("T2").unit("°C").divisor(100))
 		);*/
-		ScriptEngineManager manager = new ScriptEngineManager();
-		engine = manager.getEngineByName("nashorn");
-		try {
-			engine.eval(new InputStreamReader(getClass().getResourceAsStream("/br_uncompress.js")));
-		} catch (ScriptException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public class MinMax {
@@ -401,11 +387,8 @@ public class ZCLDecoder {
 					try {
 						logger.info("Model detected: {}", model);
 						if (dataTypes.containsKey(model)) {
-							String js = "record = brUncompress(" + dataTypes.get(model).getAttributes() + ",\""
-									+ BaseEncoding.base16().encode(bytes) + "\");";
-							logger.info("Will use these args: {}", js);
-							engine.eval(js);
-							BatchRecord batchRecord = (BatchRecord) engine.get("record");
+							BatchRecord batchRecord = new BatchRecord(); //(BatchRecord) engine.get("record");
+							batchRecord.uncompress(dataTypes.get(model).getTagsz(), dataTypes.get(model).getArgs(), bytes, null);
 							for (BatchDataSet dataset : batchRecord.dataset) {
 								DateTime datasettime = time.plus((dataset.data_relative_timestamp - batchRecord.batch_relative_timestamp) * 1000);
 								if (dataTypes.get(model).isLabelDefined(dataset.data.label)) {
@@ -417,7 +400,7 @@ public class ZCLDecoder {
 						} else {
 							logger.error("Model {} is not supported yet", model);
 						}
-					} catch (ScriptException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				} else {

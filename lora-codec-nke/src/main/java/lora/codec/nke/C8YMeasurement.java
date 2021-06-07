@@ -42,7 +42,7 @@ public class C8YMeasurement implements C8YDataType {
     }
 
     @Override
-    public void sendToCumulocity(ManagedObjectRepresentation device, C8YData c8yData, int value, DateTime time) {
+    public void sendToCumulocity(ManagedObjectRepresentation device, C8YData c8yData, float value, DateTime time) {
         c8yData.addMeasurement(device, fragment, series, unit, BigDecimal.valueOf(value).divide(divisor), time);
         if (setAsDeviceProperty) {
             device.set(BigDecimal.valueOf(value).divide(divisor), this.deviceProperty);
