@@ -18,7 +18,7 @@ public class C8YEvent implements C8YDataType {
     }
 
     @Override
-    public void sendToCumulocity(ManagedObjectRepresentation device, C8YData c8yData, int value, DateTime time) {
+    public void sendToCumulocity(ManagedObjectRepresentation device, C8YData c8yData, float value, DateTime time) {
         c8yData.addEvent(device, eventType, eventType + " " + value, null, time);
         if (setAsDeviceProperty) {
             device.set(value, this.deviceProperty);

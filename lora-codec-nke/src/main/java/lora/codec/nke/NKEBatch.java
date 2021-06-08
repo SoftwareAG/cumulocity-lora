@@ -5,14 +5,20 @@ import java.util.List;
 
 public class NKEBatch {
     private List<C8YDataType> dataTypes = new ArrayList<>();
-    private String attributes;
+    private int tagsz;
+    private BatchRecord.Arg[] args;
 
-    public NKEBatch(String attributes) {
-        this.attributes = attributes;
+    public int getTagsz() {
+        return tagsz;
     }
 
-    public String getAttributes() {
-        return this.attributes;
+    public BatchRecord.Arg[] getArgs() {
+        return args;
+    }
+
+    public NKEBatch(int tagsz, BatchRecord.Arg[] args) {
+        this.tagsz = tagsz;
+        this.args = args;
     }
 
     NKEBatch add(C8YDataType dataType) {
