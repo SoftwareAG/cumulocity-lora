@@ -132,7 +132,7 @@ public class TTNConnector extends LNSAbstractConnector {
 		DownlinkMessageProcessorBlockingStub service = DownlinkMessageProcessorGrpc.newBlockingStub(managedChannel)
 				.withCallCredentials(token);
 				
-		ApplicationDownlink result = service.process(ProcessDownlinkMessageRequest.newBuilder().setIds(getDeviceIds(operation.getDevEui())).setMessage(ApplicationDownlink.newBuilder().setFPort(operation.getFport()).setFrmPayload(ByteString.copyFrom(BaseEncoding.base16().decode(operation.getPayload()))).build()).build());
+		ApplicationDownlink result = service.process(ProcessDownlinkMessageRequest.newBuilder().setIds(getDeviceIds(operation.getDevEui())).setMessage(ApplicationDownlink.newBuilder().setFPort(operation.getFport()).setFrmPayload(ByteString.copyFrom(BaseEncoding.base16().decode(operation.getPayload().toUpperCase()).build()).build());
 
 		String downlinkCorrelationId = null;
 
