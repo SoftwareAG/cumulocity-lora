@@ -132,7 +132,7 @@ public class TTNConnector extends LNSAbstractConnector {
 		DownlinkMessageProcessorBlockingStub service = DownlinkMessageProcessorGrpc.newBlockingStub(managedChannel)
 				.withCallCredentials(token);
 				
-		ApplicationDownlink result = service.process(ProcessDownlinkMessageRequest.newBuilder().setIds(getDeviceIds(operation.getDevEui())).setMessage(ApplicationDownlink.newBuilder().setFPort(operation.getFport()).setFrmPayload(ByteString.copyFrom(BaseEncoding.base16().decode(operation.getPayload()))).build()).build());
+		ApplicationDownlink result = service.process(ProcessDownlinkMessageRequest.newBuilder().setIds(getDeviceIds(operation.getDevEui())).setMessage(ApplicationDownlink.newBuilder().setFPort(operation.getFport()).setFrmPayload(ByteString.copyFrom(BaseEncoding.base16().decode(operation.getPayload().toUpperCase())))).build());
 
 		String downlinkCorrelationId = null;
 
@@ -155,12 +155,12 @@ public class TTNConnector extends LNSAbstractConnector {
 			.setName(deviceProvisioning.getName())
 			.setIds(EndDeviceIdentifiers.newBuilder()
 				.setApplicationIds(ApplicationIdentifiers.newBuilder().setApplicationId(properties.getProperty(APPID)).build())
-				.setDevEui(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getDevEUI())))
-				.setJoinEui(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getAppEUI())))
+				.setDevEui(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getDevEUI().toUpperCase())))
+				.setJoinEui(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getAppEUI().toUpperCase())))
 				.build())
 			.setRootKeys(RootKeys.newBuilder()
 				.setAppKey(KeyEnvelope.newBuilder()
-					.setKey(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getAppKey())))
+					.setKey(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getAppKey().toUpperCase())))
 					.build())
 				.build())
 			.build();
@@ -168,10 +168,14 @@ public class TTNConnector extends LNSAbstractConnector {
 			.setEndDevice(device)
 			.build();
 		device = service4.create(request);
-		SetEndDeviceRequest request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
-		service1.set(request2);
-		service3.set(request2);
-		service2.set(request2);
+		if (device != null) {
+			SetEndDeviceRequest request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
+			service1.set(request2);
+			service3.set(request2);
+			service2.set(request2);
+		} else {
+			logger.error("Impossible to provision device in TTN.");
+		}
 
 		return device != null;
 	}
