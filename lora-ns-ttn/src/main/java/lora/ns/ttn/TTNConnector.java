@@ -132,7 +132,7 @@ public class TTNConnector extends LNSAbstractConnector {
 		DownlinkMessageProcessorBlockingStub service = DownlinkMessageProcessorGrpc.newBlockingStub(managedChannel)
 				.withCallCredentials(token);
 				
-		ApplicationDownlink result = service.process(ProcessDownlinkMessageRequest.newBuilder().setIds(getDeviceIds(operation.getDevEui())).setMessage(ApplicationDownlink.newBuilder().setFPort(operation.getFport()).setFrmPayload(ByteString.copyFrom(BaseEncoding.base16().decode(operation.getPayload().toUpperCase())))).build());
+		ApplicationDownlink result = service.process(ProcessDownlinkMessageRequest.newBuilder().setIds(getDeviceIds(operation.getDevEui())).setMessage(ApplicationDownlink.newBuilder().setFPort(operation.getFport()).setConfirmed(true).setFrmPayload(ByteString.copyFrom(BaseEncoding.base16().decode(operation.getPayload().toUpperCase())))).build());
 
 		String downlinkCorrelationId = null;
 
@@ -153,7 +153,9 @@ public class TTNConnector extends LNSAbstractConnector {
 		EndDeviceRegistryBlockingStub service4 = EndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
 		ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = ttn.lorawan.v3.EndDeviceOuterClass.EndDevice.newBuilder()
 			.setName(deviceProvisioning.getName())
+			.setDescription("New device created by Cumulocity")
 			.setIds(EndDeviceIdentifiers.newBuilder()
+				.setDeviceId(deviceProvisioning.getDevEUI().toLowerCase())
 				.setApplicationIds(ApplicationIdentifiers.newBuilder().setApplicationId(properties.getProperty(APPID)).build())
 				.setDevEui(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getDevEUI().toUpperCase())))
 				.setJoinEui(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getAppEUI().toUpperCase())))
