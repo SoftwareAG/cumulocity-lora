@@ -221,6 +221,7 @@ public abstract class DeviceCodec implements Component {
 				result = new Result<>(true, "Couldn't find device " + encode.getDevEui(), data);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			result = new Result<>(false, "Couldn't process " + encode.toString(), null);
 		}
 		
