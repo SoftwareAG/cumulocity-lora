@@ -72,7 +72,12 @@
     </div>
     <div class="card col-sm-4">
         <div class="card-header separator">
-            <h4 class="card-title">Upload a CSV file</h4>
+            <h4 class="card-title">Upload a CSV file
+                <button class="btn-clean m-l-4 flex-item-middle" popoverTitle="Format (one device per line)" popover="{{
+                    '<<appKey>>;<<name>>;<<devEUI>>;<<appEUI>>;<<codec id>>;<<model>>;<<instance>>'| translate}}" placement="right" type="button">
+                    <i class="fa fw fa-question-circle-o text-primary"></i>
+                </button>
+            </h4>
         </div>
         <div class="card-block">
             <div class="col-sm-12">
