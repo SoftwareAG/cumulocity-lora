@@ -1,17 +1,9 @@
 # nke WATTECO Codec
-This is a device codec for the Cumulocity LoRa framework (https://github.com/SoftwareAG/cumulocity-lora) to support nke WATTECO devices (https://www.nke-watteco.com). It is implemented as a Spring Boot application in Java.
+This is a device codec for the Cumulocity LoRa framework (https://github.com/SoftwareAG/cumulocity-lora) to support a custom device sending ground moisture values encoded on 2 bytes
 
-## Supported devices
+Moisture (2 Bytes) | Other1 (2 Bytes) | Other2 (2 Bytes) | Other3 (2 Bytes)
 
-* nke WATTECO Sens'O (50-70-011)
-* nke WATTECO Pulse Sens'O (50-70-014/039/051/072/079/160)
-* nke WATTECO Press'O (50-70-016)
-* nke WATTECO Remote temperature (50-70-043/142)
-* nke WATTECO TH (50-70-053/080)
-* nke WATTECO T (50-70-085/167)
-* nke WATTECO Ventil'O (50-70-101/166)
-* nke WATTECO Clos'O (50-70-108)
-* nke WATTECO Remote temperature 2CTN (50-70-139/163)
+6 bytes reserved for future usages
 
 ## Build & Deploy
 
