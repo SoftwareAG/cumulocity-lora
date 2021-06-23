@@ -1,4 +1,4 @@
-# nke WATTECO Codec
+# Inno PoC Codec
 This is a device codec for the Cumulocity LoRa framework (https://github.com/SoftwareAG/cumulocity-lora) to support a custom device sending ground moisture values encoded on 2 bytes
 
 Moisture (2 Bytes) | Other1 (2 Bytes) | Other2 (2 Bytes) | Other3 (2 Bytes)
