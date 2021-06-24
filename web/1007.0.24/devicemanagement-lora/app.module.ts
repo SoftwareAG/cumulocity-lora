@@ -30,6 +30,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
+import { PopoverModule, PopoverConfig } from 'ngx-bootstrap/popover';
 
 const monacoConfig: NgxMonacoEditorConfig = {
   //baseUrl: 'app-name/assets', // configure base path for monaco editor default: './assets'
@@ -300,7 +301,8 @@ declare var Buffer: {
     MonacoEditorModule.forRoot(monacoConfig),
     BsDatepickerModule.forRoot(),
     TimepickerModule.forRoot(),
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
+    PopoverModule
   ],
   providers: [
     LoraGuard,
