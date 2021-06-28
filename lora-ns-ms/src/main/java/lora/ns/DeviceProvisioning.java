@@ -38,7 +38,7 @@ public class DeviceProvisioning implements Validator {
 		}
 	}
 
-	private ProvisioningMode provisioningMode;
+	private ProvisioningMode provisioningMode = ProvisioningMode.OTAA;
 	// OTAA
 	private String appEUI;
 	private String appKey;
@@ -77,7 +77,7 @@ public class DeviceProvisioning implements Validator {
 			return null;
 		}
 	}
-	private DeviceClass deviceClass;
+	private DeviceClass deviceClass = DeviceClass.C;
 
 	public String getName() {
 		return name;
@@ -181,6 +181,16 @@ public class DeviceProvisioning implements Validator {
 
 	public void setProvisioningMode(ProvisioningMode provisioningMode) {
 		this.provisioningMode = provisioningMode;
+	}
+
+	public DeviceProvisioning name(String name) {
+		this.name = name;
+		return this;
+	}
+
+	public DeviceProvisioning appEUI(String appEUI) {
+		this.appEUI = appEUI;
+		return this;
 	}
 
 	public ValidationResult validate() {

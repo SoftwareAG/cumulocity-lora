@@ -139,8 +139,11 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	public Optional<EndDevice> getDevice(String devEui) {
 		EndDevice result = null;
 		try {
-			Device device = objeniousService.getDevice(devEui).execute().body();
-			result = new EndDevice(devEui, device.getLabel(), "A");
+			retrofit2.Response<Device> response = objeniousService.getDevice(devEui).execute();
+			if (response.isSuccessful()) {
+				Device device = response.body();
+				result = new EndDevice(devEui, device.getLabel(), "A");
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -182,24 +185,25 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			e1.printStackTrace();
 		}
 		if (device == null) {
-			DeviceCreate deviceCreate = new DeviceCreate();
-			deviceCreate.setLabel(deviceProvisioning.getName());
-			deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
-			deviceCreate.setAppeui(deviceProvisioning.getAppEUI());
-			deviceCreate.setAppkey(deviceProvisioning.getAppKey());
-			deviceCreate.setLat(deviceProvisioning.getLat());
-			deviceCreate.setLng(deviceProvisioning.getLng());
-			deviceCreate.setGroupId(Integer.parseInt(properties.getProperty("groupId")));
-			deviceCreate.setProfileId(1);
-
+			List<Profile> profiles = null;
 			try {
+				profiles = objeniousService.getProfiles().execute().body();
+				DeviceCreate deviceCreate = new DeviceCreate();
+				deviceCreate.setLabel(deviceProvisioning.getName());
+				deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
+				deviceCreate.setAppeui(deviceProvisioning.getAppEUI());
+				deviceCreate.setAppkey(deviceProvisioning.getAppKey());
+				deviceCreate.setLat(deviceProvisioning.getLat());
+				deviceCreate.setLng(deviceProvisioning.getLng());
+				deviceCreate.setGroupId(Integer.parseInt(properties.getProperty("groupId")));
+				deviceCreate.setProfileId(profiles.iterator().next().getId());
 				retrofit2.Response<Device> response = objeniousService.createDevice(deviceCreate).execute();
 				result = response.isSuccessful();
 				if (!result) {
 					logger.error(response.errorBody().string());
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
 			}
 		} else {
 			if (!device.isEnabled()) {

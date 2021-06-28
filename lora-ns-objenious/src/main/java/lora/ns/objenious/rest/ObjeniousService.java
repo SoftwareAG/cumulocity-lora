@@ -38,6 +38,9 @@ public interface ObjeniousService {
 	@POST("devices")
 	Call<Device> createDevice(@Body DeviceCreate device);
 	
+	@GET("profiles")
+	Call<List<Profile>> getProfiles();
+	
 	@GET("profiles/{id}")
 	Call<Profile> getProfile(@Path("id") Integer id);
 	

@@ -6,7 +6,7 @@ public class DeviceOperationParam {
 	private ParamType type;
 	private Object value;
 	public enum ParamType {
-		STRING, INTEGER, FLOAT, BOOL, DATE, ENUM, SEPARATOR;
+		STRING, INTEGER, FLOAT, BOOL, DATE, ENUM, SEPARATOR, GROUP;
 	}
 	public DeviceOperationParam() {}
 	public DeviceOperationParam(String id, String name, ParamType type, Object value) {

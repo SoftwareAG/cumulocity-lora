@@ -26,11 +26,11 @@ public class LNSConnectorManager {
 		return Optional.ofNullable(result);
 	}
 	
-	public void addConnector(String lnsConnectorId, LNSConnector connector) {
+	public void addConnector(LNSConnector connector) {
 		if (!connectors.containsKey(subscriptionsService.getTenant())) {
-			connectors.put(subscriptionsService.getTenant(), new HashMap<String, LNSConnector>());
+			connectors.put(subscriptionsService.getTenant(), new HashMap<>());
 		}
-		connectors.get(subscriptionsService.getTenant()).put(lnsConnectorId, connector);
+		connectors.get(subscriptionsService.getTenant()).put(connector.getId(), connector);
 	}
 	
 	public Map<String, LNSConnector> getConnectors() {
