@@ -68,7 +68,7 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	private BearerToken token;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(TTNConnector.class);
 
     public TTNConnector(Properties properties) {
 		super(properties);
@@ -147,13 +147,17 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	@Override
 	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
-		JsEndDeviceRegistryBlockingStub service1 = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		AsEndDeviceRegistryBlockingStub service2 = AsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		NsEndDeviceRegistryBlockingStub service3 = NsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		EndDeviceRegistryBlockingStub service4 = EndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		JsEndDeviceRegistryBlockingStub joinServerService = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		AsEndDeviceRegistryBlockingStub applicationServerService = AsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		NsEndDeviceRegistryBlockingStub networkServerService = NsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		EndDeviceRegistryBlockingStub endDeviceRegistryService = EndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
 		ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = ttn.lorawan.v3.EndDeviceOuterClass.EndDevice.newBuilder()
 			.setName(deviceProvisioning.getName())
 			.setDescription("New device created by Cumulocity")
+			.setJoinServerAddress(properties.getProperty("address"))
+			.setApplicationServerAddress(properties.getProperty("address"))
+			.setNetworkServerAddress(properties.getProperty("address"))
+			.setSupportsJoin(true)
 			.setIds(EndDeviceIdentifiers.newBuilder()
 				.setDeviceId(deviceProvisioning.getDevEUI().toLowerCase())
 				.setApplicationIds(ApplicationIdentifiers.newBuilder().setApplicationId(properties.getProperty(APPID)).build())
@@ -169,12 +173,14 @@ public class TTNConnector extends LNSAbstractConnector {
 		CreateEndDeviceRequest request = CreateEndDeviceRequest.newBuilder()
 			.setEndDevice(device)
 			.build();
-		device = service4.create(request);
+		device = endDeviceRegistryService.create(request);
 		if (device != null) {
 			SetEndDeviceRequest request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
-			service1.set(request2);
-			service3.set(request2);
-			service2.set(request2);
+			device = joinServerService.set(request2);
+			request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
+			device = networkServerService.set(request2);
+			request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
+			device = applicationServerService.set(request2);
 		} else {
 			logger.error("Impossible to provision device in TTN.");
 		}

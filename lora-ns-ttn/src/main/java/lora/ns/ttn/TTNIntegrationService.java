@@ -25,7 +25,7 @@ import lora.ns.OperationData;
 @Service
 public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(TTNIntegrationService.class);
 	
 	{
 		wizard.add(new InstanceWizardStep());
