@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,12 +28,16 @@ import lora.ns.LNSIntegrationService;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorRepresentation;
 import lora.ns.connector.LNSConnectorWizardStep;
+import lora.ns.device.LNSDeviceManager;
 
 @RestController
 public class LNSRestController {
 
 	@Autowired
 	private LNSIntegrationService<?> lnsProxy;
+
+	@Autowired
+	private LNSDeviceManager lnsDeviceManager;
 
 	final Logger logger = LoggerFactory.getLogger(LNSRestController.class);
 
@@ -66,6 +71,18 @@ public class LNSRestController {
 	public ResponseEntity<String> deprovisionDevice(@PathVariable String lnsInstanceId, @PathVariable String deveui) {
 		boolean result = lnsProxy.deprovisionDevice(lnsInstanceId, deveui);
 		return result ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+	}
+
+	@PostMapping(value = "/devices/{deveui}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> createDevice(@PathVariable String deveui, @RequestBody ManagedObjectRepresentation device) {
+		lnsDeviceManager.createDevice(deveui, device);
+		return ResponseEntity.ok().build();
+	}
+
+	@PutMapping(value = "/devices/{deveui}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> updateDevice(@PathVariable String deveui, @RequestBody ManagedObjectRepresentation device) {
+		lnsDeviceManager.updateDevice(deveui, device);
+		return ResponseEntity.ok().build();
 	}
 	
 	@GetMapping(value = "/lnsinstances", produces = MediaType.APPLICATION_JSON_VALUE)

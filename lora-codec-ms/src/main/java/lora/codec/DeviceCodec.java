@@ -1,5 +1,6 @@
 package lora.codec;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +18,8 @@ import com.cumulocity.sdk.client.alarm.AlarmFilter;
 import com.cumulocity.sdk.client.event.EventApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
 import org.joda.time.DateTime;
@@ -221,6 +224,7 @@ public abstract class DeviceCodec implements Component {
 				result = new Result<>(true, "Couldn't find device " + encode.getDevEui(), data);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			result = new Result<>(false, "Couldn't process " + encode.toString(), null);
 		}
 		
@@ -236,5 +240,49 @@ public abstract class DeviceCodec implements Component {
 			logger.error("Can't process {}. Expected syntax is \"raw <port number> <hex payload>\"", encode.getOperation());
 		}
 		return data;
+	}
+
+	public DeviceOperation convertJsonStringToDeviceOperation(String model, String operation) {
+		DeviceOperation deviceOperation = null;
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode root;
+		try {
+			root = mapper.readTree(operation);
+			String command = root.fieldNames().next();
+			deviceOperation = getAvailableOperations(model).get(command);
+			if (deviceOperation != null) {
+				Map<String, DeviceOperationParam> params = new HashMap<>();
+				JsonNode paramValues = root.get(command);
+				if (paramValues != null) {
+					for (DeviceOperationParam param: deviceOperation.getParams()) {
+						JsonNode value = paramValues.get(param.getId());
+						switch(param.getType()) {
+							case BOOL:
+								params.get(param.getId()).setValue(value.asBoolean());
+								break;
+							case STRING:
+							case ENUM:
+							case DATE:
+								params.get(param.getId()).setValue(value.asText());
+								break;
+							case FLOAT:
+								params.get(param.getId()).setValue(value.asDouble());
+								break;
+							case INTEGER:
+								params.get(param.getId()).setValue(value.asLong());
+								break;
+							case SEPARATOR:
+								break;
+							default:
+								break;
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return deviceOperation;
 	}
 }

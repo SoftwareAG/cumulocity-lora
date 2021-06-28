@@ -58,11 +58,16 @@ public class LNSOperationManager {
 			logger.info("Processing operation {}", operation);
 			DownlinkData encodedData = codecManager.encode(lnsDeviceManager.getDeviceEui(operation.getDeviceId()),
 					operation);
-			if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null) {
+			if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null && !encodedData.isSkipDownlink()) {
 				operation.setStatus(OperationStatus.EXECUTING.toString());
 				String lnsConnectorId = inventoryApi.get(operation.getDeviceId()).getProperty(LNSIntegrationService.LNS_CONNECTOR_REF)
 						.toString();
 				processOperation(lnsConnectorId, encodedData, operation);
+			} else if(encodedData != null && encodedData.isSkipDownlink()) {
+				operation.setStatus(OperationStatus.SUCCESSFUL.toString());
+				Command command = operation.get(Command.class);
+				command.setResult("Operation skipped.");
+				operation.set(command);				
 			} else {
 				operation.setStatus(OperationStatus.FAILED.toString());
 				Command command = operation.get(Command.class);

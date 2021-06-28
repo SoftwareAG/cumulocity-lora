@@ -33,6 +33,9 @@ public class NKECodec extends DeviceCodec {
 	@Autowired
 	private ZCLDecoder decoder; 
 
+	@Autowired
+	private ZCLEncoder encoder;
+
 	@Override
 	public String getId() {
 		return "nke";
@@ -55,7 +58,68 @@ public class NKECodec extends DeviceCodec {
 
 	@Override
 	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
-		// TODO Auto-generated method stub
+		DeviceOperation deviceOperation = convertJsonStringToDeviceOperation(model, operation);
+		switch(ZCLCluster.valueOf(deviceOperation.getId())) {
+			case AnalogInput:
+				break;
+			case Basic:
+				break;
+			case BinaryInput:
+				break;
+			case Concentration:
+				break;
+			case Configuration:
+				break;
+			case DifferentialPressure:
+				break;
+			case EnergyPowerMetering:
+				break;
+			case Illuminance:
+				break;
+			case LoRaWAN:
+				break;
+			case MultiBinaryInput:
+				break;
+			case MultiMasterSlave:
+				break;
+			case MultiStateOutput:
+				break;
+			case Occupancy:
+				break;
+			case OnOff:
+				break;
+			case PowerQuality:
+				break;
+			case Pressure:
+				break;
+			case RelativeHumidity:
+				break;
+			case SensO:
+				break;
+			case SerialInterface:
+				break;
+			case SerialMasterSlave:
+				break;
+			case SimpleMetering:
+				break;
+			case TIC_CBE:
+				break;
+			case TIC_CJE:
+				break;
+			case TIC_ICE:
+				break;
+			case TIC_PMEPMI:
+				break;
+			case TIC_STD:
+				break;
+			case Temperature:
+				break;
+			case VoltageCurrentMetering:
+				break;
+			case VolumeMeter:
+				break;
+			default:
+				break;}
 		return null;
 	}
 
@@ -68,6 +132,14 @@ public class NKECodec extends DeviceCodec {
 
 	@Override
 	public Map<String, DeviceOperation> getAvailableOperations(String model) {
-		return new HashMap<String, DeviceOperation>();
+		Map<String, DeviceOperation> result = new HashMap<>();
+		switch(model) {
+			case "50-70-053":
+				result.putAll(encoder.getDeviceOperations(ZCLCluster.Basic));
+			break;
+			default:
+			break;
+		}
+		return result;
 	}
 }

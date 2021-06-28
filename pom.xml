@@ -22,6 +22,7 @@
 		<module>lora-codec-atim-tm2d</module>
 		<module>lora-codec-atim-tmxd</module>
 		<module>lora-codec-acs-switch</module>
+		<module>lora-ns-actility</module>
 		<module>lora-ns-kerlink</module>
 		<module>lora-ns-objenious</module>
 		<module>lora-ns-orbiwise</module>
@@ -35,11 +36,11 @@
   
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<c8y.version>1006.4.0</c8y.version>
+		<c8y.version>1007.0.40</c8y.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring-boot-dependencies.version>2.2.4.RELEASE</spring-boot-dependencies.version>
+		<spring-boot-dependencies.version>2.2.8.RELEASE</spring-boot-dependencies.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -77,5 +78,4 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 </project>

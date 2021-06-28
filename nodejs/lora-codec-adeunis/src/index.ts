@@ -1,5 +1,5 @@
 import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionService, DeviceOperation } from 'c8y-codec-interface';
-import { Client, IManagedObject } from '@c8y/client';
+import { Client, IManagedObject, Severity } from '@c8y/client';
 const codec = require('@adeunis/codecs');
 require('source-map-support').install();
 
@@ -37,6 +37,9 @@ class AdeunisCodec extends DeviceCodec {
         this.decoder.setDeviceType(model);
         let result = this.decoder.decode(payload);
         console.log(result);
+
+        this.handleStatusByte(result.status, mo, time, c8yData);
+
         if (result.temperatures) {
             result.temperatures.forEach(t => {
                 c8yData.addMeasurement(mo, "Temperatures", t.name, t.unit, t.value, time);
@@ -73,6 +76,32 @@ class AdeunisCodec extends DeviceCodec {
     }
     protected _encode(client: Client, mo: IManagedObject, model: string, operation: string): DownlinkData {
         return operation.includes("get config") ? this.askDeviceConfig(null) : null;
+    }
+
+    private handleStatusByte(status, mo: IManagedObject, time: Date, c8yData: C8YData) {
+        if(status.hardwareError) {
+            c8yData.addAlarm(mo, "HardwareErrorAlarm", "Hardware error", Severity.CRITICAL, time);
+        } else {
+            c8yData.clearAlarm("HardwareErrorAlarm");
+        }
+
+        if(status.lowBattery) {
+            c8yData.addAlarm(mo, "LowBatteryAlarm", "Battery is low", Severity.MAJOR, time);
+        } else {
+            c8yData.clearAlarm("LowBatteryAlarm");
+        }
+
+        if(status.configurationDone) {
+            c8yData.addEvent(mo, "ConfigurationDone","Configuration is done", null, time);
+        }
+
+        if(status.configurationInconsistency) {
+            c8yData.addAlarm(mo, "InconsistentConfigurationAlarm", "Configuration is inconsistent", Severity.MAJOR, time);            
+        } else {
+            c8yData.clearAlarm("InconsistentConfigurationAlarm");
+        }
+
+        
     }
 }
 
