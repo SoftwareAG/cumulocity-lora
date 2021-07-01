@@ -97,8 +97,8 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 				data.setStatus(OperationStatus.SUCCESSFUL);
 				JsonNode correlationIds = rootNode.get("downlink_sent").get("correlation_ids");
 				for (JsonNode correlationId: correlationIds) {
-					if (correlationId.asText().startsWith("as:downlink:")) {
-						data.setCommandId(correlationId.asText().split(":")[2]);
+					if (correlationId.asText().startsWith("c8y:")) {
+						data.setCommandId(correlationId.asText().split(":")[1]);
 					}
 				}
 			} else if (rootNode.has("downlink_failed")) {
@@ -111,8 +111,21 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 				data.setErrorMessage(rootNode.get("downlink_failed").get("error").get("message_format").asText());
 				JsonNode correlationIds = rootNode.get("downlink_failed").get("downlink").get("correlation_ids");
 				for (JsonNode correlationId: correlationIds) {
-					if (correlationId.asText().startsWith("as:downlink:")) {
-						data.setCommandId(correlationId.asText().split(":")[2]);
+					if (correlationId.asText().startsWith("c8y:")) {
+						data.setCommandId(correlationId.asText().split(":")[1]);
+					}
+				}
+			} else if (rootNode.has("downlink_queued")) {
+				if (rootNode.get("end_device_ids").has("dev_eui")) {
+					logger.info("Downlink successfully queued on device {}", rootNode.get("end_device_ids").get("dev_eui"));
+				} else {
+					logger.info("Downlink successfully queued on device {}", rootNode.get("end_device_ids").get("device_id"));
+				}
+				data.setStatus(OperationStatus.EXECUTING);
+				JsonNode correlationIds = rootNode.get("downlink_queued").get("correlation_ids");
+				for (JsonNode correlationId: correlationIds) {
+					if (correlationId.asText().startsWith("c8y:")) {
+						data.setCommandId(correlationId.asText().split(":")[1]);
 					}
 				}
 			}
