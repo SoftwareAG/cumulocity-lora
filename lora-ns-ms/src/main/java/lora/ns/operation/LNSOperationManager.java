@@ -86,12 +86,26 @@ public class LNSOperationManager {
 	public void processOperation(String lnsConnectorId, DownlinkData operation, OperationRepresentation c8yOperation) {
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
 		if (connector.isPresent()) {
-			String commandId = connector.get().sendDownlink(operation);
-			storeOperation(lnsConnectorId, c8yOperation, commandId);
+			try {
+				String commandId = connector.get().sendDownlink(operation);
+				storeOperation(lnsConnectorId, c8yOperation, commandId);
+			} catch (Exception e) {
+				logger.error("Unable to send downlink", e);
+				c8yOperation.setStatus(OperationStatus.FAILED.toString());
+				Command command = c8yOperation.get(Command.class);
+				command.setResult("Unable to send downlink: " + e.getMessage());
+				c8yOperation.set(command);
+				deviceControlApi.update(c8yOperation);
+			}
 		} else {
 			logger.warn(
 					"Operation {} will be ignored for now as there is no connector with Id {} so we don't know where to send it. Next uplink should update the connector Id on the device and it will then be possible to succesfully send this operation.",
 					operation, lnsConnectorId);
+			c8yOperation.setStatus(OperationStatus.PENDING.toString());
+			Command command = c8yOperation.get(Command.class);
+			command.setResult("Unable to send downlink as device is not properly configured with an existing connector. Next uplink from device might fix that and operation will be properly processed.");
+			c8yOperation.set(command);
+			deviceControlApi.update(c8yOperation);
 		}
 	}
 
