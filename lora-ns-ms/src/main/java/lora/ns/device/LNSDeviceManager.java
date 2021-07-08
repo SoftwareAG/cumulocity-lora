@@ -202,7 +202,12 @@ public class LNSDeviceManager {
 		SupportedOperations supportedOperations = new SupportedOperations();
 		supportedOperations.add("c8y_Command");
 		mor.set(supportedOperations);
-		mor = inventoryApi.create(mor);
+		if (mor.getId() == null) {
+			mor = inventoryApi.create(mor);
+		} else {
+			mor.setLastUpdatedDateTime(null);
+			mor = inventoryApi.update(mor);
+		}
 		/*
 		 * if (!deviceCache.containsKey(subscriptionsService.getTenant())) {
 		 * deviceCache.put(subscriptionsService.getTenant(), new
@@ -221,7 +226,8 @@ public class LNSDeviceManager {
 			mor = createDevice(devEUI, mor);
 			mor.setName(name);
 			mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsConnectorId);
-			mor = inventoryApi.create(mor);
+			mor.setLastUpdatedDateTime(null);
+			mor = inventoryApi.update(mor);
 			ManagedObject agentApi = inventoryApi.getManagedObjectApi(agent.getId());
 			agentApi.addChildDevice(mor.getId());
 			c8yUtils.createExternalId(mor, devEUI, C8YUtils.DEVEUI_TYPE);
