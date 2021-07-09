@@ -286,6 +286,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		}
 		mor.set(new LpwanDevice().provisioned(true));
 		mor.setLastUpdatedDateTime(null);
+		mor.setName(deviceProvisioning.getName());
 		lnsDeviceManager.updateDevice(deviceProvisioning.getDevEUI(), mor);
 		return mor;
 	}
