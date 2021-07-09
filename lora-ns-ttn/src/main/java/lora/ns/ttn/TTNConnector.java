@@ -5,6 +5,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.net.ssl.SSLException;
 
@@ -25,6 +26,8 @@ import lora.ns.DeviceProvisioning;
 import lora.ns.EndDevice;
 import lora.ns.Gateway;
 import lora.ns.connector.LNSAbstractConnector;
+import ttn.lorawan.v3.AppAsGrpc;
+import ttn.lorawan.v3.AppAsGrpc.AppAsBlockingStub;
 import ttn.lorawan.v3.ApplicationOuterClass.Application;
 import ttn.lorawan.v3.ApplicationOuterClass.Applications;
 import ttn.lorawan.v3.ApplicationOuterClass.ListApplicationsRequest;
@@ -38,8 +41,6 @@ import ttn.lorawan.v3.ApplicationserverWeb.ApplicationWebhookIdentifiers;
 import ttn.lorawan.v3.ApplicationserverWeb.SetApplicationWebhookRequest;
 import ttn.lorawan.v3.AsEndDeviceRegistryGrpc;
 import ttn.lorawan.v3.AsEndDeviceRegistryGrpc.AsEndDeviceRegistryBlockingStub;
-import ttn.lorawan.v3.DownlinkMessageProcessorGrpc;
-import ttn.lorawan.v3.DownlinkMessageProcessorGrpc.DownlinkMessageProcessorBlockingStub;
 import ttn.lorawan.v3.EndDeviceOuterClass.CreateEndDeviceRequest;
 import ttn.lorawan.v3.EndDeviceOuterClass.GetEndDeviceIdentifiersForEUIsRequest;
 import ttn.lorawan.v3.EndDeviceOuterClass.GetEndDeviceRequest;
@@ -52,8 +53,8 @@ import ttn.lorawan.v3.JsEndDeviceRegistryGrpc;
 import ttn.lorawan.v3.JsEndDeviceRegistryGrpc.JsEndDeviceRegistryBlockingStub;
 import ttn.lorawan.v3.Keys.KeyEnvelope;
 import ttn.lorawan.v3.Keys.RootKeys;
-import ttn.lorawan.v3.MessageServices.ProcessDownlinkMessageRequest;
 import ttn.lorawan.v3.Messages.ApplicationDownlink;
+import ttn.lorawan.v3.Messages.DownlinkQueueRequest;
 import ttn.lorawan.v3.NsEndDeviceRegistryGrpc;
 import ttn.lorawan.v3.NsEndDeviceRegistryGrpc.NsEndDeviceRegistryBlockingStub;
 
@@ -68,9 +69,9 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	private BearerToken token;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(TTNConnector.class);
 
-    public TTNConnector(Properties properties) {
+	public TTNConnector(Properties properties) {
 		super(properties);
 	}
 
@@ -82,12 +83,12 @@ public class TTNConnector extends LNSAbstractConnector {
 	protected void init() {
 		try {
 			managedChannel = NettyChannelBuilder.forAddress(properties.getProperty("address"), 8884)
-				.sslContext(GrpcSslContexts.forClient().ciphers(null).build()).build();
+					.sslContext(GrpcSslContexts.forClient().ciphers(null).build()).build();
 		} catch (SSLException e) {
 			e.printStackTrace();
 			logger.error("Can't initiate TLS connection, falling back to plain text", e);
-			managedChannel = NettyChannelBuilder.forAddress(properties.getProperty("address"), 1884)
-				.usePlaintext().build();
+			managedChannel = NettyChannelBuilder.forAddress(properties.getProperty("address"), 1884).usePlaintext()
+					.build();
 		}
 		token = new BearerToken(properties.getProperty("apikey"));
 	}
@@ -99,28 +100,25 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	private EndDeviceIdentifiers getDeviceIds(String devEui) {
 		EndDeviceRegistryBlockingStub service = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-                .withCallCredentials(token);
-        GetEndDeviceIdentifiersForEUIsRequest request = GetEndDeviceIdentifiersForEUIsRequest.newBuilder()
-                .setDevEui(ByteString.copyFrom(BaseEncoding.base16().decode(devEui.toUpperCase())))
-                .build();
+				.withCallCredentials(token);
+		GetEndDeviceIdentifiersForEUIsRequest request = GetEndDeviceIdentifiersForEUIsRequest.newBuilder()
+				.setDevEui(ByteString.copyFrom(BaseEncoding.base16().decode(devEui.toUpperCase()))).build();
 
 		return service.getIdentifiersForEUIs(request);
 	}
 
 	@Override
 	public Optional<EndDevice> getDevice(String devEui) {
-		
+
 		EndDeviceRegistryBlockingStub service = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-                .withCallCredentials(token);
-		
-		ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = service.get(GetEndDeviceRequest.newBuilder()
-			.setEndDeviceIds(getDeviceIds(devEui))
-			.setFieldMask(FieldMask.newBuilder()
-				.addPaths("name")
-				.build())
-			.build());
-		
-		EndDevice result = new EndDevice(devEui, device.getName(), device.getSupportsClassC() ? "C" : device.getSupportsClassB() ? "B" : "A");
+				.withCallCredentials(token);
+
+		ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = service
+				.get(GetEndDeviceRequest.newBuilder().setEndDeviceIds(getDeviceIds(devEui))
+						.setFieldMask(FieldMask.newBuilder().addPaths("name").build()).build());
+
+		EndDevice result = new EndDevice(devEui, device.getName(),
+				device.getSupportsClassC() ? "C" : device.getSupportsClassB() ? "B" : "A");
 
 		return Optional.ofNullable(result);
 	}
@@ -128,53 +126,61 @@ public class TTNConnector extends LNSAbstractConnector {
 	@Override
 	public String sendDownlink(DownlinkData operation) {
 		logger.info("Will send {} to TTN.", operation);
-		
-		DownlinkMessageProcessorBlockingStub service = DownlinkMessageProcessorGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
-				
-		ApplicationDownlink result = service.process(ProcessDownlinkMessageRequest.newBuilder().setIds(getDeviceIds(operation.getDevEui())).setMessage(ApplicationDownlink.newBuilder().setFPort(operation.getFport()).setConfirmed(true).setFrmPayload(ByteString.copyFrom(BaseEncoding.base16().decode(operation.getPayload().toUpperCase())))).build());
 
-		String downlinkCorrelationId = null;
+		String downlinkCorrelationId = UUID.randomUUID().toString();
+		logger.info("Will send a downlink with correlation Id: {}", downlinkCorrelationId);
+		ApplicationDownlink downlink = ApplicationDownlink.newBuilder().setFPort(operation.getFport())
+				.setConfirmed(true)
+				.setFrmPayload(ByteString.copyFrom(BaseEncoding.base16().decode(operation.getPayload().toUpperCase())))
+				.addCorrelationIds("c8y:" + downlinkCorrelationId).build();
 
-		for (String correlationId: result.getCorrelationIdsList()) {
-			if (correlationId.startsWith("as:downlink:")) {
-				downlinkCorrelationId = correlationId.split(":")[2];
-			}
-		}
-		
+		AppAsBlockingStub asService = AppAsGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+
+		asService.downlinkQueuePush(DownlinkQueueRequest.newBuilder().addDownlinks(downlink)
+				.setEndDeviceIds(getDeviceIds(operation.getDevEui())).build());
+
 		return downlinkCorrelationId;
 	}
 
 	@Override
 	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
-		JsEndDeviceRegistryBlockingStub service1 = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		AsEndDeviceRegistryBlockingStub service2 = AsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		NsEndDeviceRegistryBlockingStub service3 = NsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		EndDeviceRegistryBlockingStub service4 = EndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		JsEndDeviceRegistryBlockingStub joinServerService = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+				.withCallCredentials(token);
+		AsEndDeviceRegistryBlockingStub applicationServerService = AsEndDeviceRegistryGrpc
+				.newBlockingStub(managedChannel).withCallCredentials(token);
+		NsEndDeviceRegistryBlockingStub networkServerService = NsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+				.withCallCredentials(token);
+		EndDeviceRegistryBlockingStub endDeviceRegistryService = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+				.withCallCredentials(token);
 		ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = ttn.lorawan.v3.EndDeviceOuterClass.EndDevice.newBuilder()
-			.setName(deviceProvisioning.getName())
-			.setDescription("New device created by Cumulocity")
-			.setIds(EndDeviceIdentifiers.newBuilder()
-				.setDeviceId(deviceProvisioning.getDevEUI().toLowerCase())
-				.setApplicationIds(ApplicationIdentifiers.newBuilder().setApplicationId(properties.getProperty(APPID)).build())
-				.setDevEui(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getDevEUI().toUpperCase())))
-				.setJoinEui(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getAppEUI().toUpperCase())))
-				.build())
-			.setRootKeys(RootKeys.newBuilder()
-				.setAppKey(KeyEnvelope.newBuilder()
-					.setKey(ByteString.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getAppKey().toUpperCase())))
-					.build())
-				.build())
-			.build();
-		CreateEndDeviceRequest request = CreateEndDeviceRequest.newBuilder()
-			.setEndDevice(device)
-			.build();
-		device = service4.create(request);
+				.setName(deviceProvisioning.getName()).setDescription("New device created by Cumulocity")
+				.setJoinServerAddress(properties.getProperty("address"))
+				.setApplicationServerAddress(properties.getProperty("address"))
+				.setNetworkServerAddress(properties.getProperty("address")).setSupportsJoin(true)
+				.setIds(EndDeviceIdentifiers.newBuilder().setDeviceId(deviceProvisioning.getDevEUI().toLowerCase())
+						.setApplicationIds(ApplicationIdentifiers.newBuilder()
+								.setApplicationId(properties.getProperty(APPID)).build())
+						.setDevEui(ByteString
+								.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getDevEUI().toUpperCase())))
+						.setJoinEui(ByteString
+								.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getAppEUI().toUpperCase())))
+						.build())
+				.setRootKeys(RootKeys.newBuilder()
+						.setAppKey(KeyEnvelope.newBuilder()
+								.setKey(ByteString.copyFrom(
+										BaseEncoding.base16().decode(deviceProvisioning.getAppKey().toUpperCase())))
+								.build())
+						.build())
+				.build();
+		CreateEndDeviceRequest request = CreateEndDeviceRequest.newBuilder().setEndDevice(device).build();
+		device = endDeviceRegistryService.create(request);
 		if (device != null) {
 			SetEndDeviceRequest request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
-			service1.set(request2);
-			service3.set(request2);
-			service2.set(request2);
+			device = joinServerService.set(request2);
+			request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
+			device = networkServerService.set(request2);
+			request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
+			device = applicationServerService.set(request2);
 		} else {
 			logger.error("Impossible to provision device in TTN.");
 		}
@@ -184,60 +190,52 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	@Override
 	public void configureRoutings(String url, String tenant, String login, String password) {
-		logger.info("Configuring routings to: {} with credentials: {}:{} on TTN app {}", url, login, password, properties.getProperty(APPID));
-		ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		logger.info("Configuring routings to: {} with credentials: {}:{} on TTN app {}", url, login, password,
+				properties.getProperty(APPID));
+		ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc.newBlockingStub(managedChannel)
+				.withCallCredentials(token);
 		ApplicationWebhook webhook = ApplicationWebhook.newBuilder()
-			.setIds(ApplicationWebhookIdentifiers.newBuilder()
-				.setWebhookId(tenant + "-" + this.getId())
-				.setApplicationIds(ApplicationIdentifiers.newBuilder().setApplicationId(properties.getProperty(APPID)).build())
-				.build())
-			.setBaseUrl(url)
-			.setUplinkMessage(Message.newBuilder().setPath("/uplink").build())
-			.setDownlinkAck(Message.newBuilder().setPath("/downlink").build())
-			.setDownlinkNack(Message.newBuilder().setPath("/downlink").build())
-			.setDownlinkSent(Message.newBuilder().setPath("/downlink").build())
-			.setDownlinkFailed(Message.newBuilder().setPath("/downlink").build())
-			.setDownlinkQueued(Message.newBuilder().setPath("/downlink").build())
-			.setFormat("json")
-			.putHeaders("Authorization", "Basic " + Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()))
-			.build();
-		app.set(SetApplicationWebhookRequest.newBuilder()
-			.setWebhook(webhook)
-			.setFieldMask(FieldMask.newBuilder()
-				.addPaths("base_url")
-				.addPaths("downlink_ack")
-				.addPaths("downlink_api_key")
-				.addPaths("downlink_failed")
-				.addPaths("downlink_nack")
-				.addPaths("downlink_queued")
-				.addPaths("downlink_sent")
-				.addPaths("format")
-				.addPaths("headers")
-				.addPaths("ids")
-				.addPaths("ids.application_ids")
-				.addPaths("ids.application_ids.application_id")
-				.addPaths("ids.webhook_id")
-				.addPaths("join_accept")
-				.addPaths("location_solved")
-				.addPaths("service_data")
-				.addPaths("uplink_message")
-				.build())
-			.build());
+				.setIds(ApplicationWebhookIdentifiers.newBuilder().setWebhookId(tenant + "-" + this.getId())
+						.setApplicationIds(ApplicationIdentifiers.newBuilder()
+								.setApplicationId(properties.getProperty(APPID)).build())
+						.build())
+				.setBaseUrl(url).setUplinkMessage(Message.newBuilder().setPath("/uplink").build())
+				.setDownlinkAck(Message.newBuilder().setPath("/downlink").build())
+				.setDownlinkNack(Message.newBuilder().setPath("/downlink").build())
+				.setDownlinkSent(Message.newBuilder().setPath("/downlink").build())
+				.setDownlinkFailed(Message.newBuilder().setPath("/downlink").build())
+				.setDownlinkQueued(Message.newBuilder().setPath("/downlink").build()).setFormat("json")
+				.putHeaders("Authorization", "Basic "
+						+ Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()))
+				.build();
+		app.set(SetApplicationWebhookRequest.newBuilder().setWebhook(webhook)
+				.setFieldMask(FieldMask.newBuilder().addPaths("base_url").addPaths("downlink_ack")
+						.addPaths("downlink_api_key").addPaths("downlink_failed").addPaths("downlink_nack")
+						.addPaths("downlink_queued").addPaths("downlink_sent").addPaths("format").addPaths("headers")
+						.addPaths("ids").addPaths("ids.application_ids").addPaths("ids.application_ids.application_id")
+						.addPaths("ids.webhook_id").addPaths("join_accept").addPaths("location_solved")
+						.addPaths("service_data").addPaths("uplink_message").build())
+				.build());
 	}
 
 	@Override
 	public void removeRoutings(String tenant) {
-		ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc.newBlockingStub(managedChannel)
+				.withCallCredentials(token);
 
 		app.delete(ApplicationWebhookIdentifiers.newBuilder().setWebhookId(tenant + "-" + this.getId()).build());
 	}
 
 	@Override
 	public boolean deprovisionDevice(String deveui) {
-		JsEndDeviceRegistryBlockingStub service1 = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		AsEndDeviceRegistryBlockingStub service2 = AsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		NsEndDeviceRegistryBlockingStub service3 = NsEndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		EndDeviceRegistryBlockingStub service4 = EndDeviceRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		JsEndDeviceRegistryBlockingStub service1 = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+				.withCallCredentials(token);
+		AsEndDeviceRegistryBlockingStub service2 = AsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+				.withCallCredentials(token);
+		NsEndDeviceRegistryBlockingStub service3 = NsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+				.withCallCredentials(token);
+		EndDeviceRegistryBlockingStub service4 = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+				.withCallCredentials(token);
 
 		EndDeviceIdentifiers ids = getDeviceIds(deveui);
 
@@ -256,7 +254,8 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	public List<Application> getApplications() {
 		logger.info("Fetching list of available applications from TTN...");
-		ApplicationRegistryBlockingStub service = ApplicationRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		ApplicationRegistryBlockingStub service = ApplicationRegistryGrpc.newBlockingStub(managedChannel)
+				.withCallCredentials(token);
 		Applications apps = service.list(ListApplicationsRequest.newBuilder().build());
 		return apps.getApplicationsList();
 	}

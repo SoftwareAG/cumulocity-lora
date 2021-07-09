@@ -1,7 +1,5 @@
 package lora.ns.device;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
@@ -31,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ConcurrentReferenceHashMap;
 
 import c8y.Command;
 import c8y.Configuration;
@@ -78,7 +75,7 @@ public class LNSDeviceManager {
 
 	@Autowired
 	protected EventApi eventApi;
-	
+
 	@Autowired
 	protected AlarmApi alarmApi;
 
@@ -94,7 +91,8 @@ public class LNSDeviceManager {
 	@Autowired
 	private LNSConnectorManager lnsConnectorManager;
 
-	private ManagedObjectRepresentation createDeviceWithName(String lnsInstanceId, DeviceData event, ManagedObjectRepresentation agent) {
+	private ManagedObjectRepresentation createDeviceWithName(String lnsInstanceId, DeviceData event,
+			ManagedObjectRepresentation agent) {
 		String name = event.getDevEui();
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent()) {
@@ -121,14 +119,16 @@ public class LNSDeviceManager {
 			if (event.getLat() != null && event.getLng() != null) {
 				updateLocation(event, mor);
 			}
-			if (!mor.hasProperty(LNSIntegrationService.LNS_CONNECTOR_REF)) {
+			if (!mor.hasProperty(LNSIntegrationService.LNS_CONNECTOR_REF)
+					|| !mor.getProperty(LNSIntegrationService.LNS_CONNECTOR_REF).toString().equals(lnsInstanceId)) {
 				mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsInstanceId);
 				updateDevice(event.getDevEui(), mor);
 			}
 			DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
 			if (mor.getProperty(CODEC_PROPERTY) != null
 					&& (codec == null || !codec.getId().equals(mor.getProperty(CODEC_PROPERTY)))) {
-				mor.set(new DeviceCodecRepresentation(codecManager.getCodec(mor.getProperty(CODEC_PROPERTY).toString())));
+				mor.set(new DeviceCodecRepresentation(
+						codecManager.getCodec(mor.getProperty(CODEC_PROPERTY).toString())));
 				updateDevice(event.getDevEui(), mor);
 			}
 			if (mor.get(LpwanDevice.class) == null || !mor.get(LpwanDevice.class).isProvisioned()) {
@@ -158,7 +158,7 @@ public class LNSDeviceManager {
 			ManagedObjectRepresentation agent) {
 		ManagedObjectRepresentation mor = getDevice(event.getDevEui().toLowerCase());
 		if (mor == null) {
-			synchronized(event.getDevEui().intern()) {
+			synchronized (event.getDevEui().intern()) {
 				mor = getDevice(event.getDevEui().toLowerCase());
 				if (mor == null) {
 					mor = createDeviceWithName(lnsInstanceId, event, agent);
@@ -185,8 +185,7 @@ public class LNSDeviceManager {
 	}
 
 	public void addDeviceToAgent(ManagedObjectRepresentation agent, ManagedObjectRepresentation mor) {
-		ManagedObject agentApi = inventoryApi
-				.getManagedObjectApi(agent.getId());
+		ManagedObject agentApi = inventoryApi.getManagedObjectApi(agent.getId());
 		try {
 			agentApi.getChildDevice(mor.getId());
 		} catch (Exception e) {
@@ -203,12 +202,19 @@ public class LNSDeviceManager {
 		SupportedOperations supportedOperations = new SupportedOperations();
 		supportedOperations.add("c8y_Command");
 		mor.set(supportedOperations);
-		mor = inventoryApi.create(mor);
-		/*if (!deviceCache.containsKey(subscriptionsService.getTenant())) {
-			deviceCache.put(subscriptionsService.getTenant(), new ConcurrentReferenceHashMap<>());
-		}*/
+		if (mor.getId() == null) {
+			mor = inventoryApi.create(mor);
+		} else {
+			mor.setLastUpdatedDateTime(null);
+			mor = inventoryApi.update(mor);
+		}
+		/*
+		 * if (!deviceCache.containsKey(subscriptionsService.getTenant())) {
+		 * deviceCache.put(subscriptionsService.getTenant(), new
+		 * ConcurrentReferenceHashMap<>()); }
+		 */
 		c8yUtils.createExternalId(mor, devEUI, C8YUtils.DEVEUI_TYPE);
-		//deviceCache.get(subscriptionsService.getTenant()).put(devEUI, mor);
+		// deviceCache.get(subscriptionsService.getTenant()).put(devEUI, mor);
 
 		return mor;
 	}
@@ -220,7 +226,8 @@ public class LNSDeviceManager {
 			mor = createDevice(devEUI, mor);
 			mor.setName(name);
 			mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsConnectorId);
-			mor = inventoryApi.create(mor);
+			mor.setLastUpdatedDateTime(null);
+			mor = inventoryApi.update(mor);
 			ManagedObject agentApi = inventoryApi.getManagedObjectApi(agent.getId());
 			agentApi.addChildDevice(mor.getId());
 			c8yUtils.createExternalId(mor, devEUI, C8YUtils.DEVEUI_TYPE);
@@ -242,10 +249,12 @@ public class LNSDeviceManager {
 				alarmApi.create(alarm);
 			}
 		}
-		/*if (!deviceCache.containsKey(subscriptionsService.getTenant())) {
-			deviceCache.put(subscriptionsService.getTenant(), new ConcurrentReferenceHashMap<>());
-		}
-		deviceCache.get(subscriptionsService.getTenant()).put(devEUI, mor);*/
+		/*
+		 * if (!deviceCache.containsKey(subscriptionsService.getTenant())) {
+		 * deviceCache.put(subscriptionsService.getTenant(), new
+		 * ConcurrentReferenceHashMap<>()); }
+		 * deviceCache.get(subscriptionsService.getTenant()).put(devEUI, mor);
+		 */
 		return mor;
 	}
 
@@ -271,38 +280,46 @@ public class LNSDeviceManager {
 		return result;
 	}
 
-	// Keep it for later use, at it requires huge changes in the framework and the UI...
-	//Map<String, ConcurrentReferenceHashMap<String, ManagedObjectRepresentation>> deviceCache = new HashMap<>();
+	// Keep it for later use, at it requires huge changes in the framework and the
+	// UI...
+	// Map<String, ConcurrentReferenceHashMap<String, ManagedObjectRepresentation>>
+	// deviceCache = new HashMap<>();
 
 	public void updateDevice(String devEui, ManagedObjectRepresentation device) {
-		/*if (!deviceCache.containsKey(subscriptionsService.getTenant())) {
-			deviceCache.put(subscriptionsService.getTenant(), new ConcurrentReferenceHashMap<>());
-		}
-		deviceCache.get(subscriptionsService.getTenant()).put(devEui, inventoryApi.update(device));*/
+		/*
+		 * if (!deviceCache.containsKey(subscriptionsService.getTenant())) {
+		 * deviceCache.put(subscriptionsService.getTenant(), new
+		 * ConcurrentReferenceHashMap<>()); }
+		 * deviceCache.get(subscriptionsService.getTenant()).put(devEui,
+		 * inventoryApi.update(device));
+		 */
 		inventoryApi.update(device);
 	}
 
 	public ManagedObjectRepresentation getDevice(String devEui) {
 		ManagedObjectRepresentation result = null;
-		/*if (!deviceCache.containsKey(subscriptionsService.getTenant())) {
-			deviceCache.put(subscriptionsService.getTenant(), new ConcurrentReferenceHashMap<>());
+		/*
+		 * if (!deviceCache.containsKey(subscriptionsService.getTenant())) {
+		 * deviceCache.put(subscriptionsService.getTenant(), new
+		 * ConcurrentReferenceHashMap<>()); } ManagedObjectRepresentation result =
+		 * deviceCache.get(subscriptionsService.getTenant()).get(devEui); if (result ==
+		 * null) {
+		 */
+		Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(devEui, C8YUtils.DEVEUI_TYPE);
+		if (extId.isPresent()) {
+			result = inventoryApi.get(extId.get().getManagedObject().getId());
+			result.setLastUpdatedDateTime(null);
+			// deviceCache.get(subscriptionsService.getTenant()).put(devEui, result);
 		}
-		ManagedObjectRepresentation result = deviceCache.get(subscriptionsService.getTenant()).get(devEui);
-		if (result == null) {*/
-			Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(devEui, C8YUtils.DEVEUI_TYPE);
-			if (extId.isPresent()) {
-				result = inventoryApi.get(extId.get().getManagedObject().getId());
-				result.setLastUpdatedDateTime(null);
-				//deviceCache.get(subscriptionsService.getTenant()).put(devEui, result);
-			}
-		//}
+		// }
 		return result;
 	}
 
 	public void getDeviceConfig(ManagedObjectRepresentation mor) {
 		if (codecManager.getAvailableOperations(mor) != null
 				&& codecManager.getAvailableOperations(mor).containsKey(GET_CONFIG_COMMAND)) {
-			OperationCollection oc = deviceControlApi.getOperationsByFilter(new OperationFilter().byDevice(mor.getId().getValue()).byStatus(OperationStatus.EXECUTING));
+			OperationCollection oc = deviceControlApi.getOperationsByFilter(
+					new OperationFilter().byDevice(mor.getId().getValue()).byStatus(OperationStatus.EXECUTING));
 			for (OperationRepresentation o : oc.get(2000).allPages()) {
 				if (o.get(Command.class) != null && o.get(Command.class).getText().contains(GET_CONFIG_COMMAND)) {
 					return;

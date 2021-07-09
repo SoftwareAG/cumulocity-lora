@@ -2,16 +2,17 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import org.springframework.validation.annotation.Validated;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Profile
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Profile {
 	@JsonProperty("id")
 	private Integer id = null;

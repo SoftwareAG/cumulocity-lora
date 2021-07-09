@@ -46,7 +46,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 	private ObjeniousService objeniousService;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(ObjeniousConnector.class);
 
 	class APIKeyInterceptor implements Interceptor {
 

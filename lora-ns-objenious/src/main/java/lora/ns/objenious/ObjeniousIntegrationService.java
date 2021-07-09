@@ -25,7 +25,7 @@ import lora.ns.OperationData;
 @Service
 public class ObjeniousIntegrationService extends LNSIntegrationService<ObjeniousConnector> {
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(ObjeniousIntegrationService.class);
 	
 	{
 		wizard.add(new ConnectorWizardStep1());

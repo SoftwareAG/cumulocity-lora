@@ -212,10 +212,12 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			if (data.getCommandId() != null) {
 				OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
 						data.getCommandId());
-				operation.setStatus(OperationStatus.FAILED.toString());
-				operation.setFailureReason(data.getErrorMessage());
-				deviceControlApi.update(operation);
-				lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
+				if (operation != null) {
+					operation.setStatus(OperationStatus.FAILED.toString());
+					operation.setFailureReason(data.getErrorMessage());
+					deviceControlApi.update(operation);
+					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
+				}
 			} else {
 				logger.error("Unknown operation");
 			}
@@ -368,9 +370,10 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 					.byStatus(OperationStatus.PENDING).byAgent(agentService.getAgent().getId().getValue()));
 			if (oc != null) {
 				for (OperationCollectionRepresentation opCollectionRepresentation = oc
-						.get(); opCollectionRepresentation != null && oc.get().getOperations() != null
-								&& !oc.get().getOperations().isEmpty(); opCollectionRepresentation = oc
-										.getNextPage(opCollectionRepresentation)) {
+						.get(); opCollectionRepresentation != null
+								&& !opCollectionRepresentation.getOperations()
+										.isEmpty(); opCollectionRepresentation = oc
+												.getNextPage(opCollectionRepresentation)) {
 					logger.info("Processing page {}", oc.get().getPageStatistics().getCurrentPage());
 					for (OperationRepresentation op : opCollectionRepresentation.getOperations()) {
 						lnsOperationManager.executePending(op);
