@@ -40,7 +40,12 @@ import ttn.lorawan.v3.ApplicationserverWeb.ApplicationWebhook.Message;
 import ttn.lorawan.v3.ApplicationserverWeb.ApplicationWebhookIdentifiers;
 import ttn.lorawan.v3.ApplicationserverWeb.SetApplicationWebhookRequest;
 import ttn.lorawan.v3.AsEndDeviceRegistryGrpc;
+import ttn.lorawan.v3.ConfigurationGrpc;
 import ttn.lorawan.v3.AsEndDeviceRegistryGrpc.AsEndDeviceRegistryBlockingStub;
+import ttn.lorawan.v3.ConfigurationGrpc.ConfigurationBlockingStub;
+import ttn.lorawan.v3.ConfigurationServices.FrequencyPlanDescription;
+import ttn.lorawan.v3.ConfigurationServices.ListFrequencyPlansRequest;
+import ttn.lorawan.v3.ConfigurationServices.ListFrequencyPlansResponse;
 import ttn.lorawan.v3.EndDeviceOuterClass.CreateEndDeviceRequest;
 import ttn.lorawan.v3.EndDeviceOuterClass.GetEndDeviceIdentifiersForEUIsRequest;
 import ttn.lorawan.v3.EndDeviceOuterClass.GetEndDeviceRequest;
@@ -53,6 +58,8 @@ import ttn.lorawan.v3.JsEndDeviceRegistryGrpc;
 import ttn.lorawan.v3.JsEndDeviceRegistryGrpc.JsEndDeviceRegistryBlockingStub;
 import ttn.lorawan.v3.Keys.KeyEnvelope;
 import ttn.lorawan.v3.Keys.RootKeys;
+import ttn.lorawan.v3.Lorawan.MACVersion;
+import ttn.lorawan.v3.Lorawan.PHYVersion;
 import ttn.lorawan.v3.Messages.ApplicationDownlink;
 import ttn.lorawan.v3.Messages.DownlinkQueueRequest;
 import ttn.lorawan.v3.NsEndDeviceRegistryGrpc;
@@ -142,8 +149,15 @@ public class TTNConnector extends LNSAbstractConnector {
 		return downlinkCorrelationId;
 	}
 
+	public List<FrequencyPlanDescription> getFrequencyPlans() {
+		ConfigurationBlockingStub config = ConfigurationGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		ListFrequencyPlansResponse frequencyPlans = config.listFrequencyPlans(ListFrequencyPlansRequest.newBuilder().build());
+		return frequencyPlans.getFrequencyPlansList();
+	}
+
 	@Override
 	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
+		logger.info("Will provision device with following parameters: {}", deviceProvisioning);
 		JsEndDeviceRegistryBlockingStub joinServerService = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
 				.withCallCredentials(token);
 		AsEndDeviceRegistryBlockingStub applicationServerService = AsEndDeviceRegistryGrpc
@@ -156,7 +170,11 @@ public class TTNConnector extends LNSAbstractConnector {
 				.setName(deviceProvisioning.getName()).setDescription("New device created by Cumulocity")
 				.setJoinServerAddress(properties.getProperty("address"))
 				.setApplicationServerAddress(properties.getProperty("address"))
-				.setNetworkServerAddress(properties.getProperty("address")).setSupportsJoin(true)
+				.setNetworkServerAddress(properties.getProperty("address"))
+				.setSupportsJoin(true)
+				.setLorawanVersion(MACVersion.valueOf(deviceProvisioning.getAdditionalProperties().getProperty("MACVersion")))
+				.setLorawanPhyVersion(PHYVersion.valueOf(deviceProvisioning.getAdditionalProperties().getProperty("PHYVersion")))
+				.setFrequencyPlanId(deviceProvisioning.getAdditionalProperties().getProperty("frequencyPlan"))
 				.setIds(EndDeviceIdentifiers.newBuilder().setDeviceId(deviceProvisioning.getDevEUI().toLowerCase())
 						.setApplicationIds(ApplicationIdentifiers.newBuilder()
 								.setApplicationId(properties.getProperty(APPID)).build())
@@ -172,15 +190,32 @@ public class TTNConnector extends LNSAbstractConnector {
 								.build())
 						.build())
 				.build();
-		CreateEndDeviceRequest request = CreateEndDeviceRequest.newBuilder().setEndDevice(device).build();
-		device = endDeviceRegistryService.create(request);
+		CreateEndDeviceRequest request = CreateEndDeviceRequest.newBuilder().setEndDevice(device)
+			.build();
+		/*device = */endDeviceRegistryService.create(request);
 		if (device != null) {
-			SetEndDeviceRequest request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
-			device = joinServerService.set(request2);
-			request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
-			device = networkServerService.set(request2);
-			request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device).build();
-			device = applicationServerService.set(request2);
+			logger.info(device.toString());
+			SetEndDeviceRequest request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device)
+				.setFieldMask(FieldMask.newBuilder().addPaths("root_keys.app_key.key").build())
+				.build();
+			/*device = */joinServerService.set(request2);
+			logger.info(device.toString());
+			request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device)
+				.setFieldMask(FieldMask.newBuilder()
+					.addPaths("supports_join")
+					.addPaths("lorawan_version")
+					.addPaths("lorawan_phy_version")
+					.addPaths("frequency_plan_id")
+					.build())
+				//.setFieldMask(FieldMask.newBuilder().addPaths("join_server_address").build())
+				.build();
+			/*device = */networkServerService.set(request2);
+			logger.info(device.toString());
+			request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device)
+				//.setFieldMask(FieldMask.newBuilder().addPaths("supports_join").build())
+				.build();
+			/*device = */applicationServerService.set(request2);
+			logger.info(device.toString());
 		} else {
 			logger.error("Impossible to provision device in TTN.");
 		}

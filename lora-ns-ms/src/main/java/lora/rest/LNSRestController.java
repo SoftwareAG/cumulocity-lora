@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +21,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-
 import lora.ns.DeviceProvisioning;
 import lora.ns.DeviceProvisioningResponse;
 import lora.ns.EndDevice;
@@ -28,6 +28,7 @@ import lora.ns.LNSIntegrationService;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorRepresentation;
 import lora.ns.connector.LNSConnectorWizardStep;
+import lora.ns.connector.PropertyDescription;
 import lora.ns.device.LNSDeviceManager;
 
 @RestController
@@ -104,5 +105,10 @@ public class LNSRestController {
 	@GetMapping(value = "/wizard", produces = MediaType.APPLICATION_JSON_VALUE)
 	public LinkedList<LNSConnectorWizardStep> getWizard() {
 		return lnsProxy.getInstanceWizard();
+	}
+	
+	@GetMapping(value = "/deviceProvisioningAdditionalProperties", produces = MediaType.APPLICATION_JSON_VALUE)
+	public LinkedList<PropertyDescription> getDeviceProvisioningAdditionalProperties() {
+		return lnsProxy.getDeviceProvisioningAdditionalProperties();
 	}
 }

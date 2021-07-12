@@ -57,6 +57,7 @@ import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
 import lora.ns.connector.LNSConnectorRepresentation;
 import lora.ns.connector.LNSConnectorWizardStep;
+import lora.ns.connector.PropertyDescription;
 import lora.ns.device.LNSDeviceManager;
 import lora.ns.gateway.LNSGatewayManager;
 import lora.ns.operation.LNSOperationManager;
@@ -115,6 +116,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	private LNSGatewayManager lnsGatewayManager;
 
 	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<>();
+
+	protected LinkedList<PropertyDescription> deviceProvisioningAdditionalProperties = new LinkedList<>();
 
 	protected final Logger logger = LoggerFactory.getLogger(LNSIntegrationService.class);
 
@@ -434,5 +437,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	public LinkedList<LNSConnectorWizardStep> getInstanceWizard() {
 		return wizard;
+	}
+
+	public LinkedList<PropertyDescription> getDeviceProvisioningAdditionalProperties() {
+		return deviceProvisioningAdditionalProperties;
 	}
 }

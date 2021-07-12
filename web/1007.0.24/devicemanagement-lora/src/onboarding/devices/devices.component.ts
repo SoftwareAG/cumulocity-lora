@@ -38,6 +38,15 @@ export class LoraDevicesComponent {
     informationText: string;
     fileContent: string[][];
     deviceToDelete: IManagedObject;
+    properties: [{
+        name: string;
+        label: string;
+        required: boolean;
+        type: string;
+        url: string;
+        values: Map<string, string>;
+    }?];
+    deviceProvisioningAdditionalProperties = {};
     @ViewChild("deleteDeviceModal", { static: false })
     deleteDeviceModal: TemplateRef<any>;
     deleteDeviceModalRef: BsModalRef;
@@ -369,15 +378,37 @@ export class LoraDevicesComponent {
         })
     }
 
+    async loadProperties(instance) {
+        let lnsInstance: IManagedObject = this.instanceMap[instance];
+        const response = await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + '/deviceProvisioningAdditionalProperties');
+        this.properties = await response.json();
+        if (this.properties && this.properties.forEach) {
+            console.log(this.properties);
+            this.properties.forEach(async p => {
+                if (p.type === "LIST") {
+                    const values = await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + "/" + instance + p.url, {
+                        method: "GET",
+                        headers: {
+                            'Content-Type': 'application/json'
+                          },
+                    });
+                    p.values = await values.json();
+                }
+                this.deviceProvisioningAdditionalProperties[p.name] = "";
+            });
+        }
+    }
+
     async provision(deviceProvisioning: { name: string, devEUI: string, appEUI: string, appKey: string, codec: string, model: string, lat?: number, lng?: number }, instance: string): Promise<IManagedObject> {
         console.log("Will provision device on LNS instance " + instance);
+        console.log({...deviceProvisioning, provisioningMode: "OTAA", additionalProperties: this.deviceProvisioningAdditionalProperties});
         let lnsInstance: IManagedObject = this.instanceMap[instance];
         return (await (await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + '/' + instance + '/devices', {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({...deviceProvisioning, provisioningMode: "OTAA"})
+            body: JSON.stringify({...deviceProvisioning, provisioningMode: "OTAA", additionalProperties: this.deviceProvisioningAdditionalProperties})
         })).json()).data;
     }
 

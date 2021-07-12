@@ -1,6 +1,7 @@
 package lora.ns;
 
 import java.math.BigDecimal;
+import java.util.Properties;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -51,6 +52,8 @@ public class DeviceProvisioning implements Validator {
 	private String model;
 	private BigDecimal lat;
 	private BigDecimal lng;
+
+	private Properties additionalProperties;
 
 	public enum DeviceClass {
 		A("A"), B("B"), C("C");
@@ -193,6 +196,14 @@ public class DeviceProvisioning implements Validator {
 		return this;
 	}
 
+	public Properties getAdditionalProperties() {
+		return additionalProperties;
+	}
+
+	public void setAdditionalProperties(Properties additionalProperties) {
+		this.additionalProperties = additionalProperties;
+	}
+
 	public ValidationResult validate() {
 		boolean result = true;
 		String reason = "";
@@ -225,5 +236,13 @@ public class DeviceProvisioning implements Validator {
 		}
 
 		return new ValidationResult(result, reason);
+	}
+
+	@Override
+	public String toString() {
+		return "DeviceProvisioning [additionalProperties=" + additionalProperties + ", appEUI=" + appEUI + ", appKey="
+				+ appKey + ", appSKey=" + appSKey + ", codec=" + codec + ", devAddr=" + devAddr + ", devEUI=" + devEUI
+				+ ", deviceClass=" + deviceClass + ", lat=" + lat + ", lng=" + lng + ", model=" + model + ", name="
+				+ name + ", nwkSKey=" + nwkSKey + ", provisioningMode=" + provisioningMode + "]";
 	}
 }

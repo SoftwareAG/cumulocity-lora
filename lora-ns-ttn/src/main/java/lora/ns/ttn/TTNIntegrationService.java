@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lora.ns.DeviceData;
 import lora.ns.LNSIntegrationService;
 import lora.ns.OperationData;
+import lora.ns.connector.PropertyDescription;
+import lora.ns.connector.PropertyDescription.PropertyType;
 
 @Service
 public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
@@ -29,6 +31,9 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 
 	{
 		wizard.add(new InstanceWizardStep());
+		deviceProvisioningAdditionalProperties.add(new PropertyDescription("MACVersion", "MAC Version", true, null, "/macversion", null, null, null, null, null, PropertyType.LIST, false));
+		deviceProvisioningAdditionalProperties.add(new PropertyDescription("PHYVersion", "PHY Version", true, null, "/phyversion", null, null, null, null, null, PropertyType.LIST, false));
+		deviceProvisioningAdditionalProperties.add(new PropertyDescription("frequencyPlan", "Frequency Plan", true, null, "/frequencyplan", null, null, null, null, null, PropertyType.LIST, false));
 	}
 
 	@Override
