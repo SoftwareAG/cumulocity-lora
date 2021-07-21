@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "c8ycli server --env.extraWebpackConfig=./extra-webpack.config.js",
+    "start": "c8ycli server -u https://lora-sandbox.dev.iot.greenflex.com --env.extraWebpackConfig=./extra-webpack.config.js",
     "build": "c8ycli build --env.extraWebpackConfig=./extra-webpack.config.js",
     "deploy": "c8ycli deploy"
   },

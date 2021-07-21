@@ -24,8 +24,8 @@ import lora.codec.C8YData;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DeviceOperationParam;
-import lora.codec.DeviceOperationParam.ParamType;
 import lora.codec.DownlinkData;
+import lora.codec.DeviceOperationParam.ParamType;
 
 @Component
 public class PyrescomCodec extends DeviceCodec {

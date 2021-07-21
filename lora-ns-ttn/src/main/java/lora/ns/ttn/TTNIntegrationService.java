@@ -7,22 +7,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import lora.ns.DeviceData;
-import lora.ns.LNSIntegrationService;
-import lora.ns.OperationData;
 import lora.ns.connector.PropertyDescription;
 import lora.ns.connector.PropertyDescription.PropertyType;
+import lora.ns.integration.LNSIntegrationService;
+import lora.ns.operation.OperationData;
 
 @Service
 public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {

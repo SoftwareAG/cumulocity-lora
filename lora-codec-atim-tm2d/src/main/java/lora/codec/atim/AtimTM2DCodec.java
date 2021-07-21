@@ -5,15 +5,15 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
+
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import lora.codec.C8YData;
 import lora.codec.DeviceCodec;
@@ -23,7 +23,7 @@ import lora.codec.DownlinkData;
 @Component
 public class AtimTM2DCodec extends DeviceCodec {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(AtimTM2DCodec.class);
 
 	private enum FRAME {
 		KEEP_ALIVE(0x01) {

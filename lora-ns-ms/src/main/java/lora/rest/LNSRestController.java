@@ -21,15 +21,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import lora.ns.DeviceProvisioning;
-import lora.ns.DeviceProvisioningResponse;
-import lora.ns.EndDevice;
-import lora.ns.LNSIntegrationService;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorRepresentation;
 import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.connector.PropertyDescription;
+import lora.ns.device.DeviceProvisioning;
+import lora.ns.device.DeviceProvisioningResponse;
+import lora.ns.device.EndDevice;
 import lora.ns.device.LNSDeviceManager;
+import lora.ns.integration.LNSIntegrationService;
 
 @RestController
 public class LNSRestController {

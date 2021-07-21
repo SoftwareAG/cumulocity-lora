@@ -28,8 +28,8 @@ import lora.codec.C8YData;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DeviceOperationParam;
-import lora.codec.DeviceOperationParam.ParamType;
 import lora.codec.DownlinkData;
+import lora.codec.DeviceOperationParam.ParamType;
 
 @Component
 public class LansitecCodec extends DeviceCodec {
@@ -59,7 +59,7 @@ public class LansitecCodec extends DeviceCodec {
 	 */
 	private static final String GET_CONFIG = "get config";
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(LansitecCodec.class);
 
 	private static final String ASSET_TRACKER = "Asset Tracker";
 

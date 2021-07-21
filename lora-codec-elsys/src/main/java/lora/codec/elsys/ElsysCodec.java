@@ -19,7 +19,7 @@ import lora.codec.DownlinkData;
 @Component
 public class ElsysCodec extends DeviceCodec {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(ElsysCodec.class);
 	
 	@Override
 	public String getId() {

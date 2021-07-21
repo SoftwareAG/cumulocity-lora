@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.junit.jupiter.api.Test;
-
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.google.common.io.BaseEncoding;
+
+import org.joda.time.DateTime;
+import org.junit.jupiter.api.Test;
 
 import lora.codec.C8YData;
 

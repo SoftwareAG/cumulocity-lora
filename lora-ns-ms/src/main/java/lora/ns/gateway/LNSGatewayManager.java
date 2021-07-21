@@ -20,7 +20,6 @@ import c8y.Hardware;
 import c8y.IsDevice;
 import c8y.Position;
 import lora.common.C8YUtils;
-import lora.ns.Gateway;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
 

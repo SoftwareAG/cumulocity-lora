@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 
 import lora.codec.DownlinkData;
-import lora.ns.DeviceProvisioning;
-import lora.ns.EndDevice;
-import lora.ns.Gateway;
 import lora.ns.connector.LNSAbstractConnector;
+import lora.ns.device.DeviceProvisioning;
+import lora.ns.device.EndDevice;
+import lora.ns.gateway.Gateway;
 import lora.ns.objenious.rest.Device;
 import lora.ns.objenious.rest.DeviceCreate;
 import lora.ns.objenious.rest.DownlinkCreate;

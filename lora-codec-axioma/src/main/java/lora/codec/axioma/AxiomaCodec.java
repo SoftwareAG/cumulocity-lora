@@ -7,14 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cumulocity.model.idtype.GId;
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+
 import org.apache.commons.codec.binary.Hex;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import com.cumulocity.model.idtype.GId;
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import c8y.Configuration;
 import c8y.RequiredAvailability;
@@ -26,7 +26,7 @@ import lora.codec.DownlinkData;
 @Component
 public class AxiomaCodec extends DeviceCodec {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(AxiomaCodec.class);
 
 	private enum DIF {
 		DWORD((byte)0x04, 4, "32 bits"),

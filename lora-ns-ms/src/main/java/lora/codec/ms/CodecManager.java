@@ -105,6 +105,7 @@ public class CodecManager {
 	public CodecProxy getCodec(String id) {
 		CodecProxy result = codecInstances.get(id);
 		if (result == null) {
+			logger.info("Codec {} not in cache, will get it from inventory.", id);
 			ExternalIDRepresentation extId = findExternalId(id, C8YUtils.CODEC_ID);
 			if (extId != null) {
 				ManagedObjectRepresentation mor = inventoryApi.get(extId.getManagedObject().getId());
@@ -112,8 +113,22 @@ public class CodecManager {
 				if (codec != null) {
 					result = new CodecProxy(id, codec.getName(), codec.getVersion());
 					codecInstances.put(id, result);
+				} else {
+					codec = new DeviceCodecRepresentation();
+					codec.setId(id);
+					codec.setName("codec_name");
+					codec.setVersion("codec_version");
+					logger.warn("Codec {} exists in inventory but structure is wrong: {}", id, mor.toJSON());
+					mor = new ManagedObjectRepresentation();
+					mor.set(codec);
+					logger.warn("Codec structure should look like: {}", mor.toJSON());
 				}
+			} else {
+				logger.warn("No external id could be found for {}.", id);
 			}
+		}
+		if (result == null) {
+			logger.warn("Codec {} is not available on that tenant.", id);
 		}
 		return result;
 	}

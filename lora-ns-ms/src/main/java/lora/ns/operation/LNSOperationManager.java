@@ -21,10 +21,10 @@ import org.springframework.stereotype.Component;
 import c8y.Command;
 import lora.codec.DownlinkData;
 import lora.codec.ms.CodecManager;
-import lora.ns.LNSIntegrationService;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
 import lora.ns.device.LNSDeviceManager;
+import lora.ns.integration.LNSIntegrationService;
 
 @Component
 public class LNSOperationManager {

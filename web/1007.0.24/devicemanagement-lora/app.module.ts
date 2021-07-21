@@ -26,6 +26,7 @@ import { LoraGuard } from './src/devices/lora.guard';
 import { LoraDevicesComponent } from './src/onboarding/devices/devices.component';
 import { LoraCodecsComponent } from './src/onboarding/codecs/codecs.component';
 import { LNSComponent } from './src/onboarding/lns/lns.component';
+import { LoRaConfigComponent } from './src/config/config.component';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
@@ -260,7 +261,7 @@ declare var Buffer: {
 };
 
 @NgModule({
-  declarations: [GroupsComponent, DevicesComponent, LoraDevicesComponent, LNSComponent, LoraCodecsComponent],
+  declarations: [GroupsComponent, DevicesComponent, LoraDevicesComponent, LNSComponent, LoraCodecsComponent, LoRaConfigComponent],
   entryComponents: [GroupsComponent, DevicesComponent],
   imports: [
     // Upgrade module must be the first
@@ -279,6 +280,10 @@ declare var Buffer: {
       {
         path: 'codecs',
         component: LoraCodecsComponent
+      },
+      {
+        path: 'config',
+        component: LoRaConfigComponent
       },
       { path: 'lora_command', component: GroupsComponent },
       ...UPGRADE_ROUTES,

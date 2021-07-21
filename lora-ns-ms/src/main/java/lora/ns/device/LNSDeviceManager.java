@@ -34,20 +34,24 @@ import c8y.Command;
 import c8y.Configuration;
 import c8y.Hardware;
 import c8y.IsDevice;
-import c8y.LpwanDevice;
 import c8y.Position;
 import c8y.SupportedOperations;
 import lora.codec.DeviceCodecRepresentation;
 import lora.codec.ms.CodecManager;
+import lora.codec.ms.CodecProxy;
 import lora.common.C8YUtils;
 import lora.ns.DeviceData;
-import lora.ns.EndDevice;
-import lora.ns.LNSIntegrationService;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
+import lora.ns.integration.LNSIntegrationService;
 
 @Component
 public class LNSDeviceManager {
+
+	/**
+	 *
+	 */
+	private static final String PROVISIONED = "provisioned";
 
 	/**
 	 *
@@ -127,12 +131,14 @@ public class LNSDeviceManager {
 			DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
 			if (mor.getProperty(CODEC_PROPERTY) != null
 					&& (codec == null || !codec.getId().equals(mor.getProperty(CODEC_PROPERTY)))) {
-				mor.set(new DeviceCodecRepresentation(
-						codecManager.getCodec(mor.getProperty(CODEC_PROPERTY).toString())));
-				updateDevice(event.getDevEui(), mor);
+				CodecProxy codecProxy = codecManager.getCodec(mor.getProperty(CODEC_PROPERTY).toString());
+				if (codecProxy != null) {
+					mor.set(new DeviceCodecRepresentation(codecProxy));
+					updateDevice(event.getDevEui(), mor);
+				}
 			}
-			if (mor.get(LpwanDevice.class) == null || !mor.get(LpwanDevice.class).isProvisioned()) {
-				mor.set(new LpwanDevice().provisioned(true));
+			if (!mor.hasProperty(PROVISIONED) || !Boolean.valueOf(mor.getProperty(PROVISIONED).toString())) {
+				mor.setProperty(PROVISIONED, true);
 				updateDevice(event.getDevEui(), mor);
 			}
 			addDeviceToAgent(agent, mor);

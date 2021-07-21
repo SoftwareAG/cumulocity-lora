@@ -4,7 +4,7 @@ import java.util.Properties;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
-import lora.ns.LNSIntegrationService;
+import lora.ns.integration.LNSIntegrationService;
 
 public abstract class LNSAbstractConnector implements LNSConnector {
 

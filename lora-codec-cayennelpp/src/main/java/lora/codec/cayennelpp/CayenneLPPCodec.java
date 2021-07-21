@@ -6,14 +6,14 @@ import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.cumulocity.model.measurement.MeasurementValue;
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
+
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import com.cumulocity.model.measurement.MeasurementValue;
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 
 import c8y.Position;
 import c8y.RequiredAvailability;
@@ -25,7 +25,7 @@ import lora.codec.DownlinkData;
 @Component
 public class CayenneLPPCodec extends DeviceCodec {
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(CayenneLPPCodec.class);
 	
 	private enum LPP_TYPE {
 		DIGITAL_INPUT((byte)0x00) {

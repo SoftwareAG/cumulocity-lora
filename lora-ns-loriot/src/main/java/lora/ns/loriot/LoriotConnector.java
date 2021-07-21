@@ -18,10 +18,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
 import lora.codec.DownlinkData;
-import lora.ns.DeviceProvisioning;
-import lora.ns.EndDevice;
-import lora.ns.Gateway;
 import lora.ns.connector.LNSAbstractConnector;
+import lora.ns.device.DeviceProvisioning;
+import lora.ns.device.EndDevice;
+import lora.ns.gateway.Gateway;
 import lora.ns.loriot.rest.LoriotService;
 import lora.ns.loriot.rest.model.AbpDeviceRegistration;
 import lora.ns.loriot.rest.model.App;
@@ -44,7 +44,7 @@ public class LoriotConnector extends LNSAbstractConnector {
 	private LoriotService loriotService;
 	private String sessionId;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(LoriotConnector.class);
 
 	class APIKeyInterceptor implements Interceptor {
 		private int maxTries = 5;

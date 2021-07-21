@@ -7,6 +7,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.io.BaseEncoding;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -21,18 +27,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.io.BaseEncoding;
-
 import lora.codec.C8YData;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DeviceOperationParam;
-import lora.codec.DeviceOperationParam.ParamType;
 import lora.codec.DownlinkData;
+import lora.codec.DeviceOperationParam.ParamType;
 
 @Component
 public class SenlabCodec extends DeviceCodec {

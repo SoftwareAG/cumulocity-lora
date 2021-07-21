@@ -12,17 +12,17 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-
 import lora.codec.DownlinkData;
-import lora.ns.DeviceProvisioning;
-import lora.ns.EndDevice;
-import lora.ns.Gateway;
 import lora.ns.connector.LNSAbstractConnector;
+import lora.ns.device.DeviceProvisioning;
+import lora.ns.device.EndDevice;
+import lora.ns.gateway.Gateway;
 import lora.ns.orbiwise.rest.OrbiwiseService;
 import lora.ns.orbiwise.rest.model.Device;
 import lora.ns.orbiwise.rest.model.DeviceCreate;
@@ -40,7 +40,7 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 
 	private OrbiwiseService orbiwiseService;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(OrbiwiseConnector.class);
 
 	private enum DeviceClass {
 		A(0), B(1), C(2);

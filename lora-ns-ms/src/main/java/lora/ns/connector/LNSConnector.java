@@ -5,9 +5,9 @@ import java.util.Optional;
 import java.util.Properties;
 
 import lora.codec.DownlinkData;
-import lora.ns.DeviceProvisioning;
-import lora.ns.EndDevice;
-import lora.ns.Gateway;
+import lora.ns.device.DeviceProvisioning;
+import lora.ns.device.EndDevice;
+import lora.ns.gateway.Gateway;
 
 public interface LNSConnector {
 	String getId();

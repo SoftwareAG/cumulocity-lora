@@ -24,10 +24,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import lora.codec.DownlinkData;
-import lora.ns.DeviceProvisioning;
-import lora.ns.EndDevice;
-import lora.ns.Gateway;
 import lora.ns.connector.LNSAbstractConnector;
+import lora.ns.device.DeviceProvisioning;
+import lora.ns.device.EndDevice;
+import lora.ns.gateway.Gateway;
 import lora.ns.kerlink.dto.ClusterDto;
 import lora.ns.kerlink.dto.CustomerDto;
 import lora.ns.kerlink.dto.EndDeviceDto;
@@ -53,7 +53,7 @@ public class KerlinkConnector extends LNSAbstractConnector {
 	private String password;
 	private String baseUrl;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(KerlinkConnector.class);
 
 	public KerlinkConnector(Properties properties) {
 		super(properties);

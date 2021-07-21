@@ -1,6 +1,8 @@
 package lora.ns;
 
+import lora.ns.integration.LNSIntegrationService;
 import lora.ns.objenious.ObjeniousConnector;
+import lora.ns.operation.OperationData;
 
 public class JsonIntegrationService extends LNSIntegrationService<ObjeniousConnector> {
 
