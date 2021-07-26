@@ -1,10 +1,12 @@
 package lora.ns.device;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.util.Properties;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.io.BaseEncoding;
 
 import lora.common.ValidationResult;
 import lora.common.Validator;
@@ -80,6 +82,7 @@ public class DeviceProvisioning implements Validator {
 			return null;
 		}
 	}
+
 	private DeviceClass deviceClass = DeviceClass.C;
 
 	public String getName() {
@@ -208,31 +211,35 @@ public class DeviceProvisioning implements Validator {
 		boolean result = true;
 		String reason = "";
 
-		if (devEUI == null || devEUI.trim().isEmpty()) {
+		if (devEUI.isBlank()) {
 			result = false;
 			reason += "\ndevEUI is required.";
 		}
-		if (appEUI == null || appEUI.trim().isEmpty()) {
-			result = false;
-			reason += "\nappEUI is required.";
+		if (appEUI.isBlank()) {
+			SecureRandom secureRandom = new SecureRandom();
+			byte[] bytes = new byte[8];
+			secureRandom.nextBytes(bytes);
+			appEUI = BaseEncoding.base16().encode(bytes);
 		}
-		switch(provisioningMode) {
+		switch (provisioningMode) {
 			case OTAA:
-			if (appKey == null || appKey.trim().isEmpty()) {
-				result = false;
-				reason += "\nappKey is required for OTAA registration.";
-			}
-			break;
+				if (appKey == null || appKey.isBlank()) {
+					SecureRandom secureRandom = new SecureRandom();
+					byte[] bytes = new byte[16];
+					secureRandom.nextBytes(bytes);
+					appKey = BaseEncoding.base16().encode(bytes);
+				}
+				break;
 			case ABP:
-			if (appSKey == null || appSKey.trim().isEmpty()) {
-				result = false;
-				reason += "\nappSKey is required for ABP registration.";
-			}
-			if (nwkSKey == null || nwkSKey.trim().isEmpty()) {
-				result = false;
-				reason += "\nnwkSKey is required for ABP registration.";
-			}
-			break;
+				if (appSKey == null || appSKey.isBlank()) {
+					result = false;
+					reason += "\nappSKey is required for ABP registration.";
+				}
+				if (nwkSKey == null || nwkSKey.isBlank()) {
+					result = false;
+					reason += "\nnwkSKey is required for ABP registration.";
+				}
+				break;
 		}
 
 		return new ValidationResult(result, reason);

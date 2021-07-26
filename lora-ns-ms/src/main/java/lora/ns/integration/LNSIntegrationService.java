@@ -232,14 +232,15 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		}
 	}
 
-	public DeviceProvisioningResponse provisionDevice(String lnsInstanceId, DeviceProvisioning deviceProvisioning) {
+	public DeviceProvisioningResponse provisionDevice(String lnsConnectorId, DeviceProvisioning deviceProvisioning) {
+		logger.info("Will provision device on LNS connector {}: {}", lnsConnectorId, deviceProvisioning);
 		DeviceProvisioningResponse response = new DeviceProvisioningResponse();
 		ManagedObjectRepresentation mor = null;
 		String errorMessage = null;
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
 		ValidationResult validationResult = deviceProvisioning.validate();
 		if (validationResult.isOk() && connector.isPresent() && connector.get().provisionDevice(deviceProvisioning)) {
-			mor = upsertDevice(lnsInstanceId, deviceProvisioning);
+			mor = upsertDevice(lnsConnectorId, deviceProvisioning);
 			EventRepresentation event = new EventRepresentation();
 			event.setType("Device provisioned");
 			event.setText("Device has been provisioned");
@@ -252,12 +253,12 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			alarm.setType("Device provisioning error");
 			if (connector.isPresent()) {
 				errorMessage = "Couldn't provision device " + deviceProvisioning.getDevEUI() + " in LNS connector "
-						+ lnsInstanceId;
+						+ lnsConnectorId;
 				if (!validationResult.isOk()) {
 					errorMessage += validationResult.getReason();
 				}
 			} else {
-				errorMessage = "LNS connector Id '" + lnsInstanceId
+				errorMessage = "LNS connector Id '" + lnsConnectorId
 						+ "' doesn't exist. Please use a valid managed object Id.";
 			}
 			alarm.setText(errorMessage);
