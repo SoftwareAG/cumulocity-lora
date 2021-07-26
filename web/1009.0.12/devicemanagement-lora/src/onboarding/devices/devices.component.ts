@@ -11,7 +11,7 @@ import {
     Pagination
 } from '@c8y/ngx-components';
 import { FilteringModifier } from '@c8y/ngx-components/core/data-grid/column/filtering-form-renderer';
-import { assign, forEach, get, identity, map, remove, sortBy, transform } from 'lodash-es';
+import { assign, transform } from 'lodash-es';
 
 /**
  * The DevicesComponent defines a few methods that can be
@@ -91,6 +91,8 @@ export class LoraDevicesComponent {
 
     serverSideDataCallback: any;
 
+    provisionDevice: any = {};
+
     async onDataSourceModifier(
         dataSourceModifier: DataSourceModifier
     ): Promise<ServerSideDataResult> {
@@ -151,7 +153,7 @@ export class LoraDevicesComponent {
     @ViewChild(DataGridComponent, { static: true })
     dataGrid: DataGridComponent;
 
-    constructor(private inventory: InventoryService, private identityService: IdentityService, private fetchClient: FetchClient, private modalService: BsModalService) {
+    constructor(private inventory: InventoryService, private identityService: IdentityService, private fetchClient: FetchClient, private modalService: BsModalService/*, private fb: FormBuilder*/) {
         // _ annotation to mark this string as translatable string.
         this.informationText = _('Ooops! It seems that there is no device to display.');
         this.serverSideDataCallback = this.onDataSourceModifier.bind(this);
@@ -163,7 +165,6 @@ export class LoraDevicesComponent {
         await this.loadCodecs();
         await this.loadProxies();
         await this.loadInstances()
-        //await this.loadDevices(1);
     }
 
     getDeviceQueryString(columns: Column[]): string {
@@ -180,6 +181,10 @@ export class LoraDevicesComponent {
             currentPage: pagination.currentPage,
             withTotalPages: true
         };
+    }
+
+    log(o) {
+        console.dir(o);
     }
 
     private getQueryObj(columns: Column[]): any {
@@ -270,6 +275,10 @@ export class LoraDevicesComponent {
         //console.log(this.instanceMap);
     }
 
+    addDeviceFromForm() {
+        this.addDevice(this.provisionDevice.deviceName, this.provisionDevice.devEUI, this.provisionDevice.appEUI, this.provisionDevice.appKey, this.provisionDevice.type, this.provisionDevice.model, this.provisionDevice.instanceSelect);
+    }
+
     // Add a managedObject (as device) to the database.
     async addDevice(name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, instance: string) {
 
@@ -277,17 +286,17 @@ export class LoraDevicesComponent {
             this.provision({
                 name,
                 devEUI: devEUI.toLowerCase(),
-                appEUI: appEUI.toLowerCase(),
-                appKey: appKey.toLowerCase(),
+                appEUI: appEUI ? appEUI.toLowerCase() : null,
+                appKey: appKey ? appKey.toLowerCase() : null,
                 codec: type,
                 model
-            }, instance)
+            }, instance).then(data => console.log(data))
         } else {
             let device = {
                 c8y_IsDevice: {},
                 devEUI: devEUI.toLowerCase(),
-                appEUI: appEUI.toLowerCase(),
-                appKey: appKey.toLowerCase(),
+                appEUI: appEUI ? appEUI.toLowerCase() : null,
+                appKey: appKey ? appKey.toLowerCase() : null,
                 codec: type,
                 type: 'c8y_LoRaDevice',
                 c8y_Hardware: { model: model },
