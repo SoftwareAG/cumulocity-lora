@@ -9,20 +9,18 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.google.common.io.BaseEncoding;
 
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 
 import lora.codec.C8YData;
+import lora.codec.Decode;
 
 public class TestDecode {
 	
 	@Test
 	public void testPayload() {
-		byte[] payload = BaseEncoding.base16().decode("010100022e040001050b070e41".toUpperCase());
-
 		ElsysCodec codec = new ElsysCodec();
 
-		C8YData c8yData = codec.decode(new ManagedObjectRepresentation(), "-", 1, new DateTime(), payload);
+		C8YData c8yData = codec.decode(new ManagedObjectRepresentation(), new Decode("0", "-", 1, "010100022e040001050b070e41", 0L));
 		
 		System.out.println(c8yData.getMeasurements().iterator().next().toJSON());
 		

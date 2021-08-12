@@ -21,20 +21,21 @@ import org.springframework.stereotype.Component;
 
 import c8y.RequiredAvailability;
 import lora.codec.C8YData;
+import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DeviceOperationParam;
-import lora.codec.DownlinkData;
 import lora.codec.DeviceOperationParam.ParamType;
+import lora.codec.DownlinkData;
+import lora.codec.Encode;
 
 @Component
 public class PyrescomCodec extends DeviceCodec {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(PyrescomCodec.class);
 	
 	private static final String CLASS_AIR = "Class'Air";
 	
-	private Map<String, String> models = new HashMap<>();
 	{
 		models.put(CLASS_AIR, CLASS_AIR);
 	}
@@ -55,13 +56,12 @@ public class PyrescomCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload) {
+	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		C8YData c8yData = new C8YData();
 		
-		ByteBuffer buffer = ByteBuffer.wrap(payload).order(ByteOrder.LITTLE_ENDIAN);
+		ByteBuffer buffer = ByteBuffer.wrap(BaseEncoding.base16().decode(decode.getPayload().toUpperCase())).order(ByteOrder.LITTLE_ENDIAN);
 		
-		if (model.equals(CLASS_AIR)) {
-			byte status = payload[2];
+		if (decode.getModel().equals(CLASS_AIR)) {
 			byte header = buffer.get();
 			if (header == 0x56) {
 				BigDecimal battery = BigDecimal.valueOf(buffer.get());
@@ -91,11 +91,11 @@ public class PyrescomCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
+	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
 		String payload = null;
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			JsonNode root = mapper.readTree(operation).get("config");
+			JsonNode root = mapper.readTree(encode.getOperation()).get("config");
 			boolean leds_enabled = root.get("leds_enabled").asBoolean();
 			boolean back_light_enabled = root.get("back_light_enabled").asBoolean();
 			int orange_threshold = root.get("orange_threshold").asInt();

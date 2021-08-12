@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.google.common.io.BaseEncoding;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -13,13 +14,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import lora.codec.C8YData;
+import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DownlinkData;
+import lora.codec.Encode;
 
 @Component
 public class ElsysCodec extends DeviceCodec {
 
 	private final Logger logger = LoggerFactory.getLogger(ElsysCodec.class);
+
+	{
+		models.put("default", "default");
+	}
 	
 	@Override
 	public String getId() {
@@ -117,10 +124,10 @@ public class ElsysCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload) {
+	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		C8YData c8yData = new C8YData();
 		
-		ByteBuffer buffer = ByteBuffer.wrap(payload);
+		ByteBuffer buffer = ByteBuffer.wrap(BaseEncoding.base16().decode(decode.getPayload().toUpperCase()));
 		while (buffer.hasRemaining()) {
 			byte type = buffer.get();
 			int offsetSize = (type >> 6) & 0x03;
@@ -132,7 +139,7 @@ public class ElsysCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
+	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
 		return null;
 	}
 

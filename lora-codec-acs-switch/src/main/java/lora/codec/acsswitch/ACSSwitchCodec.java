@@ -23,10 +23,12 @@ import org.springframework.stereotype.Component;
 import c8y.Configuration;
 import c8y.RequiredAvailability;
 import lora.codec.C8YData;
+import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DeviceOperationParam;
 import lora.codec.DownlinkData;
+import lora.codec.Encode;
 
 @Component
 public class ACSSwitchCodec extends DeviceCodec {
@@ -276,8 +278,9 @@ public class ACSSwitchCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload) {
+	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		C8YData c8yData = new C8YData();
+		byte[] payload = BaseEncoding.base16().decode(decode.getPayload().toUpperCase());
 		ByteBuffer buffer = ByteBuffer.wrap(payload).order(ByteOrder.BIG_ENDIAN);
 		FRAME frame = FRAME.BY_VALUE.get(buffer.get());
 		int numberOfRegisters = 0;
@@ -362,15 +365,15 @@ public class ACSSwitchCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
-		if (operation.contains("get config")) {
+	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
+		if (encode.getOperation().contains("get config")) {
 			return askDeviceConfig(null);
 		}
 		DownlinkData data = new DownlinkData();
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root;
 		try {
-			root = mapper.readTree(operation);
+			root = mapper.readTree(encode.getOperation());
 			String command = root.fieldNames().next();
 			PARAMETER param = PARAMETER.valueOf(command);
 			JsonNode params = root.get(command);

@@ -4,13 +4,16 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.google.common.io.BaseEncoding;
 
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 import lora.codec.C8YData;
+import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DownlinkData;
+import lora.codec.Encode;
 
 @Component
 public class ExampleCodec extends DeviceCodec {
@@ -36,20 +39,20 @@ public class ExampleCodec extends DeviceCodec {
 	}
 	
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload) {
+	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		C8YData c8yData = new C8YData();
 		
-		ByteBuffer buffer = ByteBuffer.wrap(payload);
+		ByteBuffer buffer = ByteBuffer.wrap(BaseEncoding.base16().decode(decode.getPayload().toUpperCase()));
 		byte l1 = buffer.get();
 		byte l2 = buffer.get();
 		byte v = buffer.get();
-		c8yData.addChildMeasurement(l1 + "/" + l2, "Measurement", "series", "unit", BigDecimal.valueOf(v), updateTime);
+		c8yData.addChildMeasurement(l1 + "/" + l2, "Measurement", "series", "unit", BigDecimal.valueOf(v), new DateTime(decode.getUpdateTime()));
 		
 		return c8yData;
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
+	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
 		return null;
 	}
 

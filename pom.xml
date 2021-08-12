@@ -18,6 +18,7 @@
 		<module>lora-codec-nke</module>
 		<module>lora-codec-pyrescom-classair</module>
 		<module>lora-codec-senlab</module>
+		<module>lora-codec-semtech</module>
 		<module>lora-codec-axioma</module>
 		<module>lora-codec-atim-th</module>
 		<module>lora-codec-atim-tm2d</module>
@@ -30,14 +31,13 @@
 		<module>lora-ns-ttn</module>
 		<module>lora-ns-actility</module>
 		<module>lora-codec-elsys</module>
-		<module>lora-codec-ttn</module>
 		<module>lora-codec-lansitec</module>
 		<module>lora-codec-example</module>
 	</modules>
   
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<c8y.version>1009.0.12</c8y.version>
+		<c8y.version>1010.8.0</c8y.version>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

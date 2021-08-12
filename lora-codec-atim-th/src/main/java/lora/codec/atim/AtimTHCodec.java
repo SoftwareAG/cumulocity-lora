@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.google.common.io.BaseEncoding;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -14,9 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import lora.codec.C8YData;
+import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DownlinkData;
+import lora.codec.Encode;
 
 @Component
 public class AtimTHCodec extends DeviceCodec {
@@ -115,9 +118,10 @@ public class AtimTHCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload) {
+	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		C8YData c8yData = new C8YData();
-		
+		byte[] payload = BaseEncoding.base16().decode(decode.getPayload().toUpperCase());
+
 		int code = payload[0];
 
 		FRAME frame = FRAME.BY_VALUE.get(code);
@@ -125,7 +129,7 @@ public class AtimTHCodec extends DeviceCodec {
 		logger.info("Received frame {}", frame);
 		
 		if (frame != null) {
-			frame.process(c8yData, mor, payload, updateTime);
+			frame.process(c8yData, mor, payload, new DateTime(decode.getUpdateTime()));
 		}
 
 		return c8yData;
@@ -138,7 +142,7 @@ public class AtimTHCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
+	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
 		// TODO Auto-generated method stub
 		return null;
 	}

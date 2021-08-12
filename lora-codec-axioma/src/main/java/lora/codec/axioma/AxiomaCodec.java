@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.cumulocity.model.idtype.GId;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.google.common.io.BaseEncoding;
 
 import org.apache.commons.codec.binary.Hex;
 import org.joda.time.DateTime;
@@ -19,9 +20,11 @@ import org.springframework.stereotype.Component;
 import c8y.Configuration;
 import c8y.RequiredAvailability;
 import lora.codec.C8YData;
+import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DownlinkData;
+import lora.codec.Encode;
 
 @Component
 public class AxiomaCodec extends DeviceCodec {
@@ -230,10 +233,12 @@ public class AxiomaCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload) {
+	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		C8YData c8yData = new C8YData();
+		byte[] payload = BaseEncoding.base16().decode(decode.getPayload().toUpperCase());
+
 		logger.info("Decoding Axioma payload...");
-		switch(fport) {
+		switch(decode.getfPort()) {
 		case 100:
 			readData(c8yData, mor, payload);
 			break;
@@ -256,7 +261,7 @@ public class AxiomaCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
+	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
 		// TODO Auto-generated method stub
 		return null;
 	}

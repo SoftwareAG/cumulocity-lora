@@ -9,6 +9,7 @@ import java.util.Map;
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
+import com.google.common.io.BaseEncoding;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -18,9 +19,11 @@ import org.springframework.stereotype.Component;
 import c8y.Position;
 import c8y.RequiredAvailability;
 import lora.codec.C8YData;
+import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DownlinkData;
+import lora.codec.Encode;
 
 @Component
 public class CayenneLPPCodec extends DeviceCodec {
@@ -239,29 +242,29 @@ public class CayenneLPPCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload) {
+	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		C8YData c8yData = new C8YData();
-		ByteBuffer buffer = ByteBuffer.wrap(payload);
+		ByteBuffer buffer = ByteBuffer.wrap(BaseEncoding.base16().decode(decode.getPayload().toUpperCase()));
 
 		byte channel = 0;
 		
-		switch(fport) {
+		switch(decode.getfPort()) {
 		case 1:
 		case 2:
 			while (buffer.hasRemaining()) {
-				if (fport == 1) {
+				if (decode.getfPort() == 1) {
 					channel = buffer.get();
 				}
 				logger.info("Channel is: {}", channel);
 				byte value = buffer.get();
 				LPP_TYPE type = LPP_TYPE.BY_VALUE.get(value);
 				if (type != null) {
-					type.process(channel, c8yData, mor, buffer, updateTime);
+					type.process(channel, c8yData, mor, buffer, new DateTime(decode.getUpdateTime()));
 					logger.info("Data decoded: {}", c8yData);
 				} else {
 					logger.info("{} is not a valid value", value);
 				}
-				if (fport == 2) {
+				if (decode.getfPort() == 2) {
 					channel++;
 				}
 			}
@@ -309,7 +312,7 @@ public class CayenneLPPCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
+	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -25,11 +25,13 @@ import c8y.Configuration;
 import c8y.Position;
 import c8y.RequiredAvailability;
 import lora.codec.C8YData;
+import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DeviceOperationParam;
-import lora.codec.DownlinkData;
 import lora.codec.DeviceOperationParam.ParamType;
+import lora.codec.DownlinkData;
+import lora.codec.Encode;
 
 @Component
 public class LansitecCodec extends DeviceCodec {
@@ -334,19 +336,18 @@ public class LansitecCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime,
-			byte[] payload) {
+	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		C8YData c8yData = new C8YData();
 		setAlgo("maxrssi");
 
-		ByteBuffer buffer = ByteBuffer.wrap(payload);
+		ByteBuffer buffer = ByteBuffer.wrap(BaseEncoding.base16().decode(decode.getPayload().toUpperCase()));
 
-		if (model.equals(ASSET_TRACKER)) {
+		if (decode.getModel().equals(ASSET_TRACKER)) {
 			byte type = buffer.get();
 			TYPE t = TYPE.BY_VALUE.get((byte) (type & 0xf0));
 			logger.info("Frame type: {}", t.name());
 			try {
-				t.process(mor, type, buffer, c8yData, updateTime, currentAlgo);
+				t.process(mor, type, buffer, c8yData, new DateTime(decode.getUpdateTime()), currentAlgo);
 			} catch(Exception e) {
 				logger.error(e.getMessage());
 				e.printStackTrace();
@@ -357,14 +358,14 @@ public class LansitecCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
-		if (operation.contains(GET_CONFIG)) {
+	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
+		if (encode.getOperation().contains(GET_CONFIG)) {
 			return askDeviceConfig(null);
 		}
 		String payload = null;
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			JsonNode root = mapper.readTree(operation);
+			JsonNode root = mapper.readTree(encode.getOperation());
 			String command = root.fieldNames().next();
 			if (command.equals(POSITION_REQUEST)) {
 				payload = "A1FF";

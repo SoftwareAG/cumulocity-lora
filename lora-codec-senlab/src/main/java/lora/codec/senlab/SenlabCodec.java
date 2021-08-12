@@ -28,11 +28,13 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import lora.codec.C8YData;
+import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DeviceOperationParam;
-import lora.codec.DownlinkData;
 import lora.codec.DeviceOperationParam.ParamType;
+import lora.codec.DownlinkData;
+import lora.codec.Encode;
 
 @Component
 public class SenlabCodec extends DeviceCodec {
@@ -59,13 +61,13 @@ public class SenlabCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
+	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
 		DownlinkData data = new DownlinkData();
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root;
 		String senlabOp = null;
 		try {
-			root = mapper.readTree(operation);
+			root = mapper.readTree(encode.getOperation());
 			String command = root.fieldNames().next();
 			senlabOp = "{\"id\":\"" + command + "\", \"parameters\": [";
 			JsonNode params = root.get(command);
@@ -93,7 +95,7 @@ public class SenlabCodec extends DeviceCodec {
 			headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
 			mapper = new ObjectMapper();
 			ResponseEntity<String> response = restTemplate.exchange(
-					System.getenv("C8Y_BASEURL") + "/service/slcodec/" + model + "/encodeRequest", HttpMethod.POST,
+					System.getenv("C8Y_BASEURL") + "/service/slcodec/" + encode.getModel() + "/encodeRequest", HttpMethod.POST,
 					new HttpEntity<String>(senlabOp, headers), String.class);
 			logger.info("Answer of Sensing Labs decoder is {} with content {}", response.getStatusCode(),
 					response.getBody());
@@ -124,16 +126,13 @@ public class SenlabCodec extends DeviceCodec {
 	}
 
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime,
-			byte[] payload) {
+	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		C8YData c8yData = new C8YData();
 
-		String spayload = BaseEncoding.base16().encode(payload);
 		String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get()
 				.toCumulocityCredentials().getAuthenticationString();
-		DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-		String message = "{\"port\":" + fport + ",\"payload\":\"" + spayload + "\",\"timestamp\":\""
-				+ fmt.print(updateTime) + "\"}";
+		String message = "{\"port\":" + decode.getfPort() + ",\"payload\":\"" + decode.getPayload() + "\",\"timestamp\":\""
+				+ new DateTime(decode.getUpdateTime()).toString(ISODateTimeFormat.dateTime()) + "\"}";
 
 		RestTemplate restTemplate = new RestTemplate();
 		try {
@@ -142,25 +141,25 @@ public class SenlabCodec extends DeviceCodec {
 			headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
 			ObjectMapper mapper = new ObjectMapper();
 			ResponseEntity<String> response = restTemplate.exchange(
-					System.getenv("C8Y_BASEURL") + "/service/slcodec/" + model + "/decodeMessage", HttpMethod.POST,
+					System.getenv("C8Y_BASEURL") + "/service/slcodec/" + decode.getModel() + "/decodeMessage", HttpMethod.POST,
 					new HttpEntity<String>(message, headers), String.class);
 			logger.info("Answer of Sensing Labs decoder is {} with content {}", response.getStatusCode(),
 					response.getBody());
 			String result = response.getBody();
 			JsonNode root = mapper.readTree(result);
 			ArrayNode measures = (ArrayNode) root.get("measures");
-			if (!modelDescs.containsKey(model)) {
-				addModelDesc(model);
+			if (!modelDescs.containsKey(decode.getModel())) {
+				addModelDesc(decode.getModel());
 			}
 			measures.forEach(measure -> {
 				if (measure.has("value") && measure.get("value") != null) {
 					String fragment = measure.get("id").asText();
 					String series = "" + fragment.charAt(0);
 					String unit = "";
-					if (modelDescs.get(model).get("measures").containsKey(measure.get("id").asText())) {
-						fragment = modelDescs.get(model).get("measures").get(measure.get("id").asText()).get("name");
+					if (modelDescs.get(decode.getModel()).get("measures").containsKey(measure.get("id").asText())) {
+						fragment = modelDescs.get(decode.getModel()).get("measures").get(measure.get("id").asText()).get("name");
 						series = "" + fragment.charAt(0);
-						unit = modelDescs.get(model).get("measures").get(measure.get("id").asText()).get("unit");
+						unit = modelDescs.get(decode.getModel()).get("measures").get(measure.get("id").asText()).get("unit");
 						if (unit == null || unit.equals("null")) {
 							unit = "";
 						}

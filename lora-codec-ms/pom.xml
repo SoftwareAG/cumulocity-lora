@@ -24,16 +24,6 @@
 			<version>5.1.0</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>io.kaitai</groupId>
-			<artifactId>kaitai-struct-compiler_2.12</artifactId>
-			<version>0.8</version>
-		</dependency>
-		<dependency>
-			<groupId>io.kaitai</groupId>
-			<artifactId>kaitai-struct-runtime</artifactId>
-			<version>0.8</version>
-		</dependency>
 	</dependencies>
 
 </project>

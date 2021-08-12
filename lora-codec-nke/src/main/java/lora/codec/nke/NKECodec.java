@@ -4,15 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.google.common.io.BaseEncoding;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import lora.codec.C8YData;
+import lora.codec.Decode;
 import lora.codec.DeviceCodec;
 import lora.codec.DeviceOperation;
 import lora.codec.DownlinkData;
+import lora.codec.Encode;
 
 @Component
 public class NKECodec extends DeviceCodec {
@@ -52,13 +55,13 @@ public class NKECodec extends DeviceCodec {
 	}
 
 	@Override
-	protected C8YData decode(ManagedObjectRepresentation mor, String model, int fport, DateTime updateTime, byte[] payload) {
-		return decoder.decode(mor, payload, fport, model, updateTime);
+	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
+		return decoder.decode(mor, BaseEncoding.base16().decode(decode.getPayload().toUpperCase()), decode.getfPort(), decode.getModel(), new DateTime(decode.getUpdateTime()));
 	}
 
 	@Override
-	protected DownlinkData encode(ManagedObjectRepresentation mor, String model, String operation) {
-		DeviceOperation deviceOperation = convertJsonStringToDeviceOperation(model, operation);
+	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
+		DeviceOperation deviceOperation = convertJsonStringToDeviceOperation(encode.getModel(), encode.getOperation());
 		switch(ZCLCluster.valueOf(deviceOperation.getId())) {
 			case AnalogInput:
 				break;
