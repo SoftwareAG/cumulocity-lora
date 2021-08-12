@@ -17,6 +17,7 @@ export class DevicesComponent implements OnInit {
     device: IManagedObject;
     model: string;
     codec: string;
+    useGatewayPosition: boolean = true;
     previewCommand: { success: boolean, message: string, response: any };
     devEui: string;
     @ViewChild('errorModal', { static: false })
@@ -38,20 +39,32 @@ export class DevicesComponent implements OnInit {
     constructor(public route: ActivatedRoute, private inventory: InventoryService, private identity: IdentityService, private operationService: OperationService, private fetch: FetchClient, private modalService: BsModalService, private eventService: EventService) {
         console.log(route.snapshot.parent.data.contextData.id);
         // _ annotation to mark this string as translatable string.
-        this.loadCommands();
+        this.getCodecAndModel();
         this.loadCodecs();
     }
 
-    async loadCommands() {
+    async getCodecAndModel() {
         let deviceId: string = this.route.snapshot.parent.data.contextData.id;
         const { data, res, paging } = await this.inventory.detail(deviceId);
         this.device = data;
-        this.getUnprocessPayloads();
         if (this.device.codec) {
             this.codec = this.device.codec;
             this.loadModels(this.device.codec);
         }
-        this.model = this.device.c8y_Hardware !== undefined ? this.device.c8y_Hardware.model || 'a' : 'a';
+        if (this.device.useGatewayPosition === undefined) {
+            this.useGatewayPosition = true;
+        } else {
+            this.useGatewayPosition = this.device.useGatewayPosition;
+        }
+        if (this.device.c8y_Hardware) {
+            this.model = this.device.c8y_Hardware.model;
+            this.loadCommands();
+        }
+    }
+
+    async loadCommands() {
+        let deviceId: string = this.route.snapshot.parent.data.contextData.id;
+        this.getUnprocessPayloads();
         let response = await this.fetch.fetch('service/lora-codec-' + this.device.codec + '/operations/' + this.model);
         this.commands = await response.json();
         (await this.identity.list(deviceId)).data.forEach(extId => {
@@ -78,6 +91,7 @@ export class DevicesComponent implements OnInit {
             body: JSON.stringify(toEncode)
         });
         this.previewCommand = await response.json();
+        console.dir(this.previewCommand);
         if (!this.previewCommand.success) {
             this.errorModalRef = this.modalService.show(this.errorModal);
         }
@@ -124,6 +138,7 @@ export class DevicesComponent implements OnInit {
         let device: Partial<IManagedObject> = {
             id: this.device.id,
             codec: this.codec,
+            useGatewayPosition: this.useGatewayPosition,
             c8y_Hardware: { model: this.model }
         }
 

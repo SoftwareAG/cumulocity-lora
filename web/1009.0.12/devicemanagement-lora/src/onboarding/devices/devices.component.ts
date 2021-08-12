@@ -1,17 +1,25 @@
-import { DataGridComponent, DataSourceModifier, FilteringActionType, ServerSideDataResult, _ } from '@c8y/ngx-components';
-import { Component, EventEmitter, Output, TemplateRef, ViewChild } from '@angular/core';
-import { FetchClient, InventoryService, IdentityService, IManagedObject, IExternalIdentity, QueriesUtil } from '@c8y/client';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import {
     ActionControl,
     BuiltInActionType,
     BulkActionControl,
     Column,
     ColumnDataRecordClassName,
-    Pagination
+    Pagination,
+    DataGridComponent, DataSourceModifier, FilteringActionType, ServerSideDataResult, _
 } from '@c8y/ngx-components';
+import { Component, EventEmitter, Output, TemplateRef, ViewChild } from '@angular/core';
+import { FetchClient, InventoryService, IdentityService, IManagedObject, IExternalIdentity, QueriesUtil } from '@c8y/client';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { FilteringModifier } from '@c8y/ngx-components/core/data-grid/column/filtering-form-renderer';
 import { assign, transform } from 'lodash-es';
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({name: 'property'})
+export class PropertyPipe implements PipeTransform {
+    transform(value: Array<any>, propertyName: string, propertyLabel: string): string {
+        return value ? value.map(v => v[propertyName] + ' (' + v[propertyLabel] + ')').join(',\n') : "";
+    }
+}
 
 /**
  * The DevicesComponent defines a few methods that can be
@@ -36,9 +44,17 @@ export class LoraDevicesComponent {
     codecMap: {};
     devEUIs: {};
     informationText: string;
-    fileContent: string[][];
+    fileContent: { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any }[];
     deviceToDelete: IManagedObject;
     properties: [{
+        name: string;
+        label: string;
+        required: boolean;
+        type: string;
+        url: string;
+        values: Map<string, string>;
+    }?];
+    bulkProperties: [{
         name: string;
         label: string;
         required: boolean;
@@ -92,6 +108,7 @@ export class LoraDevicesComponent {
     serverSideDataCallback: any;
 
     provisionDevice: any = {};
+    bulkProvisionDevices: any = {};
 
     async onDataSourceModifier(
         dataSourceModifier: DataSourceModifier
@@ -189,7 +206,7 @@ export class LoraDevicesComponent {
 
     private getQueryObj(columns: Column[]): any {
         return transform(columns, (query, column) => this.extendQueryByColumn(query, column), {
-            __filter: {type:'c8y_LoRaDevice'},
+            __filter: { type: 'c8y_LoRaDevice' },
             __orderby: []
         });
     }
@@ -276,11 +293,11 @@ export class LoraDevicesComponent {
     }
 
     addDeviceFromForm() {
-        this.addDevice(this.provisionDevice.deviceName, this.provisionDevice.devEUI, this.provisionDevice.appEUI, this.provisionDevice.appKey, this.provisionDevice.type, this.provisionDevice.model, this.provisionDevice.instanceSelect);
+        this.addDevice(this.provisionDevice.deviceName, this.provisionDevice.devEUI, this.provisionDevice.appEUI, this.provisionDevice.appKey, this.provisionDevice.type, this.provisionDevice.model, this.provisionDevice.instanceSelect, this.deviceProvisioningAdditionalProperties);
     }
 
     // Add a managedObject (as device) to the database.
-    async addDevice(name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, instance: string) {
+    async addDevice(name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, instance: string, additionalProperties) {
 
         if (instance) {
             this.provision({
@@ -290,7 +307,7 @@ export class LoraDevicesComponent {
                 appKey: appKey ? appKey.toLowerCase() : null,
                 codec: type,
                 model
-            }, instance).then(data => console.log(data))
+            }, instance, additionalProperties).then(data => console.log(data))
         } else {
             let device = {
                 c8y_IsDevice: {},
@@ -373,9 +390,22 @@ export class LoraDevicesComponent {
                 this.fileContent = [];
                 let csv: string = reader.result as string;
                 let lines = csv.split("\n");
-                lines.forEach(line => {
-                    this.fileContent.push(line.split(";"));
+                let headers = lines[0].trim().split(";");
+                lines.splice(1).forEach(line => {
+                    let row: { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any } = {} as { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any };
+                    row.additionalProperties = {};
+                    let lineContent = line.trim().split(";");
+                    lineContent.forEach((col, i) => {
+                        if (["name", "devEUI", "appEUI", "appKey", "type", "model"].indexOf(headers[i]) > -1) {
+                            row[headers[i]] = col;
+                        }
+                        else {
+                            row.additionalProperties[headers[i]] = col;
+                        }
+                    })
+                    this.fileContent.push(row);
                 });
+                console.dir(this.fileContent);
             }
         }
     }
@@ -383,41 +413,78 @@ export class LoraDevicesComponent {
     addDevices() {
         this.fileContent.forEach(row => {
             console.log("Will add device: " + row);
-            this.addDevice(row[3], row[0], row[1], row[2], row[4], row[5], row.length > 6 ? row[6] : null);
+            this.addDevice(row.name, row.devEUI, row.appEUI, row.appKey, row.type, row.model, this.bulkProvisionDevices.instanceSelect, row.additionalProperties);
         })
     }
 
-    async loadProperties(instance) {
+    async loadDeviceProvisioningAdditionalProperties(instance: string): Promise<{
+        properties: [{
+            name: string;
+            label: string;
+            required: boolean;
+            type: string;
+            url: string;
+            values: Map<string, string>;
+        }?], values: {}
+    }> {
+        let props: {
+            properties: [{
+                name: string;
+                label: string;
+                required: boolean;
+                type: string;
+                url: string;
+                values: Map<string, string>;
+            }?], values: {}
+        } = { properties: [], values: {} };
         let lnsInstance: IManagedObject = this.instanceMap[instance];
         const response = await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + '/deviceProvisioningAdditionalProperties');
-        this.properties = await response.json();
-        if (this.properties && this.properties.forEach) {
-            console.log(this.properties);
-            this.properties.forEach(async p => {
+        props.properties = await response.json();
+        if (props.properties && props.properties.forEach) {
+            console.log(props.properties);
+            props.properties.forEach(async p => {
                 if (p.type === "LIST") {
                     const values = await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + "/" + instance + p.url, {
                         method: "GET",
                         headers: {
                             'Content-Type': 'application/json'
-                          },
+                        },
                     });
                     p.values = await values.json();
                 }
-                this.deviceProvisioningAdditionalProperties[p.name] = "";
+                props.values[p.name] = undefined;
             });
         }
+
+        return props;
     }
 
-    async provision(deviceProvisioning: { name: string, devEUI: string, appEUI: string, appKey: string, codec: string, model: string, lat?: number, lng?: number }, instance: string): Promise<IManagedObject> {
+    async loadProperties(instance) {
+        let props = await this.loadDeviceProvisioningAdditionalProperties(instance);
+        this.properties = props.properties;
+        this.deviceProvisioningAdditionalProperties = props.values;
+        console.dir(this.properties);
+        console.dir(this.deviceProvisioningAdditionalProperties);
+    }
+
+    bulkDeviceProvisioningAdditionalProperties: any;
+
+    async loadBulkProperties(instance) {
+        let props = await this.loadDeviceProvisioningAdditionalProperties(instance);
+        this.bulkProperties = props.properties;
+        this.bulkDeviceProvisioningAdditionalProperties = props.values;
+    }
+
+    async provision(deviceProvisioning: { name: string, devEUI: string, appEUI: string, appKey: string, codec: string, model: string, lat?: number, lng?: number }, instance: string, additionalProperties): Promise<IManagedObject> {
         console.log("Will provision device on LNS instance " + instance);
-        console.log({...deviceProvisioning, provisioningMode: "OTAA", additionalProperties: this.deviceProvisioningAdditionalProperties});
+        console.log({ ...deviceProvisioning, provisioningMode: "OTAA", additionalProperties: additionalProperties });
         let lnsInstance: IManagedObject = this.instanceMap[instance];
         return (await (await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + '/' + instance + '/devices', {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({...deviceProvisioning, provisioningMode: "OTAA", additionalProperties: this.deviceProvisioningAdditionalProperties})
+            body: JSON.stringify({ ...deviceProvisioning, provisioningMode: "OTAA", additionalProperties: additionalProperties })
         })).json()).data;
     }
 

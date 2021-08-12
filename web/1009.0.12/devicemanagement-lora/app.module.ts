@@ -23,7 +23,7 @@ import { LoraNavigationFactory } from './factories/Navigation';
 import { GroupsComponent } from './src/groups/groups.component';
 import { DevicesComponent } from './src/devices/devices.component';
 import { LoraGuard } from './src/devices/lora.guard';
-import { LoraDevicesComponent } from './src/onboarding/devices/devices.component';
+import { LoraDevicesComponent, PropertyPipe } from './src/onboarding/devices/devices.component';
 import { LoraCodecsComponent } from './src/onboarding/codecs/codecs.component';
 import { LNSComponent } from './src/onboarding/lns/lns.component';
 import { LoRaConfigComponent } from './src/config/config.component';
@@ -261,7 +261,7 @@ declare var Buffer: {
 };
 
 @NgModule({
-  declarations: [GroupsComponent, DevicesComponent, LoraDevicesComponent, LNSComponent, LoraCodecsComponent, LoRaConfigComponent],
+  declarations: [GroupsComponent, DevicesComponent, LoraDevicesComponent, LNSComponent, LoraCodecsComponent, LoRaConfigComponent, PropertyPipe],
   entryComponents: [GroupsComponent, DevicesComponent],
   imports: [
     // Upgrade module must be the first
