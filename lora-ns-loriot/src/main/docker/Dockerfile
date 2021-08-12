@@ -14,5 +14,4 @@ ENV JAVA_HOME=/opt/jdk-mini
 ENV PATH="$PATH:$JAVA_HOME/bin"
 COPY etc/ /etc/@package.directory@/
 ADD resources/* /data/
-RUN chmod +x /data/entrypoint.sh
-ENTRYPOINT /data/entrypoint.sh
+ENTRYPOINT ["java", "-XX:MinRAMPercentage=60.0", "-XX:MaxRAMPercentage=90.0", "-XX:+HeapDumpOnOutOfMemoryError", "-XshowSettings:vm", "-jar", "/data/@package.name@.jar"]
