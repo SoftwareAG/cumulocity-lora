@@ -44,10 +44,9 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 			JsonNode rootNode = mapper.readTree(event);
 			String deviceEui = rootNode.get("end_device_ids").get("dev_eui").asText();
 			int fPort = rootNode.get("uplink_message").get("f_port").asInt();
-			Double rssi = rootNode.get("uplink_message").get("rx_metadata").get(0).has("rssi")
-					? rootNode.get("uplink_message").get("rx_metadata").get(0).get("rssi").asDouble()
-					: null;
-			double snr = rootNode.get("uplink_message").get("rx_metadata").get(0).get("snr").asDouble();
+			Double rssi = rootNode.at("uplink_message/rx_metadata/0/rssi").isNull() ? null :
+				rootNode.at("uplink_message/rx_metadata/0/rssi").asDouble();
+			Double snr = rootNode.at("uplink_message/rx_metadata/0/snr").isNull() ? null : rootNode.at("uplink_message/rx_metadata/0/snr").asDouble();
 			logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
 			byte[] payload = Base64.getDecoder().decode(rootNode.get("uplink_message").get("frm_payload").asText());
 			Long updateTime = new DateTime(rootNode.get("uplink_message").get("received_at").asText()).getMillis();
@@ -72,15 +71,19 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 				measurementValueMap.put("rssi", mv);
 			}
 
-			mv = new MeasurementValue();
-			mv.setValue(BigDecimal.valueOf(snr));
-			mv.setUnit("dB");
-			measurementValueMap.put("snr", mv);
+			if (snr != null) {
+				mv = new MeasurementValue();
+				mv.setValue(BigDecimal.valueOf(snr));
+				mv.setUnit("dB");
+				measurementValueMap.put("snr", mv);
+			}
 
-			m.set(measurementValueMap, "c8y_SignalStrength");
-			m.setType("c8y_SignalStrength");
-			m.setDateTime(new DateTime(updateTime));
-			measurements.add(m);
+			if (rssi != null || snr != null) {
+				m.set(measurementValueMap, "c8y_SignalStrength");
+				m.setType("c8y_SignalStrength");
+				m.setDateTime(new DateTime(updateTime));
+				measurements.add(m);
+			}
 
 			data = new DeviceData(deviceEui, deviceEui, null, null, fPort, payload, updateTime, measurements,
 					lat != null ? BigDecimal.valueOf(lat) : null, lng != null ? BigDecimal.valueOf(lng) : null);

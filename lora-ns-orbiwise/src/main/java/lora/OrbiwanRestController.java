@@ -19,14 +19,12 @@ public class OrbiwanRestController {
 	LNSRestController restController;
 
 	@PostMapping(value = "/{lnsInstanceId}/rest/callback/payloads/ul", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> lnsUp(@RequestBody String event, @PathVariable String lnsInstanceId,
-			HttpServletRequest request) {
-		return restController.lnsUp(event, lnsInstanceId, request);
+	public ResponseEntity<String> lnsUp(@RequestBody String event, @PathVariable String lnsInstanceId) {
+		return restController.lnsUp(event, lnsInstanceId);
 	}
 
 	@PostMapping(value = "/{lnsInstanceId}/rest/callback/payloads/dl", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> lnsDown(@RequestBody String event, @PathVariable String lnsInstanceId,
-			HttpServletRequest request) {
-		return restController.lnsDown(event, lnsInstanceId, request);
+	public ResponseEntity<String> lnsDown(@RequestBody String event, @PathVariable String lnsInstanceId) {
+		return restController.lnsDown(event, lnsInstanceId);
 	}
 }
