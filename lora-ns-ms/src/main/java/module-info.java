@@ -19,10 +19,7 @@ module lora.ns.ms {
     requires spring.security.core;
     requires spring.security.config;
     requires spring.security.web;
-    requires io.swagger.v3.core;
-    requires io.swagger.v3.oas.models;
     requires com.google.common;
-    requires org.apache.tomcat.embed.core;
 
     exports lora.codec.ms;
     exports lora.ns.integration;

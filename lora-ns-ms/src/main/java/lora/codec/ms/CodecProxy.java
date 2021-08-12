@@ -110,7 +110,9 @@ public class CodecProxy implements Component {
 			HttpHeaders headers = new HttpHeaders();
 			headers.set(HttpHeaders.AUTHORIZATION, authentication);
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-			ResponseEntity<Map<String, DeviceOperationParam>> response = restTemplate.exchange(System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/operations/" + model, HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<Map<String, DeviceOperationParam>>(){});
+			String url = System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/operations/" + model;
+			logger.info("Will get list of operations from URL {}", url);
+			ResponseEntity<Map<String, DeviceOperationParam>> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<Map<String, DeviceOperationParam>>(){});
 			logger.info("Answer of decoder is {} with content {}", response.getStatusCode(), response.getBody());
 			result = response.getBody();
 		} catch(HttpClientErrorException e) {

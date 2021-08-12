@@ -52,6 +52,7 @@ public class DeviceProvisioning implements Validator {
 
 	private String codec;
 	private String model;
+	private boolean useGatewayPosition = true;
 	private BigDecimal lat;
 	private BigDecimal lng;
 
@@ -205,6 +206,14 @@ public class DeviceProvisioning implements Validator {
 
 	public void setAdditionalProperties(Properties additionalProperties) {
 		this.additionalProperties = additionalProperties;
+	}
+
+	public boolean getUseGatewayPosition() {
+		return useGatewayPosition;
+	}
+
+	public void setUseGatewayPosition(boolean useGatewayPosition) {
+		this.useGatewayPosition = useGatewayPosition;
 	}
 
 	public ValidationResult validate() {

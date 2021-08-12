@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import org.slf4j.Logger;
@@ -43,17 +41,13 @@ public class LNSRestController {
 	final Logger logger = LoggerFactory.getLogger(LNSRestController.class);
 
 	@PostMapping(value = "/{lnsInstanceId}/uplink", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> lnsUp(@RequestBody String event, @PathVariable String lnsInstanceId,
-			HttpServletRequest request) {
-		logger.info("Event received from {}: {}", request.getRemoteAddr(), event);
+	public ResponseEntity<String> lnsUp(@RequestBody String event, @PathVariable String lnsInstanceId) {
 		lnsProxy.mapEventToC8Y(event, lnsInstanceId);
 		return ResponseEntity.ok().build();
 	}
 
 	@PostMapping(value = "/{lnsInstanceId}/downlink", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> lnsDown(@RequestBody String event, @PathVariable String lnsInstanceId,
-			HttpServletRequest request) {
-		logger.info("Event received from {}: {}", request.getRemoteAddr(), event);
+	public ResponseEntity<String> lnsDown(@RequestBody String event, @PathVariable String lnsInstanceId) {
 		lnsProxy.updateOperation(event, lnsInstanceId);
 		return ResponseEntity.ok().build();
 	}

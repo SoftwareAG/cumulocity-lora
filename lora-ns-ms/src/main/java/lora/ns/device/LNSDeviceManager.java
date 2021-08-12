@@ -113,6 +113,7 @@ public class LNSDeviceManager {
 			logger.info("Upsert device with devEui {} with Payload {} from fPort {}", event.getDevEui(),
 					event.getPayload(), event.getfPort());
 			ManagedObjectRepresentation mor = getOrCreateDevice(lnsInstanceId, event, agent);
+			boolean useGatewayPosition = mor.hasProperty("useGatewayPosition") ? (Boolean)mor.get("useGatewayPosition") : true;
 			if (event.getModel() == null && mor.get(Hardware.class) != null) {
 				event.setModel(mor.get(Hardware.class).getModel());
 			}
@@ -120,7 +121,8 @@ public class LNSDeviceManager {
 				m.setSource(mor);
 				measurementApi.create(m);
 			}
-			if (event.getLat() != null && event.getLng() != null) {
+			if (useGatewayPosition && event.getLat() != null && event.getLng() != null) {
+				logger.info("Using gateway position to locate device: {}, {}", event.getLat(), event.getLng());
 				updateLocation(event, mor);
 			}
 			if (!mor.hasProperty(LNSIntegrationService.LNS_CONNECTOR_REF)
