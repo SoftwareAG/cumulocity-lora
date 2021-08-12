@@ -84,6 +84,7 @@ public class SemtechCodec extends DeviceCodec {
 	}
 
 	private static final String DAS_MODEM_MSG = "{\"deveui\": \"%s\", \"uplink\": {\"msgtype\": \"modem\", \"fcnt\":%d, \"payload\": \"%s\"}}";
+	private static final String DAS_MODEM_MSG_WITH_POS = "{\"deveui\": \"%s\", \"uplink\": {\"msgtype\": \"modem\", \"fcnt\":%d, \"payload\": \"%s\", \"gnss_assist_position\": [%f, %f], \"gnss_use_2D_solver\": true, \"gnss_assist_altitude\": 0}}";
 	private static final String DAS_MSG = "{\"deveui\": \"%s\", \"uplink\": {\"msgtype\": \"%s\", \"payload\": \"%s\"}}";
 
 	private Map<String, Integer> fcnts = new HashMap<>();
@@ -172,7 +173,7 @@ public class SemtechCodec extends DeviceCodec {
 
 	private JsonNode sendGnssRequest(String devEui, String payload) {
 		String eui = formatEUI(devEui);
-		String gnsspayload = "01" + payload.substring(4);
+		String gnsspayload = payload.substring(4);
 		var message = String.format(DAS_MSG, eui, "gnss", gnsspayload);
 		return sendToDAS(message);
 	}
@@ -229,7 +230,14 @@ public class SemtechCodec extends DeviceCodec {
 
 		if (decode.getfPort() == 199) {
 			logger.info("Modem payload will be sent to DAS.");
-			JsonNode root = sendToDAS(String.format(DAS_MODEM_MSG, formatEUI(decode.getDeveui()), getFcnt(decode.getDeveui()), decode.getPayload()));
+			Position p = inventoryApi.get(mor.getId()).get(Position.class);
+			JsonNode root = null;
+			if (p != null) {
+				logger.info("Will use assisted position: {}", p);
+				root = sendToDAS(String.format(DAS_MODEM_MSG_WITH_POS, formatEUI(decode.getDeveui()), getFcnt(decode.getDeveui()), decode.getPayload(), p.getLat().doubleValue(), p.getLng().doubleValue()));
+			} else {
+				root = sendToDAS(String.format(DAS_MODEM_MSG, formatEUI(decode.getDeveui()), getFcnt(decode.getDeveui()), decode.getPayload()));
+			}
 			if (root != null) {
 				JsonNode tempNode = root.at("/info_fields/temp");
 				if (!tempNode.isMissingNode() && !tempNode.isNull()) {
