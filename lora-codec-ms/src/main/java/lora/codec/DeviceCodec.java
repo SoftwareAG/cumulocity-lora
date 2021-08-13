@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
+import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionRemovedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.event.CumulocityAlarmStatuses;
 import com.cumulocity.rest.representation.alarm.AlarmRepresentation;
@@ -76,11 +77,11 @@ public abstract class DeviceCodec implements Component {
 		return childrenNames;
 	}
 
-	private ManagedObjectRepresentation codec;
+	private Map<String, ManagedObjectRepresentation> codecs;
 	
 	@EventListener
 	private void registerCodec(MicroserviceSubscriptionAddedEvent event) {
-		codec = c8yUtils.findExternalId(this.getId(), C8YUtils.CODEC_ID).map(extId -> {
+		var codec = c8yUtils.findExternalId(this.getId(), C8YUtils.CODEC_ID).map(extId -> {
 			ManagedObjectRepresentation mor = extId.getManagedObject();
 			mor.set(new DeviceCodecRepresentation(this));
 			mor.set(new IsDevice());
@@ -99,7 +100,17 @@ public abstract class DeviceCodec implements Component {
 			return mor;
 		});
 
+		codecs.put(event.getCredentials().getTenant(), codec);
+
 		logger.info("Codec successfully initialized: {}", codec.getName());
+	}
+	
+	@EventListener
+	private void unregisterCodec(MicroserviceSubscriptionRemovedEvent event) {
+		var codec = codecs.get(event.getTenant());
+		inventoryApi.delete(codec.getId());
+		logger.info("Codec successfully removed: {}", codec.getName());
+		codecs.remove(event.getTenant());
 	}
 
 	protected void clearAlarm(ManagedObjectRepresentation device, String alarmType) {
@@ -298,6 +309,7 @@ public abstract class DeviceCodec implements Component {
 	@Scheduled(initialDelay = 10000, fixedDelay = 300000)
 	private void sendMetrics() {
 		subscriptionsService.runForEachTenant(() -> {
+			var codec = codecs.get(subscriptionsService.getTenant());
 			C8YData c8yData = new C8YData();
 			DateTime now = new DateTime();
 			String memoryFragment = "Memory";
