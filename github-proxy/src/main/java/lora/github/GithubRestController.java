@@ -12,6 +12,7 @@ import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.repository.application.ApplicationApi;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.rest.representation.application.ApplicationRepresentation;
+import com.cumulocity.rest.representation.tenant.TenantApiRepresentation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -24,7 +25,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import lora.c8y.ApplicationBinaryService;
+import lora.c8y.application.ApplicationBinaryService;
+import lora.c8y.tenant.Application;
+import lora.c8y.tenant.Subscription;
+import lora.c8y.tenant.TenantService;
 import okhttp3.Interceptor;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -45,6 +49,7 @@ public class GithubRestController {
 
     private GithubService githubService;
     private ApplicationBinaryService applicationBinaryService;
+    private TenantService tenantService;
 
     @Autowired
     public GithubRestController(MicroserviceSubscriptionsService subscriptionsService, ApplicationApi applicationApi) {
@@ -69,7 +74,7 @@ public class GithubRestController {
 
     @PostMapping(value = "/microservice", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public String publishMicroservice(@RequestBody Asset asset) {
-        String result = "KO";
+        String result = "{result: 'KO'}";
         String name = asset.getName().replace(".zip", "");
         logger.info("Application name is: {}", name);
         Optional<ApplicationRepresentation> app = applicationApi.getByName(name);
@@ -80,6 +85,7 @@ public class GithubRestController {
             application.setName(name);
             application.setKey(name + "-key");
             application.setType(ApplicationRepresentation.MICROSERVICE);
+            application.setProperty("github_asset_id", asset.getId());
             application = applicationApi.create(application);
         } else {
             application = app.get();
@@ -109,8 +115,15 @@ public class GithubRestController {
             Response<ResponseBody> response = applicationBinaryService
                     .uploadApplicationAttachment(application.getId(), file).execute();
             if (response.isSuccessful()) {
-                logger.info("New microservice upload was successful");
-                result = "OK";
+                logger.info("New microservice upload was successful, now subscribing to it...");
+                response = tenantService.subscribeToApplication(subscriptionsService.getTenant(), new Subscription().application(new Application().self(application.getSelf()))).execute();
+                if (response.isSuccessful()) {
+                    logger.info("Subscription was successful");
+                    result = "{result: 'OK'}";
+                } else {
+                    logger.error("An error occurred while subscribing to the microservice: {} {} {}", response.code(),
+                    response.message(), response.errorBody().string());
+                }
             } else {
                 logger.error("An error occurred while uploading the microservice: {} {} {}", response.code(),
                         response.message(), response.errorBody().string());
@@ -157,5 +170,9 @@ public class GithubRestController {
         applicationBinaryService = new Retrofit.Builder().client(okHttpClient).baseUrl(System.getenv("C8Y_BASEURL"))
                 .addConverterFactory(JacksonConverterFactory.create(objectMapper)).build()
                 .create(ApplicationBinaryService.class);
+
+        tenantService = new Retrofit.Builder().client(okHttpClient).baseUrl(System.getenv("C8Y_BASEURL"))
+                .addConverterFactory(JacksonConverterFactory.create(objectMapper)).build()
+                .create(TenantService.class);
     }
 }
