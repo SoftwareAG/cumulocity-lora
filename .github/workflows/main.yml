@@ -60,7 +60,7 @@ jobs:
 
             console.log('created release', { release });
         
-            for (let dir of fs.readdir('.', {withFileTypes: true})) {
+            for (let dir of await fs.readdir('.', {withFileTypes: true})) {
               if (dir.isDirectory() && (dir.name.startsWith('lora-ns') || dir.name.startsWith('lora-codec'))) {
                 for (let file of await fs.readdir(dir.name + "/target")) {
                   if (file.endsWith('.zip')) {
