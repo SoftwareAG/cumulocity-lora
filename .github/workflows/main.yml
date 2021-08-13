@@ -33,5 +33,14 @@ jobs:
         uses: whelk-io/maven-settings-xml-action@v18
         with:
           mirrors: '[{"id": "insecure-c8y-repo", "mirrorOf": "cumulocity", "url": "http://download.cumulocity.com/maven/repository/", "blocked": "false"}]'
+      - uses: actions/setup-go@v2
+      - run: export GO111MODULE=off
+      - run: go get -d github.com/envoyproxy/protoc-gen-validate/validate
+      - run: go get -d github.com/gogo/protobuf/gogoproto 
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots verify
+      - run: mkdir staging && cp target/*.zip staging
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Package
+          path: staging
