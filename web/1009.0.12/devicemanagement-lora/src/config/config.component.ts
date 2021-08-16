@@ -67,7 +67,8 @@ export class LoRaConfigComponent {
                             a.c8yAppId = apps[0].id;
                             a.status = 'installed';
                         } else {
-                            a.status = 'different_version_installed';
+                            if (!apps[0]['github_asset_created_at'] || a.created_at > apps[0]['github_asset_created_at'])
+                            a.status = 'older_version_installed';
                         }
                     } else {
                         a.status = 'different_version_installed'

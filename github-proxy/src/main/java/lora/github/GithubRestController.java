@@ -86,6 +86,7 @@ public class GithubRestController {
             application.setKey(name + "-key");
             application.setType(ApplicationRepresentation.MICROSERVICE);
             application.setProperty("github_asset_id", asset.getId());
+            application.setProperty("github_asset_created_at", asset.getCreatedAt().toString());
             application = applicationApi.create(application);
         } else {
             application = app.get();
