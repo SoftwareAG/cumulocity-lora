@@ -43,8 +43,9 @@ jobs:
         uses: whelk-io/maven-settings-xml-action@v18
         with:
           mirrors: '[{"id": "insecure-c8y-repo", "mirrorOf": "cumulocity", "url": "http://download.cumulocity.com/maven/repository/", "blocked": "false"}]'
-      - name: Set up GO
+      - name: Set up Go
         uses: actions/setup-go@v2
+      - name: Set up Go environment
         run: |
           export GO111MODULE=off
           go get -d github.com/envoyproxy/protoc-gen-validate/validate
