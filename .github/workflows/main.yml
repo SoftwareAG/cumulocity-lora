@@ -100,7 +100,7 @@ jobs:
                   owner, repo,
                   release_id: release.data.id,
                   name: dir.name,
-                  data: await fs.readFile('./nodejs/' + dir.name + '/' + dir.name + '.zip')
+                  data: await fs.readFile('nodejs/' + dir.name + '/' + dir.name + '.zip')
                 });            
               }
             }
