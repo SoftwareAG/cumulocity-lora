@@ -52,10 +52,6 @@ jobs:
           go get -d github.com/gogo/protobuf/gogoproto 
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots verify
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: Create Release
         uses: actions/github-script@v2
         with:
@@ -94,7 +90,7 @@ jobs:
               }
             }
             
-            /*for (let dir of await fs.readdir('nodejs', {withFileTypes: true})) {
+            for (let dir of await fs.readdir('nodejs', {withFileTypes: true})) {
               if (dir.isDirectory() && dir.name.startsWith('lora-codec')) {
                 console.log('Uploading ' + dir.name + '.zip as asset ' + dir.name);
                 await github.repos.uploadReleaseAsset({
@@ -104,4 +100,4 @@ jobs:
                   data: await fs.readFile('nodejs/' + dir.name + '/' + dir.name + '.zip')
                 });            
               }
-            }*/
+            }
