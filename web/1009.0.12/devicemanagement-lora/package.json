@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "c8ycli server",
-    "build": "c8ycli build",
+    "start": "c8ycli server --env.extraWebpackConfig=./extra-webpack.config.js",
+    "build": "c8ycli build --env.extraWebpackConfig=./extra-webpack.config.js",
     "deploy": "c8ycli deploy"
   },
   "keywords": [],
