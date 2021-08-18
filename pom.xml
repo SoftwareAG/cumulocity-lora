@@ -79,14 +79,4 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<extensions>
-			<extension>
-				<groupId>com.vackosar.gitflowincrementalbuilder</groupId>
-				<artifactId>gitflow-incremental-builder</artifactId>
-				<version>3.14.3</version>
-			</extension>
-		</extensions>
-	</build>
 </project>
