@@ -34,6 +34,13 @@ jobs:
             zip $codec image.tar cumulocity.json
             cd ..
           done
+      - name: Build webapp
+        run: |
+          cd web/1009.0.12/devicemanagement-lora
+          npm install
+          npm run build
+          cd dist/apps/devicemanagement-lora
+          zip devicemanagement-lora *
       - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
@@ -72,17 +79,24 @@ jobs:
             });
 
             console.log('created release', { release });
+
+            await github.repos.uploadReleaseAsset({
+              owner, repo,
+              release_id: release.data.id,
+              name: 'devicemanagement-lora.zip',
+              data: await fs.readFile('web/1009.0.12/devicemanagement-lora/dist/apps/devicemanagement-lora/devicemanagement-lora.zip')
+            });            
         
             for (let dir of await fs.readdir('.', {withFileTypes: true})) {
               console.log('Reading dir ' + dir.name);
-              if (dir.isDirectory() && (dir.name.startsWith('lora-ns') || dir.name.startsWith('lora-codec'))) {
+              if (dir.isDirectory() && (dir.name.startsWith('lora-ns') || dir.name.startsWith('lora-codec') || dir.name.startsWith('github-proxy'))) {
                 for (let file of await fs.readdir(dir.name + "/target")) {
                   if (file.endsWith('.zip')) {
                     console.log('Uploading ' + dir.name + '/target/' + file + ' as asset ' + dir.name);
                     await github.repos.uploadReleaseAsset({
                       owner, repo,
                       release_id: release.data.id,
-                      name: dir.name,
+                      name: dir.name + '.zip',
                       data: await fs.readFile(dir.name + '/target/' + file)
                     });            
                   }
