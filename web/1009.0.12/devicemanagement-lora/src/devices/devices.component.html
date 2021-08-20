@@ -98,26 +98,25 @@
                     <div *ngFor="let parameter of commands[commandChoice.value].params" [ngClass]="parameter.type === 'SEPARATOR' ? 'col-sm-12' : 'col-sm-6'">
                         <div class="form-group" *ngIf="parameter.type === 'STRING'">
                             <label for="{{parameter.id}}">{{parameter.name}}:</label>
-                            <input class="form-control" name="{{parameter.id}}" #{{parameter.id}}="ngModel" style="width: 100%" ngModel required />
+                            <input class="form-control" name="{{parameter.id}}" #{{parameter.id}}="ngModel" style="width: 100%" ngModel/>
                         </div>
                         <div class="form-group" *ngIf="parameter.type === 'ENUM'">
                             <label for="{{parameter.id}}">{{parameter.name}}:</label>
-                            <select class="form-control" name="{{parameter.id}}" #{{parameter.id}}="ngModel" ngModel required>
+                            <select class="form-control" name="{{parameter.id}}" #{{parameter.id}}="ngModel" ngModel>
                                 <option *ngFor="let option of parameter.value" [value]="option">{{option}}</option>
                             </select>
                         </div>
                         <div class="form-group" *ngIf="parameter.type === 'INTEGER'">
                             <label for="{{parameter.id}}">{{parameter.name}}:</label>
-                            <input class="form-control" type="number" name="{{parameter.id}}" #{{parameter.id}}="ngModel" style="width: 100%" ngModel required />
+                            <input class="form-control" type="number" name="{{parameter.id}}" #{{parameter.id}}="ngModel" style="width: 100%" ngModel/>
                         </div>
                         <div class="form-group" *ngIf="parameter.type === 'FLOAT'">
                             <label for="{{parameter.id}}">{{parameter.name}}:</label>
-                            <input class="form-control" type="number" step="0.01" name="{{parameter.id}}" #{{parameter.id}}="ngModel" style="width: 100%" ngModel required />
+                            <input class="form-control" type="number" step="0.01" name="{{parameter.id}}" #{{parameter.id}}="ngModel" style="width: 100%" ngModel/>
                         </div>
                         <div class="form-group" *ngIf="parameter.type === 'BOOL'">
                             <label class="form-control" class="c8y-checkbox"><input type="checkbox" name="{{parameter.id}}"
-                                    #{{parameter.id}}="ngModel" ngModel
-                                    required /><span></span>{{parameter.name}}</label>
+                                    #{{parameter.id}}="ngModel" ngModel/><span></span>{{parameter.name}}</label>
                         </div>
                         <div class="parameter-separator" *ngIf="parameter.type === 'SEPARATOR'">{{parameter.name}}</div>
                     </div>
