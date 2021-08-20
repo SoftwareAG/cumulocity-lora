@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,6 +61,18 @@ public class SenlabCodec extends DeviceCodec {
 		return "senlab";
 	}
 
+	private String getParamValueAsString(JsonNode param) {
+		String result = "";
+
+		if (param.isNumber() || param.isBoolean()) {
+			result = param.asText();
+		} else {
+			result = "\"" + param.asText() + "\"";
+		}
+
+		return result;
+	}
+
 	@Override
 	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
 		DownlinkData data = new DownlinkData();
@@ -74,10 +87,10 @@ public class SenlabCodec extends DeviceCodec {
 			Iterator<String> paramNames = params.fieldNames();
 			if (paramNames != null && paramNames.hasNext()) {
 				String paramName = paramNames.next();
-				senlabOp += "{\"id\":\"" + paramName + "\", \"value\": \"" + params.get(paramName).asText() + "\"}";
+				senlabOp += "{\"id\":\"" + paramName + "\", \"value\": "  + getParamValueAsString(params.get(paramName)) + "}";
 				while(paramNames.hasNext()) {
 					paramName = paramNames.next();
-					senlabOp += ",{\"id\":\"" + paramName + "\", \"value\": \"" + params.get(paramName).asText() + "\"}";
+					senlabOp += ",{\"id\":\"" + paramName + "\", \"value\": "  + getParamValueAsString(params.get(paramName)) + "}";
 				}
 			}
 			senlabOp += "]}";
@@ -180,6 +193,15 @@ public class SenlabCodec extends DeviceCodec {
 					logger.info("{} has no value or has an invalid value.", measure.get("id"));
 				}
 			});
+			ArrayNode events = (ArrayNode)root.get("events");
+			events.forEach(e -> {
+				String type = e.get("id").asText();
+				if (type.endsWith("overrun")) {
+					c8yData.addAlarm(mor, type, type, CumulocitySeverities.MAJOR, new DateTime(e.get("timestamp").asLong()));
+				} else if (type.endsWith("backtonormal")) {
+					c8yData.clearAlarm(type.replace("backtonormal", "overrun"));
+				}
+			});
 		} catch (HttpClientErrorException e) {
 			e.printStackTrace();
 			logger.error(e.getResponseBodyAsString());
@@ -254,7 +276,26 @@ public class SenlabCodec extends DeviceCodec {
 					paramId = paramId.trim();
 					JsonNode param = paramMap.get(paramId);
 					if (param != null) {
-						ParamType type = param != null && param.has("is") ? param.get("is").asText().contains("INT") ? ParamType.INTEGER : ParamType.valueOf(param.get("is").asText()) : null;
+						ParamType type = null;
+						if (param != null && param.has("is")) {
+							switch (param.get("is").asText().trim()) {
+								case "INT":
+								case "UINT_8":
+								case "UINT_16":
+								case "INT_8":
+								case "INT_16":
+								case "INT_32":
+									type = ParamType.INTEGER;
+									break;
+								case "HEXSTR":
+								case "HEXSTR(16)":
+								case "HEXSTR(32)":
+									type = ParamType.STRING;
+									break;
+								default:
+									type = ParamType.valueOf(param.get("is").asText());
+							}
+						}
 						opParams.add(new DeviceOperationParam(paramId, param.get("name").asText(), type, null));
 					} else {
 						logger.error("Param {} is not defined.", paramId);
