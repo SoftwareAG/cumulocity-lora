@@ -5,7 +5,7 @@ on:
       username:
         description: 'Cumulocity user login'
         required: true
-      WEBHOOK_TOKEN:
+      password:
         description: 'Cumulocity user password'
         required: true
       host:
@@ -16,7 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - with:
+          PASSWORD: ::add-mask::${{github.event.inputs.password}}
       - run: |
           cd python
-          PASSWORD=::add-mask::${{github.event.inputs.password}}
-          python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}} -p ${{github.event.inputs.WEBHOOK_TOKEN}}
+          echo "::add-mask::$PASSWORD"
+          python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}} -p $PASSWORD
