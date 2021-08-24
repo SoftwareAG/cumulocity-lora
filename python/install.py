@@ -50,19 +50,30 @@ class ApplicationType(Enum):
     MICROSERVICE = 'MICROSERVICE'
 
 def create_application(name: str, type: ApplicationType) -> str:
-    res = requests.post(host + '/application/applications', auth=auth, headers=headers, data=json.dumps({'key': name + '-key', 'name': name, 'type': type}))
+    res = requests.post(host + '/application/applications', auth=auth, headers=headers, data=json.dumps({'key': name + '-key', 'name': name, 'type': type.value, 'contextPath': name}))
     application_self = res.json()['self']
     application_id = res.json()['id']
     res = requests.get(host + '/tenant/currentTenant', headers=headers, auth=auth)
     tenant = res.json()['name']
-    requests.post(host + '/tenant/tenants/' + tenant + '/application/' + application_id, headers=headers, auth=auth, data=json.dumps({'application': {'self': application_self}}))
+    print(f"current tenant Id is {tenant}")
+    res = requests.post(host + '/tenant/tenants/' + tenant + '/applications', headers=headers, auth=auth, data=json.dumps({'application': {'self': application_self}}))
+    print(res)
+    if res.ok:
+        print(res.json())
+    else:
+        print(f"Couldn't make tenant {tenant} subscribe to application {name}")
     return application_id
 
 def attach_binary_from_url(application_id: int, url: str) -> int:
     binary = requests.get(url, stream=True)
     res = requests.post(host + '/application/applications/' + application_id + '/binaries', headers={'Accept': 'application/json'}, auth=auth, files={'file':binary.raw})
     binary_id = res.json()['id']
-    requests.put(host + '/application/applications/' + application_id, headers=headers, auth=auth, data=json.dumps({'activeVersionId': binary_id}))
+    res = requests.put(host + '/application/applications/' + application_id, headers=headers, auth=auth, data=json.dumps({'activeVersionId': binary_id}))
+    print(res)
+    if res.ok:
+        print(res.json())
+    else:
+        print(f"Couldn't make tenant subscribe to application {application_id}")
     return binary_id
 
 github_proxy_app_id = get_application_id('github-proxy')
