@@ -19,6 +19,7 @@ jobs:
       - uses: actions/github-script@v2
         with:
           script: |
+            const command = require('@actions/core/lib/command');
             command.issue('add-mask', 'echo ${{github.event.inputs.password}}');
       - run: |
           cd python
