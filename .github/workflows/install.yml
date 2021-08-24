@@ -14,14 +14,10 @@ on:
 jobs:
   install:
     runs-on: ubuntu-latest
+    env:
+      WEBHOOK_TOKEN: ${{github.event.inputs.password}}
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/github-script@v2
-        with:
-          script: |
-            const command = require('@actions/core/lib/command');
-            command.issue('add-mask', 'echo ${{github.event.inputs.password}}');
       - run: |
           cd python
-          echo "::add-mask::${{github.event.inputs.password}}"
-          python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}} -p ${{github.event.inputs.password}}
+          python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}} -p $WEBHOOK_TOKEN
