@@ -18,7 +18,5 @@ jobs:
       - uses: actions/checkout@v2
       - run: |
           cd python
-          echo "::add-mask::$PASSWORD"
-          python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}} -p $PASSWORD
-      - env:
-          PASSWORD: ::add-mask::${{github.event.inputs.password}}
+          echo "::add-mask::${{github.event.inputs.password}}"
+          python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}} -p ${{github.event.inputs.password}}
