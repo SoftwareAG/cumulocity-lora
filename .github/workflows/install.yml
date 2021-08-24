@@ -1,0 +1,21 @@
+name: Install LoRa framework to a Cumulocity tenant
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        description: 'Cumulocity user login'
+        required: true
+      password:
+        description: 'Cumulocity user password'
+        required: true
+      host:
+        description: 'Cumulocity tenant URL'
+        required: true
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          cd python
+          python3 install.py -u ${{github.event.inputs.username}} -h {{github.event.inputs.host}} -p ::add-mask::{{github.event.inputs.password}}
