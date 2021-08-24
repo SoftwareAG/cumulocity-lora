@@ -50,7 +50,10 @@ class ApplicationType(Enum):
     MICROSERVICE = 'MICROSERVICE'
 
 def create_application(name: str, type: ApplicationType) -> str:
-    res = requests.post(host + '/application/applications', auth=auth, headers=headers, data=json.dumps({'key': name + '-key', 'name': name, 'type': type.value, 'contextPath': name}))
+    payload = {'key': name + '-key', 'name': name, 'type': type.value}
+    if type == ApplicationType.HOSTED:
+        payload.update({'key': name + '-application-key', 'globalTitle': "Cumulocity", 'contextPath': name, 'manifest': {}, 'upgrade': True, 'contentSecurityPolicy': "base-uri 'none'; default-src 'self' 'unsafe-inline' http: https: ws: wss:; connect-src 'self' *.billwerk.com http: https: ws: wss:;  script-src 'self' open.mapquestapi.com *.twitter.com *.twimg.com *.aptrinsic.com 'unsafe-inline' 'unsafe-eval' data:; style-src * 'unsafe-inline' blob:; img-src * data:; font-src * data:; frame-src *;", 'resourcesUrl': '/'})
+    res = requests.post(host + '/application/applications', auth=auth, headers=headers, data=json.dumps(payload))
     application_self = res.json()['self']
     application_id = res.json()['id']
     res = requests.get(host + '/tenant/currentTenant', headers=headers, auth=auth)
