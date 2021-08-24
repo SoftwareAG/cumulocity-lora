@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - with:
-          PASSWORD: ::add-mask::${{github.event.inputs.password}}
-        run: |
+      - run: |
           cd python
           echo "::add-mask::$PASSWORD"
           python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}} -p $PASSWORD
+      - env:
+          PASSWORD: ::add-mask::${{github.event.inputs.password}}
