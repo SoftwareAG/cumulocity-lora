@@ -15,9 +15,9 @@ jobs:
   install:
     runs-on: ubuntu-latest
     env:
-      WEBHOOK_TOKEN: ${{github.event.inputs.password}}
+      PASSWORD: ::add-mask::${{github.event.inputs.password}}
     steps:
       - uses: actions/checkout@v2
       - run: |
           cd python
-          python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}} -p $WEBHOOK_TOKEN
+          python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}} -p $PASSWORD
