@@ -64,7 +64,7 @@ public class GithubRestController {
             Response<List<Release>> response = githubService.getReleases().execute();
             if (response.isSuccessful()) {
                 result = response.body();
-                result.removeIf(r -> !r.getName().startsWith("lora"));
+                result.forEach(r -> r.getAssets().removeIf(a -> !a.getName().startsWith("lora")));
             }
         } catch (IOException e) {
             e.printStackTrace();
