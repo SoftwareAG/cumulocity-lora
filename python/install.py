@@ -4,6 +4,8 @@ from typing import Optional
 import requests, sys, getopt
 from enum import Enum
 
+print(${{github.event.inputs.host}})
+
 username = None
 password = None
 host = None
