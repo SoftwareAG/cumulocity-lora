@@ -21,7 +21,6 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             console.log('environment', process.versions);
-            const core = require('@actions/core');
             const password = core.getInput('password', {required: true});
             core.exportVariable('INPUT_PASSWORD', password)
       - uses: actions/checkout@v2
