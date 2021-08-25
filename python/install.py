@@ -1,11 +1,11 @@
 from getpass import getpass
-import json
+import json, os
 from typing import Optional
 import requests, sys, getopt
 from enum import Enum
 
 username = None
-password = None
+password = os.getenv("INPUT_PASSWORD")
 host = None
 
 try:

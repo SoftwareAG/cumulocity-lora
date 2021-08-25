@@ -14,10 +14,8 @@ on:
 jobs:
   install:
     runs-on: ubuntu-latest
-    env:
-      PASSWORD: ::add-mask::${{github.event.inputs.password}}
     steps:
       - uses: actions/checkout@v2
       - run: |
           cd python
-          python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}} -p $PASSWORD
+          python3 install.py -u ${{github.event.inputs.username}} -h ${{github.event.inputs.host}}
