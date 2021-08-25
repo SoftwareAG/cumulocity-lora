@@ -15,6 +15,15 @@ jobs:
   install:
     runs-on: ubuntu-latest
     steps:
+      - name: Set password
+        uses: actions/github-script@v2
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            console.log('environment', process.versions);
+            const core = require('@actions/core');
+            const password = core.getInput('password', {required: true});
+            core.exportVariable('INPUT_PASSWORD', password)
       - uses: actions/checkout@v2
       - run: |
           cd python
