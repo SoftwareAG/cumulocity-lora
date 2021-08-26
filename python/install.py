@@ -5,7 +5,7 @@ import requests, sys, getopt
 from enum import Enum
 
 username = None
-password = os.getenv("INPUT_PASSWORD")
+password = None
 host = None
 
 try:
