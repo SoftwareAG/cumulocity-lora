@@ -1,4 +1,4 @@
-import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionService, DeviceOperation } from 'c8y-codec-interface';
+import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionService, DeviceOperation } from 'lora-codec-interface';
 import { Client, IManagedObject, Severity } from '@c8y/client';
 const codec = require('@adeunis/codecs');
 require('source-map-support').install();

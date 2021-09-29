@@ -1,4 +1,4 @@
-import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionService, DeviceOperation } from 'c8y-codec-interface';
+import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionService, DeviceOperation } from 'lora-codec-interface';
 import { IManagedObject, FetchClient, BasicAuth } from '@c8y/client';
 
 class SampolCodec extends DeviceCodec {

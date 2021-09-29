@@ -1,5 +1,5 @@
 import { IManagedObject } from "@c8y/client";
-import { C8YData, DownlinkData } from "c8y-codec-interface";
+import { C8YData, DownlinkData } from "lora-codec-interface";
 import { NodeVM, VMScript } from 'vm2';
 
 export class CustomCodec {

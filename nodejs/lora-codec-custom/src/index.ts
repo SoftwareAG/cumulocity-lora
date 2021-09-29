@@ -1,8 +1,8 @@
-import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionService, DeviceOperation } from 'c8y-codec-interface';
+import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionService, DeviceOperation } from 'lora-codec-interface';
 import { Client, IManagedObject } from '@c8y/client';
 import { Request, Response, NextFunction } from "express";
 import { CustomCodec } from './CustomCodec';
-import { DeviceOperationParam, ParamType } from 'c8y-codec-interface/dist/lora/codec/DeviceOperationParam';
+import { DeviceOperationParam, ParamType } from 'lora-codec-interface/dist/lora/codec/DeviceOperationParam';
 
 class CustomDeviceCodec extends DeviceCodec {
 
