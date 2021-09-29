@@ -77,7 +77,7 @@ public abstract class DeviceCodec implements Component {
 		return childrenNames;
 	}
 
-	private Map<String, ManagedObjectRepresentation> codecs;
+	private Map<String, ManagedObjectRepresentation> codecs = new HashMap<>();
 	
 	@EventListener
 	private void registerCodec(MicroserviceSubscriptionAddedEvent event) {
@@ -99,6 +99,8 @@ public abstract class DeviceCodec implements Component {
 
 			return mor;
 		});
+
+		logger.info("Current credentials are: {}", event.getCredentials());
 
 		codecs.put(event.getCredentials().getTenant(), codec);
 
