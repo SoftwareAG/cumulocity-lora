@@ -1,5 +1,5 @@
 import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionService, DeviceOperation } from 'lora-codec-interface';
-import { IManagedObject, FetchClient, BasicAuth } from '@c8y/client';
+import { IManagedObject, FetchClient, BasicAuth, Client } from '@c8y/client';
 
 class SampolCodec extends DeviceCodec {
 
@@ -12,14 +12,14 @@ class SampolCodec extends DeviceCodec {
     getVersion(): string {
         return "1.0";
     }
-    getModels(): string[] {
-        let models: string[] = [];
+    getModels(client: Client): Map<string, string> {
+        let models: Map<string, string> = new Map<string, string>();
         return models;
     }
     askDeviceConfig(devEui: string): DownlinkData {
         return null;
     }
-    getAvailableOperations(model: string): Map<string, DeviceOperation> {
+    getAvailableOperations(client: Client, model: string): Map<string, DeviceOperation> {
         let operations: Map<string, DeviceOperation> = new Map<string, DeviceOperation>();
         return operations;
     }
@@ -100,7 +100,7 @@ class SampolCodec extends DeviceCodec {
         return decodedPayload;
     }
 
-    protected _decode(mo: IManagedObject, model: string, fport: number, time: Date, payload: string): C8YData {
+    protected _decode(client: Client, mo: IManagedObject, model: string, fport: number, time: Date, payload: string): C8YData {
         let c8yData: C8YData = new C8YData();
 
         let result = this.decoder(Buffer.from(payload, "hex"));
@@ -117,9 +117,11 @@ class SampolCodec extends DeviceCodec {
 
         return c8yData;
     }
-    protected _encode(mo: IManagedObject, model: string, operation: string): DownlinkData {
+    protected _encode(client: Client, mo: IManagedObject, model: string, operation: string): DownlinkData {
         return operation.includes("get config") ? this.askDeviceConfig(null) : null;
     }
 }
 
-new CodecApp(new SampolCodec(new MicroserviceSubscriptionService()));
+let microserviceSubscriptionService: MicroserviceSubscriptionService = new MicroserviceSubscriptionService();
+
+new CodecApp(new SampolCodec(microserviceSubscriptionService), microserviceSubscriptionService);
