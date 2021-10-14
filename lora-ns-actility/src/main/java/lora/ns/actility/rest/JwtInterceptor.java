@@ -52,12 +52,30 @@ public abstract class JwtInterceptor implements Interceptor {
 
         okhttp3.Response response = chain.proceed(request);
 
-        logger.info("Response code from {} {}: {}", request.method(), request.url(), response.code());
+        if (!response.isSuccessful()) {
+            logger.error("Error message from Thingpark: {}", response.body().string());
+            logger.error("Request was: {}", request);
+            if (response.code() == 500) {
+                logger.error("Error 500 detected. Thingpark is unstable, we'll retry up to 5 times just in case...");
+                int cpt = 0;
+                while (!response.isSuccessful() && cpt < 5) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    response = chain.proceed(request);
+                    cpt++;
+                }
+            }
+        }
 
         if (!response.isSuccessful()) {
-            logger.error("Error message from Thingpark: {}", response);
-            logger.error("Request was: {}", request);
+            logger.error("We were unable to reach ThingPark after 5 tries, please contact Actility support.");
+            logger.error("Full error is: {}", response.body().string());
         }
+
+        logger.info("Response code from {} {}: {}", request.method(), request.url(), response.code());
 
         return response;
     }

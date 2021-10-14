@@ -9,6 +9,7 @@ import java.util.Map;
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
@@ -19,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import lora.ns.DeviceData;
+import lora.ns.connector.PropertyDescription;
+import lora.ns.connector.PropertyDescription.PropertyType;
 import lora.ns.integration.LNSIntegrationService;
 import lora.ns.operation.OperationData;
 
@@ -29,6 +32,7 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 	
 	{
 		wizard.add(new ConnectorWizardStep1());
+		deviceProvisioningAdditionalProperties.add(new PropertyDescription("deviceProfile", "Device profile", true, null, "/deviceProfiles", null, null, null, null, null, PropertyType.LIST, false));
 	}
 
 	@Override
@@ -37,19 +41,16 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
         DeviceData data = null;
         try {
             JsonNode rootNode = mapper.readTree(event);
-            String deviceEui = rootNode.get("device_properties").get("deveui").asText();
-            String name = rootNode.get("device_properties").get("external_id").asText();
-            int fPort = rootNode.get("protocol_data").get("port").asInt();
-            double rssi = rootNode.get("protocol_data").get("rssi").asDouble();
-            double snr = rootNode.get("protocol_data").get("snr").asDouble();
-            double noise = rootNode.get("protocol_data").get("noise").asDouble();
-            double signal = rootNode.get("protocol_data").get("signal").asDouble();
-            double sf = rootNode.get("protocol_data").get("sf").asDouble();
-            Double lat = rootNode.has("lat") ? rootNode.get("lat").asDouble() : null;
-            Double lng = rootNode.has("lng") ? rootNode.get("lng").asDouble() : null;
+            String deviceEui = rootNode.get("DevEUI_uplink").get("DevEUI").asText();
+            int fPort = rootNode.get("DevEUI_uplink").get("FPort").asInt();
+            double rssi = rootNode.get("DevEUI_uplink").get("LrrRSSI").asDouble();
+            double snr = rootNode.get("DevEUI_uplink").get("LrrSNR").asDouble();
+            double sf = rootNode.get("DevEUI_uplink").get("SpFact").asDouble();
+            Double lat = rootNode.get("DevEUI_uplink").has("DevLAT") ? rootNode.get("DevEUI_uplink").get("DevLAT").asDouble() : null;
+            Double lng = rootNode.get("DevEUI_uplink").has("DevLON") ? rootNode.get("DevEUI_uplink").get("DevLON").asDouble() : null;
             logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
-            byte[] payload = BaseEncoding.base16().decode(rootNode.get("payload_cleartext").asText().toUpperCase());
-            Long updateTime = new DateTime(rootNode.get("timestamp").asText()).getMillis();
+            byte[] payload = BaseEncoding.base16().decode(rootNode.get("DevEUI_uplink").get("payload_hex").asText().toUpperCase());
+            Long updateTime = new DateTime(rootNode.get("DevEUI_uplink").get("Time").asText()).getMillis();
             //String model = null;
             logger.info("Update time is: " + updateTime);
 
@@ -62,16 +63,6 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
     		mv.setUnit("dBm");
     		measurementValueMap.put("rssi", mv);
     		
-    		mv = new MeasurementValue();
-    		mv.setValue(BigDecimal.valueOf(noise));
-    		mv.setUnit("dBm");
-    		measurementValueMap.put("noise", mv);
-    		
-    		mv = new MeasurementValue();
-    		mv.setValue(BigDecimal.valueOf(signal));
-    		mv.setUnit("dBm");
-    		measurementValueMap.put("signal", mv);
-
     		mv = new MeasurementValue();
     		mv.setValue(BigDecimal.valueOf(snr));
     		mv.setUnit("dB");
@@ -87,7 +78,7 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
     		m.setDateTime(new DateTime(updateTime));
     		measurements.add(m);
 
-    		data = new DeviceData(name, deviceEui, null, null, fPort, payload, updateTime, measurements, lat != null ? BigDecimal.valueOf(lat) : null, lng != null ? BigDecimal.valueOf(lng) : null);
+    		data = new DeviceData(deviceEui, deviceEui, null, null, fPort, payload, updateTime, measurements, lat != null ? BigDecimal.valueOf(lat) : null, lng != null ? BigDecimal.valueOf(lng) : null);
         } catch (Exception e) {
         	e.printStackTrace();
             logger.error("Error on Mapping LoRa payload to Cumulocity", e);
@@ -102,12 +93,12 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode rootNode = mapper.readTree(event);
-            String commandId = rootNode.get("command_id") != null ? rootNode.get("command_id").asText() : null;
+            String commandId = rootNode.get("DevEUI_downlink_Sent").has("CorrelationID") ? rootNode.get("DevEUI_downlink_Sent").get("CorrelationID").asText() : null;
             if (commandId != null) {
             	data.setCommandId(commandId);
-	            JsonNode error = rootNode.get("error");
-	            if (error != null) {
-	            	data.setErrorMessage(error.asText());
+	            int error = rootNode.get("DevEUI_downlink_Sent").get("DeliveryStatus").asInt();
+	            if (error == 0) {
+	            	data.setErrorMessage("Error");
 	            	data.setStatus(OperationStatus.FAILED);
 	            }
             }
@@ -119,7 +110,15 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 	
 	@Override
 	public boolean isOperationUpdate(String eventString) {
-		return false;
+        ObjectMapper mapper = new ObjectMapper();
+		boolean result = false;
+		try {
+			JsonNode rootNode = mapper.readTree(eventString);
+			result = rootNode.has("DevEUI_downlink_Sent");
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	@Override

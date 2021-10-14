@@ -11,7 +11,7 @@ public class ConnectorWizardStep1 implements LNSConnectorWizardStep {
 	{
 		propertyDescriptions.add(new PropertyDescription("domain", "Domain", true, null, null, null, null, null, null, null, PropertyType.TEXT, false));
 		propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.TEXT, false));
-		propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.TEXT, true));
+		propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD, true));
 	}
 
 	@Override

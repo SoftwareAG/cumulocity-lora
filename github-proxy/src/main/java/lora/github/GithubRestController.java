@@ -90,7 +90,12 @@ public class GithubRestController {
             application = applicationApi.create(application);
         } else {
             application = app.get();
+            ApplicationRepresentation appToUpdate = new ApplicationRepresentation();
+            appToUpdate.setId(application.getId());
+            appToUpdate.setProperty("github_asset_id", asset.getId());
+            appToUpdate.setProperty("github_asset_created_at", asset.getCreatedAt().toString());
             logger.info("Application exists and will be updated: {}", application.getId());
+            application = applicationApi.update(appToUpdate);
         }
 
         okhttp3.RequestBody body = new okhttp3.RequestBody() {

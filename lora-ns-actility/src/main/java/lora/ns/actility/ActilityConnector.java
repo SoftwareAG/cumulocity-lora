@@ -15,17 +15,25 @@ import org.slf4j.LoggerFactory;
 import lora.codec.DownlinkData;
 import lora.ns.actility.rest.ActilityAdminService;
 import lora.ns.actility.rest.ActilityCoreService;
+import lora.ns.actility.rest.ActilityTunnelService;
 import lora.ns.actility.rest.JwtInterceptor;
 import lora.ns.actility.rest.model.Connection;
 import lora.ns.actility.rest.model.ConnectionHttpConfig;
 import lora.ns.actility.rest.model.ConnectionRequest;
+import lora.ns.actility.rest.model.DeviceCreate;
+import lora.ns.actility.rest.model.DeviceProfile;
+import lora.ns.actility.rest.model.DownlinkMessage;
 import lora.ns.actility.rest.model.Route;
+import lora.ns.actility.rest.model.SecurityParams;
 import lora.ns.actility.rest.model.Token;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.device.DeviceProvisioning;
+import lora.ns.device.DeviceProvisioning.ProvisioningMode;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -34,9 +42,10 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	private ActilityCoreService actilityCoreService;
 	private ActilityAdminService actilityAdminService;
-	
+	private ActilityTunnelService actilityTunnelService;
+
 	private String downlinkAsId;
-	private String downlinkAsKey;
+	private String downlinkAsKey = "4e0ff46472fa1840f25368c066e94769";
 	private String routeRef;
 
 	private final Logger logger = LoggerFactory.getLogger(ActilityConnector.class);
@@ -52,7 +61,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 			String token = null;
 			try {
 				Response<Token> response;
-				response = actilityAdminService.getToken("client_credentials", this.clientId, this.clientSecret).execute();
+				response = actilityAdminService.getToken("client_credentials", this.clientId, this.clientSecret)
+						.execute();
 				if (response.isSuccessful() && response.body() != null) {
 					token = response.body().getAccessToken();
 					logger.info("Successfully received a JWT: {}", token);
@@ -76,16 +86,27 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	protected void init() {
-		OkHttpClient dxClient = new OkHttpClient.Builder().addInterceptor(new DXAdminJWTInterceptor(properties.getProperty("username"), properties.getProperty("password"))).build();
+		HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+		interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+		OkHttpClient dxClient = new OkHttpClient.Builder().addInterceptor(
+				new DXAdminJWTInterceptor(properties.getProperty("username"), properties.getProperty("password")))
+				.addInterceptor(interceptor)
+				.build();
 
 		String domain = properties.getProperty("domain");
 
-		Retrofit core = new Retrofit.Builder().client(dxClient).baseUrl("https://"+domain+".thingpark.io/thingpark/dx/core/latest/api/")
+		OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+		Retrofit core = new Retrofit.Builder().client(dxClient)
+				.baseUrl("https://" + domain + ".thingpark.io/thingpark/dx/core/latest/api/")
 				.addConverterFactory(JacksonConverterFactory.create()).build();
-		Retrofit admin = new Retrofit.Builder().baseUrl("https://"+domain+".thingpark.io/iot-flow/v1/")
-				.addConverterFactory(JacksonConverterFactory.create()).build();
+		Retrofit admin = new Retrofit.Builder().baseUrl("https://" + domain + ".thingpark.io/iot-flow/v1/")
+				.client(client).addConverterFactory(JacksonConverterFactory.create()).build();
+		Retrofit tunnel = new Retrofit.Builder().baseUrl("https://" + domain + ".thingpark.io/thingpark/lrc/rest/")
+				.client(client).addConverterFactory(JacksonConverterFactory.create()).build();
 		actilityCoreService = core.create(ActilityCoreService.class);
 		actilityAdminService = admin.create(ActilityAdminService.class);
+		actilityTunnelService = tunnel.create(ActilityTunnelService.class);
 	}
 
 	@Override
@@ -98,6 +119,16 @@ public class ActilityConnector extends LNSAbstractConnector {
 	@Override
 	public Optional<EndDevice> getDevice(String devEui) {
 		EndDevice result = null;
+		try {
+			Response<List<DeviceCreate>> devs = actilityCoreService.getDeviceByEUI(devEui).execute();
+			if (devs.isSuccessful() && !devs.body().isEmpty()) {
+				DeviceCreate dev = devs.body().get(0);
+				logger.info("Device {} is named {}", devEui, dev.getName());
+				result = new EndDevice(devEui, dev.getName(), null);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return Optional.ofNullable(result);
 	}
 
@@ -105,48 +136,98 @@ public class ActilityConnector extends LNSAbstractConnector {
 	public String sendDownlink(DownlinkData operation) {
 		String result = null;
 		logger.info("Will send {} to Thingpark.", operation.toString());
-
+		try {
+			DownlinkMessage message = new DownlinkMessage();
+			message.setPayloadHex(operation.getPayload());
+			message.setTargetPorts(operation.getFport().toString());
+			SecurityParams securityParams = new SecurityParams();
+			securityParams.setAsId("cumulocity");
+			securityParams.setAsKey(downlinkAsKey);
+			message.setSecurityParams(securityParams);
+			Response<DownlinkMessage> response = actilityCoreService.sendDownlink(operation.getDevEui(), message).execute();
+			logger.info("Response from Thingpark was {}", response.code());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return result;
 	}
 
 	@Override
 	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
 		boolean result = false;
+		DeviceCreate device = new DeviceCreate();
+		device.setEUI(deviceProvisioning.getDevEUI());
+		device.setName(deviceProvisioning.getName());
+		device.setProcessingStrategyId("ROUTE");
+		device.getRouteRefs().add(routeRef);
+		device.setDeviceProfileId(deviceProvisioning.getAdditionalProperties().getProperty("deviceProfile"));
+		if (deviceProvisioning.getProvisioningMode() == ProvisioningMode.OTAA) {
+			device.setActivationType("OTAA");
+			device.setApplicationEUI(deviceProvisioning.getAppEUI());
+			device.setApplicationKey(deviceProvisioning.getAppKey());
+		} else {
+			device.setActivationType("ABP");
+		}
+
+		try {
+			Response<DeviceCreate> response = actilityCoreService.createDevice(device).execute();
+			if (response.isSuccessful()) {
+				result = true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return result;
 	}
 
 	@Override
 	public void configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
+		String connectionId = null;
 
-		removeRoutings(tenant);
-
+		try {
+			for (Route route : actilityCoreService.getRoutes().execute().body()) {
+				if (route.getName().equals(tenant + "-" + getId())) {
+					routeRef = route.getRef();
+				}
+			}
+			for (Connection c : actilityCoreService.getConnections().execute().body()) {
+				if (c.getName().equals(tenant + "-" + getId())) {
+					connectionId = c.getId();
+				}
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		ConnectionRequest connectionRequest = new ConnectionRequest();
 		ConnectionHttpConfig configuration = new ConnectionHttpConfig();
-		configuration.setDestinationURL(url);
-		configuration.getHeaders().put("Authorization", "Basic " + Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
+		configuration.setDestinationURL(url + "/uplink");
+		configuration.getHeaders().put("Authorization",
+				"Basic " + Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
+		configuration.setDownlinkAsId("cumulocity");
+		configuration.setDownlinkAsKey(downlinkAsKey);
 		connectionRequest.setConfiguration(configuration);
 		connectionRequest.setName(tenant + "-" + this.getId());
 
-		Connection connection;
-		try {
-			Response<Connection> response = actilityCoreService.createConnection(connectionRequest).execute();
-			if (response.isSuccessful()) {
-				connection = response.body();
-				this.downlinkAsId = connection.getConfiguration().getDownlinkAsId();
-				this.downlinkAsKey = connection.getConfiguration().getDownlinkAsKey();
-				logger.info("Created new connection: {}", connection);
-				Response<List<Route>> response2 = actilityCoreService.getRoutes().execute();
-				if (response2.isSuccessful()) {
-					for(Route route: response2.body()) {
+		if (routeRef == null) {
+			try {
+				Response<Connection> response = actilityCoreService.createConnection(connectionRequest).execute();
+				if (response.isSuccessful()) {
+					for (Route route : actilityCoreService.getRoutes().execute().body()) {
 						if (route.getName().equals(tenant + "-" + this.getId())) {
-							this.routeRef = route.getRef();
+							routeRef = route.getRef();
 						}
 					}
 				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} else {
+			try {
+				actilityCoreService.updateConnection(connectionId, connectionRequest).execute();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -156,8 +237,15 @@ public class ActilityConnector extends LNSAbstractConnector {
 			Response<List<Connection>> response = actilityCoreService.getConnections().execute();
 			if (response.isSuccessful()) {
 				response.body().forEach(connection -> {
+					logger.info("Found Connection {}", connection.getName());
 					if (connection.getName().equals(tenant + "-" + this.getId())) {
-						actilityCoreService.deleteConnection(connection.getId());
+						try {
+							actilityCoreService.deleteConnection(connection.getId()).execute();
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (IllegalStateException e) {
+							e.printStackTrace();
+						}
 					}
 				});
 			}
@@ -169,11 +257,35 @@ public class ActilityConnector extends LNSAbstractConnector {
 	@Override
 	public boolean deprovisionDevice(String deveui) {
 		boolean result = false;
+		try {
+			Response<List<DeviceCreate>> devs = actilityCoreService.getDeviceByEUI(deveui).execute();
+			if (devs.isSuccessful() && !devs.body().isEmpty()) {
+				Response<ResponseBody> r = actilityCoreService.deleteDevice(devs.body().get(0).getRef()).execute();
+				if (r.isSuccessful()) {
+					result = true;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return result;
 	}
 
 	@Override
 	public List<Gateway> getGateways() {
 		return new ArrayList<>();
+	}
+
+	public List<DeviceProfile> getDeviceProfiles() {
+		List<DeviceProfile> result = null;
+		try {
+			Response<List<DeviceProfile>> response = actilityCoreService.getDeviceProfiles().execute();
+			if (response.isSuccessful()) {
+				result = response.body();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 }

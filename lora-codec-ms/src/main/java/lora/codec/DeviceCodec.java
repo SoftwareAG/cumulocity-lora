@@ -100,11 +100,9 @@ public abstract class DeviceCodec implements Component {
 			return mor;
 		});
 
-		logger.info("Current credentials are: {}", event.getCredentials());
-
 		codecs.put(event.getCredentials().getTenant(), codec);
 
-		logger.info("Codec successfully initialized: {}", codec.getName());
+		logger.info("Codec {} successfully initialized in tenant {}", codec.getName(), event.getCredentials().getTenant());
 	}
 	
 	@EventListener

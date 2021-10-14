@@ -1,16 +1,18 @@
 package lora.ns.actility.rest.model;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_NULL)
 public class Route {
     private String contentType;
     private String asId;
     private String ref;
     private String name;
-    private Map<String, String> connectionProperties;
+    private String connectorClass;
+    private ConnectorProperties connectorProperties;
     public String getContentType() {
         return contentType;
     }
@@ -35,10 +37,16 @@ public class Route {
     public void setName(String name) {
         this.name = name;
     }
-    public Map<String, String> getConnectionProperties() {
-        return connectionProperties;
+    public ConnectorProperties getConnectorProperties() {
+        return connectorProperties;
     }
-    public void setConnectionProperties(Map<String, String> connectionProperties) {
-        this.connectionProperties = connectionProperties;
-    }   
+    public void setConnectorProperties(ConnectorProperties connectorProperties) {
+        this.connectorProperties = connectorProperties;
+    }
+    public String getConnectorClass() {
+        return connectorClass;
+    }
+    public void setConnectorClass(String connectorClass) {
+        this.connectorClass = connectorClass;
+    }
 }

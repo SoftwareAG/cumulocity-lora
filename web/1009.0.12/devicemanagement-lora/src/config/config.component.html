@@ -16,6 +16,9 @@
                 <tr *ngFor="let asset of release.assets">
                     <td>{{asset.name.replace('.zip','')}}</td>
                     <td>
+                        <div *ngIf="asset.status === 'newer_version_installed'" class="alert alert-success" role="alert">
+                            <strong>Newer version installed</strong>
+                        </div>
                         <div *ngIf="asset.status === 'installed'" class="alert alert-success" role="alert">
                             <strong>Installed</strong>
                         </div>

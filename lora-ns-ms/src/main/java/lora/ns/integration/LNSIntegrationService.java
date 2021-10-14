@@ -188,6 +188,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	public void mapEventToC8Y(String eventString, String lnsInstanceId) {
+		logger.info("Following message was received from the LNS: {}", eventString);
 		if (isOperationUpdate(eventString)) {
 			updateOperation(eventString, lnsInstanceId);
 		} else {
