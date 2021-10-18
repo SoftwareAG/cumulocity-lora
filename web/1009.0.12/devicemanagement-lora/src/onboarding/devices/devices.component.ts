@@ -392,18 +392,20 @@ export class LoraDevicesComponent {
                 let lines = csv.split("\n");
                 let headers = lines[0].trim().split(";");
                 lines.splice(1).forEach(line => {
-                    let row: { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any } = {} as { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any };
-                    row.additionalProperties = {};
-                    let lineContent = line.trim().split(";");
-                    lineContent.forEach((col, i) => {
-                        if (["name", "devEUI", "appEUI", "appKey", "type", "model"].indexOf(headers[i]) > -1) {
-                            row[headers[i]] = col;
-                        }
-                        else {
-                            row.additionalProperties[headers[i]] = col;
-                        }
-                    })
-                    this.fileContent.push(row);
+                    if (line != "\n" && line.trim().length > 0) {
+                        let row: { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any } = {} as { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any };
+                        row.additionalProperties = {};
+                        let lineContent = line.trim().split(";");
+                        lineContent.forEach((col, i) => {
+                            if (["name", "devEUI", "appEUI", "appKey", "type", "model"].indexOf(headers[i]) > -1) {
+                                row[headers[i]] = col;
+                            }
+                            else {
+                                row.additionalProperties[headers[i]] = col;
+                            }
+                        })
+                        this.fileContent.push(row);
+                    }
                 });
                 console.dir(this.fileContent);
             }
