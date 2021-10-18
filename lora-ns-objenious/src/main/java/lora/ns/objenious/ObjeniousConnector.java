@@ -185,9 +185,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			e1.printStackTrace();
 		}
 		if (device == null) {
-			List<Profile> profiles = null;
 			try {
-				profiles = objeniousService.getProfiles().execute().body();
 				DeviceCreate deviceCreate = new DeviceCreate();
 				deviceCreate.setLabel(deviceProvisioning.getName());
 				deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
@@ -196,7 +194,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 				deviceCreate.setLat(deviceProvisioning.getLat());
 				deviceCreate.setLng(deviceProvisioning.getLng());
 				deviceCreate.setGroupId(Integer.parseInt(properties.getProperty("groupId")));
-				deviceCreate.setProfileId(profiles.iterator().next().getId());
+				deviceCreate.setProfileId(Integer.valueOf(deviceProvisioning.getAdditionalProperties().getProperty("deviceProfile")));
 				retrofit2.Response<Device> response = objeniousService.createDevice(deviceCreate).execute();
 				result = response.isSuccessful();
 				if (!result) {
@@ -312,5 +310,18 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	@Override
 	public List<Gateway> getGateways() {
 		return new ArrayList<>();
+	}
+
+	public List<Profile> getDeviceProfiles() {
+		List<Profile> result = null;
+		try {
+			retrofit2.Response<List<Profile>> response = objeniousService.getProfiles().execute();
+			if (response.isSuccessful()) {
+				result = response.body();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 }

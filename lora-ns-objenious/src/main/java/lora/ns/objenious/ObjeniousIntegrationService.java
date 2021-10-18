@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import lora.ns.DeviceData;
+import lora.ns.connector.PropertyDescription;
+import lora.ns.connector.PropertyDescription.PropertyType;
 import lora.ns.integration.LNSIntegrationService;
 import lora.ns.operation.OperationData;
 
@@ -30,6 +32,7 @@ public class ObjeniousIntegrationService extends LNSIntegrationService<Objenious
 	{
 		wizard.add(new ConnectorWizardStep1());
 		wizard.add(new ConnectorWizardStep2());
+		deviceProvisioningAdditionalProperties.add(new PropertyDescription("deviceProfile", "Device profile", true, null, "/deviceProfiles", null, null, null, null, null, PropertyType.LIST, false));
 	}
 
 	@Override
