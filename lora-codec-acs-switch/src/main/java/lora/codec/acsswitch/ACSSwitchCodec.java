@@ -53,7 +53,8 @@ public class ACSSwitchCodec extends DeviceCodec {
 		PRESENCE_PERIOD("Presence period", (byte)0x01, (byte)0x02, null),
 		PRESENCE_AND_ALARM_TYPE("Presence and alarm type", (byte)0x0D, (byte)0x01, null),
 		ALARM_CONFIGURATION("Alarm configuration", (byte)0x13, (byte)0x01, null),
-		PRESENCE_RANDOM_DELAY("Presence random delay", (byte)0x02, (byte)0x02, new ParamValue[]{new ParamValue(8,8,"min",1), new ParamValue(0,8,"max",60)});
+		PRESENCE_RANDOM_DELAY("Presence random delay", (byte)0x02, (byte)0x02, new ParamValue[]{new ParamValue(8,8,"min",1), new ParamValue(0,8,"max",60)}),
+		RTC("Real time clock (seconds since 2010-01-01)", (byte)0x03, (byte)0x04, null);
 		
 		public String label;
 		public byte code;
@@ -394,7 +395,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 
 	@Override
 	public DownlinkData askDeviceConfig(String devEui) {
-		return new DownlinkData(devEui, 1, "020201020202");
+		return new DownlinkData(devEui, 1, "0203010202020304");
 	}
 
 	@Override
