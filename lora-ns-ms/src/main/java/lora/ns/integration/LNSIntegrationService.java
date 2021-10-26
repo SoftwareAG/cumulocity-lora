@@ -182,7 +182,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			}
 			instance.setProperties(properties);
 			lnsConnectorManager.addConnector(instance);
-			lnsGatewayManager.upsertGateways(mor);
+			lnsGatewayManager.upsertGateways(instance);
 			configureRoutings(instance.getId(), event.getCredentials());
 		}
 	}
@@ -354,7 +354,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			configureRoutings(instance.getId(), credentials.get());
 		}
 
-		lnsGatewayManager.upsertGateways(mor);
+		lnsGatewayManager.upsertGateways(instance);
 
 		return mor;
 	}
@@ -371,6 +371,14 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		});
 
 		return result[0];
+	}
+
+	@Scheduled(initialDelay = 10000, fixedDelay = 300000)
+	private void scanGateways() {
+		subscriptionsService.runForEachTenant(() -> {
+			logger.info("Scanning gateways in tenant {}", subscriptionsService.getTenant());
+			lnsConnectorManager.getConnectors().values().forEach(c -> lnsGatewayManager.upsertGateways(c));
+		});
 	}
 
 	@Scheduled(initialDelay = 10000, fixedDelay = 10000)

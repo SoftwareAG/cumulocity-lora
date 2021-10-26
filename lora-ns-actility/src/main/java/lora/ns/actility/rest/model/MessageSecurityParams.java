@@ -1,6 +1,6 @@
 package lora.ns.actility.rest.model;
 
-public class SecurityParams {
+public class MessageSecurityParams {
     private String asId;
     private String asKey;
     public String getAsId() {

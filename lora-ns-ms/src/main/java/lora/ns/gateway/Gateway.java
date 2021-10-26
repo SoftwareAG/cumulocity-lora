@@ -2,12 +2,17 @@ package lora.ns.gateway;
 
 import java.math.BigDecimal;
 
+import c8y.ConnectionState;
+import lora.codec.C8YData;
+
 public class Gateway {
     private String id;
     private String name;
     private BigDecimal lat;
     private BigDecimal lng;
     private String type;
+    private ConnectionState status;
+    private C8YData data;
 
     public String getId() {
         return id;
@@ -49,12 +54,30 @@ public class Gateway {
         this.type = type;
     }
 
-    public Gateway(String id, String name, BigDecimal lat, BigDecimal lng, String type) {
+    public ConnectionState getStatus() {
+        return status;
+    }
+
+    public void setStatus(ConnectionState status) {
+        this.status = status;
+    }
+
+    public C8YData getData() {
+        return data;
+    }
+
+    public void setData(C8YData data) {
+        this.data = data;
+    }
+
+    public Gateway(String id, String name, BigDecimal lat, BigDecimal lng, String type, ConnectionState status, C8YData data) {
         this.id = id;
         this.name = name;
         this.lat = lat;
         this.lng = lng;
         this.type = type;
+        this.status = status;
+        this.data = data;
     }
 
     public Gateway() {

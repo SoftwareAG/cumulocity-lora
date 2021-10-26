@@ -2,6 +2,7 @@ package lora.ns.actility.rest;
 
 import java.util.List;
 
+import lora.ns.actility.rest.model.BaseStation;
 import lora.ns.actility.rest.model.Connection;
 import lora.ns.actility.rest.model.ConnectionRequest;
 import lora.ns.actility.rest.model.DeviceCreate;
@@ -71,6 +72,14 @@ public interface ActilityCoreService {
 	Call<List<DeviceProfile>> getDeviceProfiles();
 
 	@Headers({"Content-Type: application/json", "Accept: application/json"})
-	@PUT("devices/{devEUI}/downlinkMessages")
+	@POST("devices/{devEUI}/downlinkMessages")
 	Call<DownlinkMessage> sendDownlink(@Path("devEUI") String devEUI, @Body DownlinkMessage downlinkMessage);
+
+	@Headers("Accept: application/json")
+	@GET("baseStations")
+	Call<List<BaseStation>> getBaseStations();
+
+	@Headers("Accept: application/json")
+	@GET("baseStations/{baseStationRef}")
+	Call<BaseStation> getBaseStation(@Path("baseStationRef") String baseStationRef);
 }

@@ -46,4 +46,10 @@ public interface ObjeniousService {
 	
 	@GET("groups")
 	Call<List<Group>> getGroups();
+
+	@GET("gateways")
+	Call<List<Gateway>> getGateways();
+
+	@GET("gateways/{id}")
+	Call<List<Gateway>> getGateway(@Path("id") String id);
 }

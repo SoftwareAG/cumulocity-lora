@@ -88,7 +88,9 @@ public class LNSOperationManager {
 		if (connector.isPresent()) {
 			try {
 				String commandId = connector.get().sendDownlink(operation);
-				storeOperation(lnsConnectorId, c8yOperation, commandId);
+				if (commandId != null) {
+					storeOperation(lnsConnectorId, c8yOperation, commandId);
+				}
 			} catch (Exception e) {
 				logger.error("Unable to send downlink", e);
 				c8yOperation.setStatus(OperationStatus.FAILED.toString());
@@ -146,7 +148,7 @@ public class LNSOperationManager {
 	private void storeOperationOnMO(String lnsConnectorId, OperationRepresentation c8yOperation, String commandId) {
 		ManagedObjectRepresentation mor = inventoryApi.get(GId.asGId(lnsConnectorId));
 		if (mor != null) {
-			Map<String, String> downlinks = new HashMap<String, String>();
+			Map<String, String> downlinks = new HashMap<>();
 			if (mor.hasProperty(DOWNLINKS)) {
 				downlinks = (Map<String, String>) mor.getProperty(DOWNLINKS);
 			}

@@ -1,22 +1,27 @@
 package lora.ns.actility;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Random;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import c8y.ConnectionState;
+import lora.codec.C8YData;
 import lora.codec.DownlinkData;
 import lora.ns.actility.rest.ActilityAdminService;
 import lora.ns.actility.rest.ActilityCoreService;
-import lora.ns.actility.rest.ActilityTunnelService;
 import lora.ns.actility.rest.JwtInterceptor;
+import lora.ns.actility.rest.model.BaseStation;
 import lora.ns.actility.rest.model.Connection;
 import lora.ns.actility.rest.model.ConnectionHttpConfig;
 import lora.ns.actility.rest.model.ConnectionRequest;
@@ -24,8 +29,10 @@ import lora.ns.actility.rest.model.DeviceCreate;
 import lora.ns.actility.rest.model.DeviceProfile;
 import lora.ns.actility.rest.model.DownlinkMessage;
 import lora.ns.actility.rest.model.Route;
-import lora.ns.actility.rest.model.SecurityParams;
+import lora.ns.actility.rest.model.MessageSecurityParams;
 import lora.ns.actility.rest.model.Token;
+import lora.ns.actility.rest.model.BaseStationStatistics.ConnectionStateEnum;
+import lora.ns.actility.rest.model.BaseStationStatistics.HealthStateEnum;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.DeviceProvisioning.ProvisioningMode;
@@ -42,9 +49,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	private ActilityCoreService actilityCoreService;
 	private ActilityAdminService actilityAdminService;
-	private ActilityTunnelService actilityTunnelService;
 
-	private String downlinkAsId;
 	private String downlinkAsKey = "4e0ff46472fa1840f25368c066e94769";
 	private String routeRef;
 
@@ -102,11 +107,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 				.addConverterFactory(JacksonConverterFactory.create()).build();
 		Retrofit admin = new Retrofit.Builder().baseUrl("https://" + domain + ".thingpark.io/iot-flow/v1/")
 				.client(client).addConverterFactory(JacksonConverterFactory.create()).build();
-		Retrofit tunnel = new Retrofit.Builder().baseUrl("https://" + domain + ".thingpark.io/thingpark/lrc/rest/")
-				.client(client).addConverterFactory(JacksonConverterFactory.create()).build();
 		actilityCoreService = core.create(ActilityCoreService.class);
 		actilityAdminService = admin.create(ActilityAdminService.class);
-		actilityTunnelService = tunnel.create(ActilityTunnelService.class);
 	}
 
 	@Override
@@ -134,13 +136,14 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	public String sendDownlink(DownlinkData operation) {
-		String result = null;
+		Random r = new Random(DateTime.now().getMillis());
+		int downlinkCounter = r.nextInt();
 		logger.info("Will send {} to Thingpark.", operation.toString());
 		try {
 			DownlinkMessage message = new DownlinkMessage();
 			message.setPayloadHex(operation.getPayload());
 			message.setTargetPorts(operation.getFport().toString());
-			SecurityParams securityParams = new SecurityParams();
+			MessageSecurityParams securityParams = new MessageSecurityParams();
 			securityParams.setAsId("cumulocity");
 			securityParams.setAsKey(downlinkAsKey);
 			message.setSecurityParams(securityParams);
@@ -149,7 +152,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return result;
+		return String.valueOf(downlinkCounter);
 	}
 
 	@Override
@@ -273,7 +276,58 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	public List<Gateway> getGateways() {
-		return new ArrayList<>();
+		List<Gateway> result = new ArrayList<>();
+
+		try {
+			Response<List<BaseStation>> response = actilityCoreService.getBaseStations().execute();
+			if (response.isSuccessful()) {
+				for (BaseStation baseStation: response.body()) {
+					Response<BaseStation> r = actilityCoreService.getBaseStation(baseStation.getRef()).execute();
+					if (r.isSuccessful()) {
+						baseStation = r.body();
+						Gateway g = new Gateway();
+						if (baseStation.getSMN() != null) {
+							g.setId(baseStation.getSMN());
+						} else {
+							g.setId("Actility-" + baseStation.getId());
+						}
+						g.setName(baseStation.getName());
+						if (baseStation.getGeoLatitude() != null) {
+							g.setLat(BigDecimal.valueOf(baseStation.getGeoLatitude()));
+						}
+						if (baseStation.getGeoLongitude() != null) {
+							g.setLng(BigDecimal.valueOf(baseStation.getGeoLongitude()));
+						}
+						if (baseStation.getStatistics() != null) {
+							C8YData data = new C8YData();
+							if (baseStation.getStatistics().getConnectionState() == ConnectionStateEnum.CNX && baseStation.getStatistics().getHealthState() == HealthStateEnum.ACTIVE) {
+								g.setStatus(ConnectionState.AVAILABLE);
+							} else {
+								g.setStatus(ConnectionState.UNAVAILABLE);
+							}
+							if (baseStation.getStatistics().getTemperature() != null) {
+								data.addMeasurement(null, "Temperature", "T", "°C", BigDecimal.valueOf(baseStation.getStatistics().getTemperature()), new DateTime());
+							}
+							if (baseStation.getStatistics().getCpUUsage() != null) {
+								data.addMeasurement(null, "CPU", "Usage", "%", BigDecimal.valueOf(baseStation.getStatistics().getCpUUsage()), new DateTime());
+							}
+							if (baseStation.getStatistics().getRaMUsage() != null) {
+								data.addMeasurement(null, "RAM", "Usage", "%", BigDecimal.valueOf(baseStation.getStatistics().getRaMUsage()), new DateTime());
+							}
+							if (baseStation.getStatistics().getBatteryLevel() != null) {
+								data.addMeasurement(null, "Battery", "level", "%", BigDecimal.valueOf(baseStation.getStatistics().getBatteryLevel()), new DateTime());
+							}
+							g.setData(data);
+						}
+						result.add(g);
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 
 	public List<DeviceProfile> getDeviceProfiles() {

@@ -28,6 +28,9 @@ public class Gateway   {
   @JsonProperty("gateway_name")
   private String gatewayName = null;
 
+  @JsonProperty("gateway_type")
+  private String gatewayType = null;
+
   @JsonProperty("serial_number")
   private String serialNumber = null;
 
@@ -146,6 +149,25 @@ public class Gateway   {
 
   public void setGatewayName(String gatewayName) {
     this.gatewayName = gatewayName;
+  }
+
+  public Gateway gatewayType(String gatewayType) {
+    this.gatewayType = gatewayType;
+    return this;
+  }
+
+  /**
+   * Gateway type
+   * @return gatewayType
+  **/
+
+
+  public String getGatewayType() {
+    return gatewayType;
+  }
+
+  public void setGatewayType(String gatewayType) {
+    this.gatewayType = gatewayType;
   }
 
   public Gateway serialNumber(String serialNumber) {
@@ -379,6 +401,7 @@ public class Gateway   {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    gatewayId: ").append(toIndentedString(gatewayId)).append("\n");
     sb.append("    gatewayName: ").append(toIndentedString(gatewayName)).append("\n");
+    sb.append("    gatewayType: ").append(toIndentedString(gatewayType)).append("\n");
     sb.append("    serialNumber: ").append(toIndentedString(serialNumber)).append("\n");
     sb.append("    group: ").append(toIndentedString(group)).append("\n");
     sb.append("    lastMessage: ").append(toIndentedString(lastMessage)).append("\n");

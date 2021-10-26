@@ -1,6 +1,7 @@
 package lora.ns.objenious;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 
+import lora.codec.C8YData;
 import lora.codec.DownlinkData;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.device.DeviceProvisioning;
@@ -82,8 +84,6 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 	@Override
 	protected void init() {
-		// logger.info("Initializing Retrofit client to Objenious API");
-
 		String host = properties.getProperty("proxy-host");
 		String port = properties.getProperty("proxy-port");
 
@@ -105,7 +105,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 	@Override
 	public List<EndDevice> getDevices() {
-		List<EndDevice> result = new ArrayList<EndDevice>();
+		List<EndDevice> result = new ArrayList<>();
 		try {
 			retrofit2.Response<List<Device>> response = objeniousService.getDevices().execute();
 			List<Device> devices = response.body();
@@ -285,7 +285,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	}
 
 	public List<Group> getGroups() {
-		List<Group> result = new ArrayList<Group>();
+		List<Group> result = new ArrayList<>();
 
 		try {
 			result = objeniousService.getGroups().execute().body();
@@ -309,7 +309,24 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 	@Override
 	public List<Gateway> getGateways() {
-		return new ArrayList<>();
+		logger.info("Getting list of gateways with connector {}...", this.getName());
+		List<Gateway> result = new ArrayList<>();
+		try {
+			retrofit2.Response<List<lora.ns.objenious.rest.Gateway>> response = objeniousService.getGateways().execute();
+			if (response.isSuccessful()) {
+				response.body().forEach(g -> {
+					logger.info("Got gateway {}", g.getGatewayName());
+					C8YData data = new C8YData();
+					Gateway gateway = new Gateway(g.getGatewayId(), g.getGatewayName(), BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(), g.getStatus().toString(), data);
+					result.add(gateway);
+				});
+			} else {
+				logger.error("Couldn't retrieve gateways with connector {}", this.getName());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	public List<Profile> getDeviceProfiles() {
