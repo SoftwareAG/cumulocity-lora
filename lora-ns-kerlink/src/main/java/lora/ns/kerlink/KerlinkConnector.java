@@ -23,6 +23,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import c8y.ConnectionState;
+import lora.codec.C8YData;
 import lora.codec.DownlinkData;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.device.DeviceProvisioning;
@@ -360,9 +362,10 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		PaginatedDto<GatewayDto> gatewaysDto = restTemplate.exchange(baseUrl + "/gateways", HttpMethod.GET,
 				new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<GatewayDto>>() {
 				}).getBody();
+		C8YData c8yData = new C8YData();
 		for (GatewayDto gatewayDto : gatewaysDto.getList()) {
 			result.add(new Gateway(gatewayDto.getEui(), gatewayDto.getName(), gatewayDto.getLatitude(),
-					gatewayDto.getLongitude(), gatewayDto.getDescription()));
+					gatewayDto.getLongitude(), gatewayDto.getDescription(), ConnectionState.AVAILABLE, c8yData));
 		}
 		return result;
 	}

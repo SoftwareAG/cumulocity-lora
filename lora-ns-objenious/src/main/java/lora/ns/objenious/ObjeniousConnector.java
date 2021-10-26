@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 
+import c8y.ConnectionState;
 import lora.codec.C8YData;
 import lora.codec.DownlinkData;
 import lora.ns.connector.LNSAbstractConnector;
@@ -317,7 +318,21 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 				response.body().forEach(g -> {
 					logger.info("Got gateway {}", g.getGatewayName());
 					C8YData data = new C8YData();
-					Gateway gateway = new Gateway(g.getGatewayId(), g.getGatewayName(), BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(), g.getStatus().toString(), data);
+					ConnectionState state = ConnectionState.AVAILABLE;
+					switch(g.getStatus()) {
+						case ACTIVE:
+							state = ConnectionState.AVAILABLE;
+							break;
+						case ALERT:
+							state = ConnectionState.AVAILABLE;
+							break;
+						case INACTIVE:
+							state = ConnectionState.UNAVAILABLE;
+							break;
+						default:
+							break;
+					}
+					Gateway gateway = new Gateway(g.getGatewayId(), g.getGatewayName(), BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(), state, data);
 					result.add(gateway);
 				});
 			} else {
