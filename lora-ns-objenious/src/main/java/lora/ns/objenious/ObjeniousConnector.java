@@ -115,7 +115,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 						.map(device -> new EndDevice(device.getProperties().getDeveui(), device.getLabel(), ""))
 						.collect(Collectors.toList());
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -129,7 +129,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		try {
 			response = objeniousService.getProfile(id).execute();
 			result = response.body();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -145,7 +145,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 				Device device = response.body();
 				result = new EndDevice(devEui, device.getLabel(), "A");
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return Optional.ofNullable(result);
@@ -169,7 +169,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			if (response.isSuccessful()) {
 				result = response.body().getCommandId().toString();
 			}
-		} catch (IOException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 
@@ -182,7 +182,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		Device device = null;
 		try {
 			device = objeniousService.getDevice(deviceProvisioning.getDevEUI()).execute().body();
-		} catch (IOException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		if (device == null) {
@@ -201,7 +201,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 				if (!result) {
 					logger.error(response.errorBody().string());
 				}
-			} catch (IOException e1) {
+			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
 		} else {
@@ -213,7 +213,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 					if (!result) {
 						logger.error(response.errorBody().string());
 					}
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -248,7 +248,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			if (!response.isSuccessful()) {
 				logger.error("Error from Objenious: {}", response.errorBody().string());
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -269,12 +269,12 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 				routings.stream().filter(routing -> routing.getName().equals(name)).forEach(routing -> {
 					try {
 						objeniousService.deleteRouting(routing.getId()).execute();
-					} catch (IOException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				});
 			}
-		} catch (IOException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 	}
@@ -290,7 +290,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 		try {
 			result = objeniousService.getGroups().execute().body();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -302,7 +302,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		boolean result = false;
 		try {
 			result = objeniousService.deprovisionDevice(deveui).execute().isSuccessful();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return result;
@@ -338,7 +338,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			} else {
 				logger.error("Couldn't retrieve gateways with connector {}", this.getName());
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return result;
@@ -351,7 +351,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			if (response.isSuccessful()) {
 				result = response.body();
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return result;

@@ -23,4 +23,5 @@ public interface LNSConnector {
 	void removeRoutings(String tenant);
 	boolean deprovisionDevice(String deveui);
 	List<Gateway> getGateways();
+    Properties mergeProperties(Properties properties);
 }

@@ -3,6 +3,7 @@ package lora.rest;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
@@ -86,12 +87,19 @@ public class LNSRestController {
 	}
 	
 	@PostMapping(value = "/lnsinstances", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ManagedObjectRepresentation addLnsInstance(@RequestBody LNSConnectorRepresentation instance) {
+	public ManagedObjectRepresentation addLnsConnector(@RequestBody LNSConnectorRepresentation instance) {
 		return lnsProxy.addLNSInstance(instance);
+	}
+
+	
+	@PutMapping(value = "/lnsinstances/{lnsInstanceId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> updateLnsConnector(@PathVariable String lnsInstanceId, @RequestBody Properties properties) {
+		lnsProxy.updateLnsConnector(lnsInstanceId, properties);
+		return ResponseEntity.ok().build();
 	}
 	
 	@DeleteMapping(value = "/lnsinstances/{lnsInstanceId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> removeLnsInstance(@PathVariable String lnsInstanceId) {
+	public ResponseEntity<String> removeLnsConnector(@PathVariable String lnsInstanceId) {
 		lnsProxy.removeLNSInstance(lnsInstanceId);
 		return ResponseEntity.ok().build();
 	}

@@ -36,6 +36,26 @@ public class ObjeniousRestController {
         return result;
     }
 
+    /***
+     * Should be used when updating the connector to get the list of available device groups.
+     * @param lnsConnectorId
+     * @param properties
+     * @return
+     */
+	@PostMapping(value = "/{lnsConnectorId}/groups", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public List<Group> getGroups(@PathVariable String lnsConnectorId, @RequestBody Properties properties) {
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent()) {
+            properties = connector.get().mergeProperties(properties);
+		}
+		return new ObjeniousConnector(properties).getGroups();
+	}
+
+    /***
+     * Retrieves the list of avaible device groups in Objenious tenant when creating a new Objenious connector.
+     * @param properties
+     * @return
+     */
 	@PostMapping(value = "/groups", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public List<Group> getGroups(@RequestBody Properties properties) {
 		return new ObjeniousConnector(properties).getGroups();

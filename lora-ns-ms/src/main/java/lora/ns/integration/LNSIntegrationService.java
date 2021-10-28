@@ -457,4 +457,23 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	public LinkedList<PropertyDescription> getDeviceProvisioningAdditionalProperties() {
 		return deviceProvisioningAdditionalProperties;
 	}
+
+    public void updateLnsConnector(String lnsInstanceId, Properties properties) {
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
+		if (connector.isPresent()) {
+			LNSConnector c = connector.get();
+			c.setProperties(c.mergeProperties(properties));
+			c.getProperties().forEach((k, v) -> {
+				OptionRepresentation option = new OptionRepresentation();
+				option.setCategory(lnsInstanceId);
+				if (isPropertyEncrypted(k.toString())) {
+					option.setKey("credentials." + k.toString());
+				} else {
+					option.setKey(k.toString());
+				}
+				option.setValue(v.toString());
+				tenantOptionApi.save(option);
+			});
+		}
+    }
 }

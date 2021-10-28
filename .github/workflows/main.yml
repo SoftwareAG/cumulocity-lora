@@ -36,7 +36,7 @@ jobs:
           done
       - name: Build webapp
         run: |
-          cd web/1009.0.12/devicemanagement-lora
+          cd web/1010.0.12/devicemanagement-lora
           npm install
           npm run build
           cd dist/apps/devicemanagement-lora

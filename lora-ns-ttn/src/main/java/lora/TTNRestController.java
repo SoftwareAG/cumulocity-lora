@@ -34,6 +34,15 @@ public class TTNRestController {
 		return connector.getApplications();
 	}
 
+	@PostMapping(value = "/{lnsConnectorId}/applications", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<Application> getApplications(@PathVariable String lnsConnectorId, @RequestBody Properties properties) {
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent()) {
+            properties = connector.get().mergeProperties(properties);
+		}
+		return new TTNConnector(properties).getApplications();
+	}
+
 	@GetMapping(value = "/{lnsConnectorId}/macversion", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<IdNameEntry> getMACVersions(@PathVariable String lnsConnectorId) {
 		List<IdNameEntry> result = new ArrayList<>();

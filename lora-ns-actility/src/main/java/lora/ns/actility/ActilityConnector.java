@@ -74,7 +74,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 				} else {
 					logger.error("Can't obtain a JWT with the following reponse: {}", response.errorBody().string());
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return token;
@@ -98,14 +98,14 @@ public class ActilityConnector extends LNSAbstractConnector {
 				.addInterceptor(interceptor)
 				.build();
 
-		String domain = properties.getProperty("domain");
+		String url = properties.getProperty("url");
 
 		OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
 		Retrofit core = new Retrofit.Builder().client(dxClient)
-				.baseUrl("https://" + domain + ".thingpark.io/thingpark/dx/core/latest/api/")
+				.baseUrl(url + "/thingpark/dx/core/latest/api/")
 				.addConverterFactory(JacksonConverterFactory.create()).build();
-		Retrofit admin = new Retrofit.Builder().baseUrl("https://" + domain + ".thingpark.io/iot-flow/v1/")
+		Retrofit admin = new Retrofit.Builder().baseUrl(url + "/iot-flow/v1/")
 				.client(client).addConverterFactory(JacksonConverterFactory.create()).build();
 		actilityCoreService = core.create(ActilityCoreService.class);
 		actilityAdminService = admin.create(ActilityAdminService.class);
@@ -128,7 +128,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 				logger.info("Device {} is named {}", devEui, dev.getName());
 				result = new EndDevice(devEui, dev.getName(), null);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return Optional.ofNullable(result);
@@ -177,7 +177,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 			if (response.isSuccessful()) {
 				result = true;
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return result;
@@ -199,7 +199,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 					connectionId = c.getId();
 				}
 			}
-		} catch (IOException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		ConnectionRequest connectionRequest = new ConnectionRequest();
@@ -222,13 +222,13 @@ public class ActilityConnector extends LNSAbstractConnector {
 						}
 					}
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		} else {
 			try {
 				actilityCoreService.updateConnection(connectionId, connectionRequest).execute();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -323,7 +323,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 					}
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -337,7 +337,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 			if (response.isSuccessful()) {
 				result = response.body();
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return result;

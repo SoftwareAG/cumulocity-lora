@@ -1,0 +1,56 @@
+<div class="card" *ngFor="let release of releases">
+    <div class="card-header">
+        <h4 class="card-title">Release {{release.tag_name}} - {{release.name}}</h4>
+    </div>
+    <div class="card-header separator">
+        <h4 class="card-title">{{release.body}}</h4>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <th>Name</th>
+                <th>Status</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let asset of release.assets">
+                    <td>{{asset.name.replace('.zip','')}}</td>
+                    <td>
+                        <div *ngIf="asset.status === 'newer_version_installed'" class="alert alert-success" role="alert">
+                            <strong>Newer version installed</strong>
+                        </div>
+                        <div *ngIf="asset.status === 'installed'" class="alert alert-success" role="alert">
+                            <strong>Installed</strong>
+                        </div>
+                        <div *ngIf="asset.status === 'different_version_installed'" class="alert alert-info" role="alert">
+                            <strong>An unknown version is installed</strong>
+                        </div>
+                        <div *ngIf="asset.status === 'older_version_installed'" class="alert alert-warning" role="alert">
+                            <strong>An older version is installed</strong>
+                        </div>
+                        <div *ngIf="asset.status === 'not_installed'" class="alert alert-danger" role="alert">
+                            <strong>Not installed</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <button *ngIf="asset.status !== 'installed'" uib-tooltip="Install microservice"
+                            tooltip-append-to-body="true" tooltip-placement="left" (click)="install(asset)"
+                            [disabled]="asset.installing">
+                            Install
+                        </button>
+                        <button *ngIf="asset.status === 'installed'" uib-tooltip="Reinstall microservice"
+                            tooltip-append-to-body="true" tooltip-placement="left" (click)="install(asset)"
+                            [disabled]="asset.installing">
+                            Reinstall
+                        </button>
+                        <button *ngIf="asset.status === 'installed'" uib-tooltip="Delete microservice"
+                            tooltip-append-to-body="true" tooltip-placement="left" (click)="delete(asset)"
+                            [disabled]="asset.installing">
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
