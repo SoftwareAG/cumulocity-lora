@@ -84,7 +84,7 @@ jobs:
               owner, repo,
               release_id: release.data.id,
               name: 'devicemanagement-lora.zip',
-              data: await fs.readFile('web/1009.0.12/devicemanagement-lora/dist/apps/devicemanagement-lora/devicemanagement-lora.zip')
+              data: await fs.readFile('web/1010.0.12/devicemanagement-lora/dist/apps/devicemanagement-lora/devicemanagement-lora.zip')
             });            
         
             for (let dir of await fs.readdir('.', {withFileTypes: true})) {
