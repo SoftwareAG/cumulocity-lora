@@ -2,7 +2,7 @@ module lora.ns.ms {
     requires transitive lora_interface;
     requires org.apache.commons.codec;
     requires rest.representation;
-    requires org.joda.time;
+    requires joda.time;
     requires core.model;
     requires device.capability.model;
     requires org.slf4j;

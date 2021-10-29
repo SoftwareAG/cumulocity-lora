@@ -56,6 +56,14 @@ public interface ActilityCoreService {
 	@POST("devices")
 	Call<DeviceCreate> createDevice(@Body DeviceCreate device);
 
+	@Headers({"Content-Type: application/json", "Accept: application/json"})
+	@PUT("devices/{deviceRef}")
+	Call<DeviceCreate> updateDevice(@Path("deviceRef") String deviceRef, @Body DeviceCreate device);
+
+	@Headers("Accept: application/json")
+	@GET("devices")
+	Call<List<DeviceCreate>> getDevices();
+
 	@Headers("Accept: application/json")
 	@GET("devices")
 	Call<List<DeviceCreate>> getDeviceByEUI(@Query("deviceEUI") String devEUI);

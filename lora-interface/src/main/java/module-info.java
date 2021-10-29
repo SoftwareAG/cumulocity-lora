@@ -1,6 +1,6 @@
 module lora_interface {
     requires rest.representation;
-    requires org.joda.time;
+    requires joda.time;
     requires core.model;
     requires device.capability.model;
     requires org.slf4j;

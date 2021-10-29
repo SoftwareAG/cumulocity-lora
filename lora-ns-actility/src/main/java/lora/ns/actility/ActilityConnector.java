@@ -232,10 +232,44 @@ public class ActilityConnector extends LNSAbstractConnector {
 				e.printStackTrace();
 			}
 		}
+		try {
+			Response<List<DeviceCreate>> response = actilityCoreService.getDevices().execute();
+			if (response.isSuccessful()) {
+				response.body().forEach(d -> {
+					if (!d.getRouteRefs().contains(routeRef)) {
+						d.getRouteRefs().add(routeRef);
+						try {
+							actilityCoreService.updateDevice(d.getRef(), d).execute();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void removeRoutings(String tenant) {
+		try {
+			Response<List<DeviceCreate>> response = actilityCoreService.getDevices().execute();
+			if (response.isSuccessful()) {
+				response.body().forEach(d -> {
+					if (d.getRouteRefs().contains(routeRef)) {
+						d.getRouteRefs().remove(routeRef);
+						try {
+							actilityCoreService.updateDevice(d.getRef(), d).execute();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		try {
 			Response<List<Connection>> response = actilityCoreService.getConnections().execute();
 			if (response.isSuccessful()) {
@@ -244,9 +278,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 					if (connection.getName().equals(tenant + "-" + this.getId())) {
 						try {
 							actilityCoreService.deleteConnection(connection.getId()).execute();
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (IllegalStateException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}

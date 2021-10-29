@@ -42,13 +42,9 @@
 						<phase>package</phase>
 						<goals>
 							<goal>package</goal>
-							<goal>upload</goal>
 						</goals>
 						<configuration>
-							<name>${project.artifactId}</name>
-							<image>${project.artifactId}</image>
-							<encoding>UTF-8</encoding>
-							<skipMicroserviceUpload>false</skipMicroserviceUpload>
+							<deleteImage>false</deleteImage>
 						</configuration>
 					</execution>
 				</executions>
