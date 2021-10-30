@@ -16,7 +16,7 @@ export class CustomCodec {
         try {
             this.vm = new NodeVM({
                 eval: false,
-                require: { external: ['c8y-codec-interface'] , import: ['c8y-codec-interface'] },
+                require: { external: ['lora-codec-interface'] , import: ['lora-codec-interface'] },
             });
         } catch(e) {
             console.error("Can't create new VM.", e);
@@ -36,7 +36,7 @@ export class CustomCodec {
     public set decodeString(newDecodeString: string) {
         console.log("Compiling script...");
         try {
-            this.decodeScript = new VMScript("const { C8YData } = require('c8y-codec-interface');module.exports = function(device, fport, time, payload) { " + newDecodeString + " }").compile();
+            this.decodeScript = new VMScript("const { C8YData } = require('lora-codec-interface');module.exports = function(device, fport, time, payload) { " + newDecodeString + " }").compile();
         } catch(e) {
             console.error(e);
         }
@@ -44,7 +44,7 @@ export class CustomCodec {
     }
 
     public addEncodeString(operation:string, encodeString: string) {
-        this.encodeScripts.set(operation, new VMScript("const { DownlinkData } = require('c8y-codec-interface');module.exports = function(device, operation) { " + encodeString + " }").compile());
+        this.encodeScripts.set(operation, new VMScript("const { DownlinkData } = require('lora-codec-interface');module.exports = function(device, operation) { " + encodeString + " }").compile());
     }
 
     public decode(device: IManagedObject, fport: number, time: Date, payload: string): C8YData {
