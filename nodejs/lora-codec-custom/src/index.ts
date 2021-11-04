@@ -25,11 +25,11 @@ class CustomDeviceCodec extends DeviceCodec {
         return {devEui: devEui, fport: 1, payload: "01"};
     }
     getAvailableOperations(client: Client, model: string): Map<string, DeviceOperation> {
-        if (this.operations && this.operations.has(client) && this.operations.get(client).has(model)) {
-            return this.operations.get(client).get(model);
-        } else {
-            return new Map<string, DeviceOperation>();
-        }
+        let operations: Map<string, DeviceOperation> = new Map();
+        this.customCodecs.get(client).get(model).operations.forEach(o => {
+            operations.set(o.id, o);
+        })
+        return operations;
     }
     protected _decode(client: Client, mo: IManagedObject, model: string, fport: number, time: Date, payload: string): C8YData {
         return this.customCodecs.get(client).get(model).decode(mo, fport, time, payload);
@@ -39,7 +39,6 @@ class CustomDeviceCodec extends DeviceCodec {
     }
 
     customCodecs: Map<Client, Map<string, CustomCodec>> = new Map<Client, Map<string, CustomCodec>>();
-    operations: Map<Client, Map<string, Map<string, DeviceOperation>>> = new Map<Client, Map<string, Map<string, DeviceOperation>>>();
 
     constructor(serviceSubscriptionService: MicroserviceSubscriptionService) {
         super(serviceSubscriptionService);
@@ -47,16 +46,13 @@ class CustomDeviceCodec extends DeviceCodec {
             if (!this.customCodecs.has(client)) {
                 this.customCodecs.set(client, new Map<string, CustomCodec>());
             }
-            if (!this.operations.has(client)) {
-                this.operations.set(client, new Map<string, Map<string, DeviceOperation>>());
-            }
             (await client.inventory.list({type: 'CustomCodec'})).data.forEach(mo => {
                 this.customCodecs.get(client).set(mo.name, new CustomCodec(mo));
                 if (!mo.operations) {
-                    mo.operations = new Map<string, DeviceOperation>();
+                    mo.operations = new Array<DeviceOperation>();
                 }
                 if (mo.operations.size == 0) {
-                    mo.operations.set("test", {
+                    mo.operations.push({
                         id: "test",
                         name: "Sample operation",
                         params: [{
@@ -72,7 +68,7 @@ class CustomDeviceCodec extends DeviceCodec {
                         }]
                     });
                 }
-                this.operations.get(client).set(mo.name, mo.operations);
+                this.customCodecs.get(client).get(mo.name).operations = mo.operations;
             })
         });
     }
@@ -115,16 +111,21 @@ class CustomCodecApp extends CodecApp {
                 res.status(500);
             });
         });
+        this.app.post("/model/encoder", async (req: Request, res: Response, next: NextFunction) => {
+            subscriptionService.getClient(req).then(async client => {
+                let mo: IManagedObject = (await client.inventory.detail(req.body.id)).data;
+                codec.customCodecs.get(client).get(mo.name).encodeString = req.body.encodeString;
+                res.json(await client.inventory.update({id: req.body.id, encodeString: req.body.encodeString}));
+            }).catch(e => {
+                res.json({error: e.message});
+                res.status(500);
+            });
+        });
         this.app.post("/model/operation", async (req: Request, res: Response, next: NextFunction) => {
             subscriptionService.getClient(req).then(async client => {
                 let mo: IManagedObject = (await client.inventory.detail(req.body.id)).data;
-                codec.operations.get(client).get(mo.name).set(req.body.operationName, req.body.operation);
-                let operations: Map<string, DeviceOperation> = mo.operations || new Map<string, DeviceOperation>();
-                let encodeStrings : Map<string, string> = mo.encodeStrings || new Map<string, string>();
-                operations.set(req.body.operationName, req.body.operation);
-                encodeStrings.set(req.body.operationName, req.body.encodeString);
-                codec.customCodecs.get(client).get(mo.name).addEncodeString(req.body.operation, req.body.encodeString);
-                res.json(await client.inventory.update({id: mo.id, operations: operations, encodeStrings: encodeStrings}));
+                codec.customCodecs.get(client).get(mo.name).operations = req.body.operations;
+                res.json(await client.inventory.update({id: mo.id, operations: req.body.operations}));
             }).catch(e => {
                 res.json({error: e.message});
                 res.status(500);

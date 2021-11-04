@@ -1,5 +1,5 @@
 import { IManagedObject } from "@c8y/client";
-import { C8YData, DownlinkData } from "lora-codec-interface";
+import { C8YData, DownlinkData, DeviceOperation } from "lora-codec-interface";
 import { NodeVM, VMScript } from 'vm2';
 
 export class CustomCodec {
@@ -7,7 +7,8 @@ export class CustomCodec {
     name: string;
     id: string;
     decodeScript: VMScript;
-    encodeScripts: Map<string, VMScript> = new Map<string, VMScript>();
+    encodeScript: VMScript;
+    operations: Array<DeviceOperation>;
 
     constructor(mo: IManagedObject) {
         this.name = mo.name;
@@ -25,11 +26,13 @@ export class CustomCodec {
             console.log("Found a decode script: " + mo.decodeString);
             this.decodeString = mo.decodeString;
         }
-        if (mo.encodeStrings) {
-            console.log("Found an encode script: " + mo.decodeString);
-            mo.encodeStrings.forEach((encodeString: string, operation: string) => {
-                this.addEncodeString(operation, encodeString);
-            })
+        if (mo.encodeString) {
+            console.log("Found an encode script: " + mo.encodeString);
+            this.encodeString = mo.encodeString;
+        }
+        if (mo.operations) {
+            console.log("Found operations: " + mo.operations);
+            this.operations = mo.operations;
         }
     }
 
@@ -43,8 +46,14 @@ export class CustomCodec {
         console.log(this.decodeScript.code);
     }
 
-    public addEncodeString(operation:string, encodeString: string) {
-        this.encodeScripts.set(operation, new VMScript("const { DownlinkData } = require('lora-codec-interface');module.exports = function(device, operation) { " + encodeString + " }").compile());
+    public set encodeString(newEncodeString: string) {
+        console.log("Compiling script...");
+        try {
+            this.encodeScript = new VMScript("const { DownlinkData } = require('lora-codec-interface');module.exports = function(device, operation) { " + newEncodeString + " }").compile();
+        } catch(e) {
+            console.error(e);
+        }
+        console.log(this.decodeScript.code);
     }
 
     public decode(device: IManagedObject, fport: number, time: Date, payload: string): C8YData {
@@ -54,15 +63,9 @@ export class CustomCodec {
     }
 
     public encode(device: IManagedObject, operation: string): DownlinkData {
-        let result: DownlinkData = null;
+        console.log("Calling encoding script...");
+        console.log(this.vm.run(this.encodeScript));
         let operationJson: any = JSON.parse(operation);
-        let command: string = Object.keys(operationJson)[0];
-        console.log(`Will call command ${command} with parameters ${operationJson[command]}`);
-        if (this.encodeScripts.get(command)) {
-            result = this.vm.run(this.encodeScripts.get(command))(device, operationJson);
-        } else {
-            result = {fport: 1, payload: "000000", devEui: null};
-        }
-        return result;
+        return this.vm.run(this.encodeScript)(device, operationJson);
     }
 }

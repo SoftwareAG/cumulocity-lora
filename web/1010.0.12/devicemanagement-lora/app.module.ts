@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { RouterModule as NgRouterModule } from '@angular/router';
 import { UpgradeModule as NgUpgradeModule } from '@angular/upgrade/static';
 import { CoreModule, HOOK_NAVIGATOR_NODES, HOOK_ONCE_ROUTE, RouterModule, ViewContext } from '@c8y/ngx-components';
@@ -59,7 +60,6 @@ class C8YData {
   clearAlarm(alarmType: string): void;
 }
 class DownlinkData {
-  devEui: string;
   fport: number;
   payload: string;
 }
@@ -270,6 +270,7 @@ declare var Buffer: {
     // Upgrade module must be the first
     UpgradeModule,
     BrowserAnimationsModule,
+    CollapseModule.forRoot(),
     RouterModule.forRoot(),
     NgRouterModule.forRoot([
       {

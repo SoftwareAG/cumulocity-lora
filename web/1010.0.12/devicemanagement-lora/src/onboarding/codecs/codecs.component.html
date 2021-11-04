@@ -3,12 +3,16 @@
     <div class="col-sm-3"></div>
     <div class="tabContainer hidden-xs col-sm-9">
         <ul class="nav nav-tabs nav-tabsc8y">
-            <li [class]="uplink">
-                <a routerlinkactive="" title="Uplink" (click)="goToUplink()"><i class="fa fw fa-upload"></i><span class="txt">Uplink</span></a>
+            <li [class]="uplinkTab">
+                <a routerlinkactive="" title="Uplink" (click)="goToUplink()"><i class="dlt-c8y-icon-upload"></i><span class="txt">Uplink</span></a>
             </li>
-            <li [class]="downlink">
-                <a routerlinkactive="" title="Downlink" (click)="goToDownlink()"><i class="fa fw fa-download"></i><span
+            <li [class]="downlinkTab">
+                <a routerlinkactive="" title="Downlink" (click)="goToDownlink()"><i class="dlt-c8y-icon-download"></i><span
                         class="txt">Downlink</span></a>
+            </li>
+            <li [class]="operationsTab">
+                <a routerlinkactive="" title="Operations" (click)="goToOperations()"><i class="dlt-c8y-icon-stack"></i><span
+                        class="txt">Operations</span></a>
             </li>
         </ul>
     </div>
@@ -18,11 +22,11 @@
         <div class="card-block">
             <div class="form-group col-sm-12">
                 <div class="c8y-select-wrapper">
-                <label for="codec">Select Codec:</label>
-                <select #codec class="form-control" (change)="changeCodec(codec.value)" [(ngModel)]="currentCodec">
-                    <option *ngFor="let c of codecs | keyvalue" [value]="c.key">{{c.value.name}}</option>
-                </select>
-            </div>
+                    <label for="codec">Select Codec:</label>
+                    <select #codec class="form-control" (change)="changeCodec(codec.value)" [(ngModel)]="currentCodec">
+                        <option *ngFor="let c of codecs | keyvalue" [value]="c.key">{{c.value.name}}</option>
+                    </select>
+                </div>
             </div>
             <div class="form-group col-sm-12">
                 <button type="button" class="btn btn-danger" (click)="removeCodec()">Remove current codec</button>
@@ -36,7 +40,7 @@
             </div>
         </div>
     </div>
-    <div class="card col-sm-9" *ngIf="uplink === 'active'">
+    <div class="card col-sm-9" *ngIf="uplinkTab === 'active'">
         <div class="card-header" style="height: 60px">
             <h3>Decoding function</h3>
         </div>
@@ -45,29 +49,126 @@
         </div>
         <div class="card-block" style="overflow: visible">
             <div class="card" style="height: 400px">
-                <ngx-monaco-editor style="height: 100%" [options]="editorOptions" [(ngModel)]="code">
+                <ngx-monaco-editor style="height: 100%" [options]="editorOptions" [(ngModel)]="decodingScript">
                 </ngx-monaco-editor>
             </div>
         </div>
         <div class="card-footer">
             <div class="form-group col-sm-12">
-                <button type="button" class="btn btn-primary" (click)="saveDecoder()">Save codec</button>
+                <button type="button" class="btn btn-primary" (click)="saveDecoder()">Save decoder</button>
             </div>
         </div>
     </div>
-    <div class="card col-sm-9" *ngIf="downlink === 'active'">
-        <div class="card-header separator" style="height: 100px">
-            WIP
+    <div class="card col-sm-9" *ngIf="downlinkTab === 'active'">
+        <div class="card-header" style="height: 60px">
+            <h3>Encoding function</h3>
+        </div>
+        <div class="card-header separator" style="height: 40px;font-family: Consolas, 'Courier New', monospace; color: rgb(212, 212, 212); background-color: black;">
+            encode(device: IManagedObject, operation: any): DonwlinkData
         </div>
         <div class="card-block" style="overflow: visible">
             <div class="card" style="height: 400px">
-                <ngx-monaco-editor style="height: 100%" [options]="editorOptions" [(ngModel)]="code">
+                <ngx-monaco-editor style="height: 100%" [options]="editorOptions" [(ngModel)]="encodingScript">
                 </ngx-monaco-editor>
             </div>
         </div>
         <div class="card-footer">
             <div class="form-group col-sm-12">
-                <button type="button" class="btn btn-primary">Save codec</button>
+                <button type="button" class="btn btn-primary" (click)="saveEncoder()">Save encoder</button>
+            </div>
+        </div>
+    </div>
+    <div class="card col-sm-9" *ngIf="operationsTab === 'active'">
+        <div class="card-header" style="height: 60px">
+            <h3>Operation definitions</h3>
+        </div>
+        <div class="card-block" style="overflow: visible">
+            <c8y-list-group>
+                <c8y-li><h4>Operations</h4></c8y-li>
+                <c8y-li *ngFor="let operation of operations" #li>
+                    <button class="btn-clean" (click)="li.collapsed = !li.collapsed">
+                        {{ operation.name || '&lt;no name&gt;' }}
+                    </button>
+                    <c8y-li-action (click)="deleteOperation(operation)" icon="times">
+                        Delete operation
+                    </c8y-li-action>
+                    <c8y-li-collapse>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label for="operationId">Operation id:</label>
+                                <input #operationId type="text" [(ngModel)]="operation.id">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="operationId">Operation name:</label>
+                                <input #operationName type="text" [(ngModel)]="operation.name">
+                            </div>
+                        </div>
+                        <c8y-li><h4>Parameters</h4></c8y-li>
+                        <c8y-li *ngFor="let param of operation.params" #pli>
+                            <button class="btn-clean" (click)="pli.collapsed = !pli.collapsed">
+                                {{ param.name || '&lt;no name&gt;' }} {{ param.type || '&lt;no type&gt;'}}
+                            </button>
+                            <c8y-li-action (click)="deleteParam(operation, param)" icon="times">
+                                Delete parameter
+                            </c8y-li-action>
+                            <c8y-li-collapse>
+                                <div class="row">
+                                    <div class="form-group col-sm-3">
+                                        <label for="paramId">Parameter id:</label>
+                                        <input #paramId type="text" [(ngModel)]="param.id">
+                                    </div>
+                                    <div class="form-group col-sm-3">
+                                        <label for="paramId">Parameter name:</label>
+                                        <input #paramName type="text" [(ngModel)]="param.name">
+                                    </div>
+                                    <div class="form-group col-sm-3">
+                                        <div class="c8y-select-wrapper">
+                                            <label for="paramType">Select type:</label>
+                                            <select #paramType class="form-control" [(ngModel)]="param.type">
+                                                <option value="STRING">STRING</option>
+                                                <option value="INTEGER">INTEGER</option>
+                                                <option value="FLOAT">FLOAT</option>
+                                                <option value="BOOL">BOOL</option>
+                                                <option value="DATE">DATE</option>
+                                                <option value="ENUM">ENUM</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="param.type === 'ENUM'" class="col-sm-3">
+                                        <c8y-list-group>
+                                            <c8y-li *ngFor="let v of param.value; let i = index;trackBy:trackByIdx">
+                                                <c8y-li-action (click)="deleteValue(param, param.value[i])" icon="times">
+                                                    Delete value
+                                                </c8y-li-action>
+                                                <input type="text" [(ngModel)]="param.value[i]" size="10">
+                                            </c8y-li>
+                                            <c8y-li>
+                                                <button class="btn-primary" (click)="addValue(param)">
+                                                    Add value
+                                                </button>
+                                            </c8y-li>
+                                        </c8y-list-group>
+                                    </div>
+                                </div>
+                            </c8y-li-collapse>
+                        </c8y-li>
+                        <c8y-li>
+                            <button class="btn-primary" (click)="addParam(operation)">
+                                Add parameter
+                            </button>
+                        </c8y-li>
+                    </c8y-li-collapse>
+                </c8y-li>
+                <c8y-li>
+                    <button class="btn-primary" (click)="addOperation()">
+                        Add operation
+                    </button>
+                </c8y-li>
+            </c8y-list-group>
+        </div>
+        <div class="card-footer">
+            <div class="form-group col-sm-12">
+                <button type="button" class="btn btn-primary" (click)="saveOperations()">Save operations</button>
             </div>
         </div>
     </div>
