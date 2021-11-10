@@ -1,4 +1,4 @@
-package lora.codec;
+package lora.codec.uplink;
 
 import com.google.common.io.BaseEncoding;
 

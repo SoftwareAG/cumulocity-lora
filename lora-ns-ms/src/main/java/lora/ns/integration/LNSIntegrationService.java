@@ -49,7 +49,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import c8y.Hardware;
-import lora.codec.C8YData;
+import lora.codec.uplink.C8YData;
 import lora.common.C8YUtils;
 import lora.common.ValidationResult;
 import lora.ns.DeviceData;

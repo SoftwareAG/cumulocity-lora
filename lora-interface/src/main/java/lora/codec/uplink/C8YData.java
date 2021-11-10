@@ -1,4 +1,4 @@
-package lora.codec;
+package lora.codec.uplink;
 
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;

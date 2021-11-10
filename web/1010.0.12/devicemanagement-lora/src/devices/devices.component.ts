@@ -3,7 +3,10 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FetchClient, InventoryService, IManagedObject, IOperation, IdentityService, OperationService, IEvent, EventService } from '@c8y/client';
 import { ActivatedRoute } from '@angular/router';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-
+import { FormGroup } from '@angular/forms';
+import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { DeviceOperation } from '../../src/onboarding/codecs/DeviceOperation';
+import { DeviceOperationElement, ParamType } from '../../src/onboarding/codecs/DeviceOperationElement';
 
 @Component({
     selector: 'devices',
@@ -13,7 +16,7 @@ export class DevicesComponent implements OnInit {
     async ngOnInit(): Promise<void> {
 
     }
-    commands: [{}];
+    commands: {};
     device: IManagedObject;
     model: string;
     codec: string;
@@ -27,7 +30,30 @@ export class DevicesComponent implements OnInit {
     codecMap: {};
     models: Map<string, string>;
     unprocessedPayloads: IEvent[];
+    lnsProxies: IManagedObject[];
+    lnsInstances: IManagedObject[];
+    proxyMap: {};
+    instanceMap: {};
+    commandChoice: string;
 
+    form = new FormGroup({});
+    parameterValues: any = {};
+    options: FormlyFormOptions = {};
+    fields: FormlyFieldConfig[][] = new Array<FormlyFieldConfig[]>();
+
+    private lnsProxyFilter: object = {
+        type: 'LoRa Network Server agent',
+        // paging information will be a part of the response now
+        withTotalPages: true,
+        pageSize: 1000
+    };
+
+    private instanceFilter: object = {
+        type: 'LNS Connector',
+        // paging information will be a part of the response now
+        withTotalPages: true,
+        pageSize: 1000
+    };
 
     private codecsFilter: object = {
         type: 'Device Codec',
@@ -39,8 +65,32 @@ export class DevicesComponent implements OnInit {
     constructor(public route: ActivatedRoute, private inventory: InventoryService, private identity: IdentityService, private operationService: OperationService, private fetch: FetchClient, private modalService: BsModalService, private eventService: EventService) {
         console.log(route.snapshot.parent.data.contextData.id);
         // _ annotation to mark this string as translatable string.
-        this.getCodecAndModel();
-        this.loadCodecs();
+        this.init();
+    }
+
+    async init() {
+        await this.getCodecAndModel();
+        await this.loadCodecs();
+        await this.loadProxies();
+        await this.loadInstances()
+    }
+
+    async loadProxies() {
+        const { data, res, paging } = await this.inventory.list(this.lnsProxyFilter);
+        this.lnsProxies = data;
+        this.proxyMap = {};
+        data.forEach(proxy => this.proxyMap[proxy.lnsType] = proxy);
+        //console.log("Proxy Map:");
+        //console.log(this.proxyMap);
+    }
+
+    async loadInstances() {
+        const { data, res, paging } = await this.inventory.list(this.instanceFilter);
+        this.lnsInstances = data;
+        this.instanceMap = {};
+        data.forEach(instance => this.instanceMap[instance.id] = instance);
+        //console.log("Instance Map:");
+        //console.log(this.instanceMap);
     }
 
     async getCodecAndModel() {
@@ -49,7 +99,7 @@ export class DevicesComponent implements OnInit {
         this.device = data;
         if (this.device.codec) {
             this.codec = this.device.codec;
-            this.loadModels(this.device.codec);
+            await this.loadModels(this.device.codec);
         }
         if (this.device.useGatewayPosition === undefined) {
             this.useGatewayPosition = true;
@@ -58,7 +108,7 @@ export class DevicesComponent implements OnInit {
         }
         if (this.device.c8y_Hardware) {
             this.model = this.device.c8y_Hardware.model;
-            this.loadCommands();
+            await this.loadCommands();
         }
     }
 
@@ -67,6 +117,10 @@ export class DevicesComponent implements OnInit {
         this.getUnprocessPayloads();
         let response = await this.fetch.fetch('service/lora-codec-' + this.device.codec + '/operations/' + this.model);
         this.commands = await response.json();
+        console.log(this.commands);
+        Object.keys(this.commands).forEach(command => {
+            this.fields[command] = this.getFields(this.commands[command]);
+        });
         (await this.identity.list(deviceId)).data.forEach(extId => {
             if (extId.type === 'LoRa devEUI') {
                 this.devEui = extId.externalId;
@@ -74,7 +128,65 @@ export class DevicesComponent implements OnInit {
         });
     }
 
+    getFieldFromElement(element: DeviceOperationElement): FormlyFieldConfig {
+        let field: FormlyFieldConfig = {key: element.id, templateOptions: {label: element.name}};
+
+        switch(element.type) {
+            case ParamType.STRING:
+                field.type = 'input';
+                field.templateOptions.type = 'text';
+                field.templateOptions.required = true;
+                break;
+            case ParamType.INTEGER:
+            case ParamType.FLOAT:
+                field.type = 'input';
+                field.templateOptions.type = 'number';
+                field.templateOptions.required = true;
+                break;
+            case ParamType.BOOL:
+                field.type = 'checkbox';
+                break;
+            case ParamType.DATE:
+                field.type = 'input';
+                field.templateOptions.type = 'date';
+                break;
+            case ParamType.ENUM:
+                field.type = 'radio';
+                field.templateOptions.options = element.value.map(e => {return {label: e, value: e}});
+                break;
+            case ParamType.GROUP:
+                if (element.dependsOnParam) {
+                    field.hideExpression = () => {return this.parameterValues[element.dependsOnParamId] != element.dependsOnParamValue};
+                }
+                if (element.repeatable) {
+                    field.type = 'repeat';
+                    field.templateOptions.addText = 'Add ' + element.name;
+                    field.templateOptions.removeText = 'Remove ' + element.name;
+                    field.templateOptions.minOccur = element.minOccur;
+                    field.templateOptions.maxOccur = element.maxOccur;
+                    field.fieldArray = {templateOptions: {label: element.name}, wrappers: ['panel'], fieldGroup: element.elements.map(e => this.getFieldFromElement(e))};
+                    if (element.minOccur > 0) {
+                        field.defaultValue = [];
+                        for(var i=0;i<element.minOccur;i++) {
+                            field.defaultValue.push({});
+                        }
+                    }
+                } else {
+                    field.wrappers = ['panel'];
+                    field.fieldGroup = element.elements.map(e => this.getFieldFromElement(e));
+                }
+                break;
+        }
+
+        return field;
+    }
+
+    getFields(command: DeviceOperation): FormlyFieldConfig[] {
+        return command.elements.map(e => this.getFieldFromElement(e));
+    }
+
     async preview(command, parameters) {
+        console.log(parameters);
         let params = parameters ? JSON.stringify(parameters) : "{}";
         let toEncode = {
             devEui: this.devEui,

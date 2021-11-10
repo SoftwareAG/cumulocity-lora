@@ -22,13 +22,14 @@ import org.springframework.stereotype.Component;
 
 import c8y.Configuration;
 import c8y.RequiredAvailability;
-import lora.codec.C8YData;
-import lora.codec.Decode;
 import lora.codec.DeviceCodec;
-import lora.codec.DeviceOperation;
-import lora.codec.DeviceOperationParam;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
+import lora.codec.downlink.DeviceOperation;
+import lora.codec.downlink.DeviceOperationElement;
+import lora.codec.downlink.DeviceOperationElement.ParamType;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 
 @Component
 public class ACSSwitchCodec extends DeviceCodec {
@@ -400,17 +401,17 @@ public class ACSSwitchCodec extends DeviceCodec {
 
 	@Override
 	public Map<String, DeviceOperation> getAvailableOperations(String model) {
-		Map<String, DeviceOperation> result = new HashMap<String, DeviceOperation>();
+		Map<String, DeviceOperation> result = new HashMap<>();
 		
 		result.put("get config", new DeviceOperation("get config", "get config", null));
 		
 		for(PARAMETER param: PARAMETER.values()) {
-			List<DeviceOperationParam> params = new ArrayList<DeviceOperationParam>();
+			List<DeviceOperationElement> params = new ArrayList<>();
 			if (param.values == null) {
-				params.add(new DeviceOperationParam(param.name(), param.label, DeviceOperationParam.ParamType.INTEGER, null));
+				params.add(new DeviceOperationElement(param.name(), param.label, ParamType.INTEGER));
 			} else {
 				for (ParamValue value: param.values) {
-					params.add(new DeviceOperationParam(value.name, value.name, DeviceOperationParam.ParamType.INTEGER, null));
+					params.add(new DeviceOperationElement(value.name, value.name, ParamType.INTEGER));
 				}
 			}
 			result.put(param.name(), new DeviceOperation(param.name(), param.label, params));

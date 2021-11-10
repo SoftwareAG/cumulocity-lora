@@ -1,16 +1,21 @@
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { FormlyModule } from '@ngx-formly/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule as NgRouterModule } from '@angular/router';
 import { UpgradeModule as NgUpgradeModule } from '@angular/upgrade/static';
-import { CoreModule, HOOK_NAVIGATOR_NODES, HOOK_ONCE_ROUTE, RouterModule, ViewContext } from '@c8y/ngx-components';
+import { CoreModule, DynamicFormsModule, HOOK_NAVIGATOR_NODES, HOOK_ONCE_ROUTE, RouterModule, ViewContext } from '@c8y/ngx-components';
 import { AssetsNavigatorModule } from '@c8y/ngx-components/assets-navigator';
-import { SubAssetsModule } from '@c8y/ngx-components/sub-assets';
+import { BinaryFileDownloadModule } from '@c8y/ngx-components/binary-file-download';
 import { DeviceGridExampleModule } from '@c8y/ngx-components/device-grid-example';
 import { DeviceProfileModule } from '@c8y/ngx-components/device-profile';
 import { OperationsModule } from '@c8y/ngx-components/operations';
 import { ImpactProtocolModule } from '@c8y/ngx-components/protocol-impact';
+import { LoraProtocolModule } from '@c8y/ngx-components/protocol-lora';
 import { OpcuaProtocolModule } from '@c8y/ngx-components/protocol-opcua';
 import { RepositoryModule } from '@c8y/ngx-components/repository';
+import { SearchModule } from '@c8y/ngx-components/search';
+import { SubAssetsModule } from '@c8y/ngx-components/sub-assets';
 import { TrustedCertificatesModule } from '@c8y/ngx-components/trusted-certificates';
 import {
   DashboardUpgradeModule,
@@ -18,23 +23,23 @@ import {
   UpgradeModule,
   UPGRADE_ROUTES
 } from '@c8y/ngx-components/upgrade';
-import { BinaryFileDownloadModule } from '@c8y/ngx-components/binary-file-download';
-import { SearchModule } from '@c8y/ngx-components/search';
-import { LoraProtocolModule } from '@c8y/ngx-components/protocol-lora';
-import { LoraNavigationFactory } from './factories/Navigation';
-import { GroupsComponent } from './src/groups/groups.component';
-import { DevicesComponent } from './src/devices/devices.component';
-import { LoraGuard } from './src/devices/lora.guard';
-import { LoraDevicesComponent, PropertyPipe } from './src/onboarding/devices/devices.component';
-import { LoraCodecsComponent } from './src/onboarding/codecs/codecs.component';
-import { LNSComponent } from './src/onboarding/lns/lns.component';
-import { LoRaConfigComponent } from './src/config/config.component';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { PopoverModule } from 'ngx-bootstrap/popover';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
-import { PopoverModule, PopoverConfig } from 'ngx-bootstrap/popover';
+import { LoraNavigationFactory } from './factories/Navigation';
+import { LoRaConfigComponent } from './src/config/config.component';
+import { DevicesComponent } from './src/devices/devices.component';
+import { LoraGuard } from './src/devices/lora.guard';
+import { GroupsComponent } from './src/groups/groups.component';
+import { LoraCodecsComponent } from './src/onboarding/codecs/codecs.component';
+import { RepeatTypeComponent } from './src/onboarding/codecs/repeat-section.type';
+import { LoraDevicesComponent, PropertyPipe } from './src/onboarding/devices/devices.component';
 import { LNSEditComponent } from './src/onboarding/lns/lns-edit.component';
+import { LNSComponent } from './src/onboarding/lns/lns.component';
+import { PanelWrapperComponent } from './src/devices/panel-wrapper.component';
 
 const monacoConfig: NgxMonacoEditorConfig = {
   //baseUrl: 'app-name/assets', // configure base path for monaco editor default: './assets'
@@ -59,7 +64,6 @@ class C8YData {
   clearAlarm(alarmType: string): void;
 }
 class DownlinkData {
-  devEui: string;
   fport: number;
   payload: string;
 }
@@ -264,12 +268,14 @@ declare var Buffer: {
 };
 
 @NgModule({
-  declarations: [GroupsComponent, DevicesComponent, LoraDevicesComponent, LNSComponent, LNSEditComponent, LoraCodecsComponent, LoRaConfigComponent, PropertyPipe],
+  declarations: [GroupsComponent, DevicesComponent, LoraDevicesComponent, LNSComponent, LNSEditComponent, LoraCodecsComponent, LoRaConfigComponent, PropertyPipe, RepeatTypeComponent, PanelWrapperComponent],
   entryComponents: [GroupsComponent, DevicesComponent],
   imports: [
     // Upgrade module must be the first
     UpgradeModule,
     BrowserAnimationsModule,
+    DynamicFormsModule,
+    CollapseModule.forRoot(),
     RouterModule.forRoot(),
     NgRouterModule.forRoot([
       {
@@ -316,7 +322,15 @@ declare var Buffer: {
     BsDatepickerModule.forRoot(),
     TimepickerModule.forRoot(),
     ModalModule.forRoot(),
-    PopoverModule
+    PopoverModule,
+    ReactiveFormsModule,
+    FormlyModule.forRoot({
+      types: [
+        { name: 'repeat', component: RepeatTypeComponent },
+      ],
+      wrappers: [
+        { name: 'panel', component: PanelWrapperComponent },
+      ],    })
   ],
   providers: [
     LoraGuard,

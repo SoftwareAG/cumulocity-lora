@@ -7,12 +7,11 @@ import java.util.Map;
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
-import com.google.common.io.BaseEncoding;
 
 import org.junit.jupiter.api.Test;
 
-import lora.codec.C8YData;
-import lora.codec.Decode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 
 public class TestDecode {
 	

@@ -3,7 +3,7 @@ package lora.ns.gateway;
 import java.math.BigDecimal;
 
 import c8y.ConnectionState;
-import lora.codec.C8YData;
+import lora.codec.uplink.C8YData;
 
 public class Gateway {
     private String id;

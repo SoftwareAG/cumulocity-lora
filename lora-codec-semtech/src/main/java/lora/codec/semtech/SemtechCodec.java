@@ -21,12 +21,12 @@ import org.springframework.stereotype.Component;
 
 import c8y.Command;
 import c8y.Position;
-import lora.codec.C8YData;
-import lora.codec.Decode;
 import lora.codec.DeviceCodec;
-import lora.codec.DeviceOperation;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
+import lora.codec.downlink.DeviceOperation;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

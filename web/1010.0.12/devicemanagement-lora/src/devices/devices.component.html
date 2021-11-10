@@ -23,62 +23,99 @@
 
 <c8y-title translate>LoRa device operations</c8y-title>
 
-<div class="row">
-    <div class="card col-sm-4" *ngIf="device != undefined">
-        <div class="card-header separator">
-            <h4 class="card-title">{{'Configure device codec' | translate}}</h4>
-        </div>
-        <div class="card-block">
-            <c8y-form-group class="col-sm-12">
-                <div class="c8y-select-wrapper">
-                    <label for="model">Type:</label>
-                    <select class="form-control" [(ngModel)]="codec" (change)="loadModels(codec)"
-                        required>
-                        <option [ngValue]="undefined" [disabled]="true">Please select a type</option>
-                        <option *ngFor="let codec of codecs" [value]="codec.lora_codec_DeviceCodecRepresentation.id">
-                            {{codec.lora_codec_DeviceCodecRepresentation.name}}</option>
-                    </select>
+<div class="car-group">
+    <div class="col-sm-6">
+        <div class="card" *ngIf="device != undefined">
+            <div class="card-header separator">
+                <h4 class="card-title">{{'Configure device codec' | translate}}</h4>
+            </div>
+            <div class="card-block">
+                <c8y-form-group class="col-sm-12">
+                    <div class="c8y-select-wrapper">
+                        <label for="model">Type:</label>
+                        <select class="form-control" [(ngModel)]="codec" (change)="loadModels(codec)"
+                            required>
+                            <option [ngValue]="undefined" [disabled]="true">Please select a type</option>
+                            <option *ngFor="let codec of codecs" [value]="codec.lora_codec_DeviceCodecRepresentation.id">
+                                {{codec.lora_codec_DeviceCodecRepresentation.name}}</option>
+                        </select>
+                    </div>
+                </c8y-form-group>
+                <c8y-form-group class="col-sm-12">
+                    <div class="c8y-select-wrapper">
+                        <label for="model">Model:</label>
+                        <select class="form-control" [(ngModel)]="model">
+                            <option [ngValue]="undefined" [disabled]="true">Please select a model</option>
+                            <option *ngFor="let m of models | keyvalue" [value]="m.key">{{m.value}}</option>
+                        </select>
+                    </div>
+                </c8y-form-group>
+                <c8y-form-group class="col-sm-12">
+                    <label class="c8y-checkbox"><input class="form-control" type="checkbox" [(ngModel)]="useGatewayPosition" name="useGatewayPosition" /><span></span>Use gateway position</label>
+                </c8y-form-group>
+            </div>
+            <div class="card-footer">
+                <div class="form-group">
+                    <button type="button" (click)="updateDeviceCodec()" class="btn btn-primary">
+                        Update device codec
+                    </button>
                 </div>
-            </c8y-form-group>
-            <c8y-form-group class="col-sm-12">
-                <div class="c8y-select-wrapper">
-                    <label for="model">Model:</label>
-                    <select class="form-control" [(ngModel)]="model">
-                        <option [ngValue]="undefined" [disabled]="true">Please select a model</option>
-                        <option *ngFor="let m of models | keyvalue" [value]="m.key">{{m.value}}</option>
-                    </select>
-                </div>
-            </c8y-form-group>
-            <c8y-form-group class="col-sm-12">
-                <label class="c8y-checkbox"><input class="form-control" type="checkbox" [(ngModel)]="useGatewayPosition" name="useGatewayPosition" /><span></span>Use gateway position</label>
-            </c8y-form-group>
-        </div>
-        <div class="card-footer">
-            <div class="form-group">
-                <button type="button" (click)="updateDeviceCodec()" class="btn btn-primary">
-                    Update device codec
-                </button>
             </div>
         </div>
     </div>
-    <div class="col-sm-1"></div>
-    <div class="card col-sm-4">
-        <div class="card-header separator">
-            <h4 class="card-title">{{'Unprocessed payloads' | translate}}</h4>
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-header separator">
+                <h4 class="card-title">{{'Unprocessed payloads' | translate}}</h4>
+            </div>
+            <div class="card-block"><span>{{unprocessedPayloads? unprocessedPayloads.length : 0}}</span> unprocessed payloads</div>
+            <div class="card-footer">
+                <div class="form-group">
+                    <button type="button" (click)="processPayloads()" class="btn btn-primary" [disabled]="!unprocessedPayloads">
+                        Process unprocessed payloads
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="card-block"><span>{{unprocessedPayloads? unprocessedPayloads.length : 0}}</span> unprocessed payloads</div>
-        <div class="card-footer">
-            <div class="form-group">
-                <button type="button" (click)="processPayloads()" class="btn btn-primary" [disabled]="!unprocessedPayloads">
-                    Process unprocessed payloads
-                </button>
+    </div>
+    <div class="col-sm-6" *ngIf="device">
+        <div class="card">
+            <div class="card-header separator">
+                <h4 class="card-title">{{'LNS Connector' | translate}}</h4>
+            </div>
+            <div class="card-block">
+                <c8y-form-group [hasError]="instanceSelect.invalid && (instanceSelect.dirty || instanceSelect.touched)">
+                    <div class="c8y-select-wrapper">
+                        <label for="instanceSelect">LoRa network server connectors:</label>
+                        <select class="form-control" name="instanceSelect"
+                            #instanceSelect="ngModel" [(ngModel)]="device.lnsConnectorId"
+                            (change)="loadProperties(instanceSelect.value)">
+                            <option [ngValue]="undefined" [disabled]="true">Please select a connector</option>
+                            <option *ngFor="let instance of lnsInstances" [value]="instance.id">
+                                {{instance.name}} -
+                                {{proxyMap[instance.lnsType].name}}</option>
+                        </select>
+                    </div>
+                    <c8y-messages
+                        *ngIf="instanceSelect.invalid && (instanceSelect.dirty || instanceSelect.touched)">
+                        <c8y-message name="required" *ngIf="instanceSelect.errors?.required">The connector is required
+                        </c8y-message>
+                    </c8y-messages>
+                </c8y-form-group>
+            </div>
+            <div class="card-footer">
+                <div class="form-group">
+                    <button type="button" (click)="updateConnector()" class="btn btn-primary">
+                        Update connector
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="card col-sm-9">
+    <div class="card col-sm-12">
         <div class="card-header separator">
             <h4 class="card-title">{{'Send a command to the device' | translate}}</h4>
         </div>
@@ -86,16 +123,16 @@
             <div class="col-sm-12">
                 <div class="c8y-select-wrapper">
                     <label for="model">Command:</label>
-                    <select class="form-control" #commandChoice>
+                    <select class="form-control" [(ngModel)]="commandChoice">
                         <option [value]="empty" [disabled]="true">Please select a command</option>
                         <option *ngFor="let command of commands | keyvalue" [value]="command.value.id">
                             {{command.value.name}}</option>
                     </select>
                 </div>
             </div>
-            <form #parameterValues="ngForm">
+            <!--<form #parameterValues="ngForm">
                 <div *ngIf="commandChoice && commandChoice.value && commandChoice.value !== 'empty' && commands && commands[commandChoice.value]">
-                    <div *ngFor="let parameter of commands[commandChoice.value].params" [ngClass]="parameter.type === 'SEPARATOR' ? 'col-sm-12' : 'col-sm-6'">
+                    <div *ngFor="let parameter of commands[commandChoice.value].elements" [ngClass]="parameter.type === 'SEPARATOR' ? 'col-sm-12' : 'col-sm-6'">
                         <div class="form-group" *ngIf="parameter.type === 'STRING'">
                             <label for="{{parameter.id}}">{{parameter.name}}:</label>
                             <input class="form-control" name="{{parameter.id}}" #{{parameter.id}}="ngModel" style="width: 100%" ngModel/>
@@ -119,17 +156,48 @@
                                     #{{parameter.id}}="ngModel" ngModel/><span></span>{{parameter.name}}</label>
                         </div>
                         <div class="parameter-separator" *ngIf="parameter.type === 'SEPARATOR'">{{parameter.name}}</div>
+                        <fieldset  *ngIf="parameter.type === 'GROUP' && (!parameter.dependsOnParam || (parameter.dependsOnParam && parameter.dependsOnParamValue == parameterValues.value[parameter.dependsOnParamId]))">
+                            <div class="legend">{{parameter.name}}</div>
+                            <div *ngFor="let parameter of parameter.elements" [ngClass]="parameter.type === 'SEPARATOR' ? 'col-sm-12' : 'col-sm-6'">
+                                <div class="form-group" *ngIf="parameter.type === 'STRING'">
+                                    <label for="{{parameter.id}}">{{parameter.name}}:</label>
+                                    <input class="form-control" name="{{parameter.id}}" #{{parameter.id}}="ngModel" style="width: 100%" ngModel/>
+                                </div>
+                                <div class="form-group" *ngIf="parameter.type === 'ENUM'">
+                                    <label for="{{parameter.id}}">{{parameter.name}}:</label>
+                                    <select class="form-control" name="{{parameter.id}}" #{{parameter.id}}="ngModel" ngModel>
+                                        <option *ngFor="let option of parameter.value" [value]="option">{{option}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" *ngIf="parameter.type === 'INTEGER'">
+                                    <label for="{{parameter.id}}">{{parameter.name}}:</label>
+                                    <input class="form-control" type="number" name="{{parameter.id}}" #{{parameter.id}}="ngModel" style="width: 100%" ngModel/>
+                                </div>
+                                <div class="form-group" *ngIf="parameter.type === 'FLOAT'">
+                                    <label for="{{parameter.id}}">{{parameter.name}}:</label>
+                                    <input class="form-control" type="number" step="0.01" name="{{parameter.id}}" #{{parameter.id}}="ngModel" style="width: 100%" ngModel/>
+                                </div>
+                                <div class="form-group" *ngIf="parameter.type === 'BOOL'">
+                                    <label class="form-control" class="c8y-checkbox"><input type="checkbox" name="{{parameter.id}}"
+                                            #{{parameter.id}}="ngModel" ngModel/><span></span>{{parameter.name}}</label>
+                                </div>
+                                <div class="parameter-separator" *ngIf="parameter.type === 'SEPARATOR'">{{parameter.name}}</div>
+                            </div>
+                        </fieldset>
                     </div>
                 </div>
+            </form>-->
+            <form [formGroup]="form" *ngIf="fields">
+                <formly-form [model]="parameterValues" [fields]="fields[commandChoice]" [options]="options" [form]="form"></formly-form>
             </form>
         </div>
         <div class="card-footer">
-            <div class="form-group" *ngIf="commandChoice && commandChoice.value && commandChoice.value !== 'empty' && commands && commands[commandChoice.value]">
-                <button [disabled]="!parameterValues.form.valid" type="button" (click)="preview(commandChoice.value, parameterValues.value)"
+            <div class="form-group">
+                <button [disabled]="!form.valid" type="button" (click)="preview(commandChoice, parameterValues)"
                     class="btn btn-primary">
                     Preview command
                 </button>
-                <button [disabled]="!parameterValues.form.valid" type="button" (click)="send(commandChoice.value, parameterValues.value)"
+                <button [disabled]="!form.valid" type="button" (click)="send(commandChoice, parameterValues)"
                     class="btn btn-primary">
                     Send command
                 </button>

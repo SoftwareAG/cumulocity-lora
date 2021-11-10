@@ -28,7 +28,7 @@ import c8y.Availability;
 import c8y.Hardware;
 import c8y.IsDevice;
 import c8y.Position;
-import lora.codec.C8YData;
+import lora.codec.uplink.C8YData;
 import lora.common.C8YUtils;
 import lora.ns.agent.AgentService;
 import lora.ns.connector.LNSConnector;

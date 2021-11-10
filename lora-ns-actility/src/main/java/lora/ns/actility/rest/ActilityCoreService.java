@@ -69,10 +69,10 @@ public interface ActilityCoreService {
 	Call<List<DeviceCreate>> getDeviceByEUI(@Query("deviceEUI") String devEUI);
 
 	@Headers("Accept: application/json")
-	@GET("device")
+	@GET("device/{deviceRef}")
 	Call<DeviceCreate> getDevice(@Path("deviceRef") String deviceRef);
 
-	@DELETE("device")
+	@DELETE("devices/{deviceRef}")
 	Call<ResponseBody> deleteDevice(@Path("deviceRef") String deviceRef);
 
 	@Headers("Accept: application/json")

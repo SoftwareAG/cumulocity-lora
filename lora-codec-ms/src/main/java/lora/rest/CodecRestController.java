@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import lora.codec.Decode;
 import lora.codec.DeviceCodec;
-import lora.codec.DeviceOperation;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
 import lora.codec.Result;
+import lora.codec.downlink.DeviceOperation;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.Decode;
 
 @RestController
 public class CodecRestController {

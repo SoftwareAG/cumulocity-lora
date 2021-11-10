@@ -24,8 +24,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import c8y.ConnectionState;
-import lora.codec.C8YData;
-import lora.codec.DownlinkData;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.uplink.C8YData;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.EndDevice;

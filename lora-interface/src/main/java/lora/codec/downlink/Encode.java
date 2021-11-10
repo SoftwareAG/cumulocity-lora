@@ -1,4 +1,4 @@
-package lora.codec;
+package lora.codec.downlink;
 
 public class Encode {
 	private String devEui;

@@ -20,14 +20,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import c8y.RequiredAvailability;
-import lora.codec.C8YData;
-import lora.codec.Decode;
 import lora.codec.DeviceCodec;
-import lora.codec.DeviceOperation;
-import lora.codec.DeviceOperationParam;
-import lora.codec.DeviceOperationParam.ParamType;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
+import lora.codec.downlink.DeviceOperation;
+import lora.codec.downlink.DeviceOperationElement;
+import lora.codec.downlink.DeviceOperationElement.ParamType;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 
 @Component
 public class PyrescomCodec extends DeviceCodec {
@@ -131,17 +131,18 @@ public class PyrescomCodec extends DeviceCodec {
 
 	@Override
 	public Map<String, DeviceOperation> getAvailableOperations(String model) {
-		Map<String, DeviceOperation> result = new HashMap<String, DeviceOperation>();
+		Map<String, DeviceOperation> result = new HashMap<>();
 		
-		List<DeviceOperationParam> params = new ArrayList<DeviceOperationParam>();
-		params.add(new DeviceOperationParam("leds_enabled", "Leds enabled", ParamType.BOOL, null));
-		params.add(new DeviceOperationParam("back_light_enabled", "Back light enabled", ParamType.BOOL, null));
-		params.add(new DeviceOperationParam("orange_threshold", "Orange threshold", ParamType.INTEGER, null));
-		params.add(new DeviceOperationParam("red_threshold", "Red threshold", ParamType.INTEGER, null));
-		params.add(new DeviceOperationParam("day_hour", "Day hour", ParamType.INTEGER, null));
-		params.add(new DeviceOperationParam("night_hour", "Night hour", ParamType.INTEGER, null));
-		params.add(new DeviceOperationParam("hour_diff", "Hour diff in seconds", ParamType.INTEGER, null));
-		result.put("config", new DeviceOperation("config", "Config", params));
+		List<DeviceOperationElement> params = new ArrayList<>();
+		params.add(new DeviceOperationElement("leds_enabled", "Leds enabled", ParamType.BOOL));
+		params.add(new DeviceOperationElement("back_light_enabled", "Back light enabled", ParamType.BOOL));
+		params.add(new DeviceOperationElement("orange_threshold", "Orange threshold", ParamType.INTEGER));
+		params.add(new DeviceOperationElement("red_threshold", "Red threshold", ParamType.INTEGER));
+		params.add(new DeviceOperationElement("day_hour", "Day hour", ParamType.INTEGER));
+		params.add(new DeviceOperationElement("night_hour", "Night hour", ParamType.INTEGER));
+		params.add(new DeviceOperationElement("hour_diff", "Hour diff in seconds", ParamType.INTEGER));
+		result.put("config", new DeviceOperation("config", "Config"));
+		result.get("config").getElements().addAll(params);
 		
 		return result;
 	}

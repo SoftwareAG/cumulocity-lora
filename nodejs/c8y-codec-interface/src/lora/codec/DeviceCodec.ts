@@ -1,11 +1,11 @@
 import { IManagedObject, Client, IExternalIdentity, IIdentified, IAlarm, IResultList, AlarmStatus } from '@c8y/client';
-import { C8YData } from './C8YData';
-import { DownlinkData } from './DownLinkData';
+import { C8YData } from './uplink/C8YData';
+import { DownlinkData } from './downlink/DownLinkData';
 import { Component } from '../common/Component';
 import { MicroserviceSubscriptionService } from '../common/MicroserviceSubscriptionService';
-import { Decode } from './Decode';
-import { Encode } from './Encode';
-import { DeviceOperation } from './DeviceOperation';
+import { Decode } from './uplink/Decode';
+import { Encode } from './downlink/Encode';
+import { DeviceOperation } from './downlink/DeviceOperation';
 import { Result } from './Result';
 
 export abstract class DeviceCodec implements Component {

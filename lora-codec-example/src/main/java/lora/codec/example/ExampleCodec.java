@@ -9,11 +9,11 @@ import com.google.common.io.BaseEncoding;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
-import lora.codec.C8YData;
-import lora.codec.Decode;
 import lora.codec.DeviceCodec;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 
 @Component
 public class ExampleCodec extends DeviceCodec {

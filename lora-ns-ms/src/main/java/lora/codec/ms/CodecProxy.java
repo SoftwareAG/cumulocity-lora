@@ -13,11 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import lora.codec.Decode;
-import lora.codec.DeviceOperationParam;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
 import lora.codec.Result;
+import lora.codec.downlink.DeviceOperationElement;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.Decode;
 import lora.common.Component;
 
 public class CodecProxy implements Component {
@@ -103,8 +103,8 @@ public class CodecProxy implements Component {
 		return result;
 	}
 	
-	public Map<String, DeviceOperationParam> getAvailableOperations(String model) {
-		Map<String, DeviceOperationParam> result = null;
+	public Map<String, DeviceOperationElement> getAvailableOperations(String model) {
+		Map<String, DeviceOperationElement> result = null;
 		RestTemplate restTemplate = new RestTemplate();
 		try {
 			HttpHeaders headers = new HttpHeaders();
@@ -112,7 +112,7 @@ public class CodecProxy implements Component {
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 			String url = System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/operations/" + model;
 			logger.info("Will get list of operations from URL {}", url);
-			ResponseEntity<Map<String, DeviceOperationParam>> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<Map<String, DeviceOperationParam>>(){});
+			ResponseEntity<Map<String, DeviceOperationElement>> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<Map<String, DeviceOperationElement>>(){});
 			logger.info("Answer of decoder is {} with content {}", response.getStatusCode(), response.getBody());
 			result = response.getBody();
 		} catch(HttpClientErrorException e) {

@@ -17,6 +17,8 @@ module lora_interface {
     requires com.google.common;
 
     exports lora.codec;
+    exports lora.codec.uplink;
+    exports lora.codec.downlink;
     exports lora.common;
     exports lora.ns;
 }

@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import lora.codec.C8YData;
+import lora.codec.uplink.C8YData;
 
 @Service
 public class ZCLDecoder {

@@ -24,14 +24,14 @@ import org.springframework.stereotype.Component;
 import c8y.Configuration;
 import c8y.Position;
 import c8y.RequiredAvailability;
-import lora.codec.C8YData;
-import lora.codec.Decode;
 import lora.codec.DeviceCodec;
-import lora.codec.DeviceOperation;
-import lora.codec.DeviceOperationParam;
-import lora.codec.DeviceOperationParam.ParamType;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
+import lora.codec.downlink.DeviceOperation;
+import lora.codec.downlink.DeviceOperationElement;
+import lora.codec.downlink.DeviceOperationElement.ParamType;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 
 @Component
 public class LansitecCodec extends DeviceCodec {
@@ -404,13 +404,13 @@ public class LansitecCodec extends DeviceCodec {
 		result.put(POSITION_REQUEST, new DeviceOperation(POSITION_REQUEST, "Position request", null));
 		result.put(REGISTER_REQUEST, new DeviceOperation(REGISTER_REQUEST, "Register request", null));
 		result.put(DEVICE_REQUEST, new DeviceOperation(DEVICE_REQUEST, "Device request", null));
-		List<DeviceOperationParam> params = new ArrayList<>();
-		params.add(new DeviceOperationParam("breakpoint", "Breakpoint", ParamType.BOOL, false));
-		params.add(new DeviceOperationParam("selfadapt", "Selfadapt", ParamType.BOOL, false));
-		params.add(new DeviceOperationParam("oneoff", "OneOff", ParamType.BOOL, false));
-		params.add(new DeviceOperationParam("alreport", "Alreport", ParamType.BOOL, false));
-		params.add(new DeviceOperationParam("pos", "Position report", ParamType.INTEGER, null));
-		params.add(new DeviceOperationParam("hb", "Heartbeat", ParamType.INTEGER, null));
+		List<DeviceOperationElement> params = new ArrayList<>();
+		params.add(new DeviceOperationElement("breakpoint", "Breakpoint", ParamType.BOOL));
+		params.add(new DeviceOperationElement("selfadapt", "Selfadapt", ParamType.BOOL));
+		params.add(new DeviceOperationElement("oneoff", "OneOff", ParamType.BOOL));
+		params.add(new DeviceOperationElement("alreport", "Alreport", ParamType.BOOL));
+		params.add(new DeviceOperationElement("pos", "Position report", ParamType.INTEGER));
+		params.add(new DeviceOperationElement("hb", "Heartbeat", ParamType.INTEGER));
 		result.put(SET_CONFIG, new DeviceOperation(SET_CONFIG, "Set config", params));
 
 		return result;

@@ -19,12 +19,12 @@ import org.springframework.stereotype.Component;
 
 import c8y.Configuration;
 import c8y.RequiredAvailability;
-import lora.codec.C8YData;
-import lora.codec.Decode;
 import lora.codec.DeviceCodec;
-import lora.codec.DeviceOperation;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
+import lora.codec.downlink.DeviceOperation;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 
 @Component
 public class AxiomaCodec extends DeviceCodec {

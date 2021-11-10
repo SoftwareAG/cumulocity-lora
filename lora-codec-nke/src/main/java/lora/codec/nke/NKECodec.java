@@ -10,12 +10,12 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import lora.codec.C8YData;
-import lora.codec.Decode;
 import lora.codec.DeviceCodec;
-import lora.codec.DeviceOperation;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
+import lora.codec.downlink.DeviceOperation;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 
 @Component
 public class NKECodec extends DeviceCodec {
@@ -61,7 +61,7 @@ public class NKECodec extends DeviceCodec {
 
 	@Override
 	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
-		DeviceOperation deviceOperation = convertJsonStringToDeviceOperation(encode.getModel(), encode.getOperation());
+		DeviceOperation deviceOperation = convertJsonStringToDeviceOperation(encode.getOperation());
 		switch(ZCLCluster.valueOf(deviceOperation.getId())) {
 			case AnalogInput:
 				break;

@@ -4,15 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
-import com.google.common.io.BaseEncoding;
 
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 
-import lora.codec.C8YData;
-import lora.codec.Decode;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 
 public class TestCodec {
 	@Test

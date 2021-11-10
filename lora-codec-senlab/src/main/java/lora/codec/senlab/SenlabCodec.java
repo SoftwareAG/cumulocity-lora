@@ -12,10 +12,8 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.io.BaseEncoding;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +26,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import lora.codec.C8YData;
-import lora.codec.Decode;
 import lora.codec.DeviceCodec;
-import lora.codec.DeviceOperation;
-import lora.codec.DeviceOperationParam;
-import lora.codec.DeviceOperationParam.ParamType;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
+import lora.codec.downlink.DeviceOperation;
+import lora.codec.downlink.DeviceOperationElement;
+import lora.codec.downlink.DeviceOperationElement.ParamType;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 
 @Component
 public class SenlabCodec extends DeviceCodec {
@@ -257,11 +255,11 @@ public class SenlabCodec extends DeviceCodec {
 
 	@Override
 	public Map<String, DeviceOperation> getAvailableOperations(String model) {
-		Map<String, DeviceOperation> result = new HashMap<String, DeviceOperation>();
+		Map<String, DeviceOperation> result = new HashMap<>();
 		JsonNode desc = getModelDetails(model);
 		ArrayNode operations = (ArrayNode) desc.get("operations");
 		ArrayNode params = (ArrayNode) desc.get("parameters");
-		Map<String, JsonNode> paramMap = new HashMap<String, JsonNode>();
+		Map<String, JsonNode> paramMap = new HashMap<>();
 		params.forEach(param -> {
 			paramMap.put(param.get("id").asText(), param);
 		});
@@ -270,7 +268,7 @@ public class SenlabCodec extends DeviceCodec {
 			if (o.get("in") != null) {
 				paramIds = o.get("in").asText().split(",");
 			}
-			List<DeviceOperationParam> opParams = new ArrayList<>();
+			List<DeviceOperationElement> opParams = new ArrayList<>();
 			if (paramIds != null) {
 				for (String paramId : paramIds) {
 					paramId = paramId.trim();
@@ -296,13 +294,14 @@ public class SenlabCodec extends DeviceCodec {
 									type = ParamType.valueOf(param.get("is").asText());
 							}
 						}
-						opParams.add(new DeviceOperationParam(paramId, param.get("name").asText(), type, null));
+						opParams.add(new DeviceOperationElement(paramId, param.get("name").asText(), type));
 					} else {
 						logger.error("Param {} is not defined.", paramId);
 					}
 				}
 			}
-			result.put(o.get("id").asText(), new DeviceOperation(o.get("id").asText(), o.get("name").asText(), opParams));
+			result.put(o.get("id").asText(), new DeviceOperation(o.get("id").asText(), o.get("name").asText()));
+			result.get(o.get("id").asText()).getElements().addAll(opParams);
 		});
 		return result;
 	}

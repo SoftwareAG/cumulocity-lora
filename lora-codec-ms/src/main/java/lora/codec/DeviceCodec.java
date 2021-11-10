@@ -3,7 +3,9 @@ package lora.codec;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
@@ -34,6 +36,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import c8y.IsDevice;
+import lora.codec.downlink.DeviceOperation;
+import lora.codec.downlink.DeviceOperationElement;
+import lora.codec.downlink.DeviceOperationElement.ParamType;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 import lora.common.C8YUtils;
 import lora.common.Component;
 
@@ -262,48 +271,69 @@ public abstract class DeviceCodec implements Component {
 		return data;
 	}
 
-	public DeviceOperation convertJsonStringToDeviceOperation(String model, String operation) {
-		DeviceOperation deviceOperation = null;
+	public DeviceOperation convertJsonStringToDeviceOperation(String operation) {
+		final DeviceOperation deviceOperation = new DeviceOperation();
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root;
 		try {
 			root = mapper.readTree(operation);
 			String command = root.fieldNames().next();
-			deviceOperation = getAvailableOperations(model).get(command);
-			if (deviceOperation != null) {
-				Map<String, DeviceOperationParam> params = new HashMap<>();
-				JsonNode paramValues = root.get(command);
-				if (paramValues != null) {
-					for (DeviceOperationParam param: deviceOperation.getParams()) {
-						JsonNode value = paramValues.get(param.getId());
-						switch(param.getType()) {
-							case BOOL:
-								params.get(param.getId()).setValue(value.asBoolean());
-								break;
-							case STRING:
-							case ENUM:
-							case DATE:
-								params.get(param.getId()).setValue(value.asText());
-								break;
-							case FLOAT:
-								params.get(param.getId()).setValue(value.asDouble());
-								break;
-							case INTEGER:
-								params.get(param.getId()).setValue(value.asLong());
-								break;
-							case SEPARATOR:
-								break;
-							default:
-								break;
-						}
-					}
-				}
+			deviceOperation.setId(command);
+			JsonNode elements = root.get(command);
+			Iterator<Entry<String, JsonNode>> fields = elements.fields();
+			while(fields.hasNext()) {
+				Entry<String, JsonNode> field = fields.next();
+				deviceOperation.getElements().add(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		return deviceOperation;
+	}
+
+	private DeviceOperationElement convertJsonNodeToDeviceOperationElement(JsonNode node, String nodeName) {
+		DeviceOperationElement element = new DeviceOperationElement().id(nodeName);
+		switch (node.getNodeType()) {
+			case ARRAY:
+				element.setType(ParamType.GROUP);
+				element.setId(nodeName);
+				for (JsonNode field: node) {
+					element.getElements().add(convertJsonNodeToDeviceOperationElement(field, nodeName));
+				}
+				break;
+			case BOOLEAN:
+				element.setType(ParamType.BOOL);
+				element.setValue(node.asBoolean());
+				break;
+			case NUMBER:
+				if (node.isDouble() || node.isFloat() || node.isFloatingPointNumber()) {
+					element.setType(ParamType.FLOAT);
+					element.setValue(node.asDouble());
+				}
+				break;
+			case STRING:
+				element.setType(ParamType.STRING);
+				element.setValue(node.asText());
+				break;
+			case OBJECT:
+				element.setType(ParamType.GROUP);
+				element.setId(nodeName);
+				Iterator<Entry<String, JsonNode>> fields = node.fields();
+				while(fields.hasNext()) {
+					Entry<String, JsonNode> field = fields.next();
+					element.getElements().add(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
+				}
+				break;
+			case POJO:
+			case MISSING:
+			case NULL:
+			case BINARY:
+			default:
+				break;
+				
+		}
+		return element;
 	}
 
 	@Scheduled(initialDelay = 10000, fixedDelay = 300000)

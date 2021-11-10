@@ -1,7 +1,7 @@
 import { Client } from "@c8y/client";
 import express, { Request, Response, NextFunction } from "express";
 import { DeviceCodec, Decode, Encode, MicroserviceSubscriptionService } from "../..";
-import { DeviceOperation } from "../codec/DeviceOperation";
+import { DeviceOperation } from "../codec/downlink/DeviceOperation";
 import { Result } from "../codec/Result";
 
 export class CodecApp {

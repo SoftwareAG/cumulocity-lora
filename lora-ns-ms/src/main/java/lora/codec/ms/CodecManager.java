@@ -4,14 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.codec.binary.Hex;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Service;
-
 import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
@@ -30,14 +22,22 @@ import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.inventory.InventoryFilter;
 import com.cumulocity.sdk.client.inventory.ManagedObjectCollection;
 
+import org.apache.commons.codec.binary.Hex;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Service;
+
 import c8y.Command;
 import c8y.Hardware;
-import lora.codec.Decode;
 import lora.codec.DeviceCodecRepresentation;
-import lora.codec.DeviceOperationParam;
-import lora.codec.DownlinkData;
-import lora.codec.Encode;
 import lora.codec.Result;
+import lora.codec.downlink.DeviceOperationElement;
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
+import lora.codec.uplink.Decode;
 import lora.common.C8YUtils;
 import lora.ns.DeviceData;
 
@@ -212,8 +212,8 @@ public class CodecManager {
 		return data[0];
 	}
 	
-	public Map<String, DeviceOperationParam> getAvailableOperations(ManagedObjectRepresentation mor) {
-		Map<String, DeviceOperationParam> result = null;
+	public Map<String, DeviceOperationElement> getAvailableOperations(ManagedObjectRepresentation mor) {
+		Map<String, DeviceOperationElement> result = null;
 		if (mor.hasProperty(PROPERTY_CODEC)) {
 			CodecProxy codec = getCodec(mor.getProperty(PROPERTY_CODEC).toString());
 			Optional<MicroserviceCredentials> credentials = subscriptionsService.getCredentials(subscriptionsService.getTenant());

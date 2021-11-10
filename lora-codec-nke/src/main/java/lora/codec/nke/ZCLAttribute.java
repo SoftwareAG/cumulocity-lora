@@ -3,7 +3,7 @@ package lora.codec.nke;
 import java.util.HashMap;
 import java.util.Map;
 
-import lora.codec.DeviceOperation;
+import lora.codec.downlink.DeviceOperation;
 
 public enum ZCLAttribute {
     FirmwareVersion(0x0002, ZCLCluster.Basic),

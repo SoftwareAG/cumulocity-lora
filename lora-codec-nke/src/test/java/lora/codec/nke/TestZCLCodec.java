@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lora.codec.C8YData;
+import lora.codec.uplink.C8YData;
 
 public class TestZCLCodec {
 	

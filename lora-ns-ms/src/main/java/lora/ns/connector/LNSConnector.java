@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
-import lora.codec.DownlinkData;
+import lora.codec.downlink.DownlinkData;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;

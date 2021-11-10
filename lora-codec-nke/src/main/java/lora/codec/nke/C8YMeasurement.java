@@ -6,7 +6,7 @@ import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import org.joda.time.DateTime;
 
-import lora.codec.C8YData;
+import lora.codec.uplink.C8YData;
 
 public class C8YMeasurement implements C8YDataType {
 

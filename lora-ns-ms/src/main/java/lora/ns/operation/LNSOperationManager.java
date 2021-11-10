@@ -19,7 +19,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import c8y.Command;
-import lora.codec.DownlinkData;
+import lora.codec.downlink.DownlinkData;
 import lora.codec.ms.CodecManager;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
