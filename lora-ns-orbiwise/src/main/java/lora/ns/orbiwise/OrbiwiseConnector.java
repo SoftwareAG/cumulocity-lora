@@ -241,4 +241,12 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 	public List<Gateway> getGateways() {
 		return new ArrayList<>();
 	}
+
+	public boolean provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
+		return false;
+	}
+
+	public boolean deprovisionGateway(String id) {
+		return false;
+	}
 }

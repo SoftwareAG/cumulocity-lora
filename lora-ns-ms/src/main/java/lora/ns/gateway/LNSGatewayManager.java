@@ -15,7 +15,6 @@ import com.cumulocity.sdk.client.alarm.AlarmFilter;
 import com.cumulocity.sdk.client.event.EventApi;
 import com.cumulocity.sdk.client.identity.IdentityApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
-import com.cumulocity.sdk.client.inventory.ManagedObject;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
 
 import org.joda.time.DateTime;
@@ -28,9 +27,9 @@ import c8y.Availability;
 import c8y.Hardware;
 import c8y.IsDevice;
 import c8y.Position;
+import c8y.RequiredAvailability;
 import lora.codec.uplink.C8YData;
 import lora.common.C8YUtils;
-import lora.ns.agent.AgentService;
 import lora.ns.connector.LNSConnector;
 
 @Component
@@ -43,9 +42,6 @@ public class LNSGatewayManager {
 
     @Autowired
     protected IdentityApi identityApi;
-
-    @Autowired
-    private AgentService agentService;
 
     @Autowired
     private InventoryApi inventoryApi;
@@ -68,7 +64,7 @@ public class LNSGatewayManager {
                     mor = createGateway(gateway);
                 }
                 mor.setLastUpdatedDateTime(null);
-                mor.set(new Availability(new Date(), gateway.getStatus()));
+                mor.setProperty("gatewayAvailability", gateway.getStatus());
                 if (gateway.getLat() != null && gateway.getLng() != null) {
                     logger.info("Updating position of gateway {}: {}, {}", gateway.getName(), gateway.getLat(), gateway.getLng());
                     Position p = new Position();
@@ -100,6 +96,7 @@ public class LNSGatewayManager {
         ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
         mor.setName(gateway.getName());
         mor.setType("c8y_LoRaGateway");
+        mor.set(new RequiredAvailability(600));
         Hardware hardware = new Hardware(gateway.getType(), null, null);
         mor.set(hardware);
         mor.set(new IsDevice());
@@ -108,7 +105,16 @@ public class LNSGatewayManager {
         return mor;
     }
 
-    private ManagedObjectRepresentation getGateway(String id) {
+    public ManagedObjectRepresentation createGateway(GatewayProvisioning gatewayProvisioning) {
+        return createGateway(new Gateway(gatewayProvisioning.getExternalId(),
+            gatewayProvisioning.getName(),
+            gatewayProvisioning.getLat(),
+            gatewayProvisioning.getLng(),
+            gatewayProvisioning.getType(),
+            gatewayProvisioning.getStatus(), null));
+    }
+
+    public ManagedObjectRepresentation getGateway(String id) {
         ManagedObjectRepresentation result = null;
         Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(id, GATEWAY_ID_TYPE);
         if (extId.isPresent()) {

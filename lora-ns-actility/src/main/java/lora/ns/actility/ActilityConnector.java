@@ -22,6 +22,7 @@ import lora.ns.actility.rest.ActilityAdminService;
 import lora.ns.actility.rest.ActilityCoreService;
 import lora.ns.actility.rest.JwtInterceptor;
 import lora.ns.actility.rest.model.BaseStation;
+import lora.ns.actility.rest.model.BaseStationProfile;
 import lora.ns.actility.rest.model.BaseStationStatistics.ConnectionStateEnum;
 import lora.ns.actility.rest.model.BaseStationStatistics.HealthStateEnum;
 import lora.ns.actility.rest.model.Connection;
@@ -38,6 +39,7 @@ import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.DeviceProvisioning.ProvisioningMode;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
+import lora.ns.gateway.GatewayProvisioning;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -366,6 +368,51 @@ public class ActilityConnector extends LNSAbstractConnector {
 		List<DeviceProfile> result = null;
 		try {
 			Response<List<DeviceProfile>> response = actilityCoreService.getDeviceProfiles().execute();
+			if (response.isSuccessful()) {
+				result = response.body();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public boolean provisionGateway(GatewayProvisioning gatewayProvisioning) {
+		BaseStation baseStation = new BaseStation();
+		boolean result = false;
+
+		try {
+			baseStation.setName(gatewayProvisioning.getName());
+			baseStation.setUuid(gatewayProvisioning.getExternalId());
+			baseStation.setGeoLatitude(gatewayProvisioning.getLat().floatValue());
+			baseStation.setGeoLongitude(gatewayProvisioning.getLng().floatValue());
+			baseStation.setBaseStationProfileId(gatewayProvisioning.getAdditionalProperties().getProperty("baseStationProfileId"));
+			Response<BaseStation> response = actilityCoreService.createBaseStation(baseStation).execute();
+			result = response.isSuccessful();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	public boolean deprovisionGateway(String id) {
+		boolean result = false;
+
+		try {
+			Response<ResponseBody> response = actilityCoreService.deleteBaseStation(id).execute();
+			result = response.isSuccessful();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	public List<BaseStationProfile> getBaseStationProfiles() {
+		List<BaseStationProfile> result = null;
+		try {
+			Response<List<BaseStationProfile>> response = actilityCoreService.getBaseStationProfiles().execute();
 			if (response.isSuccessful()) {
 				result = response.body();
 			}

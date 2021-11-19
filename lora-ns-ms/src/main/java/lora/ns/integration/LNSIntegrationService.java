@@ -63,6 +63,8 @@ import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.DeviceProvisioningResponse;
 import lora.ns.device.EndDevice;
 import lora.ns.device.LNSDeviceManager;
+import lora.ns.gateway.GatewayProvisioning;
+import lora.ns.gateway.GatewayProvisioningResponse;
 import lora.ns.gateway.LNSGatewayManager;
 import lora.ns.operation.LNSOperationManager;
 import lora.ns.operation.OperationData;
@@ -123,6 +125,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<>();
 
 	protected LinkedList<PropertyDescription> deviceProvisioningAdditionalProperties = new LinkedList<>();
+
+	protected LinkedList<PropertyDescription> gatewayProvisioningAdditionalProperties = new LinkedList<>();
 
 	protected final Logger logger = LoggerFactory.getLogger(LNSIntegrationService.class);
 
@@ -301,6 +305,59 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		return mor;
 	}
 
+	public GatewayProvisioningResponse provisionGateway(String lnsConnectorId, GatewayProvisioning gatewayProvisioning) {
+		GatewayProvisioningResponse response = new GatewayProvisioningResponse();
+		ManagedObjectRepresentation mor;
+		String errorMessage = null;
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent() && connector.get().provisionGateway(gatewayProvisioning)) {
+			mor = lnsGatewayManager.getGateway(gatewayProvisioning.getExternalId().toLowerCase());
+			if (mor == null) {
+				mor = lnsGatewayManager.createGateway(gatewayProvisioning);
+			}
+			response.setGateway(mor);
+			EventRepresentation event = new EventRepresentation();
+			event.setType("Gateway provisioned");
+			event.setText("Gateway has been provisioned");
+			event.setDateTime(new DateTime());
+			event.setSource(mor);
+			eventApi.create(event);
+		} else {
+			AlarmRepresentation alarm = new AlarmRepresentation();
+			alarm.setType("Gateway provisioning error");
+			if (connector.isPresent()) {
+				errorMessage = "Couldn't provision gateway " + gatewayProvisioning.getExternalId() + " in LNS connector "
+						+ lnsConnectorId;
+			} else {
+				errorMessage = "LNS connector Id '" + lnsConnectorId
+						+ "' doesn't exist. Please use a valid managed object Id.";
+			}
+			alarm.setText(errorMessage);
+			alarm.setDateTime(new DateTime());
+			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
+			mor = lnsDeviceManager.getDevice(gatewayProvisioning.getExternalId().toLowerCase());
+			if (mor != null) {
+				alarm.setSource(mor);
+			} else {
+				alarm.setSource(agentService.getAgent());
+			}
+			alarmApi.create(alarm);
+		}
+		response.setErrorMessage(errorMessage);
+
+		return response;
+	}
+
+	public boolean deprovisionGateway(String lnsConnectorId, String id) {
+		boolean result = false;
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent() && connector.get().deprovisionGateway(id)) {
+			result = true;
+		}
+
+		return result;
+	}
+
 	public List<EndDevice> getDevices(String lnsInstanceId) {
 		List<EndDevice> result = new ArrayList<>();
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
@@ -362,13 +419,12 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	private boolean isPropertyEncrypted(String key) {
 		boolean[] result = { false };
 
-		wizard.forEach(step -> {
-			step.getPropertyDescriptions().forEach(p -> {
+		wizard.forEach(step -> step.getPropertyDescriptions().forEach(p -> {
 				if (p.getName().equals(key)) {
 					result[0] = p.isEncrypted();
 				}
-			});
-		});
+			})
+		);
 
 		return result[0];
 	}
@@ -450,12 +506,16 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		return result;
 	}
 
-	public LinkedList<LNSConnectorWizardStep> getInstanceWizard() {
+	public List<LNSConnectorWizardStep> getInstanceWizard() {
 		return wizard;
 	}
 
-	public LinkedList<PropertyDescription> getDeviceProvisioningAdditionalProperties() {
+	public List<PropertyDescription> getDeviceProvisioningAdditionalProperties() {
 		return deviceProvisioningAdditionalProperties;
+	}
+
+	public List<PropertyDescription> getGatewayProvisioningAdditionalProperties() {
+		return gatewayProvisioningAdditionalProperties;
 	}
 
     public void updateLnsConnector(String lnsInstanceId, Properties properties) {

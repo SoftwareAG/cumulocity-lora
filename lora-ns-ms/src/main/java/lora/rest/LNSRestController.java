@@ -1,6 +1,5 @@
 package lora.rest;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -28,6 +27,8 @@ import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.DeviceProvisioningResponse;
 import lora.ns.device.EndDevice;
 import lora.ns.device.LNSDeviceManager;
+import lora.ns.gateway.GatewayProvisioning;
+import lora.ns.gateway.GatewayProvisioningResponse;
 import lora.ns.integration.LNSIntegrationService;
 
 @RestController
@@ -68,6 +69,17 @@ public class LNSRestController {
 		boolean result = lnsProxy.deprovisionDevice(lnsInstanceId, deveui);
 		return result ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
 	}
+	
+	@PostMapping(value = "/{lnsInstanceId}/gateways", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public GatewayProvisioningResponse provisionGateway(@RequestBody GatewayProvisioning gatewayProvisioning, @PathVariable String lnsInstanceId) {
+		return lnsProxy.provisionGateway(lnsInstanceId, gatewayProvisioning);
+	}
+	
+	@DeleteMapping(value = "/{lnsInstanceId}/gateways/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> deprovisionGateway(@PathVariable String lnsInstanceId, @PathVariable String id) {
+		boolean result = lnsProxy.deprovisionGateway(lnsInstanceId, id);
+		return result ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+	}
 
 	@PostMapping(value = "/devices/{deveui}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createDevice(@PathVariable String deveui, @RequestBody ManagedObjectRepresentation device) {
@@ -105,12 +117,17 @@ public class LNSRestController {
 	}
 	
 	@GetMapping(value = "/wizard", produces = MediaType.APPLICATION_JSON_VALUE)
-	public LinkedList<LNSConnectorWizardStep> getWizard() {
+	public List<LNSConnectorWizardStep> getWizard() {
 		return lnsProxy.getInstanceWizard();
 	}
 	
 	@GetMapping(value = "/deviceProvisioningAdditionalProperties", produces = MediaType.APPLICATION_JSON_VALUE)
-	public LinkedList<PropertyDescription> getDeviceProvisioningAdditionalProperties() {
+	public List<PropertyDescription> getDeviceProvisioningAdditionalProperties() {
 		return lnsProxy.getDeviceProvisioningAdditionalProperties();
+	}
+	
+	@GetMapping(value = "/gatewayProvisioningAdditionalProperties", produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<PropertyDescription> getGatewayProvisioningAdditionalProperties() {
+		return lnsProxy.getGatewayProvisioningAdditionalProperties();
 	}
 }

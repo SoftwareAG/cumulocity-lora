@@ -41,16 +41,16 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
         DeviceData data = null;
         try {
             JsonNode rootNode = mapper.readTree(event);
-            String deviceEui = rootNode.get("DevEUI_uplink").get("DevEUI").asText();
-            int fPort = rootNode.get("DevEUI_uplink").get("FPort").asInt();
-            double rssi = rootNode.get("DevEUI_uplink").get("LrrRSSI").asDouble();
-            double snr = rootNode.get("DevEUI_uplink").get("LrrSNR").asDouble();
-            double sf = rootNode.get("DevEUI_uplink").get("SpFact").asDouble();
-            Double lat = rootNode.get("DevEUI_uplink").has("DevLAT") ? rootNode.get("DevEUI_uplink").get("DevLAT").asDouble() : null;
-            Double lng = rootNode.get("DevEUI_uplink").has("DevLON") ? rootNode.get("DevEUI_uplink").get("DevLON").asDouble() : null;
+            String deviceEui = rootNode.at("DevEUI_uplink/DevEUI").asText();
+            int fPort = rootNode.at("DevEUI_uplink/FPort").asInt();
+            double rssi = rootNode.at("DevEUI_uplink/LrrRSSI").asDouble();
+            double snr = rootNode.at("DevEUI_uplink/LrrSNR").asDouble();
+            double sf = rootNode.at("DevEUI_uplink/SpFact").asDouble();
+            Double lat = rootNode.at("DevEUI_uplink/DevLAT").asDouble();
+            Double lng = rootNode.at("DevEUI_uplink/DevLON").asDouble();
             logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
-            byte[] payload = BaseEncoding.base16().decode(rootNode.get("DevEUI_uplink").get("payload_hex").asText().toUpperCase());
-            Long updateTime = new DateTime(rootNode.get("DevEUI_uplink").get("Time").asText()).getMillis();
+            byte[] payload = BaseEncoding.base16().decode(rootNode.at("DevEUI_uplink/payload_hex").asText().toUpperCase());
+            Long updateTime = new DateTime(rootNode.at("DevEUI_uplink/Time").asText()).getMillis();
             //String model = null;
             logger.info("Update time is: " + updateTime);
 

@@ -356,4 +356,12 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		}
 		return result;
 	}
+
+	public boolean provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
+		return false;
+	}
+
+	public boolean deprovisionGateway(String id) {
+		return false;
+	}
 }

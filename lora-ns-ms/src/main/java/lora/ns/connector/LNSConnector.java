@@ -8,6 +8,7 @@ import lora.codec.downlink.DownlinkData;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
+import lora.ns.gateway.GatewayProvisioning;
 
 public interface LNSConnector {
 	String getId();
@@ -24,4 +25,6 @@ public interface LNSConnector {
 	boolean deprovisionDevice(String deveui);
 	List<Gateway> getGateways();
     Properties mergeProperties(Properties properties);
+	boolean provisionGateway(GatewayProvisioning gatewayProvisioning);
+	boolean deprovisionGateway(String id);
 }

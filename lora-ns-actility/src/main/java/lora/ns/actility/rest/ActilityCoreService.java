@@ -3,6 +3,7 @@ package lora.ns.actility.rest;
 import java.util.List;
 
 import lora.ns.actility.rest.model.BaseStation;
+import lora.ns.actility.rest.model.BaseStationProfile;
 import lora.ns.actility.rest.model.Connection;
 import lora.ns.actility.rest.model.ConnectionRequest;
 import lora.ns.actility.rest.model.DeviceCreate;
@@ -90,4 +91,15 @@ public interface ActilityCoreService {
 	@Headers("Accept: application/json")
 	@GET("baseStations/{baseStationRef}")
 	Call<BaseStation> getBaseStation(@Path("baseStationRef") String baseStationRef);
+
+	@Headers({"Content-Type: application/json", "Accept: application/json"})
+	@POST("baseStations")
+	Call<BaseStation> createBaseStation(@Body BaseStation baseStation);
+
+	@DELETE("baseStations/{baseStationRef}")
+	Call<ResponseBody> deleteBaseStation(@Path("baseStationRef") String baseStationRef);
+
+	@Headers("Accept: application/json")
+	@GET("baseStationProfiles")
+	Call<List<BaseStationProfile>> getBaseStationProfiles();
 }

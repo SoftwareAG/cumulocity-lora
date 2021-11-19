@@ -294,4 +294,12 @@ public class TTNConnector extends LNSAbstractConnector {
 		Applications apps = service.list(ListApplicationsRequest.newBuilder().build());
 		return apps.getApplicationsList();
 	}
+
+	public boolean provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
+		return false;
+	}
+
+	public boolean deprovisionGateway(String id) {
+		return false;
+	}
 }

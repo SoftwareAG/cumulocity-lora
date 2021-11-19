@@ -1,7 +1,7 @@
 module lora.ns.ms {
     requires transitive lora_interface;
     requires org.apache.commons.codec;
-    requires rest.representation;
+    requires transitive rest.representation;
     requires joda.time;
     requires core.model;
     requires device.capability.model;
@@ -15,7 +15,7 @@ module lora.ns.ms {
     requires spring.beans;
     requires spring.web;
     requires spring.core;
-    requires spring.context;
+    requires transitive spring.context;
     requires spring.security.core;
     requires spring.security.config;
     requires spring.security.web;
@@ -24,4 +24,7 @@ module lora.ns.ms {
     exports lora.codec.ms;
     exports lora.ns.integration;
     exports lora.ns.connector;
+    exports lora.ns.device;
+    exports lora.ns.gateway;
+    exports lora.ns.operation;
 }

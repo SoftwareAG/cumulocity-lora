@@ -30,4 +30,15 @@ public class ActilityRestController {
 		}
         return result;
     }
+
+    @GetMapping(value = "/{lnsConnectorId}/baseStationProfiles", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<IdNameEntry> getBaseStationProfiles(@PathVariable String lnsConnectorId) {
+        List<IdNameEntry> result = new ArrayList<>();
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent()) {
+            ActilityConnector actilityConnector = (ActilityConnector)connector.get();
+            result = actilityConnector.getBaseStationProfiles().stream().map(bsp -> new IdNameEntry(bsp.getId(), bsp.getCommercialName())).collect(Collectors.toList());
+		}
+        return result;
+    }
 }
