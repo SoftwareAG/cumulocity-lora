@@ -24,14 +24,13 @@ import com.cumulocity.sdk.client.inventory.ManagedObjectCollection;
 
 import org.apache.commons.codec.binary.Hex;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import c8y.Command;
 import c8y.Hardware;
+import lombok.extern.slf4j.Slf4j;
 import lora.codec.DeviceCodecRepresentation;
 import lora.codec.Result;
 import lora.codec.downlink.DeviceOperationElement;
@@ -42,6 +41,7 @@ import lora.common.C8YUtils;
 import lora.ns.DeviceData;
 
 @Service
+@Slf4j
 public class CodecManager {
 
 	/**
@@ -69,8 +69,6 @@ public class CodecManager {
     @Autowired
     private MicroserviceSubscriptionsService subscriptionsService;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
-	
 	private static final String LORA_DEVICE_COMMAND_ERROR = "LoRa device command error";
 	private static final String LORA_DEVICE_PAYLOAD_ERROR = "LoRa device payload decoding error";
 
@@ -83,7 +81,7 @@ public class CodecManager {
 		for (ManagedObjectRepresentation mor : col.get().allPages()) {
 			DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
 			if (codec != null) {
-				logger.info("Adding to codec list: {} {}", codec.getName(), codec.getVersion());
+				log.info("Adding to codec list: {} {}", codec.getName(), codec.getVersion());
 				codecInstances.put(codec.getId(), new CodecProxy(codec.getId(), codec.getName(), codec.getVersion()));
 			}
 		}
@@ -97,7 +95,7 @@ public class CodecManager {
 		try {
 			extId = identityApi.getExternalId(id);
 		} catch (SDKException e) {
-			logger.info("External ID {} not found", externalId);
+			log.info("External ID {} not found", externalId);
 		}
 		return extId;
 	}
@@ -105,7 +103,7 @@ public class CodecManager {
 	public CodecProxy getCodec(String id) {
 		CodecProxy result = codecInstances.get(id);
 		if (result == null) {
-			logger.info("Codec {} not in cache, will get it from inventory.", id);
+			log.info("Codec {} not in cache, will get it from inventory.", id);
 			ExternalIDRepresentation extId = findExternalId(id, C8YUtils.CODEC_ID);
 			if (extId != null) {
 				ManagedObjectRepresentation mor = inventoryApi.get(extId.getManagedObject().getId());
@@ -118,17 +116,17 @@ public class CodecManager {
 					codec.setId(id);
 					codec.setName("codec_name");
 					codec.setVersion("codec_version");
-					logger.warn("Codec {} exists in inventory but structure is wrong: {}", id, mor.toJSON());
+					log.warn("Codec {} exists in inventory but structure is wrong: {}", id, mor.toJSON());
 					mor = new ManagedObjectRepresentation();
 					mor.set(codec);
-					logger.warn("Codec structure should look like: {}", mor.toJSON());
+					log.warn("Codec structure should look like: {}", mor.toJSON());
 				}
 			} else {
-				logger.warn("No external id could be found for {}.", id);
+				log.warn("No external id could be found for {}.", id);
 			}
 		}
 		if (result == null) {
-			logger.warn("Codec {} is not available on that tenant.", id);
+			log.warn("Codec {} is not available on that tenant.", id);
 		}
 		return result;
 	}
@@ -145,13 +143,13 @@ public class CodecManager {
 				result = Optional.of(codec);
 			} else {
 				if (codec == null) {
-					logger.error("Codec {} does not exist.", device.getProperty(PROPERTY_CODEC));
+					log.error("Codec {} does not exist.", device.getProperty(PROPERTY_CODEC));
 				} else {
-					logger.error("Could not retrieve microservice credentials.");
+					log.error("Could not retrieve microservice credentials.");
 				}
 			}
 		} else {
-        	logger.info("Device has no codec information. Payload will be stored for later parsing when Codec will be provided.");
+        	log.info("Device has no codec information. Payload will be stored for later parsing when Codec will be provided.");
 		}
 		return result;
 	}
@@ -164,10 +162,10 @@ public class CodecManager {
 		eventRepresentation.setType("LoRaPayload");
 		eventRepresentation.setProperty("payload", Hex.encodeHexString(event.getPayload()));
 		eventRepresentation.setProperty("port", event.getfPort());
-		logger.info("Device details: {}", mor.toJSON());
+		log.info("Device details: {}", mor.toJSON());
 		eventRepresentation.setProperty(PROPERTY_PROCESSED, false);
 		getCodec(mor).ifPresent(codec -> {
-			logger.info("Codec {} will be used with device {} for decoding payload {} on port {}", mor.getProperty(PROPERTY_CODEC), event.getDevEui(), event.getPayload(), event.getfPort());
+			log.info("Codec {} will be used with device {} for decoding payload {} on port {}", mor.getProperty(PROPERTY_CODEC), event.getDevEui(), event.getPayload(), event.getfPort());
 			Result<String> result = codec.decode(new Decode(event));
 			if (result.isSuccess()) {
 				eventRepresentation.setProperty(PROPERTY_PROCESSED, true);
@@ -189,14 +187,14 @@ public class CodecManager {
 		DownlinkData[] data = {null};
 		ManagedObjectRepresentation mor = inventoryApi.get(operation.getDeviceId());
 		getCodec(mor).ifPresent(codec -> {
-			logger.info("Codec {} will be used with device {} for encoding operation {}", mor.getProperty(PROPERTY_CODEC), devEui, operation.toJSON());
+			log.info("Codec {} will be used with device {} for encoding operation {}", mor.getProperty(PROPERTY_CODEC), devEui, operation.toJSON());
 			Hardware hardware = mor.get(Hardware.class);
 			Result<DownlinkData> result = codec.encode(new Encode(devEui, operation.get(Command.class).getText(), hardware != null ? hardware.getModel() : null));
 			if (result.isSuccess()) {
 				if (result.getResponse() != null) {
-					logger.info("Result of command \"{}\" is payload {}", operation.get(Command.class).getText(), result.getResponse().getPayload());
+					log.info("Result of command \"{}\" is payload {}", operation.get(Command.class).getText(), result.getResponse().getPayload());
 				} else {
-					logger.info("Result of command \"{}\" is empty", operation.get(Command.class).getText());
+					log.info("Result of command \"{}\" is empty", operation.get(Command.class).getText());
 				}
 				data[0] = result.getResponse();
 			} else {
@@ -227,9 +225,9 @@ public class CodecManager {
 				result = codec.getAvailableOperations(model);
 			} else {
 				if (codec == null) {
-					logger.error("Codec {} does not exist.", mor.getProperty(PROPERTY_CODEC));
+					log.error("Codec {} does not exist.", mor.getProperty(PROPERTY_CODEC));
 				} else {
-					logger.error("Could not retrieve microservice credentials.");
+					log.error("Could not retrieve microservice credentials.");
 				}
 			}
 		}		

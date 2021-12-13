@@ -56,7 +56,7 @@ public class NKECodec extends DeviceCodec {
 
 	@Override
 	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
-		return decoder.decode(mor, BaseEncoding.base16().decode(decode.getPayload().toUpperCase()), decode.getfPort(), decode.getModel(), new DateTime(decode.getUpdateTime()));
+		return decoder.decode(mor, BaseEncoding.base16().decode(decode.getPayload().toUpperCase()), decode.getFPort(), decode.getModel(), new DateTime(decode.getUpdateTime()));
 	}
 
 	@Override

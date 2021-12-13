@@ -1,6 +1,5 @@
 package lora.ns.gateway;
 
-import java.util.Date;
 import java.util.Optional;
 
 import com.cumulocity.model.event.CumulocityAlarmStatuses;
@@ -18,24 +17,22 @@ import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import c8y.Availability;
 import c8y.Hardware;
 import c8y.IsDevice;
 import c8y.Position;
 import c8y.RequiredAvailability;
+import lombok.extern.slf4j.Slf4j;
 import lora.codec.uplink.C8YData;
 import lora.common.C8YUtils;
 import lora.ns.connector.LNSConnector;
+import lora.ns.integration.LNSIntegrationService;
 
 @Component
+@Slf4j
 public class LNSGatewayManager {
-
-    final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     protected C8YUtils c8yUtils;
@@ -59,14 +56,14 @@ public class LNSGatewayManager {
 
     public void upsertGateways(LNSConnector connector) {
             for (Gateway gateway : connector.getGateways()) {
-                ManagedObjectRepresentation mor = getGateway(gateway.getId());
+                ManagedObjectRepresentation mor = getGateway(gateway.getGwEUI());
                 if (mor == null) {
-                    mor = createGateway(gateway);
+                    mor = createGateway(connector.getId(), gateway);
                 }
                 mor.setLastUpdatedDateTime(null);
                 mor.setProperty("gatewayAvailability", gateway.getStatus());
                 if (gateway.getLat() != null && gateway.getLng() != null) {
-                    logger.info("Updating position of gateway {}: {}, {}", gateway.getName(), gateway.getLat(), gateway.getLng());
+                    log.info("Updating position of gateway {}: {}, {}", gateway.getName(), gateway.getLat(), gateway.getLng());
                     Position p = new Position();
                     p.setLat(gateway.getLat());
                     p.setLng(gateway.getLng());
@@ -86,27 +83,29 @@ public class LNSGatewayManager {
                 } catch (Exception e) {
                     connectorMorApi.addChildDevice(mor.getId());
                 }*/
-                logger.info("Processing data for gateway {}", gateway.getName());
+                log.info("Processing data for gateway {}", gateway.getName());
                 processData(mor, gateway.getData());
             }
     }
 
-    private ManagedObjectRepresentation createGateway(Gateway gateway) {
-        logger.info("Creating gateway {}", gateway.getName());
+    private ManagedObjectRepresentation createGateway(String lnsConnectorId, Gateway gateway) {
+        log.info("Creating gateway {}", gateway.getName());
         ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
         mor.setName(gateway.getName());
         mor.setType("c8y_LoRaGateway");
         mor.set(new RequiredAvailability(600));
+        mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsConnectorId);
         Hardware hardware = new Hardware(gateway.getType(), null, null);
         mor.set(hardware);
         mor.set(new IsDevice());
         mor = inventoryApi.create(mor);
-        c8yUtils.createExternalId(mor, gateway.getId(), GATEWAY_ID_TYPE);
+        c8yUtils.createExternalId(mor, gateway.getGwEUI(), GATEWAY_ID_TYPE);
         return mor;
     }
 
-    public ManagedObjectRepresentation createGateway(GatewayProvisioning gatewayProvisioning) {
-        return createGateway(new Gateway(gatewayProvisioning.getExternalId(),
+    public ManagedObjectRepresentation createGateway(String lnsConnectorId, GatewayProvisioning gatewayProvisioning) {
+        return createGateway(lnsConnectorId, new Gateway(gatewayProvisioning.getGwEUI(),
+            gatewayProvisioning.getSerial(),
             gatewayProvisioning.getName(),
             gatewayProvisioning.getLat(),
             gatewayProvisioning.getLng(),
@@ -153,7 +152,7 @@ public class LNSGatewayManager {
 				alarmApi.update(alarmRepresentation);
 			}
 		} catch (SDKException e) {
-			logger.error("Error on clearing Alarm", e);
+			log.error("Error on clearing Alarm", e);
 		}
 	}
 }

@@ -12,10 +12,9 @@ import java.util.Random;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import c8y.ConnectionState;
+import lombok.extern.slf4j.Slf4j;
 import lora.codec.downlink.DownlinkData;
 import lora.codec.uplink.C8YData;
 import lora.ns.actility.rest.ActilityAdminService;
@@ -32,6 +31,7 @@ import lora.ns.actility.rest.model.DeviceCreate;
 import lora.ns.actility.rest.model.DeviceProfile;
 import lora.ns.actility.rest.model.DownlinkMessage;
 import lora.ns.actility.rest.model.MessageSecurityParams;
+import lora.ns.actility.rest.model.RFRegion;
 import lora.ns.actility.rest.model.Route;
 import lora.ns.actility.rest.model.Token;
 import lora.ns.connector.LNSAbstractConnector;
@@ -47,6 +47,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+@Slf4j
 public class ActilityConnector extends LNSAbstractConnector {
 
 	private ActilityCoreService actilityCoreService;
@@ -54,8 +55,6 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	private String downlinkAsKey = "4e0ff46472fa1840f25368c066e94769";
 	private String routeRef;
-
-	private final Logger logger = LoggerFactory.getLogger(ActilityConnector.class);
 
 	class DXAdminJWTInterceptor extends JwtInterceptor {
 
@@ -72,9 +71,9 @@ public class ActilityConnector extends LNSAbstractConnector {
 						.execute();
 				if (response.isSuccessful() && response.body() != null) {
 					token = response.body().getAccessToken();
-					logger.info("Successfully received a JWT: {}", token);
+					log.info("Successfully received a JWT: {}", token);
 				} else {
-					logger.error("Can't obtain a JWT with the following reponse: {}", response.errorBody().string());
+					log.error("Can't obtain a JWT with the following reponse: {}", response.errorBody().string());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -127,7 +126,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 			Response<List<DeviceCreate>> devs = actilityCoreService.getDeviceByEUI(devEui).execute();
 			if (devs.isSuccessful() && !devs.body().isEmpty()) {
 				DeviceCreate dev = devs.body().get(0);
-				logger.info("Device {} is named {}", devEui, dev.getName());
+				log.info("Device {} is named {}", devEui, dev.getName());
 				result = new EndDevice(devEui, dev.getName(), null);
 			}
 		} catch (Exception e) {
@@ -140,7 +139,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 	public String sendDownlink(DownlinkData operation) {
 		Random r = new Random(DateTime.now().getMillis());
 		int downlinkCounter = r.nextInt();
-		logger.info("Will send {} to Thingpark.", operation.toString());
+		log.info("Will send {} to Thingpark.", operation.toString());
 		try {
 			DownlinkMessage message = new DownlinkMessage();
 			message.setPayloadHex(operation.getPayload());
@@ -150,7 +149,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 			securityParams.setAsKey(downlinkAsKey);
 			message.setSecurityParams(securityParams);
 			Response<DownlinkMessage> response = actilityCoreService.sendDownlink(operation.getDevEui(), message).execute();
-			logger.info("Response from Thingpark was {}", response.code());
+			log.info("Response from Thingpark was {}", response.code());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -187,7 +186,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	public void configureRoutings(String url, String tenant, String login, String password) {
-		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
+		log.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
 		String connectionId = null;
 
 		try {
@@ -276,7 +275,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 			Response<List<Connection>> response = actilityCoreService.getConnections().execute();
 			if (response.isSuccessful()) {
 				response.body().forEach(connection -> {
-					logger.info("Found Connection {}", connection.getName());
+					log.info("Found Connection {}", connection.getName());
 					if (connection.getName().equals(tenant + "-" + this.getId())) {
 						try {
 							actilityCoreService.deleteConnection(connection.getId()).execute();
@@ -320,10 +319,9 @@ public class ActilityConnector extends LNSAbstractConnector {
 					if (r.isSuccessful()) {
 						baseStation = r.body();
 						Gateway g = new Gateway();
+						g.setGwEUI(baseStation.getUuid());
 						if (baseStation.getSMN() != null) {
-							g.setId(baseStation.getSMN());
-						} else {
-							g.setId("Actility-" + baseStation.getId());
+							g.setSerial(baseStation.getSMN());
 						}
 						g.setName(baseStation.getName());
 						if (baseStation.getGeoLatitude() != null) {
@@ -383,10 +381,16 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 		try {
 			baseStation.setName(gatewayProvisioning.getName());
-			baseStation.setUuid(gatewayProvisioning.getExternalId());
-			baseStation.setGeoLatitude(gatewayProvisioning.getLat().floatValue());
-			baseStation.setGeoLongitude(gatewayProvisioning.getLng().floatValue());
-			baseStation.setBaseStationProfileId(gatewayProvisioning.getAdditionalProperties().getProperty("baseStationProfileId"));
+			baseStation.setUuid(gatewayProvisioning.getGwEUI());
+			baseStation.setSMN(gatewayProvisioning.getAdditionalProperties().getProperty("SMN"));
+			if (gatewayProvisioning.getLat() != null) {
+				baseStation.setGeoLatitude(gatewayProvisioning.getLat().floatValue());
+			}
+			if (gatewayProvisioning.getLng() != null) {
+				baseStation.setGeoLongitude(gatewayProvisioning.getLng().floatValue());
+			}
+			baseStation.setBaseStationProfileId(gatewayProvisioning.getAdditionalProperties().getProperty("gatewayProfile"));
+			baseStation.setRfRegionId(gatewayProvisioning.getAdditionalProperties().getProperty("rfRegion"));
 			Response<BaseStation> response = actilityCoreService.createBaseStation(baseStation).execute();
 			result = response.isSuccessful();
 		} catch (Exception e) {
@@ -413,6 +417,19 @@ public class ActilityConnector extends LNSAbstractConnector {
 		List<BaseStationProfile> result = null;
 		try {
 			Response<List<BaseStationProfile>> response = actilityCoreService.getBaseStationProfiles().execute();
+			if (response.isSuccessful()) {
+				result = response.body();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public List<RFRegion> getRFRegions() {
+		List<RFRegion> result = null;
+		try {
+			Response<List<RFRegion>> response = actilityCoreService.getRFRegions().execute();
 			if (response.isSuccessful()) {
 				result = response.body();
 			}

@@ -33,6 +33,9 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 	{
 		wizard.add(new ConnectorWizardStep1());
 		deviceProvisioningAdditionalProperties.add(new PropertyDescription("deviceProfile", "Device profile", true, null, "/deviceProfiles", null, null, null, null, null, PropertyType.LIST, false));
+		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("SMN", "SMN", false, null, null, null, null, null, null, null, PropertyType.TEXT, false));
+		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("gatewayProfile", "Gateway profile", true, null, "/baseStationProfiles", null, null, null, null, null, PropertyType.LIST, false));
+		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("rfRegion", "RF Region", true, null, "/rfRegions", null, null, null, null, null, PropertyType.LIST, false));
 	}
 
 	@Override

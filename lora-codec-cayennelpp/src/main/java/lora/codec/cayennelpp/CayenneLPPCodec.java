@@ -248,11 +248,11 @@ public class CayenneLPPCodec extends DeviceCodec {
 
 		byte channel = 0;
 		
-		switch(decode.getfPort()) {
+		switch(decode.getFPort()) {
 		case 1:
 		case 2:
 			while (buffer.hasRemaining()) {
-				if (decode.getfPort() == 1) {
+				if (decode.getFPort() == 1) {
 					channel = buffer.get();
 				}
 				logger.info("Channel is: {}", channel);
@@ -264,7 +264,7 @@ public class CayenneLPPCodec extends DeviceCodec {
 				} else {
 					logger.info("{} is not a valid value", value);
 				}
-				if (decode.getfPort() == 2) {
+				if (decode.getFPort() == 2) {
 					channel++;
 				}
 			}

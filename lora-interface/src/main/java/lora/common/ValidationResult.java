@@ -1,19 +1,13 @@
 package lora.common;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ValidationResult {
     private boolean ok = true;
     private String reason = "";
-
-    public ValidationResult(boolean ok, String reason) {
-        this.ok = ok;
-        this.reason = reason;
-    }
-
-    public boolean isOk() {
-        return ok;
-    }
-
-    public String getReason() {
-        return reason;
-    }
 }

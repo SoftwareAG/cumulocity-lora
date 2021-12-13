@@ -24,6 +24,7 @@
 		<module>lora-codec-atim-tm2d</module>
 		<module>lora-codec-atim-tmxd</module>
 		<module>lora-codec-acs-switch</module>
+		<module>lora-codec-c8y</module>
 		<module>lora-ns-kerlink</module>
 		<module>lora-ns-objenious</module>
 		<module>lora-ns-orbiwise</module>
@@ -76,6 +77,12 @@
 				<version>${c8y.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>1.18.22</version>
+				<scope>provided</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

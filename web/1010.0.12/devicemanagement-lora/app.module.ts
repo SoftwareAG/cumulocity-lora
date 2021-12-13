@@ -37,6 +37,7 @@ import { GroupsComponent } from './src/groups/groups.component';
 import { LoraCodecsComponent } from './src/onboarding/codecs/codecs.component';
 import { RepeatTypeComponent } from './src/onboarding/codecs/repeat-section.type';
 import { LoraDevicesComponent, PropertyPipe } from './src/onboarding/devices/devices.component';
+import { LoraGatewaysComponent } from './src/onboarding/gateways/gateways.component';
 import { LNSEditComponent } from './src/onboarding/lns/lns-edit.component';
 import { LNSComponent } from './src/onboarding/lns/lns.component';
 import { PanelWrapperComponent } from './src/devices/panel-wrapper.component';
@@ -268,7 +269,7 @@ declare var Buffer: {
 };
 
 @NgModule({
-  declarations: [GroupsComponent, DevicesComponent, LoraDevicesComponent, LNSComponent, LNSEditComponent, LoraCodecsComponent, LoRaConfigComponent, PropertyPipe, RepeatTypeComponent, PanelWrapperComponent],
+  declarations: [GroupsComponent, DevicesComponent, LoraDevicesComponent, LoraGatewaysComponent, LNSComponent, LNSEditComponent, LoraCodecsComponent, LoRaConfigComponent, PropertyPipe, RepeatTypeComponent, PanelWrapperComponent],
   entryComponents: [GroupsComponent, DevicesComponent],
   imports: [
     // Upgrade module must be the first
@@ -281,6 +282,10 @@ declare var Buffer: {
       {
         path: 'lora-device',
         component: LoraDevicesComponent
+      },
+      {
+        path: 'lora-gateway',
+        component: LoraGatewaysComponent
       },
       {
         path: 'lns',

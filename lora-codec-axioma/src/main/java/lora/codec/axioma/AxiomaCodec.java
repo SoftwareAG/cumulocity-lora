@@ -238,7 +238,7 @@ public class AxiomaCodec extends DeviceCodec {
 		byte[] payload = BaseEncoding.base16().decode(decode.getPayload().toUpperCase());
 
 		logger.info("Decoding Axioma payload...");
-		switch(decode.getfPort()) {
+		switch(decode.getFPort()) {
 		case 100:
 			readData(c8yData, mor, payload);
 			break;

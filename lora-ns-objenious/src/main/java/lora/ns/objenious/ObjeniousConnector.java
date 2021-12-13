@@ -332,7 +332,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 						default:
 							break;
 					}
-					Gateway gateway = new Gateway(g.getGatewayId(), g.getGatewayName(), BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(), state, data);
+					Gateway gateway = new Gateway(g.getGatewayId(), g.getSerialNumber(), g.getGatewayName(), BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(), state, data);
 					result.add(gateway);
 				});
 			} else {

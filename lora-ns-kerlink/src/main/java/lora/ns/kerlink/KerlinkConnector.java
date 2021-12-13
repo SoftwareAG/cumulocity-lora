@@ -364,7 +364,7 @@ public class KerlinkConnector extends LNSAbstractConnector {
 				}).getBody();
 		C8YData c8yData = new C8YData();
 		for (GatewayDto gatewayDto : gatewaysDto.getList()) {
-			result.add(new Gateway(gatewayDto.getEui(), gatewayDto.getName(), gatewayDto.getLatitude(),
+			result.add(new Gateway(gatewayDto.getEui(), gatewayDto.getEui(), gatewayDto.getName(), gatewayDto.getLatitude(),
 					gatewayDto.getLongitude(), gatewayDto.getDescription(), ConnectionState.AVAILABLE, c8yData));
 		}
 		return result;

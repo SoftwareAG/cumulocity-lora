@@ -34,6 +34,7 @@ public class BaseStation {
 
   private String name = null;
 
+  @JsonProperty("SMN")
   private String SMN = null;
 
   private String administrativeInfo = null;

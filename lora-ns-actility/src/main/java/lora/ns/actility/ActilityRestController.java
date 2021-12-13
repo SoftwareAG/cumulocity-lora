@@ -41,4 +41,15 @@ public class ActilityRestController {
 		}
         return result;
     }
+
+    @GetMapping(value = "/{lnsConnectorId}/rfRegions", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<IdNameEntry> getRfRegions(@PathVariable String lnsConnectorId) {
+        List<IdNameEntry> result = new ArrayList<>();
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent()) {
+            ActilityConnector actilityConnector = (ActilityConnector)connector.get();
+            result = actilityConnector.getRFRegions().stream().map(bsp -> new IdNameEntry(bsp.getId(), bsp.getName())).collect(Collectors.toList());
+		}
+        return result;
+    }
 }

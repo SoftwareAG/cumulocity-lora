@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLException;
 
@@ -18,10 +19,12 @@ import com.google.protobuf.FieldMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import c8y.ConnectionState;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import lora.codec.downlink.DownlinkData;
+import lora.codec.uplink.C8YData;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.EndDevice;
@@ -51,7 +54,11 @@ import ttn.lorawan.v3.EndDeviceOuterClass.GetEndDeviceIdentifiersForEUIsRequest;
 import ttn.lorawan.v3.EndDeviceOuterClass.GetEndDeviceRequest;
 import ttn.lorawan.v3.EndDeviceOuterClass.SetEndDeviceRequest;
 import ttn.lorawan.v3.EndDeviceRegistryGrpc;
+import ttn.lorawan.v3.GatewayRegistryGrpc;
 import ttn.lorawan.v3.EndDeviceRegistryGrpc.EndDeviceRegistryBlockingStub;
+import ttn.lorawan.v3.GatewayOuterClass.Gateways;
+import ttn.lorawan.v3.GatewayOuterClass.ListGatewaysRequest;
+import ttn.lorawan.v3.GatewayRegistryGrpc.GatewayRegistryBlockingStub;
 import ttn.lorawan.v3.Identifiers.ApplicationIdentifiers;
 import ttn.lorawan.v3.Identifiers.EndDeviceIdentifiers;
 import ttn.lorawan.v3.JsEndDeviceRegistryGrpc;
@@ -284,7 +291,12 @@ public class TTNConnector extends LNSAbstractConnector {
 
 	@Override
 	public List<Gateway> getGateways() {
-		return new ArrayList<>();
+		GatewayRegistryBlockingStub gatewayRegistry = GatewayRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+		ListGatewaysRequest request = ListGatewaysRequest.newBuilder().build();
+		Gateways gateways =  gatewayRegistry.list(request);
+		return gateways.getGatewaysList().stream().map(g -> {
+			return new Gateway( g.getIds().getEui().toStringUtf8(), g.getIds().getGatewayId(), g.getName(), null, null, g.getVersionIds().getBrandId(), g.isInitialized() ? ConnectionState.AVAILABLE : ConnectionState.UNAVAILABLE, new C8YData());
+		}).collect(Collectors.toList());
 	}
 
 	public List<Application> getApplications() {

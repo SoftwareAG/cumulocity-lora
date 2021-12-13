@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
-import { ApplicationService } from "@c8y/ngx-components/api";
-import { IApplication, ApplicationType, FetchClient } from "@c8y/client";
+import { ApplicationService, TenantService } from "@c8y/ngx-components/api";
+import { IApplication, FetchClient } from "@c8y/client";
 
 class Asset {
     id: number;
@@ -11,6 +11,8 @@ class Asset {
     status?: string;
     c8yAppId?: string | number;
     installing: boolean = false;
+    installedOnCurrentTenant: boolean = true;
+    installedOnTenant: string;
 }
 
 class Release {
@@ -28,11 +30,17 @@ class Release {
 })
 
 export class LoRaConfigComponent {
-    constructor(private applicationService: ApplicationService, private fetchClient: FetchClient) {
+    constructor(private applicationService: ApplicationService, private fetchClient: FetchClient, private tenantService: TenantService) {
+        this.getCurrentTenant();
         this.getReleases();
     }
 
     releases: Release[];
+    currentTenantId: string;
+
+    async getCurrentTenant() {
+        this.currentTenantId = (await this.tenantService.current()).data.name;
+    }
 
     async install(asset: Asset) {
         asset.installing = true;
@@ -52,6 +60,8 @@ export class LoRaConfigComponent {
         this.applicationService.delete(asset.c8yAppId).then(() => this.getReleases());
     }
 
+    installedApps: Map<string, IApplication> = new Map<string, IApplication>();
+
     async getReleases() {
         this.releases = await (await this.fetchClient.fetch('service/github-proxy/releases')).json();
         console.dir(this.releases);
@@ -59,18 +69,30 @@ export class LoRaConfigComponent {
             r.assets.forEach(async a => {
                 let name: string = a.name.replace(".zip", "");
                 console.log("Checking app " + name);
-                let apps: IApplication[] = (await this.applicationService.listByName(name)).data;
-                if (apps && apps.length == 1) {
-                    console.log(apps[0]);
-                    if (apps[0]['github_asset_id']) {
-                        if (apps[0]['github_asset_id'] == a.id) {
-                            a.c8yAppId = apps[0].id;
+                let app: IApplication;
+                if (this.installedApps.has(name)) {
+                    app = this.installedApps.get(name);
+                }
+                else {
+                    let apps: IApplication[] = (await this.applicationService.listByName(name)).data;
+                    if (apps && apps.length == 1) {
+                        app = apps[0];
+                        this.installedApps.set(name, app);
+                    }
+                }
+                if (app) {
+                    a.installedOnCurrentTenant = app.owner.tenant.id === this.currentTenantId;
+                    a.installedOnTenant = app.owner.tenant.id;
+                    console.log(app);
+                    if (app['github_asset_id']) {
+                        if (app['github_asset_id'] == a.id) {
+                            a.c8yAppId = app.id;
                             a.status = 'installed';
                         } else {
-                            if (!apps[0]['github_asset_created_at'] || a.created_at > apps[0]['github_asset_created_at']) {
+                            if (!app['github_asset_created_at'] || a.created_at > app['github_asset_created_at']) {
                                 a.status = 'older_version_installed';
                             }
-                            if (a.created_at < apps[0]['github_asset_created_at']) {
+                            if (a.created_at < app['github_asset_created_at']) {
                                 a.status = 'newer_version_installed';
                             }
                         }

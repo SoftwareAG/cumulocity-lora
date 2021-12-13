@@ -10,8 +10,16 @@ export class LoraNavigationFactory implements NavigatorNodeFactory {
 
     let loraDevice: NavigatorNode = new NavigatorNode({
       label: _('LoRa devices'),
-      icon: 'c8y-device',
+      icon: 'sensor',
       path: '/lora-device',
+      priority: 0,
+      routerLinkExact: false
+    });
+
+    let loraGateway: NavigatorNode = new NavigatorNode({
+      label: _('LoRa gateways'),
+      icon: 'wifi',
+      path: '/lora-gateway',
       priority: 0,
       routerLinkExact: false
     });
@@ -44,7 +52,7 @@ export class LoraNavigationFactory implements NavigatorNodeFactory {
       label: _('LoRa'),
       icon: 'wifi',
       name: 'lora',
-      children: [loraDevice, loraNS, loraCodecs, loraConfig],
+      children: [loraDevice, loraGateway, loraNS, loraCodecs, loraConfig],
       priority: 2,
       routerLinkExact: false
     });

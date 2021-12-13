@@ -18,6 +18,9 @@ public class Token {
     @JsonProperty("jti")
     private String jti;
 
+    @JsonProperty("operator_id")
+    private String operatorId;
+
     @JsonProperty("client_id")
     private String clientId;
 

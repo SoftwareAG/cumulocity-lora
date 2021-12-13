@@ -2,8 +2,6 @@ package lora.codec.ms;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import lombok.extern.slf4j.Slf4j;
 import lora.codec.Result;
 import lora.codec.downlink.DeviceOperationElement;
 import lora.codec.downlink.DownlinkData;
@@ -20,6 +19,7 @@ import lora.codec.downlink.Encode;
 import lora.codec.uplink.Decode;
 import lora.common.Component;
 
+@Slf4j
 public class CodecProxy implements Component {
 	
 	/**
@@ -32,8 +32,6 @@ public class CodecProxy implements Component {
 	 */
 	private static final String C8Y_BASEURL = "C8Y_BASEURL";
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
-	
 	private String id;
 	private String name;
 	private String version;
@@ -71,11 +69,11 @@ public class CodecProxy implements Component {
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 			headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
 			ResponseEntity<Result<DownlinkData>> response = restTemplate.exchange(System.getenv(C8Y_BASEURL) +  SERVICE_LORA_CODEC + id + "/encode", HttpMethod.POST, new HttpEntity<Encode>(data, headers), new ParameterizedTypeReference<Result<DownlinkData>>(){});
-			logger.info("Answer of encoder is {} with content {}", response.getStatusCode(), response.getBody());
+			log.info("Answer of encoder is {} with content {}", response.getStatusCode(), response.getBody());
 			result = response.getBody();
 		} catch(HttpClientErrorException e) {
 			e.printStackTrace();
-			logger.error(e.getResponseBodyAsString());
+			log.error(e.getResponseBodyAsString());
 			result = new Result<>(false, e.getResponseBodyAsString(), null);
 		}
 		return result;
@@ -94,10 +92,10 @@ public class CodecProxy implements Component {
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 			ResponseEntity<Result<String>> response = restTemplate.exchange(System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/decode", HttpMethod.POST, new HttpEntity<Decode>(data, headers), new ParameterizedTypeReference<Result<String>>(){});
 			result = response.getBody();
-			logger.info("Answer of decoder is {} with content {}", response.getStatusCode(), result != null ? result.getResponse() : "");
+			log.info("Answer of decoder is {} with content {}", response.getStatusCode(), result != null ? result.getResponse() : "");
 		} catch(HttpClientErrorException e) {
 			e.printStackTrace();
-			logger.error(e.getResponseBodyAsString());
+			log.error(e.getResponseBodyAsString());
 			result = new Result<>(false, e.getResponseBodyAsString(), null);
 		}
 		return result;
@@ -111,13 +109,13 @@ public class CodecProxy implements Component {
 			headers.set(HttpHeaders.AUTHORIZATION, authentication);
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 			String url = System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/operations/" + model;
-			logger.info("Will get list of operations from URL {}", url);
+			log.info("Will get list of operations from URL {}", url);
 			ResponseEntity<Map<String, DeviceOperationElement>> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<Map<String, DeviceOperationElement>>(){});
-			logger.info("Answer of decoder is {} with content {}", response.getStatusCode(), response.getBody());
+			log.info("Answer of decoder is {} with content {}", response.getStatusCode(), response.getBody());
 			result = response.getBody();
 		} catch(HttpClientErrorException e) {
 			e.printStackTrace();
-			logger.error(e.getResponseBodyAsString());
+			log.error(e.getResponseBodyAsString());
 		}
 		return result;
 	}

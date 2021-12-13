@@ -142,7 +142,7 @@ public class SenlabCodec extends DeviceCodec {
 
 		String authentication = subscriptionsService.getCredentials(subscriptionsService.getTenant()).get()
 				.toCumulocityCredentials().getAuthenticationString();
-		String message = "{\"port\":" + decode.getfPort() + ",\"payload\":\"" + decode.getPayload() + "\",\"timestamp\":\""
+		String message = "{\"port\":" + decode.getFPort() + ",\"payload\":\"" + decode.getPayload() + "\",\"timestamp\":\""
 				+ new DateTime(decode.getUpdateTime()).toString(ISODateTimeFormat.dateTime()) + "\"}";
 
 		RestTemplate restTemplate = new RestTemplate();

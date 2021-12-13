@@ -215,7 +215,7 @@ public abstract class DeviceCodec implements Component {
 			if (device.isPresent()) {
 				ManagedObjectRepresentation mor = device.get();
 				C8YData c8yData = decode(mor, decode);
-				logger.info("Processing payload {} from port {} for device {}", decode.getPayload(), decode.getfPort(), decode.getDeveui());
+				logger.info("Processing payload {} from port {} for device {}", decode.getPayload(), decode.getFPort(), decode.getDeveui());
 				processData(decode.getDeveui(), mor, c8yData);
 			} else {
 				result = new Result<>(false, "Couldn't find device " + decode.getDeveui(), "NOK");

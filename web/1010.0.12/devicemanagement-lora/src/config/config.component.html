@@ -32,7 +32,7 @@
                             <strong>Not installed</strong>
                         </div>
                     </td>
-                    <td>
+                    <td *ngIf="asset.installedOnCurrentTenant || asset.status === 'not_installed'">
                         <button *ngIf="asset.status !== 'installed'" uib-tooltip="Install microservice"
                             tooltip-append-to-body="true" tooltip-placement="left" (click)="install(asset)"
                             [disabled]="asset.installing">
@@ -48,6 +48,9 @@
                             [disabled]="asset.installing">
                             Remove
                         </button>
+                    </td>
+                    <td *ngIf="!asset.installedOnCurrentTenant && asset.status !== 'not_installed'">
+                        Asset is installed on tenant: {{asset.installedOnTenant}}.
                     </td>
                 </tr>
             </tbody>

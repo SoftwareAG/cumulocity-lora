@@ -13,6 +13,8 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { FilteringModifier } from '@c8y/ngx-components/core/data-grid/column/filtering-form-renderer';
 import { assign, transform } from 'lodash-es';
 import { Pipe, PipeTransform } from '@angular/core';
+import { LnsService } from '../../../src/service/LnsService';
+import { CodecService } from '../../../src/service/CodecService';
 
 @Pipe({name: 'property'})
 export class PropertyPipe implements PipeTransform {
@@ -35,13 +37,7 @@ export class PropertyPipe implements PipeTransform {
 })
 export class LoraDevicesComponent {
     devices: IManagedObject[];
-    codecs: IManagedObject[];
-    lnsProxies: IManagedObject[];
-    lnsInstances: IManagedObject[];
-    proxyMap: {};
-    instanceMap: {};
     models: Map<string, string>;
-    codecMap: {};
     devEUIs: {};
     informationText: string;
     fileContent: { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any }[];
@@ -170,18 +166,11 @@ export class LoraDevicesComponent {
     @ViewChild(DataGridComponent, { static: true })
     dataGrid: DataGridComponent;
 
-    constructor(private inventory: InventoryService, private identityService: IdentityService, private fetchClient: FetchClient, private modalService: BsModalService/*, private fb: FormBuilder*/) {
+    constructor(public lnsService: LnsService, public codecService: CodecService, private inventory: InventoryService, private identityService: IdentityService, private fetchClient: FetchClient, private modalService: BsModalService/*, private fb: FormBuilder*/) {
         // _ annotation to mark this string as translatable string.
         this.informationText = _('Ooops! It seems that there is no device to display.');
         this.serverSideDataCallback = this.onDataSourceModifier.bind(this);
         this.queriesUtil = new QueriesUtil();
-        this.init();
-    }
-
-    async init() {
-        await this.loadCodecs();
-        await this.loadProxies();
-        await this.loadInstances()
     }
 
     getDeviceQueryString(columns: Column[]): string {
@@ -265,33 +254,6 @@ export class LoraDevicesComponent {
         return result;
     }
 
-    async loadCodecs() {
-        const { data, res, paging } = await this.inventory.list(this.codecsFilter);
-        this.codecs = data;
-        this.codecMap = {};
-        data.forEach(codec => this.codecMap[codec.lora_codec_DeviceCodecRepresentation.id] = codec.lora_codec_DeviceCodecRepresentation);
-        //console.log("Codec Map:");
-        //console.log(this.codecMap);
-    }
-
-    async loadProxies() {
-        const { data, res, paging } = await this.inventory.list(this.lnsProxyFilter);
-        this.lnsProxies = data;
-        this.proxyMap = {};
-        data.forEach(proxy => this.proxyMap[proxy.lnsType] = proxy);
-        //console.log("Proxy Map:");
-        //console.log(this.proxyMap);
-    }
-
-    async loadInstances() {
-        const { data, res, paging } = await this.inventory.list(this.instanceFilter);
-        this.lnsInstances = data;
-        this.instanceMap = {};
-        data.forEach(instance => this.instanceMap[instance.id] = instance);
-        //console.log("Instance Map:");
-        //console.log(this.instanceMap);
-    }
-
     addDeviceFromForm() {
         this.addDevice(this.provisionDevice.deviceName, this.provisionDevice.devEUI, this.provisionDevice.appEUI, this.provisionDevice.appKey, this.provisionDevice.type, this.provisionDevice.model, this.provisionDevice.instanceSelect, this.deviceProvisioningAdditionalProperties);
     }
@@ -300,7 +262,7 @@ export class LoraDevicesComponent {
     async addDevice(name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, instance: string, additionalProperties) {
 
         if (instance) {
-            this.provision({
+            this.provisionDevice({
                 name,
                 devEUI: devEUI.toLowerCase(),
                 appEUI: appEUI ? appEUI.toLowerCase() : null,
@@ -349,7 +311,7 @@ export class LoraDevicesComponent {
 
     async endDelete(deprovision: boolean) {
         if (deprovision) {
-            await this.deprovision(this.deviceToDelete);
+            await this.lnsService.deprovisionDevice(this.deviceToDelete);
         }
         await this.inventory.delete(this.deviceToDelete);
         this.deleteDeviceModalRef.hide();
@@ -419,50 +381,8 @@ export class LoraDevicesComponent {
         })
     }
 
-    async loadDeviceProvisioningAdditionalProperties(instance: string): Promise<{
-        properties: [{
-            name: string;
-            label: string;
-            required: boolean;
-            type: string;
-            url: string;
-            values: Map<string, string>;
-        }?], values: {}
-    }> {
-        let props: {
-            properties: [{
-                name: string;
-                label: string;
-                required: boolean;
-                type: string;
-                url: string;
-                values: Map<string, string>;
-            }?], values: {}
-        } = { properties: [], values: {} };
-        let lnsInstance: IManagedObject = this.instanceMap[instance];
-        const response = await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + '/deviceProvisioningAdditionalProperties');
-        props.properties = await response.json();
-        if (props.properties && props.properties.forEach) {
-            console.log(props.properties);
-            props.properties.forEach(async p => {
-                if (p.type === "LIST") {
-                    const values = await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + "/" + instance + p.url, {
-                        method: "GET",
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                    });
-                    p.values = await values.json();
-                }
-                props.values[p.name] = undefined;
-            });
-        }
-
-        return props;
-    }
-
     async loadProperties(instance) {
-        let props = await this.loadDeviceProvisioningAdditionalProperties(instance);
+        let props = await this.lnsService.getDeviceProvisioningAdditionalProperties(instance);
         this.properties = props.properties;
         this.deviceProvisioningAdditionalProperties = props.values;
         console.dir(this.properties);
@@ -472,27 +392,8 @@ export class LoraDevicesComponent {
     bulkDeviceProvisioningAdditionalProperties: any;
 
     async loadBulkProperties(instance) {
-        let props = await this.loadDeviceProvisioningAdditionalProperties(instance);
+        let props = await this.lnsService.getDeviceProvisioningAdditionalProperties(instance);
         this.bulkProperties = props.properties;
         this.bulkDeviceProvisioningAdditionalProperties = props.values;
-    }
-
-    async provision(deviceProvisioning: { name: string, devEUI: string, appEUI: string, appKey: string, codec: string, model: string, lat?: number, lng?: number }, instance: string, additionalProperties): Promise<IManagedObject> {
-        console.log("Will provision device on LNS instance " + instance);
-        console.log({ ...deviceProvisioning, provisioningMode: "OTAA", additionalProperties: additionalProperties });
-        let lnsInstance: IManagedObject = this.instanceMap[instance];
-        return (await (await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + '/' + instance + '/devices', {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ ...deviceProvisioning, provisioningMode: "OTAA", additionalProperties: additionalProperties })
-        })).json()).data;
-    }
-
-    async deprovision(device: IManagedObject) {
-        await this.fetchClient.fetch('service/lora-ns-' + this.instanceMap[device.lnsConnectorId].lnsType + '/' + device.lnsConnectorId + '/devices/' + await this.getDevEUI(device), {
-            method: "DELETE"
-        });
     }
 }

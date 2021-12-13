@@ -56,7 +56,7 @@
                         <select class="form-control" #type="ngModel" name="type" [(ngModel)]="provisionDevice.type"
                             (change)="loadModels(type.value)" required>
                             <option [ngValue]="undefined" [disabled]="true">Please select a type</option>
-                            <option *ngFor="let codec of codecs"
+                            <option *ngFor="let codec of codecService.codecs"
                                 [value]="codec.lora_codec_DeviceCodecRepresentation.id">
                                 {{codec.lora_codec_DeviceCodecRepresentation.name}}</option>
                         </select>
@@ -93,9 +93,9 @@
                             #instanceSelect="ngModel" [(ngModel)]="provisionDevice.instanceSelect"
                             (change)="loadProperties(instanceSelect.value)">
                             <option [ngValue]="undefined" [disabled]="true">Please select a connector</option>
-                            <option *ngFor="let instance of lnsInstances" [value]="instance.id">
+                            <option *ngFor="let instance of lnsService.lnsInstances" [value]="instance.id">
                                 {{instance.name}} -
-                                {{proxyMap[instance.lnsType].name}}</option>
+                                {{lnsService.proxyMap[instance.lnsType].name}}</option>
                         </select>
                     </div>
                     <c8y-messages
@@ -187,14 +187,18 @@
             </c8y-form-group>
             <div *ngIf="instanceSelect.valid">
                 File must contain the following columns:<br>
-                <span style="word-wrap: break-word">name;devEUI;appEUI;appKey;type;model<span *ngIf="bulkProperties !== undefined"><span
-                        *ngFor="let bulkProperty of bulkProperties">;{{bulkProperty.name}}<button *ngIf="bulkProperty.type === 'LIST'" class="btn-clean m-l-4 flex-item-middle" popoverTitle="Accepted values (label in parenthesis):"
-                        popover="{{bulkProperty.values | property:'id':'name'}}"
-                            placement="right" type="button">
-                            <i class="fa fw fa-question-circle-o text-primary"></i>
-                        </button>
-        </span></span>
+                <span style="word-wrap: break-word">name;devEUI;appEUI;appKey;type;model<span
+                        *ngIf="bulkProperties !== undefined"><span
+                            *ngFor="let bulkProperty of bulkProperties">;{{bulkProperty.name}}<button
+                                *ngIf="bulkProperty.type === 'LIST'" class="btn-clean m-l-4 flex-item-middle"
+                                popoverTitle="Accepted values (label in parenthesis):"
+                                popover="{{bulkProperty.values | property:'id':'name'}}" placement="right"
+                                type="button">
+                                <i class="fa fw dlt-c8y-icon-help-outline text-primary"></i>
+                            </button>
                         </span>
+                    </span>
+                </span>
             </div>
             <div class="col-sm-12">
                 <input type="file" (change)="changeListener($event.target.files)">
@@ -214,8 +218,7 @@
 </div>
 
 <div class="split-scroll">
-    <c8y-data-grid [title]="'Devices' | translate" class="scroll-column"
-        [columns]="columns" [pagination]="pagination"
+    <c8y-data-grid [title]="'Devices' | translate" class="scroll-column" [columns]="columns" [pagination]="pagination"
         [selectable]="true" [actionControls]="actionControls" [bulkActionControls]="bulkActionControls"
         [serverSideDataCallback]="serverSideDataCallback">
         <c8y-column name="deveui">
@@ -225,18 +228,18 @@
         </c8y-column>
         <c8y-column name="type">
             <ng-container *c8yCellRendererDef="let context">
-                {{codecMap[context.value] && codecMap[context.value].name}}
+                {{codecService.codecMap[context.value] && codecService.codecMap[context.value].name}}
             </ng-container>
         </c8y-column>
         <c8y-column name="lnstype">
             <ng-container *c8yCellRendererDef="let context">
-                {{instanceMap[context.value] && proxyMap[instanceMap[context.value].lnsType] &&
-                proxyMap[instanceMap[context.value].lnsType].name}}
+                {{lnsService.instanceMap[context.value] && lnsService.proxyMap[lnsService.instanceMap[context.value].lnsType] &&
+                lnsService.proxyMap[lnsService.instanceMap[context.value].lnsType].name}}
             </ng-container>
         </c8y-column>
         <c8y-column name="lnsname">
             <ng-container *c8yCellRendererDef="let context">
-                {{instanceMap[context.value] && instanceMap[context.value].name}}
+                {{lnsService.instanceMap[context.value] && lnsService.instanceMap[context.value].name}}
             </ng-container>
         </c8y-column>
     </c8y-data-grid>

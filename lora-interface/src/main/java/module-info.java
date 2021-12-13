@@ -15,6 +15,7 @@ module lora_interface {
     requires spring.core;
     requires spring.context;
     requires com.google.common;
+    requires transitive lombok;
 
     exports lora.codec;
     exports lora.codec.uplink;

@@ -84,7 +84,7 @@ public class SemtechCodec extends DeviceCodec {
 	}
 
 	private static final String DAS_MODEM_MSG = "{\"deveui\": \"%s\", \"uplink\": {\"msgtype\": \"modem\", \"fcnt\":%d, \"payload\": \"%s\"}}";
-	private static final String DAS_MODEM_MSG_WITH_POS = "{\"deveui\": \"%s\", \"uplink\": {\"msgtype\": \"modem\", \"fcnt\":%d, \"payload\": \"%s\", \"gnss_assist_position\": [%f, %f], \"gnss_use_2D_solver\": true, \"gnss_assist_altitude\": 0}}";
+	private static final String DAS_MODEM_MSG_WITH_POS = "{\"deveui\": \"%s\", \"uplink\": {\"msgtype\": \"modem\", \"fcnt\":%d, \"payload\": \"%s\", \"gnss_assist_position\": [%f, %f], \"gnss_assist_altitude\": %f}}";
 	private static final String DAS_MSG = "{\"deveui\": \"%s\", \"uplink\": {\"msgtype\": \"%s\", \"payload\": \"%s\"}}";
 
 	private Map<String, Integer> fcnts = new HashMap<>();
@@ -208,9 +208,11 @@ public class SemtechCodec extends DeviceCodec {
 			BigDecimal timestamp = positionSolution.at("/position_solution/timestamp").decimalValue();
 			BigDecimal lat = llh.get(0).decimalValue();
 			BigDecimal lng = llh.get(1).decimalValue();
+			BigDecimal alt = llh.get(2).decimalValue();
 			Position p = new Position();
 			p.setLat(lat);
 			p.setLng(lng);
+			p.setAlt(alt);
 			mor.set(p);
 			c8yData.updateRootDevice(mor);
 			EventRepresentation locationUpdate = new EventRepresentation();
@@ -228,13 +230,13 @@ public class SemtechCodec extends DeviceCodec {
 	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		var c8yData = new C8YData();
 
-		if (decode.getfPort() == 199) {
+		if (decode.getFPort() == 199) {
 			logger.info("Modem payload will be sent to DAS.");
 			Position p = inventoryApi.get(mor.getId()).get(Position.class);
 			JsonNode root = null;
 			if (p != null) {
 				logger.info("Will use assisted position: {}", p);
-				root = sendToDAS(String.format(DAS_MODEM_MSG_WITH_POS, formatEUI(decode.getDeveui()), getFcnt(decode.getDeveui()), decode.getPayload(), p.getLat().doubleValue(), p.getLng().doubleValue()));
+				root = sendToDAS(String.format(DAS_MODEM_MSG_WITH_POS, formatEUI(decode.getDeveui()), getFcnt(decode.getDeveui()), decode.getPayload(), p.getLat().doubleValue(), p.getLng().doubleValue(), p.getAlt().doubleValue()));
 			} else {
 				root = sendToDAS(String.format(DAS_MODEM_MSG, formatEUI(decode.getDeveui()), getFcnt(decode.getDeveui()), decode.getPayload()));
 			}

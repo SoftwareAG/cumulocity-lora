@@ -8,9 +8,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.io.BaseEncoding;
 
+import lombok.Data;
 import lora.common.ValidationResult;
 import lora.common.Validator;
 
+@Data
 public class DeviceProvisioning implements Validator {
 	private String name;
 	private String devEUI;
@@ -86,136 +88,6 @@ public class DeviceProvisioning implements Validator {
 
 	private DeviceClass deviceClass = DeviceClass.C;
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDevEUI() {
-		return devEUI;
-	}
-
-	public void setDevEUI(String devEUI) {
-		this.devEUI = devEUI;
-	}
-
-	public String getAppEUI() {
-		return appEUI;
-	}
-
-	public void setAppEUI(String appEUI) {
-		this.appEUI = appEUI;
-	}
-
-	public String getAppKey() {
-		return appKey;
-	}
-
-	public void setAppKey(String appKey) {
-		this.appKey = appKey;
-	}
-
-	public BigDecimal getLat() {
-		return lat;
-	}
-
-	public void setLat(BigDecimal lat) {
-		this.lat = lat;
-	}
-
-	public BigDecimal getLng() {
-		return lng;
-	}
-
-	public void setLng(BigDecimal lng) {
-		this.lng = lng;
-	}
-
-	public String getCodec() {
-		return codec;
-	}
-
-	public void setCodec(String codec) {
-		this.codec = codec;
-	}
-
-	public String getModel() {
-		return model;
-	}
-
-	public void setModel(String model) {
-		this.model = model;
-	}
-
-	public DeviceClass getDeviceClass() {
-		return deviceClass;
-	}
-
-	public void setDeviceClass(DeviceClass deviceClass) {
-		this.deviceClass = deviceClass;
-	}
-
-	public String getAppSKey() {
-		return appSKey;
-	}
-
-	public void setAppSKey(String appSKey) {
-		this.appSKey = appSKey;
-	}
-
-	public String getDevAddr() {
-		return devAddr;
-	}
-
-	public void setDevAddr(String devAddr) {
-		this.devAddr = devAddr;
-	}
-
-	public String getNwkSKey() {
-		return nwkSKey;
-	}
-
-	public void setNwkSKey(String nwkSKey) {
-		this.nwkSKey = nwkSKey;
-	}
-
-	public ProvisioningMode getProvisioningMode() {
-		return provisioningMode;
-	}
-
-	public void setProvisioningMode(ProvisioningMode provisioningMode) {
-		this.provisioningMode = provisioningMode;
-	}
-
-	public DeviceProvisioning name(String name) {
-		this.name = name;
-		return this;
-	}
-
-	public DeviceProvisioning appEUI(String appEUI) {
-		this.appEUI = appEUI;
-		return this;
-	}
-
-	public Properties getAdditionalProperties() {
-		return additionalProperties;
-	}
-
-	public void setAdditionalProperties(Properties additionalProperties) {
-		this.additionalProperties = additionalProperties;
-	}
-
-	public boolean getUseGatewayPosition() {
-		return useGatewayPosition;
-	}
-
-	public void setUseGatewayPosition(boolean useGatewayPosition) {
-		this.useGatewayPosition = useGatewayPosition;
-	}
-
 	public ValidationResult validate() {
 		boolean result = true;
 		String reason = "";
@@ -252,13 +124,5 @@ public class DeviceProvisioning implements Validator {
 		}
 
 		return new ValidationResult(result, reason);
-	}
-
-	@Override
-	public String toString() {
-		return "DeviceProvisioning [additionalProperties=" + additionalProperties + ", appEUI=" + appEUI + ", appKey="
-				+ appKey + ", appSKey=" + appSKey + ", codec=" + codec + ", devAddr=" + devAddr + ", devEUI=" + devEUI
-				+ ", deviceClass=" + deviceClass + ", lat=" + lat + ", lng=" + lng + ", model=" + model + ", name="
-				+ name + ", nwkSKey=" + nwkSKey + ", provisioningMode=" + provisioningMode + "]";
 	}
 }

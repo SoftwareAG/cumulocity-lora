@@ -67,11 +67,13 @@ public abstract class JwtInterceptor implements Interceptor {
                     response = chain.proceed(request);
                     cpt++;
                 }
+                if (!response.isSuccessful()) {
+                    logger.error("We were unable to reach ThingPark after 5 tries, please contact Actility support.");
+                }
             }
         }
 
         if (!response.isSuccessful()) {
-            logger.error("We were unable to reach ThingPark after 5 tries, please contact Actility support.");
             logger.error("Full error is: {}", response.body().string());
         }
 

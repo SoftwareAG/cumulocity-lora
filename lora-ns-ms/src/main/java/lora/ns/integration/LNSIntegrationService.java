@@ -311,9 +311,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		String errorMessage = null;
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
 		if (connector.isPresent() && connector.get().provisionGateway(gatewayProvisioning)) {
-			mor = lnsGatewayManager.getGateway(gatewayProvisioning.getExternalId().toLowerCase());
+			mor = lnsGatewayManager.getGateway(gatewayProvisioning.getGwEUI().toLowerCase());
 			if (mor == null) {
-				mor = lnsGatewayManager.createGateway(gatewayProvisioning);
+				mor = lnsGatewayManager.createGateway(lnsConnectorId, gatewayProvisioning);
 			}
 			response.setGateway(mor);
 			EventRepresentation event = new EventRepresentation();
@@ -326,16 +326,17 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			AlarmRepresentation alarm = new AlarmRepresentation();
 			alarm.setType("Gateway provisioning error");
 			if (connector.isPresent()) {
-				errorMessage = "Couldn't provision gateway " + gatewayProvisioning.getExternalId() + " in LNS connector "
+				errorMessage = "Couldn't provision gateway " + gatewayProvisioning.getGwEUI() + " in LNS connector "
 						+ lnsConnectorId;
 			} else {
 				errorMessage = "LNS connector Id '" + lnsConnectorId
 						+ "' doesn't exist. Please use a valid managed object Id.";
 			}
+			logger.error(errorMessage);
 			alarm.setText(errorMessage);
 			alarm.setDateTime(new DateTime());
 			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
-			mor = lnsDeviceManager.getDevice(gatewayProvisioning.getExternalId().toLowerCase());
+			mor = lnsDeviceManager.getDevice(gatewayProvisioning.getGwEUI().toLowerCase());
 			if (mor != null) {
 				alarm.setSource(mor);
 			} else {

@@ -9,6 +9,7 @@ import lora.ns.actility.rest.model.ConnectionRequest;
 import lora.ns.actility.rest.model.DeviceCreate;
 import lora.ns.actility.rest.model.DeviceProfile;
 import lora.ns.actility.rest.model.DownlinkMessage;
+import lora.ns.actility.rest.model.RFRegion;
 import lora.ns.actility.rest.model.Route;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -102,4 +103,8 @@ public interface ActilityCoreService {
 	@Headers("Accept: application/json")
 	@GET("baseStationProfiles")
 	Call<List<BaseStationProfile>> getBaseStationProfiles();
+
+	@Headers("Accept: application/json")
+	@GET("rfRegions")
+	Call<List<RFRegion>> getRFRegions();
 }

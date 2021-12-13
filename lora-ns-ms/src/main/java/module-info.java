@@ -20,6 +20,7 @@ module lora.ns.ms {
     requires spring.security.config;
     requires spring.security.web;
     requires com.google.common;
+    requires transitive lombok;
 
     exports lora.codec.ms;
     exports lora.ns.integration;

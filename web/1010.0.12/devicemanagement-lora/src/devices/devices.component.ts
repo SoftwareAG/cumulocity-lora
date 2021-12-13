@@ -1,12 +1,14 @@
 import { _ } from '@c8y/ngx-components';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FetchClient, InventoryService, IManagedObject, IOperation, IdentityService, OperationService, IEvent, EventService } from '@c8y/client';
+import { InventoryService, IManagedObject, IOperation, IdentityService, OperationService, IEvent, EventService } from '@c8y/client';
 import { ActivatedRoute } from '@angular/router';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { FormGroup } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { DeviceOperation } from '../../src/onboarding/codecs/DeviceOperation';
 import { DeviceOperationElement, ParamType } from '../../src/onboarding/codecs/DeviceOperationElement';
+import { CodecService } from '../../src/service/CodecService';
+import { LnsService } from '../../src/service/LnsService';
 
 @Component({
     selector: 'devices',
@@ -18,6 +20,7 @@ export class DevicesComponent implements OnInit {
     }
     commands: {};
     device: IManagedObject;
+    selectedLnsConnectorId: string;
     model: string;
     codec: string;
     useGatewayPosition: boolean = true;
@@ -26,43 +29,25 @@ export class DevicesComponent implements OnInit {
     @ViewChild('errorModal', { static: false })
     errorModal: TemplateRef<any>;
     errorModalRef: BsModalRef;
-    codecs: IManagedObject[];
-    codecMap: {};
     models: Map<string, string>;
     unprocessedPayloads: IEvent[];
-    lnsProxies: IManagedObject[];
-    lnsInstances: IManagedObject[];
-    proxyMap: {};
-    instanceMap: {};
     commandChoice: string;
+    deviceProvisioningAdditionalProperties = {};
+    properties: [{
+        name: string;
+        label: string;
+        required: boolean;
+        type: string;
+        url: string;
+        values: Map<string, string>;
+    }?];
 
     form = new FormGroup({});
     parameterValues: any = {};
     options: FormlyFormOptions = {};
     fields: FormlyFieldConfig[][] = new Array<FormlyFieldConfig[]>();
 
-    private lnsProxyFilter: object = {
-        type: 'LoRa Network Server agent',
-        // paging information will be a part of the response now
-        withTotalPages: true,
-        pageSize: 1000
-    };
-
-    private instanceFilter: object = {
-        type: 'LNS Connector',
-        // paging information will be a part of the response now
-        withTotalPages: true,
-        pageSize: 1000
-    };
-
-    private codecsFilter: object = {
-        type: 'Device Codec',
-        // paging information will be a part of the response now
-        withTotalPages: true,
-        pageSize: 100
-    };
-
-    constructor(public route: ActivatedRoute, private inventory: InventoryService, private identity: IdentityService, private operationService: OperationService, private fetch: FetchClient, private modalService: BsModalService, private eventService: EventService) {
+    constructor(public route: ActivatedRoute, public lnsService: LnsService, public codecService: CodecService, private inventory: InventoryService, private identity: IdentityService, private operationService: OperationService, private modalService: BsModalService, private eventService: EventService) {
         console.log(route.snapshot.parent.data.contextData.id);
         // _ annotation to mark this string as translatable string.
         this.init();
@@ -70,33 +55,13 @@ export class DevicesComponent implements OnInit {
 
     async init() {
         await this.getCodecAndModel();
-        await this.loadCodecs();
-        await this.loadProxies();
-        await this.loadInstances()
-    }
-
-    async loadProxies() {
-        const { data, res, paging } = await this.inventory.list(this.lnsProxyFilter);
-        this.lnsProxies = data;
-        this.proxyMap = {};
-        data.forEach(proxy => this.proxyMap[proxy.lnsType] = proxy);
-        //console.log("Proxy Map:");
-        //console.log(this.proxyMap);
-    }
-
-    async loadInstances() {
-        const { data, res, paging } = await this.inventory.list(this.instanceFilter);
-        this.lnsInstances = data;
-        this.instanceMap = {};
-        data.forEach(instance => this.instanceMap[instance.id] = instance);
-        //console.log("Instance Map:");
-        //console.log(this.instanceMap);
     }
 
     async getCodecAndModel() {
         let deviceId: string = this.route.snapshot.parent.data.contextData.id;
         const { data, res, paging } = await this.inventory.detail(deviceId);
         this.device = data;
+        this.selectedLnsConnectorId = this.device.lnsConnectorId;
         if (this.device.codec) {
             this.codec = this.device.codec;
             await this.loadModels(this.device.codec);
@@ -115,9 +80,9 @@ export class DevicesComponent implements OnInit {
     async loadCommands() {
         let deviceId: string = this.route.snapshot.parent.data.contextData.id;
         this.getUnprocessPayloads();
-        let response = await this.fetch.fetch('service/lora-codec-' + this.device.codec + '/operations/' + this.model);
-        this.commands = await response.json();
+        this.commands = await this.codecService.getOperations(this.device.codec, this.model);
         console.log(this.commands);
+        this.fields = new Array<FormlyFieldConfig[]>();
         Object.keys(this.commands).forEach(command => {
             this.fields[command] = this.getFields(this.commands[command]);
         });
@@ -182,7 +147,7 @@ export class DevicesComponent implements OnInit {
     }
 
     getFields(command: DeviceOperation): FormlyFieldConfig[] {
-        return command.elements.map(e => this.getFieldFromElement(e));
+        return command && command.elements ? command.elements.map(e => this.getFieldFromElement(e)) : [];
     }
 
     async preview(command, parameters) {
@@ -194,15 +159,7 @@ export class DevicesComponent implements OnInit {
             model: this.device.c8y_Hardware !== undefined ? this.device.c8y_Hardware.model || 'a' : 'a'
         }
         console.log(toEncode);
-        let response = await this.fetch.fetch('service/lora-codec-' + this.device.codec + '/encode', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(toEncode)
-        });
-        this.previewCommand = await response.json();
+        this.previewCommand = await this.codecService.encode(this.device.codec, toEncode);
         console.dir(this.previewCommand);
         if (!this.previewCommand.success) {
             this.errorModalRef = this.modalService.show(this.errorModal);
@@ -221,29 +178,14 @@ export class DevicesComponent implements OnInit {
         this.operationService.create(operation);
     }
 
-    async loadCodecs() {
-        const { data, res, paging } = await this.inventory.list(this.codecsFilter);
-        this.codecs = data;
-        this.codecMap = {};
-        data.forEach(codec => this.codecMap[codec.lora_codec_DeviceCodecRepresentation.id] = codec.lora_codec_DeviceCodecRepresentation);
-    }
-
     async loadModels(codec) {
         console.log("Loading models for codec " + codec);
-        const response = await this.fetch.fetch('service/lora-codec-' + codec + '/models');
-        console.log(response);
-        if (response) {
-            try {
-                this.models = await response.json();
-            } catch(e) {
-                console.log(e);
-                this.models = new Map<string, string>();
-            }
-        }
-        else {
-            this.models = new Map<string, string>();
+        this.models = await this.codecService.getModels(codec);
+        if (!this.models[this.model]) {
+            this.model = undefined;
         }
         console.log(this.models);
+        console.log(this.model);
     }
 
     updateDeviceCodec() {
@@ -255,6 +197,8 @@ export class DevicesComponent implements OnInit {
         }
 
         this.inventory.update(device);
+        this.device.codec = this.codec;
+        this.device.c8y_Hardware = {model: this.model};
         this.loadCommands();
     }
 
@@ -279,15 +223,7 @@ export class DevicesComponent implements OnInit {
                 updateTime: new Date(event.time).getTime()
             }
             console.log(toDecode);
-            let response = await this.fetch.fetch('service/lora-codec-' + this.device.codec + '/decode', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(toDecode)
-            });
-            let decodeResult = await response.json();
+            let decodeResult = await this.codecService.decode(this.device.codec, toDecode);
             if (decodeResult.success) {
                 event.processed = true;
                 event.creationTime = null;
@@ -298,5 +234,28 @@ export class DevicesComponent implements OnInit {
             }
         });
         this.getUnprocessPayloads();
+    }
+
+    async loadProperties(instance: string) {
+        let props = await this.lnsService.getDeviceProvisioningAdditionalProperties(instance);
+        this.properties = props.properties;
+        this.deviceProvisioningAdditionalProperties = props.values;
+        console.dir(this.properties);
+        console.dir(this.deviceProvisioningAdditionalProperties);
+    }
+
+    async updateConnector() {
+        try {
+            await this.lnsService.deprovisionDevice(this.device);
+        } catch(e) {
+            console.log(e);
+        }
+        try {
+            let response = await this.lnsService.provisionDevice({appEUI: this.device.appEUI, appKey: this.device.appKey, devEUI: this.devEui, codec: this.device.codec, model: this.device.c8y_Hardware.model, name: this.device.name}, this.selectedLnsConnectorId, this.deviceProvisioningAdditionalProperties);
+            console.log(response);
+        } catch(e) {
+            console.log(e);
+        }
+        this.device.lnsConnectorId = this.selectedLnsConnectorId;
     }
 }
