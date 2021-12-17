@@ -40,7 +40,9 @@ import lora.codec.DeviceCodecRepresentation;
 import lora.codec.ms.CodecManager;
 import lora.codec.ms.CodecProxy;
 import lora.common.C8YUtils;
+import lora.common.ValidationResult;
 import lora.ns.DeviceData;
+import lora.ns.agent.AgentService;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
 import lora.ns.integration.LNSIntegrationService;
@@ -94,6 +96,9 @@ public class LNSDeviceManager {
 
 	@Autowired
 	private LNSConnectorManager lnsConnectorManager;
+
+	@Autowired
+	private AgentService agentService;
 
 	private ManagedObjectRepresentation createDeviceWithName(String lnsInstanceId, DeviceData event,
 			ManagedObjectRepresentation agent) {
@@ -339,5 +344,87 @@ public class LNSDeviceManager {
 			operation.setDeviceId(mor.getId());
 			deviceControlApi.create(operation);
 		}
+	}
+
+	private ManagedObjectRepresentation upsertDevice(String lnsInstanceId, DeviceProvisioning deviceProvisioning) {
+		ManagedObjectRepresentation mor;
+		mor = getDevice(deviceProvisioning.getDevEUI().toLowerCase());
+		if (mor == null) {
+			mor = createDevice(deviceProvisioning.getDevEUI(), null);
+		}
+		mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsInstanceId);
+		addDeviceToAgent(agentService.getAgent(), mor);
+		if (deviceProvisioning.getCodec() != null) {
+			mor.setProperty("codec", deviceProvisioning.getCodec());
+		}
+		if (deviceProvisioning.getModel() != null) {
+			Hardware hardware = new Hardware();
+			hardware.setModel(deviceProvisioning.getModel());
+			mor.set(hardware);
+		}
+		mor.setProperty("provisioned", true);
+		mor.setLastUpdatedDateTime(null);
+		mor.setName(deviceProvisioning.getName());
+		updateDevice(deviceProvisioning.getDevEUI(), mor);
+		return mor;
+	}
+	
+	public DeviceProvisioningResponse provisionDevice(String lnsConnectorId, DeviceProvisioning deviceProvisioning) {
+		logger.info("Will provision device on LNS connector {}: {}", lnsConnectorId, deviceProvisioning);
+		DeviceProvisioningResponse response = new DeviceProvisioningResponse();
+		ManagedObjectRepresentation mor = null;
+		String errorMessage = null;
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		ValidationResult validationResult = deviceProvisioning.validate();
+		if (validationResult.isOk() && connector.isPresent() && connector.get().provisionDevice(deviceProvisioning)) {
+			mor = upsertDevice(lnsConnectorId, deviceProvisioning);
+			EventRepresentation event = new EventRepresentation();
+			event.setType("Device provisioned");
+			event.setText("Device has been provisioned");
+			event.setDateTime(new DateTime());
+			event.setSource(mor);
+			eventApi.create(event);
+			getDeviceConfig(mor);
+		} else {
+			AlarmRepresentation alarm = new AlarmRepresentation();
+			alarm.setType("Device provisioning error");
+			if (connector.isPresent()) {
+				errorMessage = "Couldn't provision device " + deviceProvisioning.getDevEUI() + " in LNS connector "
+						+ lnsConnectorId;
+				if (!validationResult.isOk()) {
+					errorMessage += validationResult.getReason();
+				}
+			} else {
+				errorMessage = "LNS connector Id '" + lnsConnectorId
+						+ "' doesn't exist. Please use a valid managed object Id.";
+			}
+			alarm.setText(errorMessage);
+			alarm.setDateTime(new DateTime());
+			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
+			mor = getDevice(deviceProvisioning.getDevEUI().toLowerCase());
+			if (mor != null) {
+				alarm.setSource(mor);
+			} else {
+				alarm.setSource(agentService.getAgent());
+			}
+			alarmApi.create(alarm);
+		}
+		response.setDevice(mor);
+		response.setErrorMessage(errorMessage);
+		return response;
+	}
+
+	public boolean deprovisionDevice(String lnsInstanceId, String deveui) {
+		boolean result = false;
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
+		if (connector.isPresent() && connector.get().deprovisionDevice(deveui)) {
+			ManagedObjectRepresentation mor = getDevice(deveui);
+			mor.removeProperty("c8y_RequiredInterval");
+			mor.setProperty("provisioned", false);
+			mor.setLastUpdatedDateTime(null);
+			updateDevice(deveui, mor);
+			result = true;
+		}
+		return result;
 	}
 }

@@ -3,6 +3,7 @@ package lora.ns.gateway;
 import java.util.Optional;
 
 import com.cumulocity.model.event.CumulocityAlarmStatuses;
+import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.rest.representation.alarm.AlarmRepresentation;
 import com.cumulocity.rest.representation.event.EventRepresentation;
 import com.cumulocity.rest.representation.identity.ExternalIDRepresentation;
@@ -27,7 +28,9 @@ import c8y.RequiredAvailability;
 import lombok.extern.slf4j.Slf4j;
 import lora.codec.uplink.C8YData;
 import lora.common.C8YUtils;
+import lora.ns.agent.AgentService;
 import lora.ns.connector.LNSConnector;
+import lora.ns.connector.LNSConnectorManager;
 import lora.ns.integration.LNSIntegrationService;
 
 @Component
@@ -51,6 +54,12 @@ public class LNSGatewayManager {
 
 	@Autowired
 	protected MeasurementApi measurementApi;
+
+    @Autowired
+    private AgentService agentService;
+
+    @Autowired
+    private LNSConnectorManager lnsConnectorManager;
 
     public static final String GATEWAY_ID_TYPE = "LoRa Gateway Id";
 
@@ -154,5 +163,59 @@ public class LNSGatewayManager {
 		} catch (SDKException e) {
 			log.error("Error on clearing Alarm", e);
 		}
+	}
+
+	public GatewayProvisioningResponse provisionGateway(String lnsConnectorId, GatewayProvisioning gatewayProvisioning) {
+		GatewayProvisioningResponse response = new GatewayProvisioningResponse();
+		ManagedObjectRepresentation mor;
+		String errorMessage = null;
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent() && connector.get().provisionGateway(gatewayProvisioning)) {
+			mor = getGateway(gatewayProvisioning.getGwEUI().toLowerCase());
+			if (mor == null) {
+				mor = createGateway(lnsConnectorId, gatewayProvisioning);
+			}
+			response.setGateway(mor);
+			EventRepresentation event = new EventRepresentation();
+			event.setType("Gateway provisioned");
+			event.setText("Gateway has been provisioned");
+			event.setDateTime(new DateTime());
+			event.setSource(mor);
+			eventApi.create(event);
+		} else {
+			AlarmRepresentation alarm = new AlarmRepresentation();
+			alarm.setType("Gateway provisioning error");
+			if (connector.isPresent()) {
+				errorMessage = "Couldn't provision gateway " + gatewayProvisioning.getGwEUI() + " in LNS connector "
+						+ lnsConnectorId;
+			} else {
+				errorMessage = "LNS connector Id '" + lnsConnectorId
+						+ "' doesn't exist. Please use a valid managed object Id.";
+			}
+			log.error(errorMessage);
+			alarm.setText(errorMessage);
+			alarm.setDateTime(new DateTime());
+			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
+			mor = getGateway(gatewayProvisioning.getGwEUI().toLowerCase());
+			if (mor != null) {
+				alarm.setSource(mor);
+			} else {
+				alarm.setSource(agentService.getAgent());
+			}
+			alarmApi.create(alarm);
+		}
+		response.setErrorMessage(errorMessage);
+
+		return response;
+	}
+
+	public boolean deprovisionGateway(String lnsConnectorId, String id) {
+		boolean result = false;
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent() && connector.get().deprovisionGateway(id)) {
+			result = true;
+		}
+
+		return result;
 	}
 }

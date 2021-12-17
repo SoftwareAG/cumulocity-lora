@@ -58,26 +58,28 @@ public class LNSOperationManager {
 		logger.info("Will execute operation {}", operation.toJSON());
 		if (lnsDeviceManager.getDeviceEui(operation.getDeviceId()) != null) {
 			logger.info("Processing operation {}", operation);
-			DownlinkData encodedData = codecManager.encode(lnsDeviceManager.getDeviceEui(operation.getDeviceId()),
-					operation);
-			if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null
-					&& !encodedData.isSkipDownlink()) {
-				operation.setStatus(OperationStatus.EXECUTING.toString());
-				String lnsConnectorId = inventoryApi.get(operation.getDeviceId())
-						.getProperty(LNSIntegrationService.LNS_CONNECTOR_REF).toString();
-				processOperation(lnsConnectorId, encodedData, operation);
-			} else if (encodedData != null && encodedData.isSkipDownlink()) {
-				operation.setStatus(OperationStatus.SUCCESSFUL.toString());
-				Command command = operation.get(Command.class);
-				command.setResult("Operation skipped.");
-				operation.set(command);
-			} else {
-				operation.setStatus(OperationStatus.FAILED.toString());
-				Command command = operation.get(Command.class);
-				command.setResult("Operation not supported.");
-				operation.set(command);
+			if (operation.get(Command.class) != null) {
+				DownlinkData encodedData = codecManager.encode(lnsDeviceManager.getDeviceEui(operation.getDeviceId()),
+						operation);
+				if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null
+						&& !encodedData.isSkipDownlink()) {
+					operation.setStatus(OperationStatus.EXECUTING.toString());
+					String lnsConnectorId = inventoryApi.get(operation.getDeviceId())
+							.getProperty(LNSIntegrationService.LNS_CONNECTOR_REF).toString();
+					processOperation(lnsConnectorId, encodedData, operation);
+				} else if (encodedData != null && encodedData.isSkipDownlink()) {
+					operation.setStatus(OperationStatus.SUCCESSFUL.toString());
+					Command command = operation.get(Command.class);
+					command.setResult("Operation skipped.");
+					operation.set(command);
+				} else {
+					operation.setStatus(OperationStatus.FAILED.toString());
+					Command command = operation.get(Command.class);
+					command.setResult("Operation not supported.");
+					operation.set(command);
+				}
+				deviceControlApi.update(operation);
 			}
-			deviceControlApi.update(operation);
 		} else {
 			logger.info("Operation {} will be ignored", operation);
 		}

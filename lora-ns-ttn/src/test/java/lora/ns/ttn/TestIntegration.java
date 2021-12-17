@@ -1,10 +1,8 @@
 package lora.ns.ttn;
 
-import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
-import lora.ns.device.DeviceProvisioning;
+import lora.ns.DeviceData;
 
 public class TestIntegration {
     /*@Test
@@ -33,4 +31,11 @@ public class TestIntegration {
         TTNConnector connector = new TTNConnector(properties);
         connector.sendDownlink(new DownlinkData("0018B20000001437", 1, "01"));
     }*/
+
+    @Test
+    public void testUplink() {
+        TTNIntegrationService service = new TTNIntegrationService();
+        DeviceData deviceData = service.processUplinkEvent("{\"uplink_message\": {\"rx_metadata\": [{\"snr\": 11.2}]}}}");
+        System.out.println(deviceData.getMeasurements().get(0).toJSON());
+    }
 }

@@ -42,23 +42,17 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 		DeviceData data = null;
 		try {
 			JsonNode rootNode = mapper.readTree(event);
-			String deviceEui = rootNode.get("end_device_ids").get("dev_eui").asText();
-			int fPort = rootNode.get("uplink_message").get("f_port").asInt();
-			Double rssi = rootNode.at("uplink_message/rx_metadata/0/rssi").isNull() ? null :
-				rootNode.at("uplink_message/rx_metadata/0/rssi").asDouble();
-			Double snr = rootNode.at("uplink_message/rx_metadata/0/snr").isNull() ? null : rootNode.at("uplink_message/rx_metadata/0/snr").asDouble();
+			String deviceEui = rootNode.at("/end_device_ids/dev_eui").asText();
+			int fPort = rootNode.at("/uplink_message/f_port").asInt();
+			Double rssi = rootNode.at("/uplink_message/rx_metadata/0/rssi").asDouble();
+			Double snr = rootNode.at("/uplink_message/rx_metadata/0/snr").asDouble();
 			logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
-			byte[] payload = Base64.getDecoder().decode(rootNode.get("uplink_message").get("frm_payload").asText());
-			Long updateTime = new DateTime(rootNode.get("uplink_message").get("received_at").asText()).getMillis();
+			byte[] payload = Base64.getDecoder().decode(rootNode.at("/uplink_message/frm_payload").asText());
+			Long updateTime = rootNode.has("/uplink_message/received_at") ? new DateTime(rootNode.at("/uplink_message/received_at").asText()).getMillis() : new DateTime().getMillis();
 			logger.info("Update time is: {}", updateTime);
 
-			Double lat = null;
-			Double lng = null;
-			if (rootNode.get("uplink_message").has("locations")
-					&& rootNode.get("uplink_message").get("locations").has("user")) {
-				lat = rootNode.get("uplink_message").get("locations").get("user").get("latitude").asDouble();
-				lng = rootNode.get("uplink_message").get("locations").get("user").get("longitude").asDouble();
-			}
+			Double lat = rootNode.at("/uplink_message/locations/user/latitude").asDouble();
+			Double lng = rootNode.at("/uplink_message/locations/user/longitude").asDouble();
 
 			List<MeasurementRepresentation> measurements = new ArrayList<>();
 			MeasurementRepresentation m = new MeasurementRepresentation();

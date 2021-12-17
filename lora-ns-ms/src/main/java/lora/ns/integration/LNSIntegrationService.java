@@ -15,11 +15,8 @@ import java.util.Properties;
 import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
-import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.model.idtype.GId;
 import com.cumulocity.model.operation.OperationStatus;
-import com.cumulocity.rest.representation.alarm.AlarmRepresentation;
-import com.cumulocity.rest.representation.event.EventRepresentation;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.cumulocity.rest.representation.operation.OperationCollectionRepresentation;
@@ -48,10 +45,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-import c8y.Hardware;
 import lora.codec.uplink.C8YData;
 import lora.common.C8YUtils;
-import lora.common.ValidationResult;
 import lora.ns.DeviceData;
 import lora.ns.agent.AgentService;
 import lora.ns.connector.LNSConnector;
@@ -59,12 +54,8 @@ import lora.ns.connector.LNSConnectorManager;
 import lora.ns.connector.LNSConnectorRepresentation;
 import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.connector.PropertyDescription;
-import lora.ns.device.DeviceProvisioning;
-import lora.ns.device.DeviceProvisioningResponse;
 import lora.ns.device.EndDevice;
 import lora.ns.device.LNSDeviceManager;
-import lora.ns.gateway.GatewayProvisioning;
-import lora.ns.gateway.GatewayProvisioningResponse;
 import lora.ns.gateway.LNSGatewayManager;
 import lora.ns.operation.LNSOperationManager;
 import lora.ns.operation.OperationData;
@@ -162,11 +153,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	@EventListener
 	private void init(MicroserviceSubscriptionAddedEvent event) {
-		getAllLNSInstances(event);
-		agentService.registerAgent(this);
-	}
-
-	private void getAllLNSInstances(MicroserviceSubscriptionAddedEvent event) {
 		logger.info("Looking for LNS Connectors in tenant {}", subscriptionsService.getTenant());
 		InventoryFilter filter = new InventoryFilter().byType(LNS_CONNECTOR_TYPE);
 		ManagedObjectCollection col = inventoryApi.getManagedObjectsByFilter(filter);
@@ -189,6 +175,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			lnsGatewayManager.upsertGateways(instance);
 			configureRoutings(instance.getId(), event.getCredentials());
 		}
+		agentService.registerAgent(this);
 	}
 
 	public void mapEventToC8Y(String eventString, String lnsInstanceId) {
@@ -237,128 +224,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		}
 	}
 
-	public DeviceProvisioningResponse provisionDevice(String lnsConnectorId, DeviceProvisioning deviceProvisioning) {
-		logger.info("Will provision device on LNS connector {}: {}", lnsConnectorId, deviceProvisioning);
-		DeviceProvisioningResponse response = new DeviceProvisioningResponse();
-		ManagedObjectRepresentation mor = null;
-		String errorMessage = null;
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		ValidationResult validationResult = deviceProvisioning.validate();
-		if (validationResult.isOk() && connector.isPresent() && connector.get().provisionDevice(deviceProvisioning)) {
-			mor = upsertDevice(lnsConnectorId, deviceProvisioning);
-			EventRepresentation event = new EventRepresentation();
-			event.setType("Device provisioned");
-			event.setText("Device has been provisioned");
-			event.setDateTime(new DateTime());
-			event.setSource(mor);
-			eventApi.create(event);
-			lnsDeviceManager.getDeviceConfig(mor);
-		} else {
-			AlarmRepresentation alarm = new AlarmRepresentation();
-			alarm.setType("Device provisioning error");
-			if (connector.isPresent()) {
-				errorMessage = "Couldn't provision device " + deviceProvisioning.getDevEUI() + " in LNS connector "
-						+ lnsConnectorId;
-				if (!validationResult.isOk()) {
-					errorMessage += validationResult.getReason();
-				}
-			} else {
-				errorMessage = "LNS connector Id '" + lnsConnectorId
-						+ "' doesn't exist. Please use a valid managed object Id.";
-			}
-			alarm.setText(errorMessage);
-			alarm.setDateTime(new DateTime());
-			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
-			mor = lnsDeviceManager.getDevice(deviceProvisioning.getDevEUI().toLowerCase());
-			if (mor != null) {
-				alarm.setSource(mor);
-			} else {
-				alarm.setSource(agentService.getAgent());
-			}
-			alarmApi.create(alarm);
-		}
-		response.setDevice(mor);
-		response.setErrorMessage(errorMessage);
-		return response;
-	}
-
-	private ManagedObjectRepresentation upsertDevice(String lnsInstanceId, DeviceProvisioning deviceProvisioning) {
-		ManagedObjectRepresentation mor;
-		mor = lnsDeviceManager.getDevice(deviceProvisioning.getDevEUI().toLowerCase());
-		if (mor == null) {
-			mor = lnsDeviceManager.createDevice(deviceProvisioning.getDevEUI(), null);
-		}
-		mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsInstanceId);
-		lnsDeviceManager.addDeviceToAgent(agentService.getAgent(), mor);
-		if (deviceProvisioning.getCodec() != null) {
-			mor.setProperty("codec", deviceProvisioning.getCodec());
-		}
-		if (deviceProvisioning.getModel() != null) {
-			Hardware hardware = new Hardware();
-			hardware.setModel(deviceProvisioning.getModel());
-			mor.set(hardware);
-		}
-		mor.setProperty("provisioned", true);
-		mor.setLastUpdatedDateTime(null);
-		mor.setName(deviceProvisioning.getName());
-		lnsDeviceManager.updateDevice(deviceProvisioning.getDevEUI(), mor);
-		return mor;
-	}
-
-	public GatewayProvisioningResponse provisionGateway(String lnsConnectorId, GatewayProvisioning gatewayProvisioning) {
-		GatewayProvisioningResponse response = new GatewayProvisioningResponse();
-		ManagedObjectRepresentation mor;
-		String errorMessage = null;
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		if (connector.isPresent() && connector.get().provisionGateway(gatewayProvisioning)) {
-			mor = lnsGatewayManager.getGateway(gatewayProvisioning.getGwEUI().toLowerCase());
-			if (mor == null) {
-				mor = lnsGatewayManager.createGateway(lnsConnectorId, gatewayProvisioning);
-			}
-			response.setGateway(mor);
-			EventRepresentation event = new EventRepresentation();
-			event.setType("Gateway provisioned");
-			event.setText("Gateway has been provisioned");
-			event.setDateTime(new DateTime());
-			event.setSource(mor);
-			eventApi.create(event);
-		} else {
-			AlarmRepresentation alarm = new AlarmRepresentation();
-			alarm.setType("Gateway provisioning error");
-			if (connector.isPresent()) {
-				errorMessage = "Couldn't provision gateway " + gatewayProvisioning.getGwEUI() + " in LNS connector "
-						+ lnsConnectorId;
-			} else {
-				errorMessage = "LNS connector Id '" + lnsConnectorId
-						+ "' doesn't exist. Please use a valid managed object Id.";
-			}
-			logger.error(errorMessage);
-			alarm.setText(errorMessage);
-			alarm.setDateTime(new DateTime());
-			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
-			mor = lnsDeviceManager.getDevice(gatewayProvisioning.getGwEUI().toLowerCase());
-			if (mor != null) {
-				alarm.setSource(mor);
-			} else {
-				alarm.setSource(agentService.getAgent());
-			}
-			alarmApi.create(alarm);
-		}
-		response.setErrorMessage(errorMessage);
-
-		return response;
-	}
-
-	public boolean deprovisionGateway(String lnsConnectorId, String id) {
-		boolean result = false;
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		if (connector.isPresent() && connector.get().deprovisionGateway(id)) {
-			result = true;
-		}
-
-		return result;
-	}
-
 	public List<EndDevice> getDevices(String lnsInstanceId) {
 		List<EndDevice> result = new ArrayList<>();
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
@@ -379,10 +244,10 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		}
 	}
 
-	public ManagedObjectRepresentation addLNSInstance(LNSConnectorRepresentation instanceRepresentation) {
+	public ManagedObjectRepresentation addLnsConnector(LNSConnectorRepresentation connectorRepresentation) {
 		ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
 		mor.setType(LNS_CONNECTOR_TYPE);
-		mor.setName(instanceRepresentation.getName());
+		mor.setName(connectorRepresentation.getName());
 		mor.setProperty(LNS_TYPE, this.getType());
 		mor = inventoryApi.create(mor);
 
@@ -390,7 +255,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		agentApi.addChildDevice(mor.getId());
 
 		String category = mor.getId().getValue();
-		instanceRepresentation.getProperties().forEach((k, v) -> {
+		connectorRepresentation.getProperties().forEach((k, v) -> {
 			OptionRepresentation option = new OptionRepresentation();
 			option.setCategory(category);
 			if (isPropertyEncrypted(k.toString())) {
@@ -403,7 +268,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		});
 
 		LNSConnector instance = getInstance(mor);
-		instance.setProperties(instanceRepresentation.getProperties());
+		instance.setProperties(connectorRepresentation.getProperties());
 
 		lnsConnectorManager.addConnector(instance);
 		Optional<MicroserviceCredentials> credentials = subscriptionsService
@@ -416,6 +281,33 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 		return mor;
 	}
+
+	public void removeLnsConnector(String lnsConnectorId) {
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent()) {
+			connector.get().removeRoutings(subscriptionsService.getTenant());
+			inventoryApi.delete(new GId(lnsConnectorId));
+		}
+	}
+
+    public void updateLnsConnector(String lnsConnectorId, Properties properties) {
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent()) {
+			LNSConnector c = connector.get();
+			c.setProperties(c.mergeProperties(properties));
+			c.getProperties().forEach((k, v) -> {
+				OptionRepresentation option = new OptionRepresentation();
+				option.setCategory(lnsConnectorId);
+				if (isPropertyEncrypted(k.toString())) {
+					option.setKey("credentials." + k.toString());
+				} else {
+					option.setKey(k.toString());
+				}
+				option.setValue(v.toString());
+				tenantOptionApi.save(option);
+			});
+		}
+    }
 
 	private boolean isPropertyEncrypted(String key) {
 		boolean[] result = { false };
@@ -485,28 +377,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		return taskScheduler;
 	}
 
-	public void removeLNSInstance(String lnsInstanceId) {
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
-		if (connector.isPresent()) {
-			connector.get().removeRoutings(subscriptionsService.getTenant());
-			inventoryApi.delete(new GId(lnsInstanceId));
-		}
-	}
-
-	public boolean deprovisionDevice(String lnsInstanceId, String deveui) {
-		boolean result = false;
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
-		if (connector.isPresent() && connector.get().deprovisionDevice(deveui)) {
-			ManagedObjectRepresentation mor = lnsDeviceManager.getDevice(deveui);
-			mor.removeProperty("c8y_RequiredInterval");
-			mor.setProperty("provisioned", false);
-			mor.setLastUpdatedDateTime(null);
-			lnsDeviceManager.updateDevice(deveui, mor);
-			result = true;
-		}
-		return result;
-	}
-
 	public List<LNSConnectorWizardStep> getInstanceWizard() {
 		return wizard;
 	}
@@ -518,23 +388,4 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	public List<PropertyDescription> getGatewayProvisioningAdditionalProperties() {
 		return gatewayProvisioningAdditionalProperties;
 	}
-
-    public void updateLnsConnector(String lnsInstanceId, Properties properties) {
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
-		if (connector.isPresent()) {
-			LNSConnector c = connector.get();
-			c.setProperties(c.mergeProperties(properties));
-			c.getProperties().forEach((k, v) -> {
-				OptionRepresentation option = new OptionRepresentation();
-				option.setCategory(lnsInstanceId);
-				if (isPropertyEncrypted(k.toString())) {
-					option.setKey("credentials." + k.toString());
-				} else {
-					option.setKey(k.toString());
-				}
-				option.setValue(v.toString());
-				tenantOptionApi.save(option);
-			});
-		}
-    }
 }
