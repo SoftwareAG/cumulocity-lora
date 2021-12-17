@@ -57,6 +57,23 @@
             <div class="form-group col-sm-12">
                 <button type="button" class="btn btn-primary" (click)="saveDecoder()">Save decoder</button>
             </div>
+            <div class="row">
+                <div class="form-group col-sm-6">
+                    <label for="payload">Enter a payload to decode:</label>
+                    <input #payload required placeholder="hex payload"/>
+                </div>
+                <div class="form-group col-sm-6">
+                    <label for="fport">Enter FPort:</label>
+                    <input type="number" #fport required placeholder="fport"/>
+                </div>
+            </div>
+            <div class="form-group col-sm-12">
+                <button type="button" class="btn btn-primary" (click)="decode(payload.value, fport.value)">Test decoder</button>
+            </div>
+            <div class="col-sm-12">
+                <ngx-monaco-editor style="height: 200px" [options]="resultOptions" [(ngModel)]="decoded">
+                </ngx-monaco-editor>
+            </div>
         </div>
     </div>
     <div class="card col-sm-9" *ngIf="downlinkTab === 'active'">

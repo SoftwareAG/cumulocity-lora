@@ -3,6 +3,7 @@ import { FetchClient, IManagedObject, InventoryService } from '@c8y/client';
 import { C8yJSONSchema } from '@c8y/ngx-components';
 import { DeviceOperation } from "./DeviceOperation";
 import { DeviceOperationElement, ParamType } from "./DeviceOperationElement";
+import { C8YData } from "./C8YData";
 
 @Component({
     selector: 'codecs',
@@ -28,6 +29,12 @@ export class LoraCodecsComponent {
         }
     };
 
+    resultOptions = {
+        theme: 'vs-dark',
+        language: 'json',
+        readOnly: true
+    };
+
     defaultDecodingScript: string = '/* Example of decoder:\nlet c8yData = new C8YData();\nlet buffer = Buffer.from(payload, "hex");\nc8yData.addMeasurement(device, "temperature", "T", "°C", buffer.readInt16BE(0) / 10.0, time);\nconsole.log(c8yData);\nreturn c8yData;*/';
     defaultEncodingScript: string = '/* Example of encoder:\nlet downlinkData = new DownlinkData();\nif (operation.SET_PERIODICITY) {\n\tdownlinkData = {fport: 1, payload: "01" + ("0"+(Number(operation.SET_PERIODICITY.PERIODICITY).toString(16))).slice(-2)};\n}\nconsole.log(downlinkData);\nreturn downlinkData;*/';
     decodingScript: string;
@@ -37,6 +44,8 @@ export class LoraCodecsComponent {
     uplinkTab = "active";
     downlinkTab = "";
     operationsTab = "";
+
+    decoded: string;
 
     constructor(private inventory: InventoryService, private fetchClient: FetchClient, public jsonschema: C8yJSONSchema, private readonly changeDetectorRef: ChangeDetectorRef) {
         this.loadCodecs();
@@ -230,5 +239,13 @@ export class LoraCodecsComponent {
 
     isGroup(element: DeviceOperationElement): boolean {
         return element.type && element.type == ParamType.GROUP;
+    }
+
+    decode(payload: string, fport: number) {
+        let time = new Date();
+        let device = {};
+        let localDecode = Function("device", "fport", "time", "payload", "C8YData", "Buffer", this.decodingScript);
+        console.log(localDecode);
+        this.decoded = JSON.stringify(localDecode({}, fport, new Date(), payload, C8YData, Buffer), null, '\t');
     }
 }
