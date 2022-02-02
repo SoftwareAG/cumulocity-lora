@@ -41,16 +41,16 @@ public class ObjeniousIntegrationService extends LNSIntegrationService<Objenious
         DeviceData data = null;
         try {
             JsonNode rootNode = mapper.readTree(event);
-            String deviceEui = rootNode.get("device_properties").get("deveui").asText();
-            String name = rootNode.get("device_properties").get("external_id").asText();
-            int fPort = rootNode.get("protocol_data").get("port").asInt();
-            double rssi = rootNode.get("protocol_data").get("rssi").asDouble();
-            double snr = rootNode.get("protocol_data").get("snr").asDouble();
-            double noise = rootNode.get("protocol_data").get("noise").asDouble();
-            double signal = rootNode.get("protocol_data").get("signal").asDouble();
-            double sf = rootNode.get("protocol_data").get("sf").asDouble();
-            Double lat = rootNode.has("lat") ? rootNode.get("lat").asDouble() : null;
-            Double lng = rootNode.has("lng") ? rootNode.get("lng").asDouble() : null;
+            String deviceEui = rootNode.at("/device_properties/deveui").asText();
+            String name = rootNode.at("/device_properties/external_id").asText();
+            int fPort = rootNode.at("/protocol_data/port").asInt();
+            double rssi = rootNode.at("/protocol_data/rssi").asDouble();
+            double snr = rootNode.at("/protocol_data/snr").asDouble();
+            double noise = rootNode.at("/protocol_data/noise").asDouble();
+            double signal = rootNode.at("/protocol_data/signal").asDouble();
+            double sf = rootNode.at("/protocol_data/sf").asDouble();
+            Double lat = rootNode.at("/lat").asDouble();
+            Double lng = rootNode.at("/lng").asDouble();
             logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
 			JsonNode payloadNode = rootNode.get("payload_cleartext");
 			byte[] payload = new byte[0];
