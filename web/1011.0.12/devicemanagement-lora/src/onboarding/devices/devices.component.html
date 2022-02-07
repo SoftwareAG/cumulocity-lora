@@ -175,9 +175,9 @@
                         [(ngModel)]="bulkProvisionDevices.instanceSelect"
                         (change)="loadBulkProperties(instanceSelect.value)">
                         <option [ngValue]="undefined" [disabled]="true">Please select a connector</option>
-                        <option *ngFor="let instance of lnsInstances" [value]="instance.id">
+                        <option *ngFor="let instance of lnsService.lnsInstances" [value]="instance.id">
                             {{instance.name}} -
-                            {{proxyMap[instance.lnsType].name}}</option>
+                            {{lnsService.proxyMap[instance.lnsType].name}}</option>
                     </select>
                 </div>
                 <c8y-messages *ngIf="instanceSelect.invalid && (instanceSelect.dirty || instanceSelect.touched)">
@@ -259,9 +259,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-default" (click)="endDelete(deprovision.checked)" translate=""
-            ng-reflect-translate="">Confirm</button>
-        <button class="btn btn-primary" (click)="deleteDeviceModalRef.hide()" translate=""
-            ng-reflect-translate="">Cancel</button>
+        <button class="btn btn-default" (click)="endDelete(deprovision.checked)">Confirm</button>
+        <button class="btn btn-primary" (click)="deleteDeviceModalRef.hide()">Cancel</button>
     </div>
 </ng-template>
