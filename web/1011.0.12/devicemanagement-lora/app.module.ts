@@ -3,7 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule as NgRouterModule } from '@angular/router';
 import { UpgradeModule as NgUpgradeModule } from '@angular/upgrade/static';
-import { CoreModule, HOOK_NAVIGATOR_NODES, HOOK_ONCE_ROUTE, PluginsModule, RouterModule, ViewContext } from '@c8y/ngx-components';
+import { CoreModule, HOOK_NAVIGATOR_NODES, HOOK_ONCE_ROUTE, PluginsModule, RouterModule, ViewContext, DynamicFormsModule } from '@c8y/ngx-components';
 import { AssetsNavigatorModule } from '@c8y/ngx-components/assets-navigator';
 import { BinaryFileDownloadModule } from '@c8y/ngx-components/binary-file-download';
 import { DeviceGridExampleModule } from '@c8y/ngx-components/device-grid-example';
@@ -326,6 +326,7 @@ declare var Buffer: {
     ModalModule.forRoot(),
     PopoverModule,
     ReactiveFormsModule,
+    DynamicFormsModule,
     FormlyModule.forRoot({
       types: [
         { name: 'repeat', component: RepeatTypeComponent },

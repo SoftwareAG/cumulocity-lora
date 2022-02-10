@@ -10,7 +10,7 @@ import { FieldArrayType } from '@ngx-formly/core';
         <button class="btn btn-danger" type="button" (click)="remove(i)">{{ to.removeText }}</button>
       </div>
     </div>
-    <div style="margin:30px 0;" *ngIf="field.fieldGroup.length < to.maxOccur">
+    <div style="margin:30px 0;" *ngIf="field.fieldGroup && field.fieldGroup.length < to.maxOccur">
       <button class="btn btn-primary" type="button" (click)="add()">{{ to.addText }}</button>
     </div>
   `,
