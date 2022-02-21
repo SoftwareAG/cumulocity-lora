@@ -300,7 +300,8 @@ declare var Buffer: {
         path: 'config',
         component: LoRaConfigComponent
       },
-      { path: 'lora_command', component: GroupsComponent },
+      { path: 'health', component: GroupsComponent },
+      { path: 'lora_command', component: DevicesComponent },
       ...UPGRADE_ROUTES], { enableTracing: false, useHash: true }),
     CoreModule.forRoot(),
     AssetsNavigatorModule.config({

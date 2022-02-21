@@ -40,8 +40,9 @@ export class LoraDevicesComponent {
     models: Map<string, string>;
     devEUIs: {};
     informationText: string;
-    fileContent: { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any }[];
+    fileContent: { name: string, devEUI: string, appEUI: string, appKey: string, type: string, codec: string, model: string, additionalProperties: any }[];
     deviceToDelete: IManagedObject;
+    deviceToChange: IManagedObject;
     properties: [{
         name: string;
         label: string;
@@ -62,6 +63,15 @@ export class LoraDevicesComponent {
     @ViewChild("deleteDeviceModal", { static: false })
     deleteDeviceModal: TemplateRef<any>;
     deleteDeviceModalRef: BsModalRef;
+    @ViewChild("deleteDevicesModal", { static: false })
+    deleteDevicesModal: TemplateRef<any>;
+    deleteDevicesModalRef: BsModalRef;
+    @ViewChild("changeDeviceTypeModal", { static: false })
+    changeDeviceTypeModal: TemplateRef<any>;
+    changeDeviceTypeModalRef: BsModalRef;
+    @ViewChild("changeDevicesTypeModal", { static: false })
+    changeDevicesTypeModal: TemplateRef<any>;
+    changeDevicesTypeModalRef: BsModalRef;
     queriesUtil: QueriesUtil;
     columns: Column[] = [
         { name: 'deveui', header: 'Dev EUI', path: 'id' },
@@ -75,6 +85,11 @@ export class LoraDevicesComponent {
         {
             name: 'type',
             header: 'Type',
+            path: 'type'
+        },
+        {
+            name: 'codec',
+            header: 'Codec',
             path: 'codec'
         },
         {
@@ -90,10 +105,12 @@ export class LoraDevicesComponent {
         currentPage: 1
     };
     actionControls: ActionControl[] = [
-        { type: BuiltInActionType.Delete, callback: item => this.delete(<IManagedObject>item) }
+        { type: BuiltInActionType.Delete, callback: item => this.delete(<IManagedObject>item) },
+        { type: "CHANGE_TYPE", text: "Change Type", icon: "pencil", callback: item => this.changeType(<IManagedObject>item) }
     ];
     bulkActionControls: BulkActionControl[] = [
-        { type: BuiltInActionType.Delete, callback: selectedItemIds => console.dir(selectedItemIds) }
+        { type: BuiltInActionType.Delete, callback: selectedItemIds => this.deleteAll(selectedItemIds) },
+        { type: "CHANGE TYPE", text: "Change Type", icon: "pencil", callback: selectedItemIds => this.changeTypes(selectedItemIds) }
     ];
 
     @Output() onColumnsChange: EventEmitter<Column[]> = new EventEmitter<
@@ -105,6 +122,8 @@ export class LoraDevicesComponent {
 
     provisionDevice: any = {};
     bulkProvisionDevices: any = {};
+    devicesToDelete: string[];
+    devicesToChange: string[];
 
     async onDataSourceModifier(
         dataSourceModifier: DataSourceModifier
@@ -142,27 +161,6 @@ export class LoraDevicesComponent {
         }
     }
 
-    private codecsFilter: object = {
-        type: 'Device Codec',
-        // paging information will be a part of the response now
-        withTotalPages: true,
-        pageSize: 1000
-    };
-
-    private lnsProxyFilter: object = {
-        type: 'LoRa Network Server agent',
-        // paging information will be a part of the response now
-        withTotalPages: true,
-        pageSize: 1000
-    };
-
-    private instanceFilter: object = {
-        type: 'LNS Connector',
-        // paging information will be a part of the response now
-        withTotalPages: true,
-        pageSize: 1000
-    };
-
     @ViewChild(DataGridComponent, { static: true })
     dataGrid: DataGridComponent;
 
@@ -174,13 +172,15 @@ export class LoraDevicesComponent {
     }
 
     getDeviceQueryString(columns: Column[]): string {
-        console.dir(this.getQueryObj(columns));
-        return this.queriesUtil.buildQuery(this.getQueryObj(columns));
+        //console.dir(this.getQueryObj(columns));
+        let q = this.queriesUtil.buildQuery(this.getQueryObj(columns));
+        console.log(q);
+        return q
     }
 
     private getDevicesFilters(columns: Column[], pagination: Pagination) {
-        let query = this.getDeviceQueryString(columns)
-        console.dir(query);
+        //let query = this.getDeviceQueryString(columns)
+        //console.dir(query);
         return {
             q: this.getDeviceQueryString(columns),
             pageSize: pagination.pageSize,
@@ -189,13 +189,18 @@ export class LoraDevicesComponent {
         };
     }
 
-    log(o) {
-        console.dir(o);
-    }
-
     private getQueryObj(columns: Column[]): any {
         return transform(columns, (query, column) => this.extendQueryByColumn(query, column), {
-            __filter: { type: 'c8y_LoRaDevice' },
+            //fragmentType: 'lora_ns_device_LoRaDevice',
+            //__or: {type: 'c8y_LoRaDevice', fragmentType: 'lora_ns_device_LoRaDevice' },
+            //has: 'lora_ns_device_LoRaDevice',
+            __filter: {
+                //__has: 'lora_ns_device_LoRaDevice'
+                __or: [
+                    {__has: 'lora_ns_device_LoRaDevice'},
+                    {type: 'c8y_LoRaDevice'}
+                ]
+            },
             __orderby: []
         });
     }
@@ -238,14 +243,13 @@ export class LoraDevicesComponent {
 
     async getDevicesTotal(): Promise<number> {
         const filters = {
-            fragmentType: 'c8y_IsDevice',
-            type: 'c8y_LoRaDevice',
+            query: 'has(c8y_IsDevice) and (has(lora_ns_device_LoRaDevice) or type eq c8y_LoRaDevice)',
             pageSize: 1,
             withTotalPages: true
         };
         return (await this.inventory.list(filters)).paging.totalPages;
     }
-    // Promise-based usage of InventoryService.
+
     async loadDevices(columns: Column[], pagination: Pagination) {
         let result = await this.getDevices(columns, pagination);
         this.devices = result.data;
@@ -255,20 +259,21 @@ export class LoraDevicesComponent {
     }
 
     addDeviceFromForm() {
-        this.addDevice(this.provisionDevice.deviceName, this.provisionDevice.devEUI, this.provisionDevice.appEUI, this.provisionDevice.appKey, this.provisionDevice.type, this.provisionDevice.model, this.provisionDevice.instanceSelect, this.deviceProvisioningAdditionalProperties);
+        this.addDevice(this.provisionDevice.deviceName, this.provisionDevice.devEUI, this.provisionDevice.appEUI, this.provisionDevice.appKey, this.provisionDevice.type, this.provisionDevice.codec, this.provisionDevice.model, this.provisionDevice.instanceSelect, this.deviceProvisioningAdditionalProperties);
     }
 
     // Add a managedObject (as device) to the database.
-    async addDevice(name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, instance: string, additionalProperties) {
+    async addDevice(name: string, devEUI: string, appEUI: string, appKey: string, type: string, codec: string, model: string, instance: string, additionalProperties) {
 
         if (instance) {
-            this.provisionDevice({
+            this.lnsService.provisionDevice({
                 name,
                 devEUI: devEUI.toLowerCase(),
                 appEUI: appEUI ? appEUI.toLowerCase() : null,
                 appKey: appKey ? appKey.toLowerCase() : null,
-                codec: type,
-                model
+                codec,
+                model,
+                type
             }, instance, additionalProperties).then(data => console.log(data))
         } else {
             let device = {
@@ -276,11 +281,11 @@ export class LoraDevicesComponent {
                 devEUI: devEUI.toLowerCase(),
                 appEUI: appEUI ? appEUI.toLowerCase() : null,
                 appKey: appKey ? appKey.toLowerCase() : null,
-                codec: type,
-                type: 'c8y_LoRaDevice',
+                codec,
+                type,
                 c8y_Hardware: { model: model },
                 c8y_LpwanDevice: { provisioned: false },
-                c8y_SupportedOperations: ["c8y_Command"],
+                c8y_SupportedOperations: ["c8y_Command", "c8y_Configuration"],
                 battery: 100
             };
 
@@ -309,6 +314,11 @@ export class LoraDevicesComponent {
         this.deleteDeviceModalRef = this.modalService.show(this.deleteDeviceModal, { backdrop: true, ignoreBackdropClick: true });
     }
 
+    deleteAll(selectedIds: string[]) {
+        this.devicesToDelete = selectedIds;
+        this.deleteDevicesModalRef = this.modalService.show(this.deleteDevicesModal, { backdrop: true, ignoreBackdropClick: true });
+    }
+
     async endDelete(deprovision: boolean) {
         if (deprovision) {
             await this.lnsService.deprovisionDevice(this.deviceToDelete);
@@ -317,6 +327,42 @@ export class LoraDevicesComponent {
         this.deleteDeviceModalRef.hide();
         this.dataGrid.reload();
         //this.loadDevices();
+    }
+
+    async endDeleteAll(deprovision: boolean) {
+        this.devicesToDelete.forEach(async id => {
+            if (deprovision) {
+                await this.lnsService.deprovisionDevice({id: id});
+            }
+            await this.inventory.delete(id);
+        })
+        this.deleteDeviceModalRef.hide();
+        this.dataGrid.reload();
+        //this.loadDevices();
+    }
+
+    async changeType(device: IManagedObject) {
+        this.deviceToChange = device;
+        this.changeDeviceTypeModalRef = this.modalService.show(this.changeDeviceTypeModal, { backdrop: true, ignoreBackdropClick: true });
+    }
+
+    async changeTypes(selectedItemIds: string[]) {
+        this.devicesToChange = selectedItemIds;
+        this.changeDevicesTypeModalRef = this.modalService.show(this.changeDevicesTypeModal, { backdrop: true, ignoreBackdropClick: true });
+    }
+
+    async endChangeDeviceType(type: string) {
+        await this.inventory.update({id: this.deviceToChange.id, type: type});
+        this.changeDeviceTypeModalRef.hide();
+        this.dataGrid.reload();
+    }
+
+    async endChangeDevicesType(type: string) {
+        this.devicesToChange.forEach(async id => {
+            await this.inventory.update({id: id, type: type});
+        })
+        this.changeDevicesTypeModalRef.hide();
+        this.dataGrid.reload();
     }
 
     async getDevEUI(device) {
@@ -355,11 +401,11 @@ export class LoraDevicesComponent {
                 let headers = lines[0].trim().split(";");
                 lines.splice(1).forEach(line => {
                     if (line != "\n" && line.trim().length > 0) {
-                        let row: { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any } = {} as { name: string, devEUI: string, appEUI: string, appKey: string, type: string, model: string, additionalProperties: any };
+                        let row: { name: string, devEUI: string, appEUI: string, appKey: string, type: string, codec: string, model: string, additionalProperties: any } = {} as { name: string, devEUI: string, appEUI: string, appKey: string, type: string, codec: string, model: string, additionalProperties: any };
                         row.additionalProperties = {};
                         let lineContent = line.trim().split(";");
                         lineContent.forEach((col, i) => {
-                            if (["name", "devEUI", "appEUI", "appKey", "type", "model"].indexOf(headers[i]) > -1) {
+                            if (["name", "devEUI", "appEUI", "appKey", "type", "codec", "model"].indexOf(headers[i]) > -1) {
                                 row[headers[i]] = col;
                             }
                             else {
@@ -377,7 +423,7 @@ export class LoraDevicesComponent {
     addDevices() {
         this.fileContent.forEach(row => {
             console.log("Will add device: " + row);
-            this.addDevice(row.name, row.devEUI, row.appEUI, row.appKey, row.type, row.model, this.bulkProvisionDevices.instanceSelect, row.additionalProperties);
+            this.addDevice(row.name, row.devEUI, row.appEUI, row.appKey, row.type, row.codec, row.model, this.bulkProvisionDevices.instanceSelect, row.additionalProperties);
         })
     }
 

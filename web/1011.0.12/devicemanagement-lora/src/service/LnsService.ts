@@ -45,7 +45,7 @@ export class LnsService {
         data.forEach(instance => this.instanceMap[instance.id] = instance);
     }
 
-    async getDevEUI(device: IManagedObject) {
+    async getDevEUI(device: Partial<IManagedObject>) {
         let extIds = (await this.identityService.list(device.id)).data.filter(extId => extId.type === "LoRa devEUI");
         let extId = "-";
         if (extIds.length > 0) {
@@ -67,7 +67,7 @@ export class LnsService {
         })).json()).data;
     }
 
-    async deprovisionDevice(device: IManagedObject) {
+    async deprovisionDevice(device: Partial<IManagedObject>) {
         await this.client.fetch('service/lora-ns-' + this.instanceMap[device.lnsConnectorId].lnsType + '/' + device.lnsConnectorId + '/devices/' + await this.getDevEUI(device), {
             method: "DELETE"
         });

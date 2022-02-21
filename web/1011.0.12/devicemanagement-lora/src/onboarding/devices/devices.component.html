@@ -18,7 +18,7 @@
                     </c8y-messages>
                 </c8y-form-group>
                 <c8y-form-group class="col-sm-6" [hasError]="devEUI.invalid && (devEUI.dirty || devEUI.touched)">
-                    <label>Dev EUI:</label>
+                    <label for="devEUI">Dev EUI:</label>
                     <input required pattern="[a-fA-F0-9]{16}" #devEUI="ngModel" name="devEUI"
                         [(ngModel)]="provisionDevice.devEUI" class="form-control" maxlength="16"
                         aria-describedby="devEUI-help" placeholder="0011223344556677" />
@@ -49,19 +49,27 @@
                         128 bits hex number used to encrypt communication. Will be randomly generated if not provided.
                     </span>
                 </c8y-form-group>
+                <c8y-form-group class="col-sm-12">
+                    <label for="type">Type:</label>
+                    <input class="form-control" #type="ngModel" name="type" [(ngModel)]="provisionDevice.type"
+                        aria-describedby="type"/>
+                    <span id="type" class="help-block">
+                        Type of device.
+                    </span>
+                </c8y-form-group>
                 <div class="col-sm-12">
                     <c8y-form-group class="c8y-select-wrapper"
-                        [hasError]="type.invalid && (type.dirty || type.touched)">
-                        <label for="type">Type:</label>
-                        <select class="form-control" #type="ngModel" name="type" [(ngModel)]="provisionDevice.type"
-                            (change)="loadModels(type.value)" required>
+                        [hasError]="codec.invalid && (codec.dirty || codec.touched)">
+                        <label for="codec">Codec:</label>
+                        <select class="form-control" #codec="ngModel" name="codec" [(ngModel)]="provisionDevice.codec"
+                            (change)="loadModels(codec.value)" required>
                             <option [ngValue]="undefined" [disabled]="true">Please select a type</option>
                             <option *ngFor="let codec of codecService.codecs"
                                 [value]="codec.lora_codec_DeviceCodecRepresentation.id">
                                 {{codec.lora_codec_DeviceCodecRepresentation.name}}</option>
                         </select>
-                        <c8y-messages *ngIf="type.invalid && (type.dirty || type.touched)">
-                            <c8y-message name="required" *ngIf="type.errors?.required">The device type is required
+                        <c8y-messages *ngIf="codec.invalid && (codec.dirty || codec.touched)">
+                            <c8y-message name="required" *ngIf="codec.errors?.required">The device codec is required
                             </c8y-message>
                         </c8y-messages>
                     </c8y-form-group>
@@ -187,7 +195,7 @@
             </c8y-form-group>
             <div *ngIf="instanceSelect.valid">
                 File must contain the following columns:<br>
-                <span style="word-wrap: break-word">name;devEUI;appEUI;appKey;type;model<span
+                <span style="word-wrap: break-word">name;devEUI;appEUI;appKey;type;codec;model<span
                         *ngIf="bulkProperties !== undefined"><span
                             *ngFor="let bulkProperty of bulkProperties">;{{bulkProperty.name}}<button
                                 *ngIf="bulkProperty.type === 'LIST'" class="btn-clean m-l-4 flex-item-middle"
@@ -226,7 +234,7 @@
                 <a [routerLink]="['/device', context.value]">{{devEUIs[context.value]}}</a>
             </ng-container>
         </c8y-column>
-        <c8y-column name="type">
+        <c8y-column name="codec">
             <ng-container *c8yCellRendererDef="let context">
                 {{codecService.codecMap[context.value] && codecService.codecMap[context.value].name}}
             </ng-container>
@@ -261,5 +269,58 @@
     <div class="modal-footer">
         <button class="btn btn-default" (click)="endDelete(deprovision.checked)">Confirm</button>
         <button class="btn btn-primary" (click)="deleteDeviceModalRef.hide()">Cancel</button>
+    </div>
+</ng-template>
+
+<ng-template #deleteDevicesModal>
+    <div class="modal-header">
+        <h4 id="dialog-name" class="modal-title pull-left">Confirm devices
+            deletion
+        </h4>
+    </div>
+    <div class="modal-body">
+        Devices will be removed from inventory<br>
+        <div class="form-group">
+            <label class="c8y-checkbox"><input type="checkbox" #deprovision /><span></span>Deprovision devices from
+                LoRa network server</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" (click)="endDeleteAll(deprovision.checked)">Confirm</button>
+        <button class="btn btn-primary" (click)="deleteDevicesModalRef.hide()">Cancel</button>
+    </div>
+</ng-template>
+
+<ng-template #changeDeviceTypeModal>
+    <div class="modal-header">
+        <h4 id="dialog-name" class="modal-title pull-left">Change device type
+        </h4>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <label class="form-control">Type new device type</label>
+            <input #changeType required/>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" (click)="endChangeType(changeType.value)">Confirm</button>
+        <button class="btn btn-primary" (click)="changeDeviceTypeModalRef.hide()">Cancel</button>
+    </div>
+</ng-template>
+
+<ng-template #changeDevicesTypeModal>
+    <div class="modal-header">
+        <h4 id="dialog-name" class="modal-title pull-left">Change devices type
+        </h4>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <label class="form-control">Type new devices type</label>
+            <input #changeType required/>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" (click)="endChangeTypes(changeType.value)">Confirm</button>
+        <button class="btn btn-primary" (click)="changeDevicesTypeModalRef.hide()">Cancel</button>
     </div>
 </ng-template>

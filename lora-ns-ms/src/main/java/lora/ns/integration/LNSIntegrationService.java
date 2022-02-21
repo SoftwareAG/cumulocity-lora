@@ -23,11 +23,9 @@ import com.cumulocity.rest.representation.operation.OperationCollectionRepresent
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.cumulocity.rest.representation.tenant.OptionRepresentation;
 import com.cumulocity.sdk.client.QueryParam;
-import com.cumulocity.sdk.client.alarm.AlarmApi;
 import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
 import com.cumulocity.sdk.client.devicecontrol.OperationCollection;
 import com.cumulocity.sdk.client.devicecontrol.OperationFilter;
-import com.cumulocity.sdk.client.event.EventApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.inventory.InventoryFilter;
 import com.cumulocity.sdk.client.inventory.ManagedObject;
@@ -82,12 +80,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	@Autowired
 	private MeasurementApi measurementApi;
-
-	@Autowired
-	private EventApi eventApi;
-
-	@Autowired
-	private AlarmApi alarmApi;
 
 	@Autowired
 	private DeviceControlApi deviceControlApi;

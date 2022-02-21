@@ -16,6 +16,7 @@ import lora.common.Validator;
 public class DeviceProvisioning implements Validator {
 	private String name;
 	private String devEUI;
+	private String type;
 
 	public enum ProvisioningMode {
 		OTAA("OTAA"), ABP("ABP");

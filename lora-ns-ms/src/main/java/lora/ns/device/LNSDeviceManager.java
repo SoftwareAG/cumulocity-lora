@@ -210,10 +210,12 @@ public class LNSDeviceManager {
 		if (mor == null) {
 			mor = new ManagedObjectRepresentation();
 		}
-		mor.setType("c8y_LoRaDevice");
+		//mor.setType("c8y_LoRaDevice");
+		mor.set(new LoRaDevice());
 		mor.set(new IsDevice());
 		SupportedOperations supportedOperations = new SupportedOperations();
 		supportedOperations.add("c8y_Command");
+		supportedOperations.add("c8y_Configuration");
 		mor.set(supportedOperations);
 		if (mor.getId() == null) {
 			mor = inventoryApi.create(mor);
@@ -361,6 +363,9 @@ public class LNSDeviceManager {
 			Hardware hardware = new Hardware();
 			hardware.setModel(deviceProvisioning.getModel());
 			mor.set(hardware);
+		}
+		if (deviceProvisioning.getType() != null) {
+			mor.setType(deviceProvisioning.getType());
 		}
 		mor.setProperty("provisioned", true);
 		mor.setLastUpdatedDateTime(null);

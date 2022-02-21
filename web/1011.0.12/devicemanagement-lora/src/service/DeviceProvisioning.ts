@@ -5,6 +5,7 @@ export class DeviceProvisioning {
     appKey: string;
     codec: string;
     model: string;
+    type: string;
     lat?: number;
     lng?: number
 }
