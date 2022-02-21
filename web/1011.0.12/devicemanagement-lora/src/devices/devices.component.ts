@@ -251,7 +251,7 @@ export class DevicesComponent implements OnInit {
             console.log(e);
         }
         try {
-            let response = await this.lnsService.provisionDevice({appEUI: this.device.appEUI, appKey: this.device.appKey, devEUI: this.devEui, codec: this.device.codec, model: this.device.c8y_Hardware.model, name: this.device.name}, this.selectedLnsConnectorId, this.deviceProvisioningAdditionalProperties);
+            let response = await this.lnsService.provisionDevice({appEUI: this.device.appEUI, appKey: this.device.appKey, devEUI: this.devEui, codec: this.device.codec, model: this.device.c8y_Hardware.model, name: this.device.name, type: this.device.type}, this.selectedLnsConnectorId, this.deviceProvisioningAdditionalProperties);
             console.log(response);
         } catch(e) {
             console.log(e);
