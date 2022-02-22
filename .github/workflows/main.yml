@@ -46,10 +46,6 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: maven-settings-xml-action
-        uses: whelk-io/maven-settings-xml-action@v18
-        with:
-          mirrors: '[{"id": "insecure-c8y-repo", "mirrorOf": "cumulocity", "url": "http://download.cumulocity.com/maven/repository/", "blocked": "false"}]'
       - name: Set up Go
         uses: actions/setup-go@v2
       - name: Set up Go environment
