@@ -63,7 +63,7 @@
                         <label for="codec">Codec:</label>
                         <select class="form-control" #codec="ngModel" name="codec" [(ngModel)]="provisionDevice.codec"
                             (change)="loadModels(codec.value)" required>
-                            <option [ngValue]="undefined" [disabled]="true">Please select a type</option>
+                            <option [ngValue]="undefined" [disabled]="true">Please select a codec</option>
                             <option *ngFor="let codec of codecService.codecs"
                                 [value]="codec.lora_codec_DeviceCodecRepresentation.id">
                                 {{codec.lora_codec_DeviceCodecRepresentation.name}}</option>
