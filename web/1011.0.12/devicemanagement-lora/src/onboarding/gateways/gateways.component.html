@@ -20,7 +20,7 @@
                 <c8y-form-group class="col-sm-6" [hasError]="id.invalid && (id.dirty || id.touched)">
                     <label>Gateway Id:</label>
                     <input required #id="ngModel" name="id"
-                        [(ngModel)]="provisionGateway.gwEUI" class="form-control" maxlength="16"
+                        [(ngModel)]="provisionGateway.gwEUI" class="form-control"
                         aria-describedby="id-help" />
                     <c8y-messages *ngIf="id.invalid && (id.dirty || id.touched)">
                         <c8y-message name="required" *ngIf="id.errors?.required">The gateway Id is required
