@@ -1,0 +1,1 @@
+mvn archetype:generate -DarchetypeGroupId=com.softwareag -DarchetypeArtifactId=lora-codec-archetype -DarchetypeVersion=1.0-SNAPSHOT -DgroupId=com.softwareag
