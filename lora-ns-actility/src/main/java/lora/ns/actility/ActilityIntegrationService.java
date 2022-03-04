@@ -96,10 +96,10 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode rootNode = mapper.readTree(event);
-            String commandId = rootNode.get("DevEUI_downlink_Sent").has("CorrelationID") ? rootNode.get("DevEUI_downlink_Sent").get("CorrelationID").asText() : null;
+            String commandId = rootNode.at("DevEUI_downlink_Sent/CorrelationID").asText();
             if (commandId != null) {
             	data.setCommandId(commandId);
-	            int error = rootNode.get("DevEUI_downlink_Sent").get("DeliveryStatus").asInt();
+	            int error = rootNode.at("DevEUI_downlink_Sent/DeliveryStatus").asInt();
 	            if (error == 0) {
 	            	data.setErrorMessage("Error");
 	            	data.setStatus(OperationStatus.FAILED);
