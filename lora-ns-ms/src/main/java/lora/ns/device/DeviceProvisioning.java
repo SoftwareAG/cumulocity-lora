@@ -93,11 +93,11 @@ public class DeviceProvisioning implements Validator {
 		boolean result = true;
 		String reason = "";
 
-		if (devEUI.isBlank()) {
+		if (devEUI == null || devEUI.isBlank()) {
 			result = false;
 			reason += "\ndevEUI is required.";
 		}
-		if (appEUI.isBlank()) {
+		if (appEUI == null || appEUI.isBlank()) {
 			SecureRandom secureRandom = new SecureRandom();
 			byte[] bytes = new byte[8];
 			secureRandom.nextBytes(bytes);
