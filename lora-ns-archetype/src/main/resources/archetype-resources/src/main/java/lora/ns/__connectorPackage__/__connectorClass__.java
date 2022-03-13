@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import lora.codec.downlink.DownlinkData;
 import lora.codec.uplink.C8YData;
 import lora.ns.connector.LNSAbstractConnector;
+import lora.ns.connector.LNSResponse;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.DeviceProvisioning.ProvisioningMode;
 import lora.ns.device.EndDevice;
@@ -33,54 +34,52 @@ public class ${connectorClass} extends LNSAbstractConnector {
     }
 
     @Override
-	public List<EndDevice> getDevices() {
-		List<EndDevice> result = new ArrayList<EndDevice>();
-		return result;
+	public LNSResponse<List<EndDevice>> getDevices() {
+		return new LNSResponse<List<EndDevice>>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
-	public Optional<EndDevice> getDevice(String devEui) {
-		EndDevice result = null;
-		return Optional.ofNullable(result);
+	public LNSResponse<EndDevice> getDevice(String devEui) {
+		return new LNSResponse<EndDevice>().withOk(false).withMessage("Not implemented.");
     }
 
 	@Override
-	public String sendDownlink(DownlinkData operation) {
-		return "unique correlation id goes here";
+	public LNSResponse<String> sendDownlink(DownlinkData operation) {
+		return new LNSResponse<String>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
-	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
-        return false;
+	public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
+        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
-	public void configureRoutings(String url, String tenant, String login, String password) {
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
-	public void removeRoutings(String tenant) {
+	public LNSResponse<Void> removeRoutings(String tenant) {
+        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
-	public boolean deprovisionDevice(String deveui) {
-        return false;
+	public LNSResponse<Void> deprovisionDevice(String deveui) {
+        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
-	public List<Gateway> getGateways() {
-		List<Gateway> result = new ArrayList<>();
-
-        return result;
+	public LNSResponse<List<Gateway>> getGateways() {
+        return new LNSResponse<List<Gateway>>().withOk(false).withMessage("Not implemented.");
 	}
 
     @Override
-	public boolean provisionGateway(GatewayProvisioning gatewayProvisioning) {
-        return false;
+	public LNSResponse<Void> provisionGateway(GatewayProvisioning gatewayProvisioning) {
+        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
     @Override
-	public boolean deprovisionGateway(String id) {
-        return false;
+	public LNSResponse<Void> deprovisionGateway(String id) {
+        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 }
