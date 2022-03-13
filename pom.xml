@@ -92,12 +92,6 @@
 
         <module>lora-codec-example</module>
 
-
-        <module>lora-codec-archetype</module>
-
-
-        <module>lora-ns-archetype</module>
-
     </modules>
 
 
