@@ -14,17 +14,17 @@ public interface LNSConnector {
 	String getId();
 	String getType();
 	String getName();
-	List<EndDevice> getDevices();
+	LNSResponse<List<EndDevice>> getDevices();
 	void setProperties(Properties properties);
 	Properties getProperties();
-	Optional<EndDevice> getDevice(String devEui);
-	String sendDownlink(DownlinkData downlinkData);
-	boolean provisionDevice(DeviceProvisioning deviceProvisioning);
-	void configureRoutings(String url, String tenant, String login, String password);
-	void removeRoutings(String tenant);
-	boolean deprovisionDevice(String deveui);
-	List<Gateway> getGateways();
+	LNSResponse<EndDevice> getDevice(String devEui);
+	LNSResponse<String> sendDownlink(DownlinkData downlinkData);
+	LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning);
+	LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password);
+	LNSResponse<Void> removeRoutings(String tenant);
+	LNSResponse<Void> deprovisionDevice(String deveui);
+	LNSResponse<List<Gateway>> getGateways();
     Properties mergeProperties(Properties properties);
-	boolean provisionGateway(GatewayProvisioning gatewayProvisioning);
-	boolean deprovisionGateway(String id);
+	LNSResponse<Void> provisionGateway(GatewayProvisioning gatewayProvisioning);
+	LNSResponse<Void> deprovisionGateway(String id);
 }

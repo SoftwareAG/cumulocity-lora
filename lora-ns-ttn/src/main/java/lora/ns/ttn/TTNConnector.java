@@ -26,13 +26,17 @@ import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import lora.codec.downlink.DownlinkData;
 import lora.codec.uplink.C8YData;
 import lora.ns.connector.LNSAbstractConnector;
+import lora.ns.connector.LNSResponse;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
 import ttn.lorawan.v3.AppAsGrpc;
 import ttn.lorawan.v3.AppAsGrpc.AppAsBlockingStub;
+import ttn.lorawan.v3.ApplicationAccessGrpc;
+import ttn.lorawan.v3.ApplicationAccessGrpc.ApplicationAccessBlockingStub;
 import ttn.lorawan.v3.ApplicationOuterClass.Application;
 import ttn.lorawan.v3.ApplicationOuterClass.Applications;
+import ttn.lorawan.v3.ApplicationOuterClass.ListApplicationCollaboratorsRequest;
 import ttn.lorawan.v3.ApplicationOuterClass.ListApplicationsRequest;
 import ttn.lorawan.v3.ApplicationRegistryGrpc;
 import ttn.lorawan.v3.ApplicationRegistryGrpc.ApplicationRegistryBlockingStub;
@@ -54,13 +58,17 @@ import ttn.lorawan.v3.EndDeviceOuterClass.GetEndDeviceIdentifiersForEUIsRequest;
 import ttn.lorawan.v3.EndDeviceOuterClass.GetEndDeviceRequest;
 import ttn.lorawan.v3.EndDeviceOuterClass.SetEndDeviceRequest;
 import ttn.lorawan.v3.EndDeviceRegistryGrpc;
-import ttn.lorawan.v3.GatewayRegistryGrpc;
 import ttn.lorawan.v3.EndDeviceRegistryGrpc.EndDeviceRegistryBlockingStub;
+import ttn.lorawan.v3.GatewayOuterClass;
+import ttn.lorawan.v3.GatewayOuterClass.CreateGatewayRequest;
 import ttn.lorawan.v3.GatewayOuterClass.Gateways;
 import ttn.lorawan.v3.GatewayOuterClass.ListGatewaysRequest;
+import ttn.lorawan.v3.GatewayRegistryGrpc;
 import ttn.lorawan.v3.GatewayRegistryGrpc.GatewayRegistryBlockingStub;
 import ttn.lorawan.v3.Identifiers.ApplicationIdentifiers;
 import ttn.lorawan.v3.Identifiers.EndDeviceIdentifiers;
+import ttn.lorawan.v3.Identifiers.GatewayIdentifiers;
+import ttn.lorawan.v3.Identifiers.OrganizationOrUserIdentifiers;
 import ttn.lorawan.v3.JsEndDeviceRegistryGrpc;
 import ttn.lorawan.v3.JsEndDeviceRegistryGrpc.JsEndDeviceRegistryBlockingStub;
 import ttn.lorawan.v3.Keys.KeyEnvelope;
@@ -71,247 +79,411 @@ import ttn.lorawan.v3.Messages.ApplicationDownlink;
 import ttn.lorawan.v3.Messages.DownlinkQueueRequest;
 import ttn.lorawan.v3.NsEndDeviceRegistryGrpc;
 import ttn.lorawan.v3.NsEndDeviceRegistryGrpc.NsEndDeviceRegistryBlockingStub;
+import ttn.lorawan.v3.RightsOuterClass.Collaborator;
+import ttn.lorawan.v3.RightsOuterClass.Collaborators;
+import ttn.lorawan.v3.RightsOuterClass.Right;
 
 public class TTNConnector extends LNSAbstractConnector {
 
-	/**
-	 *
-	 */
-	private static final String APPID = "appid";
+        /**
+         *
+         */
+        private static final String APPID = "appid";
 
-	private ManagedChannel managedChannel;
+        private ManagedChannel managedChannel;
 
-	private BearerToken token;
+        private BearerToken token;
 
-	private final Logger logger = LoggerFactory.getLogger(TTNConnector.class);
+        private final Logger logger = LoggerFactory.getLogger(TTNConnector.class);
 
-	public TTNConnector(Properties properties) {
-		super(properties);
-	}
+        public TTNConnector(Properties properties) {
+                super(properties);
+        }
 
-	public TTNConnector(ManagedObjectRepresentation instance) {
-		super(instance);
-	}
+        public TTNConnector(ManagedObjectRepresentation instance) {
+                super(instance);
+        }
 
-	@Override
-	protected void init() {
-		try {
-			managedChannel = NettyChannelBuilder.forAddress(properties.getProperty("address"), 8884)
-					.sslContext(GrpcSslContexts.forClient().ciphers(null).build()).build();
-		} catch (SSLException e) {
-			e.printStackTrace();
-			logger.error("Can't initiate TLS connection, falling back to plain text", e);
-			managedChannel = NettyChannelBuilder.forAddress(properties.getProperty("address"), 1884).usePlaintext()
-					.build();
-		}
-		token = new BearerToken(properties.getProperty("apikey"));
-	}
+        @Override
+        protected void init() {
+                try {
+                        managedChannel = NettyChannelBuilder.forAddress(properties.getProperty("address"), 8884)
+                                        .sslContext(GrpcSslContexts.forClient().ciphers(null).build()).build();
+                } catch (SSLException e) {
+                        e.printStackTrace();
+                        logger.error("Can't initiate TLS connection, falling back to plain text", e);
+                        managedChannel = NettyChannelBuilder.forAddress(properties.getProperty("address"), 1884)
+                                        .usePlaintext()
+                                        .build();
+                }
+                token = new BearerToken(properties.getProperty("apikey"));
+        }
 
-	@Override
-	public List<EndDevice> getDevices() {
-		return new ArrayList<>();
-	}
+        @Override
+        public LNSResponse<List<EndDevice>> getDevices() {
+                return new LNSResponse<List<EndDevice>>().withResult(new ArrayList<>());
+        }
 
-	private EndDeviceIdentifiers getDeviceIds(String devEui) {
-		EndDeviceRegistryBlockingStub service = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
-		GetEndDeviceIdentifiersForEUIsRequest request = GetEndDeviceIdentifiersForEUIsRequest.newBuilder()
-				.setDevEui(ByteString.copyFrom(BaseEncoding.base16().decode(devEui.toUpperCase()))).build();
+        private EndDeviceIdentifiers getDeviceIds(String devEui) {
+                EndDeviceRegistryBlockingStub service = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+                                .withCallCredentials(token);
+                GetEndDeviceIdentifiersForEUIsRequest request = GetEndDeviceIdentifiersForEUIsRequest.newBuilder()
+                                .setDevEui(ByteString.copyFrom(BaseEncoding.base16().decode(devEui.toUpperCase())))
+                                .build();
 
-		return service.getIdentifiersForEUIs(request);
-	}
+                return service.getIdentifiersForEUIs(request);
+        }
 
-	@Override
-	public Optional<EndDevice> getDevice(String devEui) {
+        @Override
+        public LNSResponse<EndDevice> getDevice(String devEui) {
+                LNSResponse<EndDevice> result = new LNSResponse<>();
 
-		EndDeviceRegistryBlockingStub service = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
+                try {
+                        EndDeviceRegistryBlockingStub service = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+        
+                        ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = service
+                                        .get(GetEndDeviceRequest.newBuilder().setEndDeviceIds(getDeviceIds(devEui))
+                                                        .setFieldMask(FieldMask.newBuilder().addPaths("name").build()).build());
+        
+                        EndDevice endDevice = new EndDevice(devEui, device.getName(),
+                                        device.getSupportsClassC() ? "C" : device.getSupportsClassB() ? "B" : "A");
 
-		ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = service
-				.get(GetEndDeviceRequest.newBuilder().setEndDeviceIds(getDeviceIds(devEui))
-						.setFieldMask(FieldMask.newBuilder().addPaths("name").build()).build());
+                        result.setOk(true);
+                        result.setResult(endDevice);
 
-		EndDevice result = new EndDevice(devEui, device.getName(),
-				device.getSupportsClassC() ? "C" : device.getSupportsClassB() ? "B" : "A");
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        result.setOk(false);
+                        result.setMessage(e.getMessage());
+                }
 
-		return Optional.ofNullable(result);
-	}
+                return result;
+        }
 
-	@Override
-	public String sendDownlink(DownlinkData operation) {
-		logger.info("Will send {} to TTN.", operation);
+        @Override
+        public LNSResponse<String> sendDownlink(DownlinkData operation) {
+                LNSResponse<String> result = new LNSResponse<>();
+                logger.info("Will send {} to TTN.", operation);
 
-		String downlinkCorrelationId = UUID.randomUUID().toString();
-		logger.info("Will send a downlink with correlation Id: {}", downlinkCorrelationId);
-		ApplicationDownlink downlink = ApplicationDownlink.newBuilder().setFPort(operation.getFport())
-				.setConfirmed(true)
-				.setFrmPayload(ByteString.copyFrom(BaseEncoding.base16().decode(operation.getPayload().toUpperCase())))
-				.addCorrelationIds("c8y:" + downlinkCorrelationId).build();
+                String downlinkCorrelationId = UUID.randomUUID().toString();
+                logger.info("Will send a downlink with correlation Id: {}", downlinkCorrelationId);
+                try {
+                        ApplicationDownlink downlink = ApplicationDownlink.newBuilder().setFPort(operation.getFport())
+                                        .setConfirmed(true)
+                                        .setFrmPayload(ByteString.copyFrom(
+                                                        BaseEncoding.base16().decode(operation.getPayload().toUpperCase())))
+                                        .addCorrelationIds("c8y:" + downlinkCorrelationId).build();
+        
+                        AppAsBlockingStub asService = AppAsGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+        
+                        asService.downlinkQueuePush(DownlinkQueueRequest.newBuilder().addDownlinks(downlink)
+                                        .setEndDeviceIds(getDeviceIds(operation.getDevEui())).build());
+                        result.setOk(true);
+                        result.setResult(downlinkCorrelationId);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        result.setOk(false);
+                        result.setMessage(e.getMessage());
+                }
 
-		AppAsBlockingStub asService = AppAsGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
+                return result;
+        }
 
-		asService.downlinkQueuePush(DownlinkQueueRequest.newBuilder().addDownlinks(downlink)
-				.setEndDeviceIds(getDeviceIds(operation.getDevEui())).build());
+        public List<FrequencyPlanDescription> getFrequencyPlans() {
+                ConfigurationBlockingStub config = ConfigurationGrpc.newBlockingStub(managedChannel)
+                                .withCallCredentials(token);
+                ListFrequencyPlansResponse frequencyPlans = config
+                                .listFrequencyPlans(ListFrequencyPlansRequest.newBuilder().build());
+                return frequencyPlans.getFrequencyPlansList();
+        }
 
-		return downlinkCorrelationId;
-	}
+        @Override
+        public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
+                logger.info("Will provision device with following parameters: {}", deviceProvisioning);
+                LNSResponse<Void> result = new LNSResponse<>();
+                try {
 
-	public List<FrequencyPlanDescription> getFrequencyPlans() {
-		ConfigurationBlockingStub config = ConfigurationGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		ListFrequencyPlansResponse frequencyPlans = config.listFrequencyPlans(ListFrequencyPlansRequest.newBuilder().build());
-		return frequencyPlans.getFrequencyPlansList();
-	}
+                        JsEndDeviceRegistryBlockingStub joinServerService = JsEndDeviceRegistryGrpc
+                                        .newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+                        AsEndDeviceRegistryBlockingStub applicationServerService = AsEndDeviceRegistryGrpc
+                                        .newBlockingStub(managedChannel).withCallCredentials(token);
+                        NsEndDeviceRegistryBlockingStub networkServerService = NsEndDeviceRegistryGrpc
+                                        .newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+                        EndDeviceRegistryBlockingStub endDeviceRegistryService = EndDeviceRegistryGrpc
+                                        .newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+                        ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = ttn.lorawan.v3.EndDeviceOuterClass.EndDevice
+                                        .newBuilder()
+                                        .setName(deviceProvisioning.getName())
+                                        .setDescription("New device created by Cumulocity")
+                                        .setJoinServerAddress(properties.getProperty("address"))
+                                        .setApplicationServerAddress(properties.getProperty("address"))
+                                        .setNetworkServerAddress(properties.getProperty("address"))
+                                        .setSupportsJoin(true)
+                                        .setLorawanVersion(MACVersion.valueOf(
+                                                        deviceProvisioning.getAdditionalProperties().getProperty("MACVersion")))
+                                        .setLorawanPhyVersion(PHYVersion.valueOf(
+                                                        deviceProvisioning.getAdditionalProperties().getProperty("PHYVersion")))
+                                        .setFrequencyPlanId(deviceProvisioning.getAdditionalProperties()
+                                                        .getProperty("frequencyPlan"))
+                                        .setIds(EndDeviceIdentifiers.newBuilder()
+                                                        .setDeviceId(deviceProvisioning.getDevEUI().toLowerCase())
+                                                        .setApplicationIds(ApplicationIdentifiers.newBuilder()
+                                                                        .setApplicationId(properties.getProperty(APPID))
+                                                                        .build())
+                                                        .setDevEui(ByteString
+                                                                        .copyFrom(BaseEncoding.base16()
+                                                                                        .decode(deviceProvisioning.getDevEUI()
+                                                                                                        .toUpperCase())))
+                                                        .setJoinEui(ByteString
+                                                                        .copyFrom(BaseEncoding.base16()
+                                                                                        .decode(deviceProvisioning.getAppEUI()
+                                                                                                        .toUpperCase())))
+                                                        .build())
+                                        .setRootKeys(RootKeys.newBuilder()
+                                                        .setAppKey(KeyEnvelope.newBuilder()
+                                                                        .setKey(ByteString.copyFrom(
+                                                                                        BaseEncoding.base16().decode(
+                                                                                                        deviceProvisioning
+                                                                                                                        .getAppKey()
+                                                                                                                        .toUpperCase())))
+                                                                        .build())
+                                                        .build())
+                                        .build();
+                        CreateEndDeviceRequest request = CreateEndDeviceRequest.newBuilder().setEndDevice(device)
+                                        .build();
+                        endDeviceRegistryService.create(request);
+                        SetEndDeviceRequest request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device)
+                                        .setFieldMask(FieldMask.newBuilder().addPaths("root_keys.app_key.key").build())
+                                        .build();
+                        joinServerService.set(request2);
+                        request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device)
+                                        .setFieldMask(FieldMask.newBuilder()
+                                                        .addPaths("supports_join")
+                                                        .addPaths("lorawan_version")
+                                                        .addPaths("lorawan_phy_version")
+                                                        .addPaths("frequency_plan_id")
+                                                        .build())
+                                        .build();
+                        networkServerService.set(request2);
+                        request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device)
+                                        .build();
+                        applicationServerService.set(request2);
+                        result.setOk(true);
+                } catch (Exception e) {
+                        e.printStackTrace();
+                        result.setOk(false);
+                        result.setMessage(e.getMessage());
+                }
 
-	@Override
-	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
-		logger.info("Will provision device with following parameters: {}", deviceProvisioning);
-		JsEndDeviceRegistryBlockingStub joinServerService = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
-		AsEndDeviceRegistryBlockingStub applicationServerService = AsEndDeviceRegistryGrpc
-				.newBlockingStub(managedChannel).withCallCredentials(token);
-		NsEndDeviceRegistryBlockingStub networkServerService = NsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
-		EndDeviceRegistryBlockingStub endDeviceRegistryService = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
-		ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = ttn.lorawan.v3.EndDeviceOuterClass.EndDevice.newBuilder()
-				.setName(deviceProvisioning.getName()).setDescription("New device created by Cumulocity")
-				.setJoinServerAddress(properties.getProperty("address"))
-				.setApplicationServerAddress(properties.getProperty("address"))
-				.setNetworkServerAddress(properties.getProperty("address"))
-				.setSupportsJoin(true)
-				.setLorawanVersion(MACVersion.valueOf(deviceProvisioning.getAdditionalProperties().getProperty("MACVersion")))
-				.setLorawanPhyVersion(PHYVersion.valueOf(deviceProvisioning.getAdditionalProperties().getProperty("PHYVersion")))
-				.setFrequencyPlanId(deviceProvisioning.getAdditionalProperties().getProperty("frequencyPlan"))
-				.setIds(EndDeviceIdentifiers.newBuilder().setDeviceId(deviceProvisioning.getDevEUI().toLowerCase())
-						.setApplicationIds(ApplicationIdentifiers.newBuilder()
-								.setApplicationId(properties.getProperty(APPID)).build())
-						.setDevEui(ByteString
-								.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getDevEUI().toUpperCase())))
-						.setJoinEui(ByteString
-								.copyFrom(BaseEncoding.base16().decode(deviceProvisioning.getAppEUI().toUpperCase())))
-						.build())
-				.setRootKeys(RootKeys.newBuilder()
-						.setAppKey(KeyEnvelope.newBuilder()
-								.setKey(ByteString.copyFrom(
-										BaseEncoding.base16().decode(deviceProvisioning.getAppKey().toUpperCase())))
-								.build())
-						.build())
-				.build();
-		CreateEndDeviceRequest request = CreateEndDeviceRequest.newBuilder().setEndDevice(device)
-			.build();
-		/*device = */endDeviceRegistryService.create(request);
-		if (device != null) {
-			logger.info(device.toString());
-			SetEndDeviceRequest request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device)
-				.setFieldMask(FieldMask.newBuilder().addPaths("root_keys.app_key.key").build())
-				.build();
-			/*device = */joinServerService.set(request2);
-			logger.info(device.toString());
-			request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device)
-				.setFieldMask(FieldMask.newBuilder()
-					.addPaths("supports_join")
-					.addPaths("lorawan_version")
-					.addPaths("lorawan_phy_version")
-					.addPaths("frequency_plan_id")
-					.build())
-				//.setFieldMask(FieldMask.newBuilder().addPaths("join_server_address").build())
-				.build();
-			/*device = */networkServerService.set(request2);
-			logger.info(device.toString());
-			request2 = SetEndDeviceRequest.newBuilder().setEndDevice(device)
-				//.setFieldMask(FieldMask.newBuilder().addPaths("supports_join").build())
-				.build();
-			/*device = */applicationServerService.set(request2);
-			logger.info(device.toString());
-		} else {
-			logger.error("Impossible to provision device in TTN.");
-		}
+                return result;
+        }
 
-		return device != null;
-	}
+        @Override
+        public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+                logger.info("Configuring routings to: {} with credentials: {}:{} on TTN app {}", url, login, password,
+                                properties.getProperty(APPID));
+                LNSResponse<Void> result = new LNSResponse<>();
+                try {
 
-	@Override
-	public void configureRoutings(String url, String tenant, String login, String password) {
-		logger.info("Configuring routings to: {} with credentials: {}:{} on TTN app {}", url, login, password,
-				properties.getProperty(APPID));
-		ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
-		ApplicationWebhook webhook = ApplicationWebhook.newBuilder()
-				.setIds(ApplicationWebhookIdentifiers.newBuilder().setWebhookId(tenant + "-" + this.getId())
-						.setApplicationIds(ApplicationIdentifiers.newBuilder()
-								.setApplicationId(properties.getProperty(APPID)).build())
-						.build())
-				.setBaseUrl(url).setUplinkMessage(Message.newBuilder().setPath("/uplink").build())
-				.setDownlinkAck(Message.newBuilder().setPath("/downlink").build())
-				.setDownlinkNack(Message.newBuilder().setPath("/downlink").build())
-				.setDownlinkSent(Message.newBuilder().setPath("/downlink").build())
-				.setDownlinkFailed(Message.newBuilder().setPath("/downlink").build())
-				.setDownlinkQueued(Message.newBuilder().setPath("/downlink").build()).setFormat("json")
-				.putHeaders("Authorization", "Basic "
-						+ Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()))
-				.build();
-		app.set(SetApplicationWebhookRequest.newBuilder().setWebhook(webhook)
-				.setFieldMask(FieldMask.newBuilder().addPaths("base_url").addPaths("downlink_ack")
-						.addPaths("downlink_api_key").addPaths("downlink_failed").addPaths("downlink_nack")
-						.addPaths("downlink_queued").addPaths("downlink_sent").addPaths("format").addPaths("headers")
-						.addPaths("ids").addPaths("ids.application_ids").addPaths("ids.application_ids.application_id")
-						.addPaths("ids.webhook_id").addPaths("join_accept").addPaths("location_solved")
-						.addPaths("service_data").addPaths("uplink_message").build())
-				.build());
-	}
+                        ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc
+                                        .newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+                        ApplicationWebhook webhook = ApplicationWebhook.newBuilder()
+                                        .setIds(ApplicationWebhookIdentifiers.newBuilder()
+                                                        .setWebhookId(tenant + "-" + this.getId())
+                                                        .setApplicationIds(ApplicationIdentifiers.newBuilder()
+                                                                        .setApplicationId(properties.getProperty(APPID))
+                                                                        .build())
+                                                        .build())
+                                        .setBaseUrl(url).setUplinkMessage(Message.newBuilder().setPath("/uplink").build())
+                                        .setDownlinkAck(Message.newBuilder().setPath("/downlink").build())
+                                        .setDownlinkNack(Message.newBuilder().setPath("/downlink").build())
+                                        .setDownlinkSent(Message.newBuilder().setPath("/downlink").build())
+                                        .setDownlinkFailed(Message.newBuilder().setPath("/downlink").build())
+                                        .setDownlinkQueued(Message.newBuilder().setPath("/downlink").build()).setFormat("json")
+                                        .putHeaders("Authorization", "Basic "
+                                                        + Base64.getEncoder().encodeToString(
+                                                                        (tenant + "/" + login + ":" + password).getBytes()))
+                                        .build();
+                        app.set(SetApplicationWebhookRequest.newBuilder().setWebhook(webhook)
+                                        .setFieldMask(FieldMask.newBuilder().addPaths("base_url").addPaths("downlink_ack")
+                                                        .addPaths("downlink_api_key").addPaths("downlink_failed")
+                                                        .addPaths("downlink_nack")
+                                                        .addPaths("downlink_queued").addPaths("downlink_sent")
+                                                        .addPaths("format").addPaths("headers")
+                                                        .addPaths("ids").addPaths("ids.application_ids")
+                                                        .addPaths("ids.application_ids.application_id")
+                                                        .addPaths("ids.webhook_id").addPaths("join_accept")
+                                                        .addPaths("location_solved")
+                                                        .addPaths("service_data").addPaths("uplink_message").build())
+                                        .build());
+                        result.setOk(true);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        result.setOk(false);
+                        result.setMessage(e.getMessage());
+                }
 
-	@Override
-	public void removeRoutings(String tenant) {
-		ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
+                return result;
+        }
 
-		app.delete(ApplicationWebhookIdentifiers.newBuilder().setWebhookId(tenant + "-" + this.getId()).build());
-	}
+        @Override
+        public LNSResponse<Void> removeRoutings(String tenant) {
+                LNSResponse<Void> result = new LNSResponse<>();
+                try {
+                        ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc
+                                        .newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+        
+                        app.delete(ApplicationWebhookIdentifiers.newBuilder().setWebhookId(tenant + "-" + this.getId())
+                                        .build());
+                        result.setOk(true);
+                } catch (Exception e) {
+                        e.printStackTrace();
+                        result.setOk(false);
+                        result.setMessage(e.getMessage());
+                }
 
-	@Override
-	public boolean deprovisionDevice(String deveui) {
-		JsEndDeviceRegistryBlockingStub service1 = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
-		AsEndDeviceRegistryBlockingStub service2 = AsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
-		NsEndDeviceRegistryBlockingStub service3 = NsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
-		EndDeviceRegistryBlockingStub service4 = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
+                return result;
+        }
 
-		EndDeviceIdentifiers ids = getDeviceIds(deveui);
+        @Override
+        public LNSResponse<Void> deprovisionDevice(String deveui) {
+                LNSResponse<Void> result = new LNSResponse<>();
+                try {
+                        JsEndDeviceRegistryBlockingStub service1 = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+                        AsEndDeviceRegistryBlockingStub service2 = AsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+                        NsEndDeviceRegistryBlockingStub service3 = NsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+                        EndDeviceRegistryBlockingStub service4 = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+        
+                        EndDeviceIdentifiers ids = getDeviceIds(deveui);
+        
+                        service2.delete(ids);
+                        service3.delete(ids);
+                        service1.delete(ids);
+                        service4.delete(ids);
+                        result.setOk(true);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        result.setOk(false);
+                        result.setMessage(e.getMessage());
+                }
 
-		service2.delete(ids);
-		service3.delete(ids);
-		service1.delete(ids);
-		Empty r = service4.delete(ids);
+                return result;
+        }
 
-		return r != null;
-	}
+        @Override
+        public LNSResponse<List<Gateway>> getGateways() {
+                LNSResponse<List<Gateway>> result = new LNSResponse<>();
+                try {
+                        GatewayRegistryBlockingStub gatewayRegistry = ttn.lorawan.v3.GatewayRegistryGrpc
+                                        .newBlockingStub(managedChannel).withCallCredentials(token);
+                        ListGatewaysRequest request = ListGatewaysRequest.newBuilder().build();
+                        Gateways gateways = gatewayRegistry.list(request);
+                        result.setOk(true);
+                        result.setResult(gateways.getGatewaysList().stream().map(g -> {
+                                return new Gateway(g.getIds().getEui().toStringUtf8(), g.getIds().getGatewayId(), g.getName(),
+                                                null, null, g.getVersionIds().getBrandId(),
+                                                g.isInitialized() ? ConnectionState.AVAILABLE : ConnectionState.UNAVAILABLE,
+                                                new C8YData());
+                        }).collect(Collectors.toList()));
+                } catch (Exception e) {
+                        e.printStackTrace();
+                        result.setOk(false);
+                        result.setMessage(e.getMessage());
+                }
 
-	@Override
-	public List<Gateway> getGateways() {
-		GatewayRegistryBlockingStub gatewayRegistry = GatewayRegistryGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-		ListGatewaysRequest request = ListGatewaysRequest.newBuilder().build();
-		Gateways gateways =  gatewayRegistry.list(request);
-		return gateways.getGatewaysList().stream().map(g -> {
-			return new Gateway( g.getIds().getEui().toStringUtf8(), g.getIds().getGatewayId(), g.getName(), null, null, g.getVersionIds().getBrandId(), g.isInitialized() ? ConnectionState.AVAILABLE : ConnectionState.UNAVAILABLE, new C8YData());
-		}).collect(Collectors.toList());
-	}
+                return result;
+        }
 
-	public List<Application> getApplications() {
-		logger.info("Fetching list of available applications from TTN...");
-		ApplicationRegistryBlockingStub service = ApplicationRegistryGrpc.newBlockingStub(managedChannel)
-				.withCallCredentials(token);
-		Applications apps = service.list(ListApplicationsRequest.newBuilder().build());
-		return apps.getApplicationsList();
-	}
+        public List<Application> getApplications() {
+                logger.info("Fetching list of available applications from TTN...");
+                ApplicationRegistryBlockingStub service = ApplicationRegistryGrpc.newBlockingStub(managedChannel)
+                                .withCallCredentials(token);
+                Applications apps = service.list(ListApplicationsRequest.newBuilder().build());
+                return apps.getApplicationsList();
+        }
 
-	public boolean provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
-		return false;
-	}
+        private OrganizationOrUserIdentifiers getCurrentUserOrOrganization() {
+                OrganizationOrUserIdentifiers result = null;
 
-	public boolean deprovisionGateway(String id) {
-		return false;
-	}
+                ApplicationAccessBlockingStub applicationAccess = ApplicationAccessGrpc.newBlockingStub(managedChannel)
+                                .withCallCredentials(token);
+                Collaborators collaborators = applicationAccess.listCollaborators(ListApplicationCollaboratorsRequest
+                                .newBuilder().setApplicationIds(ApplicationIdentifiers.newBuilder()
+                                                .setApplicationId(properties.getProperty(APPID)).build())
+                                .build());
+                for (Collaborator collaborator : collaborators.getCollaboratorsList()) {
+                        for (Right right : collaborator.getRightsList()) {
+                                if (right == Right.RIGHT_GATEWAY_ALL) {
+                                        result = collaborator.getIds();
+                                }
+                        }
+                }
+
+                return result;
+        }
+
+        public LNSResponse<Void> provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
+                LNSResponse<Void> result = new LNSResponse<>();
+                if (getCurrentUserOrOrganization() == null) {
+                        result.setOk(false);
+                        result.setMessage("no user with gateway creation rights was found.");
+                } else {
+                        GatewayRegistryBlockingStub gatewayRegistry = GatewayRegistryGrpc
+                                        .newBlockingStub(managedChannel).withCallCredentials(token);
+                        GatewayOuterClass.Gateway gateway = GatewayOuterClass.Gateway.newBuilder()
+                                        .setIds(GatewayIdentifiers.newBuilder()
+                                                        .setGatewayId(gatewayProvisioning.getGwEUI())
+                                                        .setEui(ByteString
+                                                                        .copyFrom(BaseEncoding.base16()
+                                                                                        .decode(gatewayProvisioning
+                                                                                                        .getGwEUI()
+                                                                                                        .toUpperCase())))
+                                                        .build())
+                                        .setGatewayServerAddress(properties.getProperty("address"))
+                                        .setStatusPublic(Boolean.parseBoolean(gatewayProvisioning
+                                                        .getAdditionalProperties().getProperty("public")))
+                                        .setFrequencyPlanId(gatewayProvisioning.getAdditionalProperties()
+                                                        .getProperty("frequencyPlan"))
+                                        .build();
+                        CreateGatewayRequest request = CreateGatewayRequest.newBuilder()
+                                        .setGateway(gateway)
+                                        .setCollaborator(getCurrentUserOrOrganization()).build();
+                        try {
+                                result.setOk(gatewayRegistry.create(request) != null);
+                        } catch (Exception e) {
+                                result.setOk(false);
+                                result.setMessage(e.getMessage());
+                        }
+                }
+                return result;
+        }
+
+        public LNSResponse<Void> deprovisionGateway(String id) {
+                LNSResponse<Void> result = new LNSResponse<>();
+                try {
+                        GatewayRegistryBlockingStub gatewayRegistry = GatewayRegistryGrpc.newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+                        gatewayRegistry.delete(GatewayIdentifiers.newBuilder()
+                                        .setEui(ByteString
+                                                        .copyFrom(BaseEncoding.base16().decode(id.toUpperCase())))
+                                        .build());
+
+                        result.setOk(true);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        result.setOk(false);
+                        result.setMessage(e.getMessage());
+                }
+                return result;
+        }
 }

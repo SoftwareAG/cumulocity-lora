@@ -15,10 +15,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import lora.codec.downlink.DownlinkData;
 import lora.ns.connector.LNSAbstractConnector;
+import lora.ns.connector.LNSResponse;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
@@ -36,6 +38,7 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -117,70 +120,94 @@ public class LoriotConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public List<EndDevice> getDevices() {
-		List<EndDevice> result = new ArrayList<EndDevice>();
+	public LNSResponse<List<EndDevice>> getDevices() {
+		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true).withResult(new ArrayList<EndDevice>());
 		try {
 			retrofit2.Response<List<Device>> response = loriotService.getDevices(getProperties().getProperty("appid"))
 					.execute();
-			List<Device> devices = response.body();
-			if (devices != null) {
-				result = devices.stream()
-						.map(device -> new EndDevice(device.getDeveui(), device.getTitle(), device.getDevclass()))
-						.collect(Collectors.toList());
+			if (response.isSuccessful()) {
+				List<Device> devices = response.body();
+				if (devices != null) {
+					result.setResult(devices.stream()
+							.map(device -> new EndDevice(device.getDeveui(), device.getTitle(), device.getDevclass()))
+							.collect(Collectors.toList()));
+				}
+			} else {
+				result.withOk(false).withMessage(response.errorBody().string());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 
 		return result;
 	}
 
 	@Override
-	public Optional<EndDevice> getDevice(String devEui) {
-		EndDevice result = null;
+	public LNSResponse<EndDevice> getDevice(String devEui) {
+		LNSResponse<EndDevice> result = new LNSResponse<EndDevice>().withOk(true);
 		try {
-			Device device = loriotService.getDevice(getProperties().getProperty("appid"), devEui).execute().body();
-			result = new EndDevice(devEui, device.getTitle(), device.getDevclass());
+			retrofit2.Response<Device> response = loriotService.getDevice(getProperties().getProperty("appid"), devEui).execute();
+			if (response.isSuccessful()) {
+				Device device = response.body();
+				result.setResult(new EndDevice(devEui, device.getTitle(), device.getDevclass()));
+			} else {
+				result.withOk(false).withMessage(response.errorBody().string());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
-		return Optional.ofNullable(result);
+		return result;
 	}
 
 	@Override
-	public String sendDownlink(DownlinkData operation) {
+	public LNSResponse<String> sendDownlink(DownlinkData operation) {
+		LNSResponse<String> result = new LNSResponse<String>().withOk(true);
 		String token = null;
 		try {
-			List<String> tokens = loriotService.getTokens(getProperties().getProperty("appid")).execute().body();
-			token = tokens.iterator().next();
+			retrofit2.Response<List<String>> response = loriotService.getTokens(getProperties().getProperty("appid")).execute();
+			if (response.isSuccessful()) {
+				token = response.body().iterator().next();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
-		logger.info("Will send {} to Loriot.", operation.toString());
-		RestTemplate restTemplate = new RestTemplate();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		List<MediaType> mediaTypes = new ArrayList<MediaType>();
-		mediaTypes.add(MediaType.APPLICATION_JSON);
-		headers.setAccept(mediaTypes);
-		headers.setBearerAuth(token);
-		Downlink downlink = new Downlink(operation.getDevEui(), operation.getFport(), operation.getPayload(),
-				getProperties().getProperty("appid"));
-		logger.info("Will send {} to Loriot.", downlink.toJson());
-		DownlinkResponse response = restTemplate.postForObject(getProperties().getProperty("url") + "/1/rest",
-				new HttpEntity<String>(downlink.toJson(), headers), DownlinkResponse.class);
-
-		return response != null ? response.getSeqdn() : null;
+		if (token != null) {
+			logger.info("Will send {} to Loriot.", operation.toString());
+			RestTemplate restTemplate = new RestTemplate();
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			List<MediaType> mediaTypes = new ArrayList<MediaType>();
+			mediaTypes.add(MediaType.APPLICATION_JSON);
+			headers.setAccept(mediaTypes);
+			headers.setBearerAuth(token);
+			Downlink downlink = new Downlink(operation.getDevEui(), operation.getFport(), operation.getPayload(),
+					getProperties().getProperty("appid"));
+			logger.info("Will send {} to Loriot.", downlink.toJson());
+			try {
+				DownlinkResponse response = restTemplate.postForObject(getProperties().getProperty("url") + "/1/rest",
+						new HttpEntity<String>(downlink.toJson(), headers), DownlinkResponse.class);
+				if (response != null) {
+					result.setResult(response.getSeqdn());
+				}
+			} catch(HttpClientErrorException e) {
+				e.printStackTrace();
+				result.withOk(false).withMessage(e.getResponseBodyAsString());
+			}
+		}
+		return result;
 	}
 
 	@Override
-	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
-		boolean result = false;
+	public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		Device device = null;
 		try {
 			retrofit2.Response<Device> response = loriotService
 					.getDevice(getProperties().getProperty("appid"), deviceProvisioning.getDevEUI()).execute();
-			if (response.code() == 200) {
+			if (response.isSuccessful()) {
 				device = response.body();
 			}
 		} catch (IOException e1) {
@@ -203,8 +230,8 @@ public class LoriotConnector extends LNSAbstractConnector {
 		return result;
 	}
 
-	private boolean provisionDeviceOtaa(DeviceProvisioning deviceProvisioning) {
-		boolean result = false;
+	private LNSResponse<Void> provisionDeviceOtaa(DeviceProvisioning deviceProvisioning) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		OtaaDeviceRegistration deviceCreate = new OtaaDeviceRegistration();
 		deviceCreate.setTitle(deviceProvisioning.getName());
 		deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
@@ -214,16 +241,19 @@ public class LoriotConnector extends LNSAbstractConnector {
 		deviceCreate.setDevclass(Optional.ofNullable(deviceProvisioning.getDeviceClass().name()).orElse("A"));
 
 		try {
-			result = loriotService.createDeviceOtaa(getProperties().getProperty("appid"), deviceCreate).execute()
-					.isSuccessful();
+			retrofit2.Response<Device> response = loriotService.createDeviceOtaa(getProperties().getProperty("appid"), deviceCreate).execute();
+			if (!response.isSuccessful()) {
+				result.withOk(false).withMessage(response.errorBody().string());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 		return result;
 	}
 
-	private boolean provisionDeviceAbp(DeviceProvisioning deviceProvisioning) {
-		boolean result = false;
+	private LNSResponse<Void> provisionDeviceAbp(DeviceProvisioning deviceProvisioning) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		AbpDeviceRegistration deviceCreate = new AbpDeviceRegistration();
 		deviceCreate.setTitle(deviceProvisioning.getName());
 		deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
@@ -234,16 +264,20 @@ public class LoriotConnector extends LNSAbstractConnector {
 		deviceCreate.setDevclass(Optional.ofNullable(deviceProvisioning.getDeviceClass().name()).orElse("A"));
 
 		try {
-			result = loriotService.createDeviceAbp(getProperties().getProperty("appid"), deviceCreate).execute()
-					.isSuccessful();
+			retrofit2.Response<Device> response = loriotService.createDeviceAbp(getProperties().getProperty("appid"), deviceCreate).execute();
+			if (!response.isSuccessful()) {
+				result.withOk(false).withMessage(response.errorBody().string());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 		return result;
 	}
 
 	@Override
-	public void configureRoutings(String url, String tenant, String login, String password) {
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
 		try {
 			retrofit2.Response<List<Output>> outputs = loriotService.getOutputs(getProperties().getProperty("appid"))
@@ -261,15 +295,21 @@ public class LoriotConnector extends LNSAbstractConnector {
 			}
 			HttpPush httpPush = new HttpPush(url + "/uplink",
 					"Basic " + Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
-			loriotService.createHttpPush(getProperties().getProperty("appid"), httpPush).execute();
+			retrofit2.Response<ResponseBody> response = loriotService.createHttpPush(getProperties().getProperty("appid"), httpPush).execute();
+			if (!response.isSuccessful()) {
+				result.withOk(false).withMessage(response.errorBody().string());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
+		return result;
 	}
 
 	@Override
-	public void removeRoutings(String tenant) {
+	public LNSResponse<Void> removeRoutings(String tenant) {
 		// TODO
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented");
 	}
 
 	public List<App> getApps() {
@@ -285,26 +325,30 @@ public class LoriotConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public boolean deprovisionDevice(String deveui) {
-		boolean result = false;
+	public LNSResponse<Void> deprovisionDevice(String deveui) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		try {
-			result = loriotService.removeDevice(getProperties().getProperty("appid"), deveui).execute().isSuccessful();
+			retrofit2.Response<Device> response = loriotService.removeDevice(getProperties().getProperty("appid"), deveui).execute();
+			if (!response.isSuccessful()) {
+				result.withOk(false).withMessage(response.errorBody().string());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 		return result;
 	}
 
 	@Override
-	public List<Gateway> getGateways() {
-		return new ArrayList<>();
+	public LNSResponse<List<Gateway>> getGateways() {
+		return new LNSResponse<List<Gateway>>().withOk(false).withMessage("Not implemented");
 	}
 
-	public boolean provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
-		return false;
+	public LNSResponse<Void> provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented");
 	}
 
-	public boolean deprovisionGateway(String id) {
-		return false;
+	public LNSResponse<Void> deprovisionGateway(String id) {
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented");
 	}
 }

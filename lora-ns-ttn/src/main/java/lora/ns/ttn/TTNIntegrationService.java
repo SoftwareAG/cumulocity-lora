@@ -34,6 +34,9 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 		deviceProvisioningAdditionalProperties.add(new PropertyDescription("MACVersion", "MAC Version", true, null, "/macversion", null, null, null, null, null, PropertyType.LIST, false));
 		deviceProvisioningAdditionalProperties.add(new PropertyDescription("PHYVersion", "PHY Version", true, null, "/phyversion", null, null, null, null, null, PropertyType.LIST, false));
 		deviceProvisioningAdditionalProperties.add(new PropertyDescription("frequencyPlan", "Frequency Plan", true, null, "/frequencyplan", null, null, null, null, null, PropertyType.LIST, false));
+
+		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("public", "Make status public", true, null, null, null, null, null, null, null, PropertyType.BOOLEAN, false));
+		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("frequencyPlan", "Frequency Plan", true, null, "/frequencyplan", null, null, null, null, null, PropertyType.LIST, false));
 	}
 
 	@Override

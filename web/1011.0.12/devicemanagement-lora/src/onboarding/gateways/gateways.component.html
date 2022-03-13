@@ -76,8 +76,7 @@
                             <label class="c8y-checkbox"><input type="checkbox"
                                     [(ngModel)]="gatewayProvisioningAdditionalProperties[property.name]"
                                     name="{{property.name}}" #{{property.name}}="ngModel" ngModel
-                                    required /><span></span>Provision gateway on
-                                LoRa network server</label>
+                                     /><span></span>{{property.label}}</label>
                         </c8y-form-group>
                         <c8y-form-group *ngIf="property.type === 'LIST'">
                             <label for="{{property.name}}">{{property.label}}:</label>

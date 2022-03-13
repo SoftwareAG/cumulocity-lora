@@ -8,10 +8,11 @@ import {
     DataGridComponent, DataSourceModifier, FilteringActionType, ServerSideDataResult, _
 } from '@c8y/ngx-components';
 import { Component, EventEmitter, Output, TemplateRef, ViewChild } from '@angular/core';
-import { FetchClient, InventoryService, IdentityService, IManagedObject, IExternalIdentity, QueriesUtil } from '@c8y/client';
+import { FetchClient, InventoryService, IdentityService, IManagedObject, QueriesUtil } from '@c8y/client';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { FilteringModifier } from '@c8y/ngx-components/core/data-grid/column/filtering-form-renderer';
 import { assign, transform } from 'lodash-es';
+import { LnsService } from '../../../src/service/LnsService';
 
 /**
  * The GatewaysComponent defines a few methods that can be
@@ -152,7 +153,7 @@ export class LoraGatewaysComponent {
     @ViewChild(DataGridComponent, { static: true })
     dataGrid: DataGridComponent;
 
-    constructor(private inventory: InventoryService, private identityService: IdentityService, private fetchClient: FetchClient, private modalService: BsModalService/*, private fb: FormBuilder*/) {
+    constructor(private inventory: InventoryService, private identityService: IdentityService, private fetchClient: FetchClient, private modalService: BsModalService, private lnsService: LnsService) {
         // _ annotation to mark this string as translatable string.
         this.informationText = _('Ooops! It seems that there is no gateway to display.');
         this.serverSideDataCallback = this.onDataSourceModifier.bind(this);
@@ -242,7 +243,7 @@ export class LoraGatewaysComponent {
         let result = await this.getGateways(columns, pagination);
         this.gateways = result.data;
         this.ids = {};
-        result.data.forEach(async gateway => this.ids[gateway.id] = await this.getGWId(gateway));
+        result.data.forEach(async gateway => this.ids[gateway.id] = await this.lnsService.getGWId(gateway));
         return result;
     }
 
@@ -272,7 +273,7 @@ export class LoraGatewaysComponent {
     async addGateway(name: string, id: string, type: string, instance: string, additionalProperties) {
 
         if (instance) {
-            this.provision({
+            this.lnsService.provision({
                 name,
                 gwEUI: id.toLowerCase(),
                 type: type
@@ -289,21 +290,12 @@ export class LoraGatewaysComponent {
 
     async endDelete(deprovision: boolean) {
         if (deprovision) {
-            await this.deprovision(this.gatewayToDelete);
+            await this.lnsService.deprovision(this.gatewayToDelete);
         }
         await this.inventory.delete(this.gatewayToDelete);
         this.deleteGatewayModalRef.hide();
         this.dataGrid.reload();
         //this.loadGateways();
-    }
-
-    async getGWId(gateway) {
-        let extIds = (await this.identityService.list(gateway.id)).data.filter(extId => extId.type === "LoRa Gateway Id");
-        let extId = "-";
-        if (extIds.length > 0) {
-            extId = extIds[0].externalId;
-        }
-        return extId;
     }
 
     changeListener(files: FileList) {
@@ -403,24 +395,5 @@ export class LoraGatewaysComponent {
         let props = await this.loadGatewayProvisioningAdditionalProperties(instance);
         this.bulkProperties = props.properties;
         this.bulkGatewayProvisioningAdditionalProperties = props.values;
-    }
-
-    async provision(gatewayProvisioning: { name: string, gwEUI: string, type: string, lat?: number, lng?: number }, instance: string, additionalProperties): Promise<IManagedObject> {
-        console.log("Will provision gateway on LNS instance " + instance);
-        console.log({ ...gatewayProvisioning, additionalProperties: additionalProperties });
-        let lnsInstance: IManagedObject = this.instanceMap[instance];
-        return (await (await this.fetchClient.fetch('service/lora-ns-' + lnsInstance.lnsType + '/' + instance + '/gateways', {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ ...gatewayProvisioning, additionalProperties: additionalProperties })
-        })).json()).data;
-    }
-
-    async deprovision(gateway: IManagedObject) {
-        await this.fetchClient.fetch('service/lora-ns-' + this.instanceMap[gateway.lnsConnectorId].lnsType + '/' + gateway.lnsConnectorId + '/gateways/' + await this.getGWId(gateway), {
-            method: "DELETE"
-        });
     }
 }

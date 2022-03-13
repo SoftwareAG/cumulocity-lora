@@ -164,7 +164,7 @@ export class LoraDevicesComponent {
     @ViewChild(DataGridComponent, { static: true })
     dataGrid: DataGridComponent;
 
-    constructor(public lnsService: LnsService, public codecService: CodecService, private inventory: InventoryService, private identityService: IdentityService, private fetchClient: FetchClient, private modalService: BsModalService/*, private fb: FormBuilder*/) {
+    constructor(public lnsService: LnsService, public codecService: CodecService, private inventory: InventoryService, private identityService: IdentityService, private fetchClient: FetchClient, private modalService: BsModalService) {
         // _ annotation to mark this string as translatable string.
         this.informationText = _('Ooops! It seems that there is no device to display.');
         this.serverSideDataCallback = this.onDataSourceModifier.bind(this);

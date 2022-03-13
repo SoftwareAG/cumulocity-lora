@@ -45,6 +45,7 @@ import lora.ns.DeviceData;
 import lora.ns.agent.AgentService;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
+import lora.ns.connector.LNSResponse;
 import lora.ns.integration.LNSIntegrationService;
 
 @Component
@@ -105,9 +106,9 @@ public class LNSDeviceManager {
 		String name = event.getDevEui();
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent()) {
-			Optional<EndDevice> device = connector.get().getDevice(event.getDevEui());
-			if (device.isPresent()) {
-				name = device.get().getName();
+			LNSResponse<EndDevice> device = connector.get().getDevice(event.getDevEui());
+			if (device.isOk()) {
+				name = device.getResult().getName();
 			}
 		}
 		return createDevice(lnsInstanceId, name, event.getDevEui().toLowerCase(), agent);
@@ -374,36 +375,43 @@ public class LNSDeviceManager {
 		return mor;
 	}
 	
-	public DeviceProvisioningResponse provisionDevice(String lnsConnectorId, DeviceProvisioning deviceProvisioning) {
+	public LNSResponse<ManagedObjectRepresentation> provisionDevice(String lnsConnectorId, DeviceProvisioning deviceProvisioning) {
 		logger.info("Will provision device on LNS connector {}: {}", lnsConnectorId, deviceProvisioning);
-		DeviceProvisioningResponse response = new DeviceProvisioningResponse();
+		LNSResponse<ManagedObjectRepresentation> response = new LNSResponse<ManagedObjectRepresentation>().withOk(true);
 		ManagedObjectRepresentation mor = null;
-		String errorMessage = null;
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
 		ValidationResult validationResult = deviceProvisioning.validate();
-		if (validationResult.isOk() && connector.isPresent() && connector.get().provisionDevice(deviceProvisioning)) {
-			mor = upsertDevice(lnsConnectorId, deviceProvisioning);
-			EventRepresentation event = new EventRepresentation();
-			event.setType("Device provisioned");
-			event.setText("Device has been provisioned");
-			event.setDateTime(new DateTime());
-			event.setSource(mor);
-			eventApi.create(event);
-			getDeviceConfig(mor);
+		if (validationResult.isOk() && connector.isPresent()) {
+			LNSResponse<Void> result = connector.get().provisionDevice(deviceProvisioning);
+			if (result.isOk()) {
+				mor = upsertDevice(lnsConnectorId, deviceProvisioning);
+				EventRepresentation event = new EventRepresentation();
+				event.setType("Device provisioned");
+				event.setText("Device has been provisioned");
+				event.setDateTime(new DateTime());
+				event.setSource(mor);
+				eventApi.create(event);
+				getDeviceConfig(mor);
+				response.setResult(mor);
+			} else {
+				response.setOk(false);
+				response.setMessage(result.getMessage());
+			}
 		} else {
+			response.setOk(false);
 			AlarmRepresentation alarm = new AlarmRepresentation();
 			alarm.setType("Device provisioning error");
 			if (connector.isPresent()) {
-				errorMessage = "Couldn't provision device " + deviceProvisioning.getDevEUI() + " in LNS connector "
-						+ lnsConnectorId;
+				response.setMessage("Couldn't provision device " + deviceProvisioning.getDevEUI() + " in LNS connector "
+						+ lnsConnectorId);
 				if (!validationResult.isOk()) {
-					errorMessage += validationResult.getReason();
+					response.setMessage(response.getMessage() + validationResult.getReason());
 				}
 			} else {
-				errorMessage = "LNS connector Id '" + lnsConnectorId
-						+ "' doesn't exist. Please use a valid managed object Id.";
+				response.setMessage("LNS connector Id '" + lnsConnectorId
+						+ "' doesn't exist. Please use a valid managed object Id.");
 			}
-			alarm.setText(errorMessage);
+			alarm.setText(response.getMessage());
 			alarm.setDateTime(new DateTime());
 			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
 			mor = getDevice(deviceProvisioning.getDevEUI().toLowerCase());
@@ -414,21 +422,29 @@ public class LNSDeviceManager {
 			}
 			alarmApi.create(alarm);
 		}
-		response.setDevice(mor);
-		response.setErrorMessage(errorMessage);
 		return response;
 	}
 
-	public boolean deprovisionDevice(String lnsInstanceId, String deveui) {
-		boolean result = false;
+	public LNSResponse<Void> deprovisionDevice(String lnsInstanceId, String deveui) {
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
-		if (connector.isPresent() && connector.get().deprovisionDevice(deveui)) {
-			ManagedObjectRepresentation mor = getDevice(deveui);
-			mor.removeProperty("c8y_RequiredInterval");
-			mor.setProperty("provisioned", false);
-			mor.setLastUpdatedDateTime(null);
-			updateDevice(deveui, mor);
-			result = true;
+		LNSResponse<Void> result = new LNSResponse<>();
+		if (connector.isPresent()) {
+			result = connector.get().deprovisionDevice(deveui);
+			if (result.isOk()) {
+				ManagedObjectRepresentation mor = getDevice(deveui);
+				mor.removeProperty("c8y_RequiredInterval");
+				mor.setProperty("provisioned", false);
+				mor.setLastUpdatedDateTime(null);
+				try {
+					updateDevice(deveui, mor);
+				} catch (Exception e) {
+					e.printStackTrace();
+					result.setOk(false);
+					result.setMessage(e.getMessage());
+				}
+			}
+		} else {
+			result.withMessage("No connector found with id " + lnsInstanceId).withOk(false);
 		}
 		return result;
 	}

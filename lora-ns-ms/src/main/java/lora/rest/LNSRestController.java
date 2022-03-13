@@ -22,13 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorRepresentation;
 import lora.ns.connector.LNSConnectorWizardStep;
+import lora.ns.connector.LNSResponse;
 import lora.ns.connector.PropertyDescription;
 import lora.ns.device.DeviceProvisioning;
-import lora.ns.device.DeviceProvisioningResponse;
 import lora.ns.device.EndDevice;
 import lora.ns.device.LNSDeviceManager;
 import lora.ns.gateway.GatewayProvisioning;
-import lora.ns.gateway.GatewayProvisioningResponse;
 import lora.ns.gateway.LNSGatewayManager;
 import lora.ns.integration.LNSIntegrationService;
 
@@ -59,30 +58,28 @@ public class LNSRestController {
 	}
 
 	@GetMapping(value = "/{lnsInstanceId}/devices", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<EndDevice> getDevices(@PathVariable String lnsInstanceId) {
+	public LNSResponse<List<EndDevice>> getDevices(@PathVariable String lnsInstanceId) {
 		return lnsProxy.getDevices(lnsInstanceId);
 	}
 	
 	@PostMapping(value = "/{lnsInstanceId}/devices", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public DeviceProvisioningResponse provisionDevice(@RequestBody DeviceProvisioning deviceProvisioning, @PathVariable String lnsInstanceId) {
+	public LNSResponse<ManagedObjectRepresentation> provisionDevice(@RequestBody DeviceProvisioning deviceProvisioning, @PathVariable String lnsInstanceId) {
 		return lnsDeviceManager.provisionDevice(lnsInstanceId, deviceProvisioning);
 	}
 	
 	@DeleteMapping(value = "/{lnsInstanceId}/devices/{deveui}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> deprovisionDevice(@PathVariable String lnsInstanceId, @PathVariable String deveui) {
-		boolean result = lnsDeviceManager.deprovisionDevice(lnsInstanceId, deveui);
-		return result ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+	public LNSResponse<Void> deprovisionDevice(@PathVariable String lnsInstanceId, @PathVariable String deveui) {
+		return lnsDeviceManager.deprovisionDevice(lnsInstanceId, deveui);
 	}
 	
 	@PostMapping(value = "/{lnsInstanceId}/gateways", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public GatewayProvisioningResponse provisionGateway(@RequestBody GatewayProvisioning gatewayProvisioning, @PathVariable String lnsInstanceId) {
+	public LNSResponse<ManagedObjectRepresentation> provisionGateway(@RequestBody GatewayProvisioning gatewayProvisioning, @PathVariable String lnsInstanceId) {
 		return lnsGatewayManager.provisionGateway(lnsInstanceId, gatewayProvisioning);
 	}
 	
 	@DeleteMapping(value = "/{lnsInstanceId}/gateways/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> deprovisionGateway(@PathVariable String lnsInstanceId, @PathVariable String id) {
-		boolean result = lnsGatewayManager.deprovisionGateway(lnsInstanceId, id);
-		return result ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+	public LNSResponse<Void> deprovisionGateway(@PathVariable String lnsInstanceId, @PathVariable String id) {
+		return lnsGatewayManager.deprovisionGateway(lnsInstanceId, id);
 	}
 
 	@PostMapping(value = "/devices/{deveui}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

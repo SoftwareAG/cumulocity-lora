@@ -27,6 +27,7 @@ import c8y.ConnectionState;
 import lora.codec.downlink.DownlinkData;
 import lora.codec.uplink.C8YData;
 import lora.ns.connector.LNSAbstractConnector;
+import lora.ns.connector.LNSResponse;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
@@ -101,27 +102,34 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		}
 	}
 
-	public List<EndDevice> getDevices() {
+	public LNSResponse<List<EndDevice>> getDevices() {
+		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true).withResult(new ArrayList<>());
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
-		List<EndDevice> endDevices = new ArrayList<>();
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
 		RestTemplate restTemplate = new RestTemplate();
-		PaginatedDto<EndDeviceDto> endDevicesDto = restTemplate.exchange(baseUrl + "/endDevices", HttpMethod.GET,
-				new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>() {
-				}).getBody();
-		for (EndDeviceDto endDeviceDto : endDevicesDto.getList()) {
-			endDevices
-					.add(new EndDevice(endDeviceDto.getDevEui(), endDeviceDto.getName(), endDeviceDto.getClassType()));
+		try {
+			ResponseEntity<PaginatedDto<EndDeviceDto>> response = restTemplate.exchange(baseUrl + "/endDevices", HttpMethod.GET,
+					new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>() {
+					});
+			if (response.hasBody()) {
+				for (EndDeviceDto endDeviceDto : response.getBody().getList()) {
+					result.getResult()
+							.add(new EndDevice(endDeviceDto.getDevEui(), endDeviceDto.getName(), endDeviceDto.getClassType()));
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
-		return endDevices;
+		return result;
 	}
 
 	@Override
-	public String sendDownlink(DownlinkData operation) {
-		String result = null;
+	public LNSResponse<String> sendDownlink(DownlinkData operation) {
+		LNSResponse<String> result = new LNSResponse<String>().withOk(true);
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -139,19 +147,21 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		RestTemplate restTemplate = new RestTemplate();
 		try {
 			logger.info("Will send data to {}", baseUrl + "/dataDown");
-			result = restTemplate.exchange(baseUrl + "/dataDown", HttpMethod.POST,
+			String response = restTemplate.exchange(baseUrl + "/dataDown", HttpMethod.POST,
 					new HttpEntity<String>(request, headers), String.class).getHeaders().getLocation().getPath();
-			result = result.substring(result.lastIndexOf('/') + 1);
-			logger.info("Operation id: {}", result);
+			result.setMessage(response.substring(response.lastIndexOf('/') + 1));
+			logger.info("Operation id: {}", response);
 		} catch (HttpClientErrorException e) {
 			e.printStackTrace();
 			logger.error(e.getResponseBodyAsString());
+			result.withOk(false).withMessage(e.getResponseBodyAsString());
 		}
 		return result;
 	}
 
 	@Override
-	public Optional<EndDevice> getDevice(String devEui) {
+	public LNSResponse<EndDevice> getDevice(String devEui) {
+		LNSResponse<EndDevice> result = new LNSResponse<EndDevice>().withOk(true);
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -161,11 +171,13 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		logger.info("Will get device info on URL: {}", baseUrl + "/endDevices/" + devEui);
 		EndDeviceDto endDeviceDto = restTemplate.exchange(baseUrl + "/endDevices/" + devEui, HttpMethod.GET,
 				new HttpEntity<String>("", headers), EndDeviceDto.class).getBody();
-		return Optional.of(new EndDevice(devEui, endDeviceDto.getName(), endDeviceDto.getClassType()));
+		result.setResult(new EndDevice(devEui, endDeviceDto.getName(), endDeviceDto.getClassType()));
+		return result;
 	}
 
 	@Override
-	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
+	public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -181,9 +193,18 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		dto.setClassType("A");
 		dto.setAppEui(deviceProvisioning.getAppEUI());
 		dto.setAppKey(deviceProvisioning.getAppKey());
-		ResponseEntity<String> res = restTemplate.exchange(baseUrl + "/endDevices/" + deviceProvisioning.getDevEUI(),
-				HttpMethod.PUT, new HttpEntity<EndDeviceDto>(dto, headers), String.class);
-		return res.getStatusCodeValue() == 201;
+		try {
+			ResponseEntity<String> res = restTemplate.exchange(baseUrl + "/endDevices/" + deviceProvisioning.getDevEUI(),
+					HttpMethod.PUT, new HttpEntity<EndDeviceDto>(dto, headers), String.class);
+			if (res.getStatusCodeValue() != 201) {
+				result.withOk(false).withMessage(res.getBody());
+			}
+		} catch(HttpClientErrorException e) {
+			e.printStackTrace();
+			logger.error(e.getResponseBodyAsString());
+			result.withOk(false).withMessage(e.getResponseBodyAsString());
+		}
+		return result;
 	}
 
 	@Override
@@ -195,7 +216,8 @@ public class KerlinkConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public void configureRoutings(String url, String tenant, String login, String password) {
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -270,13 +292,14 @@ public class KerlinkConnector extends LNSAbstractConnector {
 				e.printStackTrace();
 			}
 			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-			ResponseEntity<String> result = restTemplate.exchange(baseUrl + "/pushConfigurations", HttpMethod.POST,
+			ResponseEntity<String> response = restTemplate.exchange(baseUrl + "/pushConfigurations", HttpMethod.POST,
 					request, String.class);
-			if (result.getStatusCode() == HttpStatus.CREATED) {
-				String[] tokens = result.getHeaders().getLocation().getPath().split("/");
+			if (response.getStatusCode() == HttpStatus.CREATED) {
+				String[] tokens = response.getHeaders().getLocation().getPath().split("/");
 				configId = Integer.parseInt(tokens[tokens.length - 1]);
 			} else {
-				logger.error("Something was wrong while creating the push config: {}", result.getBody());
+				result.withOk(false).withMessage("Something was wrong while creating the push config: " + response.getBody());
+				logger.error("Something was wrong while creating the push config: {}", response.getBody());
 			}
 		}
 		if (configId != null) {
@@ -292,13 +315,16 @@ public class KerlinkConnector extends LNSAbstractConnector {
 			ResponseEntity<String> response = restTemplate.exchange(baseUrl + "/clusters/" + clusterId,
 					HttpMethod.PATCH, new HttpEntity<ClusterDto>(cluster, headers), String.class);
 			if (response.getStatusCode() != HttpStatus.NO_CONTENT) {
+				result.withOk(false).withMessage("Something was wrong while updating the cluster: " + response.getBody());
 				logger.error("Something was wrong while updating the cluster: {}", response.getBody());
 			}
 		}
+		return result;
 	}
 
 	@Override
-	public void removeRoutings(String tenant) {
+	public LNSResponse<Void> removeRoutings(String tenant) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -316,10 +342,12 @@ public class KerlinkConnector extends LNSAbstractConnector {
 						HttpMethod.DELETE, new HttpEntity<String>("", headers), String.class);
 			}
 		}
+		return result;
 	}
 
 	@Override
-	public boolean deprovisionDevice(String deveui) {
+	public LNSResponse<Void> deprovisionDevice(String deveui) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -329,7 +357,10 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<String> res = restTemplate.exchange(baseUrl + "/endDevices/" + deveui, HttpMethod.DELETE,
 				new HttpEntity<String>("", headers), String.class);
-		return res.getStatusCodeValue() == 204;
+		if (res.getStatusCodeValue() != 204) {
+			result.withOk(false).withMessage(res.getBody());
+		}
+		return result;
 	}
 
 	public List<ClusterDto> getClusters() {
@@ -351,8 +382,8 @@ public class KerlinkConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public List<Gateway> getGateways() {
-		List<Gateway> result = new ArrayList<>();
+	public LNSResponse<List<Gateway>> getGateways() {
+		LNSResponse<List<Gateway>> result = new LNSResponse<List<Gateway>>().withOk(true).withResult(new ArrayList<>());
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -364,17 +395,17 @@ public class KerlinkConnector extends LNSAbstractConnector {
 				}).getBody();
 		C8YData c8yData = new C8YData();
 		for (GatewayDto gatewayDto : gatewaysDto.getList()) {
-			result.add(new Gateway(gatewayDto.getEui(), gatewayDto.getEui(), gatewayDto.getName(), gatewayDto.getLatitude(),
+			result.getResult().add(new Gateway(gatewayDto.getEui(), gatewayDto.getEui(), gatewayDto.getName(), gatewayDto.getLatitude(),
 					gatewayDto.getLongitude(), gatewayDto.getDescription(), ConnectionState.AVAILABLE, c8yData));
 		}
 		return result;
 	}
 
-	public boolean provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
-		return false;
+	public LNSResponse<Void> provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented");
 	}
 
-	public boolean deprovisionGateway(String id) {
-		return false;
+	public LNSResponse<Void> deprovisionGateway(String id) {
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented");
 	}
 }

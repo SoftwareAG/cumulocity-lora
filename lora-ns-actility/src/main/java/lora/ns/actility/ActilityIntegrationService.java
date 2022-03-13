@@ -44,16 +44,16 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
         DeviceData data = null;
         try {
             JsonNode rootNode = mapper.readTree(event);
-            String deviceEui = rootNode.at("DevEUI_uplink/DevEUI").asText();
-            int fPort = rootNode.at("DevEUI_uplink/FPort").asInt();
-            double rssi = rootNode.at("DevEUI_uplink/LrrRSSI").asDouble();
-            double snr = rootNode.at("DevEUI_uplink/LrrSNR").asDouble();
-            double sf = rootNode.at("DevEUI_uplink/SpFact").asDouble();
-            Double lat = rootNode.at("DevEUI_uplink/DevLAT").asDouble();
-            Double lng = rootNode.at("DevEUI_uplink/DevLON").asDouble();
+            String deviceEui = rootNode.at("/DevEUI_uplink/DevEUI").asText();
+            int fPort = rootNode.at("/DevEUI_uplink/FPort").asInt();
+            double rssi = rootNode.at("/DevEUI_uplink/LrrRSSI").asDouble();
+            double snr = rootNode.at("/DevEUI_uplink/LrrSNR").asDouble();
+            double sf = rootNode.at("/DevEUI_uplink/SpFact").asDouble();
+            Double lat = rootNode.at("/DevEUI_uplink/DevLAT").asDouble();
+            Double lng = rootNode.at("/lora-codec-acs-switchDevEUI_uplink/DevLON").asDouble();
             logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
-            byte[] payload = BaseEncoding.base16().decode(rootNode.at("DevEUI_uplink/payload_hex").asText().toUpperCase());
-            Long updateTime = new DateTime(rootNode.at("DevEUI_uplink/Time").asText()).getMillis();
+            byte[] payload = BaseEncoding.base16().decode(rootNode.at("/DevEUI_uplink/payload_hex").asText().toUpperCase());
+            Long updateTime = new DateTime(rootNode.at("/DevEUI_uplink/Time").asText()).getMillis();
             //String model = null;
             logger.info("Update time is: " + updateTime);
 
@@ -96,10 +96,10 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode rootNode = mapper.readTree(event);
-            String commandId = rootNode.at("DevEUI_downlink_Sent/CorrelationID").asText();
+            String commandId = rootNode.at("/DevEUI_downlink_Sent/CorrelationID").asText();
             if (commandId != null) {
             	data.setCommandId(commandId);
-	            int error = rootNode.at("DevEUI_downlink_Sent/DeliveryStatus").asInt();
+	            int error = rootNode.at("/DevEUI_downlink_Sent/DeliveryStatus").asInt();
 	            if (error == 0) {
 	            	data.setErrorMessage("Error");
 	            	data.setStatus(OperationStatus.FAILED);

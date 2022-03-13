@@ -35,6 +35,7 @@ import lora.ns.actility.rest.model.RFRegion;
 import lora.ns.actility.rest.model.Route;
 import lora.ns.actility.rest.model.Token;
 import lora.ns.connector.LNSAbstractConnector;
+import lora.ns.connector.LNSResponse;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.DeviceProvisioning.ProvisioningMode;
 import lora.ns.device.EndDevice;
@@ -113,30 +114,32 @@ public class ActilityConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public List<EndDevice> getDevices() {
-		List<EndDevice> result = new ArrayList<EndDevice>();
+	public LNSResponse<List<EndDevice>> getDevices() {
+		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true).withResult(new ArrayList<EndDevice>());
 
 		return result;
 	}
 
 	@Override
-	public Optional<EndDevice> getDevice(String devEui) {
-		EndDevice result = null;
+	public LNSResponse<EndDevice> getDevice(String devEui) {
+		LNSResponse<EndDevice> result = new LNSResponse<>();
 		try {
 			Response<List<DeviceCreate>> devs = actilityCoreService.getDeviceByEUI(devEui).execute();
 			if (devs.isSuccessful() && !devs.body().isEmpty()) {
 				DeviceCreate dev = devs.body().get(0);
 				log.info("Device {} is named {}", devEui, dev.getName());
-				result = new EndDevice(devEui, dev.getName(), null);
+				result.withOk(true).withResult(new EndDevice(devEui, dev.getName(), null));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
-		return Optional.ofNullable(result);
+		return result;
 	}
 
 	@Override
-	public String sendDownlink(DownlinkData operation) {
+	public LNSResponse<String> sendDownlink(DownlinkData operation) {
+		LNSResponse<String> result = new LNSResponse<>();
 		Random r = new Random(DateTime.now().getMillis());
 		int downlinkCounter = r.nextInt();
 		log.info("Will send {} to Thingpark.", operation.toString());
@@ -150,15 +153,17 @@ public class ActilityConnector extends LNSAbstractConnector {
 			message.setSecurityParams(securityParams);
 			Response<DownlinkMessage> response = actilityCoreService.sendDownlink(operation.getDevEui(), message).execute();
 			log.info("Response from Thingpark was {}", response.code());
+			result.withOk(true).withResult(String.valueOf(downlinkCounter));
 		} catch (Exception e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
-		return String.valueOf(downlinkCounter);
+		return result;
 	}
 
 	@Override
-	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
-		boolean result = false;
+	public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		DeviceCreate device = new DeviceCreate();
 		device.setEUI(deviceProvisioning.getDevEUI());
 		device.setName(deviceProvisioning.getName());
@@ -175,17 +180,19 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 		try {
 			Response<DeviceCreate> response = actilityCoreService.createDevice(device).execute();
-			if (response.isSuccessful()) {
-				result = true;
+			if (!response.isSuccessful()) {
+				result.withOk(false).withMessage(response.errorBody().string());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 		return result;
 	}
 
 	@Override
-	public void configureRoutings(String url, String tenant, String login, String password) {
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		log.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
 		String connectionId = null;
 
@@ -202,6 +209,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
+			return result.withOk(false).withMessage(e1.getMessage());
 		}
 		ConnectionRequest connectionRequest = new ConnectionRequest();
 		ConnectionHttpConfig configuration = new ConnectionHttpConfig();
@@ -225,12 +233,14 @@ public class ActilityConnector extends LNSAbstractConnector {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				return result.withOk(false).withMessage(e.getMessage());
 			}
 		} else {
 			try {
 				actilityCoreService.updateConnection(connectionId, connectionRequest).execute();
 			} catch (Exception e) {
 				e.printStackTrace();
+				return result.withOk(false).withMessage(e.getMessage());
 			}
 		}
 		try {
@@ -249,11 +259,15 @@ public class ActilityConnector extends LNSAbstractConnector {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
+
+		return result;
 	}
 
 	@Override
-	public void removeRoutings(String tenant) {
+	public LNSResponse<Void> removeRoutings(String tenant) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		try {
 			Response<List<DeviceCreate>> response = actilityCoreService.getDevices().execute();
 			if (response.isSuccessful()) {
@@ -270,6 +284,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			return result.withOk(false).withMessage(e.getMessage());
 		}
 		try {
 			Response<List<Connection>> response = actilityCoreService.getConnections().execute();
@@ -287,29 +302,32 @@ public class ActilityConnector extends LNSAbstractConnector {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public boolean deprovisionDevice(String deveui) {
-		boolean result = false;
-		try {
-			Response<List<DeviceCreate>> devs = actilityCoreService.getDeviceByEUI(deveui).execute();
-			if (devs.isSuccessful() && !devs.body().isEmpty()) {
-				Response<ResponseBody> r = actilityCoreService.deleteDevice(devs.body().get(0).getRef()).execute();
-				if (r.isSuccessful()) {
-					result = true;
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			return result.withOk(false).withMessage(e.getMessage());
 		}
 		return result;
 	}
 
 	@Override
-	public List<Gateway> getGateways() {
-		List<Gateway> result = new ArrayList<>();
+	public LNSResponse<Void> deprovisionDevice(String deveui) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
+		try {
+			Response<List<DeviceCreate>> devs = actilityCoreService.getDeviceByEUI(deveui).execute();
+			if (devs.isSuccessful() && !devs.body().isEmpty()) {
+				Response<ResponseBody> r = actilityCoreService.deleteDevice(devs.body().get(0).getRef()).execute();
+				if (!r.isSuccessful()) {
+					result.withOk(false).withMessage(r.message());
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return result.withOk(false).withMessage(e.getMessage());
+		}
+		return result;
+	}
+
+	@Override
+	public LNSResponse<List<Gateway>> getGateways() {
+		LNSResponse<List<Gateway>> result = new LNSResponse<List<Gateway>>().withOk(true).withResult(new ArrayList<>());
 
 		try {
 			Response<List<BaseStation>> response = actilityCoreService.getBaseStations().execute();
@@ -351,12 +369,13 @@ public class ActilityConnector extends LNSAbstractConnector {
 							}
 							g.setData(data);
 						}
-						result.add(g);
+						result.getResult().add(g);
 					}
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 
 		return result;
@@ -375,9 +394,9 @@ public class ActilityConnector extends LNSAbstractConnector {
 		return result;
 	}
 
-	public boolean provisionGateway(GatewayProvisioning gatewayProvisioning) {
+	public LNSResponse<Void> provisionGateway(GatewayProvisioning gatewayProvisioning) {
 		BaseStation baseStation = new BaseStation();
-		boolean result = false;
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 
 		try {
 			baseStation.setName(gatewayProvisioning.getName());
@@ -392,22 +411,28 @@ public class ActilityConnector extends LNSAbstractConnector {
 			baseStation.setBaseStationProfileId(gatewayProvisioning.getAdditionalProperties().getProperty("gatewayProfile"));
 			baseStation.setRfRegionId(gatewayProvisioning.getAdditionalProperties().getProperty("rfRegion"));
 			Response<BaseStation> response = actilityCoreService.createBaseStation(baseStation).execute();
-			result = response.isSuccessful();
+			if (!response.isSuccessful()) {
+				result.withOk(false).withMessage(response.errorBody().string());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 
 		return result;
 	}
 
-	public boolean deprovisionGateway(String id) {
-		boolean result = false;
+	public LNSResponse<Void> deprovisionGateway(String id) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 
 		try {
 			Response<ResponseBody> response = actilityCoreService.deleteBaseStation(id).execute();
-			result = response.isSuccessful();
+			if (!response.isSuccessful()) {
+				result.withOk(false).withMessage(response.errorBody().string());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 
 		return result;

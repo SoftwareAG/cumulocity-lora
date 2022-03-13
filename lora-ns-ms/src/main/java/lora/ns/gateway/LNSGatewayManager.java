@@ -1,5 +1,6 @@
 package lora.ns.gateway;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.cumulocity.model.event.CumulocityAlarmStatuses;
@@ -31,6 +32,7 @@ import lora.common.C8YUtils;
 import lora.ns.agent.AgentService;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
+import lora.ns.connector.LNSResponse;
 import lora.ns.integration.LNSIntegrationService;
 
 @Component
@@ -64,7 +66,9 @@ public class LNSGatewayManager {
     public static final String GATEWAY_ID_TYPE = "LoRa Gateway Id";
 
     public void upsertGateways(LNSConnector connector) {
-            for (Gateway gateway : connector.getGateways()) {
+        LNSResponse<List<Gateway>> gateways = connector.getGateways();
+        if (gateways.isOk()) {
+            for (Gateway gateway : gateways.getResult()) {
                 ManagedObjectRepresentation mor = getGateway(gateway.getGwEUI());
                 if (mor == null) {
                     mor = createGateway(connector.getId(), gateway);
@@ -95,6 +99,7 @@ public class LNSGatewayManager {
                 log.info("Processing data for gateway {}", gateway.getName());
                 processData(mor, gateway.getData());
             }
+        }
     }
 
     private ManagedObjectRepresentation createGateway(String lnsConnectorId, Gateway gateway) {
@@ -165,35 +170,41 @@ public class LNSGatewayManager {
 		}
 	}
 
-	public GatewayProvisioningResponse provisionGateway(String lnsConnectorId, GatewayProvisioning gatewayProvisioning) {
-		GatewayProvisioningResponse response = new GatewayProvisioningResponse();
+	public LNSResponse<ManagedObjectRepresentation> provisionGateway(String lnsConnectorId, GatewayProvisioning gatewayProvisioning) {
+		LNSResponse<ManagedObjectRepresentation> response = new LNSResponse<ManagedObjectRepresentation>().withOk(true);
 		ManagedObjectRepresentation mor;
-		String errorMessage = null;
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		if (connector.isPresent() && connector.get().provisionGateway(gatewayProvisioning)) {
-			mor = getGateway(gatewayProvisioning.getGwEUI().toLowerCase());
-			if (mor == null) {
-				mor = createGateway(lnsConnectorId, gatewayProvisioning);
-			}
-			response.setGateway(mor);
-			EventRepresentation event = new EventRepresentation();
-			event.setType("Gateway provisioned");
-			event.setText("Gateway has been provisioned");
-			event.setDateTime(new DateTime());
-			event.setSource(mor);
-			eventApi.create(event);
+		if (connector.isPresent()) {
+            LNSResponse<Void> lnsResponse = connector.get().provisionGateway(gatewayProvisioning);
+            if (lnsResponse.isOk()) {
+                mor = getGateway(gatewayProvisioning.getGwEUI().toLowerCase());
+                if (mor == null) {
+                    mor = createGateway(lnsConnectorId, gatewayProvisioning);
+                }
+                response.setResult(mor);
+                EventRepresentation event = new EventRepresentation();
+                event.setType("Gateway provisioned");
+                event.setText("Gateway has been provisioned");
+                event.setDateTime(new DateTime());
+                event.setSource(mor);
+                eventApi.create(event);
+            } else {
+                response.setOk(false);
+                response.setMessage(lnsResponse.getMessage());
+            }
 		} else {
+            response.setOk(false);
 			AlarmRepresentation alarm = new AlarmRepresentation();
 			alarm.setType("Gateway provisioning error");
 			if (connector.isPresent()) {
-				errorMessage = "Couldn't provision gateway " + gatewayProvisioning.getGwEUI() + " in LNS connector "
-						+ lnsConnectorId;
+				response.setMessage("Couldn't provision gateway " + gatewayProvisioning.getGwEUI() + " in LNS connector "
+						+ lnsConnectorId);
 			} else {
-				errorMessage = "LNS connector Id '" + lnsConnectorId
-						+ "' doesn't exist. Please use a valid managed object Id.";
+				response.setMessage("LNS connector Id '" + lnsConnectorId
+						+ "' doesn't exist. Please use a valid managed object Id.");
 			}
-			log.error(errorMessage);
-			alarm.setText(errorMessage);
+			log.error(response.getMessage());
+			alarm.setText(response.getMessage());
 			alarm.setDateTime(new DateTime());
 			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
 			mor = getGateway(gatewayProvisioning.getGwEUI().toLowerCase());
@@ -204,17 +215,19 @@ public class LNSGatewayManager {
 			}
 			alarmApi.create(alarm);
 		}
-		response.setErrorMessage(errorMessage);
 
 		return response;
 	}
 
-	public boolean deprovisionGateway(String lnsConnectorId, String id) {
-		boolean result = false;
+	public LNSResponse<Void> deprovisionGateway(String lnsConnectorId, String id) {
+		LNSResponse<Void> result = new LNSResponse<>();
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		if (connector.isPresent() && connector.get().deprovisionGateway(id)) {
-			result = true;
-		}
+		if (connector.isPresent()) {
+            result = connector.get().deprovisionGateway(id);
+		} else {
+            result.setOk(false);
+            result.setMessage("No connector found with id " + lnsConnectorId);
+        }
 
 		return result;
 	}

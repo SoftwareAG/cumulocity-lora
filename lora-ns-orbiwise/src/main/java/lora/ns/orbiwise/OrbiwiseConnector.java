@@ -8,7 +8,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -20,19 +19,17 @@ import org.springframework.http.MediaType;
 
 import lora.codec.downlink.DownlinkData;
 import lora.ns.connector.LNSAbstractConnector;
+import lora.ns.connector.LNSResponse;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
 import lora.ns.orbiwise.rest.OrbiwiseService;
 import lora.ns.orbiwise.rest.model.Device;
 import lora.ns.orbiwise.rest.model.DeviceCreate;
-import lora.ns.orbiwise.rest.model.DownlinkResponse;
 import lora.ns.orbiwise.rest.model.Pushmode;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.ResponseBody;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -105,57 +102,71 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public List<EndDevice> getDevices() {
-		List<EndDevice> result = new ArrayList<EndDevice>();
+	public LNSResponse<List<EndDevice>> getDevices() {
+		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true).withResult(new ArrayList<>());
 		try {
-			retrofit2.Response<List<Device>> response = orbiwiseService.getDevices().execute();
-			List<Device> devices = response.body();
-			if (devices != null) {
-				result = devices.stream()
-						.map(device -> new EndDevice(device.getDeveui(), device.getDeveui(),
-								DeviceClass.BY_VALUE.get(device.getLora_device_class()).name()))
-						.collect(Collectors.toList());
+			var response = orbiwiseService.getDevices().execute();
+			if (response.isSuccessful()) {
+				List<Device> devices = response.body();
+				if (devices != null) {
+					result.setResult(devices.stream()
+							.map(device -> new EndDevice(device.getDeveui(), device.getDeveui(),
+									DeviceClass.BY_VALUE.get(device.getLora_device_class()).name()))
+							.collect(Collectors.toList()));
+				}
+			} else {
+				result.withOk(false).withMessage(response.errorBody().string());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 
 		return result;
 	}
 
 	@Override
-	public Optional<EndDevice> getDevice(String devEui) {
-		EndDevice result = null;
+	public LNSResponse<EndDevice> getDevice(String devEui) {
+		LNSResponse<EndDevice> result = new LNSResponse<EndDevice>().withOk(true);
 		try {
-			Device device = orbiwiseService.getDevice(devEui).execute().body();
-			result = new EndDevice(devEui, devEui, DeviceClass.BY_VALUE.get(device.getLora_device_class()).name());
+			var response = orbiwiseService.getDevice(devEui).execute();
+			if (response.isSuccessful()) {
+				Device device = response.body();
+				result.setResult(new EndDevice(devEui, devEui, DeviceClass.BY_VALUE.get(device.getLora_device_class()).name()));
+			} else {
+				result.withOk(false).withMessage(response.errorBody().string());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
-		return Optional.ofNullable(result);
+		return result;
 	}
 
 	@Override
-	public String sendDownlink(DownlinkData operation) {
-		String result = null;
+	public LNSResponse<String> sendDownlink(DownlinkData operation) {
+		LNSResponse<String> result = new LNSResponse<String>().withOk(true);
 		logger.info("Will send {} to Orbiwan.", operation.toString());
 
 		try {
-			retrofit2.Response<DownlinkResponse> response = orbiwiseService
+			var response = orbiwiseService
 					.sendCommand(operation.getDevEui(), operation.getFport(), operation.getPayload()).execute();
 			if (response.isSuccessful()) {
-				result = response.body().getId().toString();
+				result.setResult(response.body().getId().toString());
+			} else {
+				result.withOk(false).withMessage(response.errorBody().string());
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
+			result.withOk(false).withMessage(e1.getMessage());
 		}
 
 		return result;
 	}
 
 	@Override
-	public boolean provisionDevice(DeviceProvisioning deviceProvisioning) {
-		boolean result = false;
+	public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		DeviceCreate deviceCreate = new DeviceCreate();
 		deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
 		deviceCreate.setAppeui(deviceProvisioning.getAppEUI());
@@ -168,19 +179,22 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 		}
 
 		try {
-			Response<ResponseBody> response = orbiwiseService.createDevice(deviceCreate).execute();
-			result = response.isSuccessful();
+			var response = orbiwiseService.createDevice(deviceCreate).execute();
 			if (!response.isSuccessful()) {
+				result.withOk(false).withMessage(response.errorBody().string());
 				logger.error("Error from Orbiwan: {}", response.errorBody().string());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 		return result;
 	}
 
-	public void configureRouting(String url, String tenant, String login, String password, String subscriptions) {
+	public LNSResponse<Void> configureRouting(String url, String tenant, String login, String password, String subscriptions) {
 		assert orbiwiseService != null : "orbiwiseService is not initialized";
+
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 
 		Pushmode pushmode = new Pushmode();
 		pushmode.setAuth_string(
@@ -200,53 +214,65 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 		pushmode.setRetry_policy(1);
 
 		try {
-			retrofit2.Response<ResponseBody> response = orbiwiseService.createHttpRouting(pushmode).execute();
+			var response = orbiwiseService.createHttpRouting(pushmode).execute();
 			if (!response.isSuccessful()) {
 				logger.error("Error from Orbiwan: {}", response.errorBody().string());
+				result.withOk(false).withMessage(response.errorBody().string());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
+
+		return result;
 	}
 
 	@Override
-	public void configureRoutings(String url, String tenant, String login, String password) {
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
-		configureRouting(url, tenant, login, password, "payloads_dl,payloads_ul");
+		return configureRouting(url, tenant, login, password, "payloads_dl,payloads_ul");
 	}
 
 	@Override
-	public void removeRoutings(String tenant) {
+	public LNSResponse<Void> removeRoutings(String tenant) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		try {
-			orbiwiseService.stopRouting().execute();
-		} catch (
-
-		IOException e1) {
+			var response = orbiwiseService.stopRouting().execute();
+			if (!response.isSuccessful()) {
+				result.withOk(false).withMessage(response.errorBody().string());
+			}
+		} catch (IOException e1) {
 			e1.printStackTrace();
-		}
-	}
-
-	@Override
-	public boolean deprovisionDevice(String deveui) {
-		boolean result = false;
-		try {
-			result = orbiwiseService.deprovisionDevice(deveui).execute().isSuccessful();
-		} catch (IOException e) {
-			e.printStackTrace();
+			result.withOk(false).withMessage(e1.getMessage());
 		}
 		return result;
 	}
 
 	@Override
-	public List<Gateway> getGateways() {
-		return new ArrayList<>();
+	public LNSResponse<Void> deprovisionDevice(String deveui) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
+		try {
+			var response = orbiwiseService.deprovisionDevice(deveui).execute();
+			if (!response.isSuccessful()) {
+				result.withOk(false).withMessage(response.errorBody().string());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
+		}
+		return result;
 	}
 
-	public boolean provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
-		return false;
+	@Override
+	public LNSResponse<List<Gateway>> getGateways() {
+		return new LNSResponse<List<Gateway>>().withOk(true).withResult(new ArrayList<>());
 	}
 
-	public boolean deprovisionGateway(String id) {
-		return false;
+	public LNSResponse<Void> provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	}
+
+	public LNSResponse<Void> deprovisionGateway(String id) {
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 }

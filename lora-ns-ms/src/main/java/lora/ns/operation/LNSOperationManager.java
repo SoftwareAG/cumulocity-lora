@@ -23,6 +23,7 @@ import lora.codec.downlink.DownlinkData;
 import lora.codec.ms.CodecManager;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
+import lora.ns.connector.LNSResponse;
 import lora.ns.device.LNSDeviceManager;
 import lora.ns.integration.LNSIntegrationService;
 
@@ -89,9 +90,14 @@ public class LNSOperationManager {
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
 		if (connector.isPresent()) {
 			try {
-				String commandId = connector.get().sendDownlink(operation);
-				if (commandId != null) {
-					storeOperation(lnsConnectorId, c8yOperation, commandId);
+				LNSResponse<String> lnsResponse = connector.get().sendDownlink(operation);
+				if (lnsResponse.isOk()) {
+					String commandId = lnsResponse.getResult();
+					if (commandId != null) {
+						storeOperation(lnsConnectorId, c8yOperation, commandId);
+					} else {
+						logger.warn("Operation {} status won't be updated as no correlation Id was sent by LNS.", operation);
+					}
 				}
 			} catch (Exception e) {
 				logger.error("Unable to send downlink", e);

@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +50,7 @@ import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
 import lora.ns.connector.LNSConnectorRepresentation;
 import lora.ns.connector.LNSConnectorWizardStep;
+import lora.ns.connector.LNSResponse;
 import lora.ns.connector.PropertyDescription;
 import lora.ns.device.EndDevice;
 import lora.ns.device.LNSDeviceManager;
@@ -216,8 +216,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		}
 	}
 
-	public List<EndDevice> getDevices(String lnsInstanceId) {
-		List<EndDevice> result = new ArrayList<>();
+	public LNSResponse<List<EndDevice>> getDevices(String lnsInstanceId) {
+		LNSResponse<List<EndDevice>> result = new LNSResponse<>("No connector found with id " + lnsInstanceId, false, null);
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent()) {
 			result = connector.get().getDevices();
