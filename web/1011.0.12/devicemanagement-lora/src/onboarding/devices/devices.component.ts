@@ -278,6 +278,7 @@ export class LoraDevicesComponent {
         } else {
             let device = {
                 c8y_IsDevice: {},
+                lora_ns_device_LoRaDevice: {},
                 devEUI: devEUI.toLowerCase(),
                 appEUI: appEUI ? appEUI.toLowerCase() : null,
                 appKey: appKey ? appKey.toLowerCase() : null,
@@ -352,14 +353,14 @@ export class LoraDevicesComponent {
     }
 
     async endChangeDeviceType(type: string) {
-        await this.inventory.update({id: this.deviceToChange.id, type: type});
+        await this.inventory.update({id: this.deviceToChange.id, type: type, lora_ns_device_LoRaDevice: {}});
         this.changeDeviceTypeModalRef.hide();
         this.dataGrid.reload();
     }
 
     async endChangeDevicesType(type: string) {
         this.devicesToChange.forEach(async id => {
-            await this.inventory.update({id: id, type: type});
+            await this.inventory.update({id: id, type: type, lora_ns_device_LoRaDevice: {}});
         })
         this.changeDevicesTypeModalRef.hide();
         this.dataGrid.reload();
