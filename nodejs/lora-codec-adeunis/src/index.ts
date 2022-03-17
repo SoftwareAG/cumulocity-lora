@@ -29,7 +29,7 @@ class AdeunisCodec extends DeviceCodec {
     }
     getAvailableOperations(client: Client, model: string): Map<string, DeviceOperation> {
         let operations: Map<string, DeviceOperation> = new Map<string, DeviceOperation>();
-        operations.set("get config", {id: "get config", name: "get config", params: null});
+        operations.set("get config", {id: "get config", name: "get config", elements: null});
         return operations;
     }
     protected _decode(client: Client, mo: IManagedObject, model: string, fport: number, time: Date, payload: string): C8YData {

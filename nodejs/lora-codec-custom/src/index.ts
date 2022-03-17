@@ -2,7 +2,7 @@ import { DeviceCodec, CodecApp, C8YData, DownlinkData, MicroserviceSubscriptionS
 import { Client, IManagedObject } from '@c8y/client';
 import { Request, Response, NextFunction } from "express";
 import { CustomCodec } from './CustomCodec';
-import { DeviceOperationParam, ParamType } from 'lora-codec-interface/dist/lora/codec/DeviceOperationParam';
+import { ParamType } from 'lora-codec-interface/dist/lora/codec/downlink/DeviceOperationElement';
 
 class CustomDeviceCodec extends DeviceCodec {
 
@@ -52,10 +52,10 @@ class CustomDeviceCodec extends DeviceCodec {
                     mo.operations = new Array<DeviceOperation>();
                 }
                 if (mo.operations.size == 0) {
-                    mo.operations.push({
+                    mo.operations.push(<DeviceOperation>{
                         id: "test",
                         name: "Sample operation",
-                        params: [{
+                        elements: [{
                             id: "param1",
                             name: "Param 1",
                             type: ParamType.STRING,
