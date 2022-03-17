@@ -256,6 +256,9 @@ public class ActilityConnector extends LNSAbstractConnector {
 						}
 					}
 				});
+			} else {
+				log.error("Error while retrieving the list of devices: {}", response.errorBody().string());
+				result.withOk(false).withMessage(response.errorBody().string());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -372,6 +375,9 @@ public class ActilityConnector extends LNSAbstractConnector {
 						result.getResult().add(g);
 					}
 				}
+			} else {
+				log.error("Error while retrieving the list of gateways: {}", response.errorBody().string());
+				result.withOk(false).withMessage(response.errorBody().string());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -387,6 +393,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 			Response<List<DeviceProfile>> response = actilityCoreService.getDeviceProfiles().execute();
 			if (response.isSuccessful()) {
 				result = response.body();
+			} else {
+				log.error("Error while retrieving the list of device profiles: {}", response.errorBody().string());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -444,6 +452,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 			Response<List<BaseStationProfile>> response = actilityCoreService.getBaseStationProfiles().execute();
 			if (response.isSuccessful()) {
 				result = response.body();
+			} else {
+				log.error("Error while retrieving the list of base station profiles: {}", response.errorBody().string());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -457,6 +467,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 			Response<List<RFRegion>> response = actilityCoreService.getRFRegions().execute();
 			if (response.isSuccessful()) {
 				result = response.body();
+			} else {
+				log.error("Error while retrieving the list of RF regions: {}", response.errorBody().string());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
