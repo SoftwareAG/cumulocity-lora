@@ -325,6 +325,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	@Scheduled(initialDelay = 10000, fixedDelay = 10000)
 	private void processPendingOperations() {
 		subscriptionsService.runForEachTenant(() -> {
+			String currentTenant = subscriptionsService.getTenant();
 			OperationCollection oc = deviceControlApi.getOperationsByFilter(new OperationFilter()
 					.byStatus(OperationStatus.PENDING).byAgent(agentService.getAgent().getId().getValue()));
 			if (oc != null) {
