@@ -325,7 +325,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	@Scheduled(initialDelay = 10000, fixedDelay = 10000)
 	private void processPendingOperations() {
 		subscriptionsService.runForEachTenant(() -> {
-			logger.info("Getting pending operations on tenant {}", subscriptionsService.getTenant());
+			String currentTenant = subscriptionsService.getTenant();
 			OperationCollection oc = deviceControlApi.getOperationsByFilter(new OperationFilter()
 					.byStatus(OperationStatus.PENDING).byAgent(agentService.getAgent().getId().getValue()));
 			if (oc != null) {
@@ -334,7 +334,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 								&& !opCollectionRepresentation.getOperations()
 										.isEmpty(); opCollectionRepresentation = oc
 												.getNextPage(opCollectionRepresentation)) {
-					logger.info("Processing page {}", oc.get().getPageStatistics().getCurrentPage());
+                                        logger.info("Processing pending operations on tenant {} - page {}", currentTenant, oc.get().getPageStatistics().getCurrentPage());
 					for (OperationRepresentation op : opCollectionRepresentation.getOperations()) {
 						lnsOperationManager.executePending(op);
 					}
