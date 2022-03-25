@@ -21,6 +21,8 @@ module lora.ns.ms {
     requires spring.security.web;
     requires com.google.common;
     requires transitive lombok;
+    requires transitive thymeleaf;
+    requires transitive thymeleaf.spring5;
 
     exports lora.codec.ms;
     exports lora.ns.integration;

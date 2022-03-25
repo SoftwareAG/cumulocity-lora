@@ -1,0 +1,18 @@
+{
+    "device_properties": {
+        "deveui": "[(${deveui}?:'0000000000000000')]",
+        "external_id": "[(${name}?:'device')]"
+    },
+    "protocol_data": {
+        "port": [(${port}?:'0')],
+        "rssi": [(${rssi}?:'0')],
+        "snr": [(${snr}?:'0')],
+        "noise": [(${noise}?:'0')],
+        "signal": [(${signal}?:'0')],
+        "sf": [(${sf}?:'12')]
+    },
+    "lat": [(${lat}?:'0.0')],
+    "lng": [(${lng}?:'0.0')],
+    "payload_cleartext": "[(${payload}?:'0000')]",
+    "timestamp": "[(${timestamp}?:${#calendars.formatISO(#calendars.createNow())})]"
+}

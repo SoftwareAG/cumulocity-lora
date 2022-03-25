@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lora.ns.connector.LNSConnector;
@@ -130,5 +131,15 @@ public class LNSRestController {
 	@GetMapping(value = "/gatewayProvisioningAdditionalProperties", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<PropertyDescription> getGatewayProvisioningAdditionalProperties() {
 		return lnsProxy.getGatewayProvisioningAdditionalProperties();
+	}
+
+	@GetMapping(value = "/simulatePayload", produces = MediaType.ALL_VALUE)
+	public String getSimulatedPayload(@RequestParam Map<String, Object> fields) {
+		return lnsProxy.getSimulatedPayload(fields);
+	}
+
+	@GetMapping(value = "/payloadAvailableFields", produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<PropertyDescription> getPayloadAvailableFields() {
+		return lnsProxy.getPayloadSimulationFields();
 	}
 }

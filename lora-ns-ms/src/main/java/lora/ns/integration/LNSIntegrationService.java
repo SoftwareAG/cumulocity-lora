@@ -36,11 +36,14 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import lora.codec.uplink.C8YData;
 import lora.common.C8YUtils;
@@ -105,11 +108,16 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	@Autowired
 	private LNSGatewayManager lnsGatewayManager;
 
+    @Autowired
+    protected SpringTemplateEngine mMessageTemplateEngine;
+
 	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<>();
 
 	protected LinkedList<PropertyDescription> deviceProvisioningAdditionalProperties = new LinkedList<>();
 
 	protected LinkedList<PropertyDescription> gatewayProvisioningAdditionalProperties = new LinkedList<>();
+
+	protected LinkedList<PropertyDescription> payloadSimulationFields = new LinkedList<>();
 
 	protected final Logger logger = LoggerFactory.getLogger(LNSIntegrationService.class);
 
@@ -124,6 +132,13 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	public abstract OperationData processDownlinkEvent(String eventString);
 
 	public abstract boolean isOperationUpdate(String eventString);
+
+	public String getSimulatedPayload(Map<String, Object> fields) {
+		final Context context = new Context();
+		context.setVariables(fields);
+		logger.info(context.toString());
+		return mMessageTemplateEngine.process("payload.json", context);
+	}
 
 	protected I getInstance(ManagedObjectRepresentation instance) {
 		@SuppressWarnings("unchecked")
@@ -379,5 +394,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	public List<PropertyDescription> getGatewayProvisioningAdditionalProperties() {
 		return gatewayProvisioningAdditionalProperties;
+	}
+
+	public List<PropertyDescription> getPayloadSimulationFields() {
+		return payloadSimulationFields;
 	}
 }
