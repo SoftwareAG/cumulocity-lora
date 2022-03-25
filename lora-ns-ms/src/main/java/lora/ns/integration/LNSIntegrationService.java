@@ -36,7 +36,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -333,7 +332,10 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	private void scanGateways() {
 		subscriptionsService.runForEachTenant(() -> {
 			logger.info("Scanning gateways in tenant {}", subscriptionsService.getTenant());
-			lnsConnectorManager.getConnectors().values().forEach(c -> lnsGatewayManager.upsertGateways(c));
+			Map<String, LNSConnector> connectors = lnsConnectorManager.getConnectors();
+			if (connectors != null) {
+				connectors.values().forEach(c -> lnsGatewayManager.upsertGateways(c));
+			}
 		});
 	}
 
