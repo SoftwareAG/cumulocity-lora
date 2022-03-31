@@ -154,11 +154,6 @@ public abstract class DeviceCodec implements Component {
 			c8yData.getRootDevice().setLastUpdatedDateTime(null);
 			logger.info("Updating root device {}", c8yData.getRootDevice().toJSON());
 			inventoryApi.update(c8yData.getRootDevice());
-		} else {
-			// Required to update device availability because of the X-Cumulocity-Application-Key header which is set by default by the SDK
-			ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
-			mor.setId(rootDevice.getId());
-			inventoryApi.update(mor);
 		}
 		processChildDevices(deveui, rootDevice, c8yData);
 	}

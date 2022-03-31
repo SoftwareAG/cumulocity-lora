@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.cumulocity.microservice.context.ContextService;
 import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
@@ -68,6 +69,9 @@ public class CodecManager {
 
     @Autowired
     private MicroserviceSubscriptionsService subscriptionsService;
+
+	@Autowired
+	protected ContextService<MicroserviceCredentials> contextService;
 
 	private static final String LORA_DEVICE_COMMAND_ERROR = "LoRa device command error";
 	private static final String LORA_DEVICE_PAYLOAD_ERROR = "LoRa device payload decoding error";
@@ -154,6 +158,18 @@ public class CodecManager {
 		return result;
 	}
 
+	private MicroserviceCredentials createContextWithoutApiKey(MicroserviceCredentials source) {
+		return new MicroserviceCredentials(
+			source.getTenant(),
+			source.getUsername(),
+			source.getPassword(),
+			source.getOAuthAccessToken(),
+			"NOT_EXISTING", //added to replace context, check: com.cumulocity.microservice.context.annotation.EnableContextSupportConfiguration.contextScopeConfigurer
+			source.getTfaToken(),
+			null
+		);
+	}
+
 	public void decode(ManagedObjectRepresentation mor, DeviceData event) {
 		EventRepresentation eventRepresentation = new EventRepresentation();
 		eventRepresentation.setSource(mor);
@@ -180,7 +196,8 @@ public class CodecManager {
 				alarmApi.create(alarm);
 			}
 		});
-		eventApi.create(eventRepresentation);
+		MicroserviceCredentials noAppKeyContext = createContextWithoutApiKey(contextService.getContext());
+		contextService.callWithinContext(noAppKeyContext, () -> eventApi.create(eventRepresentation));
 	}
 	
 	public DownlinkData encode(String devEui, OperationRepresentation operation) {
