@@ -46,6 +46,7 @@ export class DevicesComponent implements OnInit {
     parameterValues: any = {};
     options: FormlyFormOptions = {};
     fields: FormlyFieldConfig[][] = new Array<FormlyFieldConfig[]>();
+    debugMode: boolean;
 
     constructor(public route: ActivatedRoute, public lnsService: LnsService, public codecService: CodecService, private inventory: InventoryService, private identity: IdentityService, private operationService: OperationService, private modalService: BsModalService, private eventService: EventService) {
         console.log(route.snapshot.parent.data.contextData.id);
@@ -61,6 +62,7 @@ export class DevicesComponent implements OnInit {
         let deviceId: string = this.route.snapshot.parent.data.contextData.id;
         const { data, res, paging } = await this.inventory.detail(deviceId);
         this.device = data;
+        this.debugMode = data.debug;
         this.selectedLnsConnectorId = this.device.lnsConnectorId;
         if (this.device.codec) {
             this.codec = this.device.codec;
@@ -257,5 +259,13 @@ export class DevicesComponent implements OnInit {
             console.log(e);
         }
         this.device.lnsConnectorId = this.selectedLnsConnectorId;
+    }
+
+    async switchDebugMode() {
+        let device: Partial<IManagedObject> = {
+            id: this.device.id,
+            debug: this.debugMode
+        }
+        this.inventory.update(device);
     }
 }

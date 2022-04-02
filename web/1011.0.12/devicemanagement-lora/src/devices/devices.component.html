@@ -66,6 +66,19 @@
     <div class="col-sm-6">
         <div class="card">
             <div class="card-header separator">
+                <h4 class="card-title">Debug mode</h4>
+            </div>
+            <div class="card-block">
+                <label class="c8y-switch">
+                    <input type="checkbox" checked="checked" [(ngModel)]="debugMode" (change)="switchDebugMode()"/>
+                    <span></span> Enable debug mode
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-header separator">
                 <h4 class="card-title">{{'Unprocessed payloads' | translate}}</h4>
             </div>
             <div class="card-block"><span>{{unprocessedPayloads? unprocessedPayloads.length : 0}}</span> unprocessed payloads</div>

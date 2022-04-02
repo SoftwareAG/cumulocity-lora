@@ -215,6 +215,15 @@ public abstract class DeviceCodec implements Component {
 			if (device.isPresent()) {
 				ManagedObjectRepresentation mor = device.get();
 				C8YData c8yData = decode(mor, decode);
+				if (mor.hasProperty("debug") && mor.getProperty("debug").equals(true)) {
+					EventRepresentation debug = new EventRepresentation();
+					debug.setSource(mor);
+					debug.setType("LoRaDecodedPayload");
+					debug.setText("LoRa decoded payload");
+					debug.setProperty("DecodedPayload", c8yData);
+					debug.setDateTime(DateTime.now());
+					eventApi.create(debug);
+				}
 				logger.info("Processing payload {} from port {} for device {}", decode.getPayload(), decode.getFPort(), decode.getDeveui());
 				processData(decode.getDeveui(), mor, c8yData);
 			} else {

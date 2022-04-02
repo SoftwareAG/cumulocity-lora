@@ -67,7 +67,9 @@ public class C8YData {
 		}
 		m.set(measurementValueMap, fragment);
 		m.setType(fragment);
-		m.setSource(mor);
+		ManagedObjectRepresentation source = new ManagedObjectRepresentation();
+		source.setId(mor.getId());
+		m.setSource(source);
 		m.setDateTime(time);
 
 		return m;
@@ -100,7 +102,9 @@ public class C8YData {
 
 	private EventRepresentation createEvent(ManagedObjectRepresentation mor, String eventType, String eventText, Map<String, Object> properties, DateTime dateTime) {
         EventRepresentation eventRepresentation = new EventRepresentation();
-        eventRepresentation.setSource(mor);
+		ManagedObjectRepresentation source = new ManagedObjectRepresentation();
+		source.setId(mor.getId());
+        eventRepresentation.setSource(source);
         eventRepresentation.setDateTime(dateTime);
         eventRepresentation.setText(eventText);
         eventRepresentation.setType(eventType);
@@ -128,7 +132,9 @@ public class C8YData {
 
 	private AlarmRepresentation createAlarm(ManagedObjectRepresentation mor, String alarmType, String alarmText, CumulocitySeverities severity, DateTime dateTime) {
         AlarmRepresentation alarmRepresentation = new AlarmRepresentation();
-        alarmRepresentation.setSource(mor);
+		ManagedObjectRepresentation source = new ManagedObjectRepresentation();
+		source.setId(mor.getId());
+        alarmRepresentation.setSource(source);
         alarmRepresentation.setDateTime(dateTime);
         alarmRepresentation.setText(alarmText);
         alarmRepresentation.setType(alarmType);
