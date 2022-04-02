@@ -4,8 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Calendar;
 
 import org.junit.jupiter.api.Test;
+
+import lora.codec.uplink.C8YData;
+import lora.codec.uplink.Decode;
 
 import com.google.common.io.BaseEncoding;
 
@@ -64,5 +68,12 @@ public class TestACSSwitchCodec {
 		parameter.getValues(buffer);
 		assertEquals(1, parameter.values[0].value, "Wrong value for min");
 		assertEquals(240, parameter.values[1].value, "Wrong value for max");
+	}
+
+	@Test
+	void testNormalPayload() {
+		ACSSwitchCodec codec = new ACSSwitchCodec();
+		C8YData data = codec.decode(null, new Decode("0", null, 1, "4200000a4c03000000001700000000611508", Calendar.getInstance().getTimeInMillis()));
+		System.out.println(data);
 	}
 }

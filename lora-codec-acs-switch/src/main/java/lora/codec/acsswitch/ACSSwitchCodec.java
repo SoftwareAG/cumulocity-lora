@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -368,10 +370,16 @@ public class ACSSwitchCodec extends DeviceCodec {
 
 	@Override
 	protected DownlinkData encode(ManagedObjectRepresentation mor, Encode encode) {
+		DownlinkData data = new DownlinkData();
 		if (encode.getOperation().contains("get config")) {
 			return askDeviceConfig(null);
 		}
-		DownlinkData data = new DownlinkData();
+		if (encode.getOperation().contains("sync")) {
+			int timestamp = (int)((Calendar.getInstance().getTimeInMillis() - new GregorianCalendar(2010, Calendar.JANUARY, 1).getTimeInMillis()) / 1000l);
+			data.setPayload("0301" + PARAMETER.RTC.buildPayload(timestamp));
+			data.setFport(1);
+			return data;
+		}
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root;
 		try {
@@ -403,7 +411,9 @@ public class ACSSwitchCodec extends DeviceCodec {
 	public Map<String, DeviceOperation> getAvailableOperations(String model) {
 		Map<String, DeviceOperation> result = new HashMap<>();
 		
-		result.put("get config", new DeviceOperation("get config", "get config", null));
+		result.put("get config", new DeviceOperation("get config", "get config"));
+
+		result.put("sync", new DeviceOperation("sync", "Set RTC to now (UTC)"));
 		
 		for(PARAMETER param: PARAMETER.values()) {
 			List<DeviceOperationElement> params = new ArrayList<>();
