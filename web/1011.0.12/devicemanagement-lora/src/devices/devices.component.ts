@@ -227,12 +227,8 @@ export class DevicesComponent implements OnInit {
             console.log(toDecode);
             let decodeResult = await this.codecService.decode(this.device.codec, toDecode);
             if (decodeResult.success) {
-                event.processed = true;
-                event.creationTime = null;
-                event.time = null;
-                event.type = null;
-                event.source = null;
-                await this.eventService.update(event);
+                await this.eventService.update({id: event.id, processed: true});
+                this.unprocessedPayloads.splice(this.unprocessedPayloads.indexOf(event), 1);
             }
         });
         this.getUnprocessPayloads();
