@@ -231,7 +231,6 @@ export class DevicesComponent implements OnInit {
                 this.unprocessedPayloads.splice(this.unprocessedPayloads.indexOf(event), 1);
             }
         });
-        this.getUnprocessPayloads();
     }
 
     async loadProperties(instance: string) {
