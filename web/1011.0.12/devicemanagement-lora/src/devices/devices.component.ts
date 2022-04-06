@@ -206,7 +206,7 @@ export class DevicesComponent implements OnInit {
 
     getUnprocessPayloads() {
         this.unprocessedPayloads = new Array<IEvent>();
-        this.eventService.list({ source: this.device.id, type: "LoRaPayload", pageSize: 1000 }).then(data => {
+        this.eventService.list({ source: this.device.id, type: "LoRaPayload", pageSize: 10000 }).then(data => {
             data.data.forEach(event => {
                 if (!event.processed) {
                     this.unprocessedPayloads.push(event);
