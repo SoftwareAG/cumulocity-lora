@@ -201,3 +201,24 @@
             ng-reflect-translate="">Cancel</button>
     </div>
 </ng-template>
+
+<ng-template #deleteGatewaysModal>
+    <div class="modal-header">
+        <h4 id="dialog-name" class="modal-title pull-left">Confirm gateways
+            deletion
+        </h4>
+    </div>
+    <div class="modal-body">
+        Gateways will be removed from inventory<br>
+        <div class="form-group">
+            <label class="c8y-checkbox"><input type="checkbox" #deprovision /><span></span>Deprovision gateways from
+                LoRa network server</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" (click)="endDeleteAll(deprovision.checked)" translate=""
+            ng-reflect-translate="">Confirm</button>
+        <button class="btn btn-primary" (click)="deleteGatewaysModalRef.hide()" translate=""
+            ng-reflect-translate="">Cancel</button>
+    </div>
+</ng-template>

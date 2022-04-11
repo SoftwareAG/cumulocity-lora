@@ -36,6 +36,7 @@ export class LoraGatewaysComponent {
     informationText: string;
     fileContent: { name: string, id: string, type: string, additionalProperties: any }[];
     gatewayToDelete: IManagedObject;
+    gatewaysToDelete : string[];
     properties: [{
         name: string;
         label: string;
@@ -56,6 +57,9 @@ export class LoraGatewaysComponent {
     @ViewChild("deleteGatewayModal", { static: false })
     deleteGatewayModal: TemplateRef<any>;
     deleteGatewayModalRef: BsModalRef;
+    @ViewChild("deleteGatewaysModal", { static: false })
+    deleteGatewaysModal: TemplateRef<any>;
+    deleteGatewaysModalRef: BsModalRef;
     queriesUtil: QueriesUtil;
     columns: Column[] = [
         { name: 'id', header: 'GW Id', path: 'id' },
@@ -87,7 +91,7 @@ export class LoraGatewaysComponent {
         { type: BuiltInActionType.Delete, callback: item => this.delete(<IManagedObject>item) }
     ];
     bulkActionControls: BulkActionControl[] = [
-        { type: BuiltInActionType.Delete, callback: selectedItemIds => console.dir(selectedItemIds) }
+        { type: BuiltInActionType.Delete, callback: selectedItemIds => this.deleteAll(selectedItemIds) }
     ];
 
     @Output() onColumnsChange: EventEmitter<Column[]> = new EventEmitter<
@@ -188,7 +192,12 @@ export class LoraGatewaysComponent {
 
     private getQueryObj(columns: Column[]): any {
         return transform(columns, (query, column) => this.extendQueryByColumn(query, column), {
-            __filter: { type: 'c8y_LoRaGateway' },
+            __filter: {
+                __or: [
+                    {__has: 'lora_ns_gateway_LoRaGateway'},
+                    {type: 'c8y_LoRaGateway'}
+                ]
+            },
             __orderby: []
         });
     }
@@ -232,7 +241,7 @@ export class LoraGatewaysComponent {
     async getGatewaysTotal(): Promise<number> {
         const filters = {
             fragmentType: 'c8y_IsDevice',
-            type: 'c8y_LoRaGateway',
+            query: 'has(c8y_IsDevice) and (has(lora_ns_gateway_LoRaGateway) or type eq c8y_LoRaGateway)',
             pageSize: 1,
             withTotalPages: true
         };
@@ -273,7 +282,7 @@ export class LoraGatewaysComponent {
     async addGateway(name: string, id: string, type: string, instance: string, additionalProperties) {
 
         if (instance) {
-            this.lnsService.provision({
+            this.lnsService.provisionGateway({
                 name,
                 gwEUI: id.toLowerCase(),
                 type: type
@@ -288,12 +297,29 @@ export class LoraGatewaysComponent {
         this.deleteGatewayModalRef = this.modalService.show(this.deleteGatewayModal, { backdrop: true, ignoreBackdropClick: true });
     }
 
+    deleteAll(gateways: string[]) {
+        this.gatewaysToDelete = gateways;
+        this.deleteGatewaysModalRef = this.modalService.show(this.deleteGatewaysModal, { backdrop: true, ignoreBackdropClick: true });
+    }
+
     async endDelete(deprovision: boolean) {
         if (deprovision) {
-            await this.lnsService.deprovision(this.gatewayToDelete);
+            await this.lnsService.deprovisionGateway(this.gatewayToDelete);
         }
         await this.inventory.delete(this.gatewayToDelete);
         this.deleteGatewayModalRef.hide();
+        this.dataGrid.reload();
+        //this.loadGateways();
+    }
+
+    async endDeleteAll(deprovision: boolean) {
+        this.gatewaysToDelete.forEach(async id => {
+            if (deprovision) {
+                await this.lnsService.deprovisionGateway({id: id});
+            }
+            await this.inventory.delete({id: id});
+        });
+        this.deleteGatewaysModalRef.hide();
         this.dataGrid.reload();
         //this.loadGateways();
     }

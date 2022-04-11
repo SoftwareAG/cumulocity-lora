@@ -337,7 +337,7 @@ export class LoraDevicesComponent {
             }
             await this.inventory.delete(id);
         })
-        this.deleteDeviceModalRef.hide();
+        this.deleteDevicesModalRef.hide();
         this.dataGrid.reload();
         //this.loadDevices();
     }

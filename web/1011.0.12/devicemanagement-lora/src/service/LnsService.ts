@@ -78,10 +78,14 @@ export class LnsService {
         }
     }
 
-    async deprovisionDevice(device: Partial<IManagedObject>): Promise<LNSResponse> {
-        return (await (await this.client.fetch('service/lora-ns-' + this.instanceMap[device.lnsConnectorId].lnsType + '/' + device.lnsConnectorId + '/devices/' + await this.getDevEUI(device), {
+    async deprovisionDevice(device: Partial<IManagedObject>) {
+        let response: LNSResponse = await (await this.client.fetch('service/lora-ns-' + this.instanceMap[device.lnsConnectorId].lnsType + '/' + device.lnsConnectorId + '/devices/' + await this.getDevEUI(device), {
             method: "DELETE"
-        })).json()).data;
+        })).json();
+        console.log(response);
+        if (!response.ok) {
+            this.alertService.danger("Can't deprovision device " + device.id);
+        }
     }
 
     async getDeviceProvisioningAdditionalProperties(instance: string): Promise<{
@@ -135,7 +139,7 @@ export class LnsService {
         return extId;
     }
 
-    async provision(gatewayProvisioning: { name: string, gwEUI: string, type: string, lat?: number, lng?: number }, instance: string, additionalProperties) {
+    async provisionGateway(gatewayProvisioning: { name: string, gwEUI: string, type: string, lat?: number, lng?: number }, instance: string, additionalProperties) {
         console.log("Will provision gateway on LNS instance " + instance);
         console.log({ ...gatewayProvisioning, additionalProperties: additionalProperties });
         let lnsInstance: IManagedObject = this.instanceMap[instance];
@@ -152,9 +156,12 @@ export class LnsService {
         }
     }
 
-    async deprovision(gateway: IManagedObject) {
-        await this.client.fetch('service/lora-ns-' + this.instanceMap[gateway.lnsConnectorId].lnsType + '/' + gateway.lnsConnectorId + '/gateways/' + await this.getGWId(gateway), {
+    async deprovisionGateway(gateway: Partial<IManagedObject>) {
+        let response: LNSResponse = await (await this.client.fetch('service/lora-ns-' + this.instanceMap[gateway.lnsConnectorId].lnsType + '/' + gateway.lnsConnectorId + '/gateways/' + await this.getGWId(gateway), {
             method: "DELETE"
-        });
+        })).json();
+        if (!response.ok) {
+            this.alertService.danger("Can't deprovision gateway " + gateway.id);
+        }
     }
 }
