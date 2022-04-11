@@ -106,7 +106,7 @@ public class LNSGatewayManager {
         log.info("Creating gateway {}", gateway.getName());
         ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
         mor.setName(gateway.getName());
-        mor.setType("c8y_LoRaGateway");
+        mor.set(new LoRaGateway());
         mor.set(new RequiredAvailability(600));
         mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsConnectorId);
         Hardware hardware = new Hardware(gateway.getType(), null, null);
