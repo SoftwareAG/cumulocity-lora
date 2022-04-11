@@ -55,6 +55,12 @@ public class CodecManager {
 	 */
 	private static final String PROPERTY_CODEC = "codec";
 
+	private static final String PROPERTY_STATUS = "status";
+
+	private static final String VALUE_PROCESSED = "processed";
+
+	private static final String VALUE_UNPROCESSED = "unprocessed";
+
 	@Autowired
 	private EventApi eventApi;
 	
@@ -180,13 +186,16 @@ public class CodecManager {
 		eventRepresentation.setProperty("port", event.getfPort());
 		log.info("Device details: {}", mor.toJSON());
 		eventRepresentation.setProperty(PROPERTY_PROCESSED, false);
+		eventRepresentation.setProperty(PROPERTY_STATUS, VALUE_UNPROCESSED);
 		getCodec(mor).ifPresent(codec -> {
 			log.info("Codec {} will be used with device {} for decoding payload {} on port {}", mor.getProperty(PROPERTY_CODEC), event.getDevEui(), event.getPayload(), event.getfPort());
 			Result<String> result = codec.decode(new Decode(event));
 			if (result.isSuccess()) {
 				eventRepresentation.setProperty(PROPERTY_PROCESSED, true);
+				eventRepresentation.setProperty(PROPERTY_STATUS, VALUE_PROCESSED);
 			} else {
 				eventRepresentation.setProperty(PROPERTY_PROCESSED, false);
+				eventRepresentation.setProperty(PROPERTY_STATUS, VALUE_UNPROCESSED);
 				AlarmRepresentation alarm = new AlarmRepresentation();
 				alarm.setSource(mor);
 				alarm.setType(LORA_DEVICE_PAYLOAD_ERROR);

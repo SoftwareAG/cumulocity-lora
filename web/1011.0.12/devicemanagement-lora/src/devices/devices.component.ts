@@ -64,6 +64,7 @@ export class DevicesComponent implements OnInit {
         this.device = data;
         this.debugMode = data.debug;
         this.selectedLnsConnectorId = this.device.lnsConnectorId;
+        this.getUnprocessPayloads();
         if (this.device.codec) {
             this.codec = this.device.codec;
             await this.loadModels(this.device.codec);
@@ -81,7 +82,6 @@ export class DevicesComponent implements OnInit {
 
     async loadCommands() {
         let deviceId: string = this.route.snapshot.parent.data.contextData.id;
-        this.getUnprocessPayloads();
         this.commands = await this.codecService.getOperations(this.device.codec, this.model);
         console.log(this.commands);
         this.fields = new Array<FormlyFieldConfig[]>();
@@ -204,15 +204,32 @@ export class DevicesComponent implements OnInit {
         this.loadCommands();
     }
 
-    getUnprocessPayloads() {
+    async getUnprocessPayloads() {
         this.unprocessedPayloads = new Array<IEvent>();
-        this.eventService.list({ source: this.device.id, type: "LoRaPayload", pageSize: 10000 }).then(data => {
-            data.data.forEach(event => {
-                if (!event.processed) {
-                    this.unprocessedPayloads.push(event);
-                }
-            })
-        })
+        let currentPage: number = 1;
+        let pageSize: number = 100;
+        let unprocessedPayloads = await this.eventService.list({
+            source: this.device.id,
+            fragmentType: "status",
+            fragmentValue: "unprocessed",
+            type: "LoRaPayload",
+            pageSize: pageSize,
+            withTotalPages: true });
+        console.log(unprocessedPayloads);
+        this.unprocessedPayloads = new Array<IEvent>();
+        this.unprocessedPayloads.push(...unprocessedPayloads.data);
+        if (unprocessedPayloads.paging.totalPages > 1) {
+            while (currentPage < unprocessedPayloads.paging.totalPages) {
+                this.unprocessedPayloads.push(...(await this.eventService.list({
+                    source: this.device.id,
+                    fragmentType: "status",
+                    fragmentValue: "unprocessed",
+                    type: "LoRaPayload",
+                    pageSize: pageSize})).data);
+                currentPage++;
+            }
+        }
+        console.log(this.unprocessedPayloads);
     }
 
     async processPayloads() {
@@ -227,7 +244,7 @@ export class DevicesComponent implements OnInit {
             console.log(toDecode);
             let decodeResult = await this.codecService.decode(this.device.codec, toDecode);
             if (decodeResult.success) {
-                await this.eventService.update({id: event.id, processed: true});
+                await this.eventService.update({id: event.id, processed: true, status: "processed"});
                 this.unprocessedPayloads.splice(this.unprocessedPayloads.indexOf(event), 1);
             }
         });

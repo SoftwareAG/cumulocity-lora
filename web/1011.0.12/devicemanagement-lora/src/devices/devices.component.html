@@ -84,7 +84,7 @@
             <div class="card-block"><span>{{unprocessedPayloads? unprocessedPayloads.length : 0}}</span> unprocessed payloads</div>
             <div class="card-footer">
                 <div class="form-group">
-                    <button type="button" (click)="processPayloads()" class="btn btn-primary" [disabled]="!unprocessedPayloads">
+                    <button type="button" (click)="processPayloads()" class="btn btn-primary" [disabled]="!unprocessedPayloads || !device.codec">
                         Process unprocessed payloads
                     </button>
                 </div>
