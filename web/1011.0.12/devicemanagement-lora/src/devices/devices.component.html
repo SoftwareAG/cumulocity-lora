@@ -56,7 +56,7 @@
             </div>
             <div class="card-footer">
                 <div class="form-group">
-                    <button type="button" (click)="updateDeviceCodec()" class="btn btn-primary">
+                    <button type="button" (click)="updateDeviceCodec()" class="btn btn-primary" [disabled]="!codecChanged">
                         Update device codec
                     </button>
                 </div>
@@ -84,7 +84,7 @@
             <div class="card-block"><span>{{unprocessedPayloads? unprocessedPayloads.length : 0}}</span> unprocessed payloads</div>
             <div class="card-footer">
                 <div class="form-group">
-                    <button type="button" (click)="processPayloads()" class="btn btn-primary" [disabled]="!unprocessedPayloads || !device.codec">
+                    <button type="button" (click)="processPayloads()" class="btn btn-primary" [disabled]="!unprocessedPayloads || !device.codec || unprocessedPayloads?.length == 0">
                         Process unprocessed payloads
                     </button>
                 </div>

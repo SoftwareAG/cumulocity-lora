@@ -47,6 +47,7 @@ export class DevicesComponent implements OnInit {
     options: FormlyFormOptions = {};
     fields: FormlyFieldConfig[][] = new Array<FormlyFieldConfig[]>();
     debugMode: boolean;
+    codecChanged: boolean;
 
     constructor(public route: ActivatedRoute, public lnsService: LnsService, public codecService: CodecService, private inventory: InventoryService, private identity: IdentityService, private operationService: OperationService, private modalService: BsModalService, private eventService: EventService) {
         console.log(route.snapshot.parent.data.contextData.id);
@@ -182,6 +183,9 @@ export class DevicesComponent implements OnInit {
 
     async loadModels(codec) {
         console.log("Loading models for codec " + codec);
+        if (!this.device.codec || this.device.codec != codec) {
+            this.codecChanged = true;
+        }
         this.models = await this.codecService.getModels(codec);
         if (!this.models[this.model]) {
             this.model = undefined;
@@ -201,6 +205,7 @@ export class DevicesComponent implements OnInit {
         this.inventory.update(device);
         this.device.codec = this.codec;
         this.device.c8y_Hardware = {model: this.model};
+        this.codecChanged = false;
         this.loadCommands();
     }
 
