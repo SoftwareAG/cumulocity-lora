@@ -1,4 +1,4 @@
-import { IManagedObject, Client, IExternalIdentity, IIdentified, IAlarm, IResultList, AlarmStatus } from '@c8y/client';
+import { IManagedObject, Client, IExternalIdentity, IAlarm, IResultList, AlarmStatus } from '@c8y/client';
 import { C8YData } from './uplink/C8YData';
 import { DownlinkData } from './downlink/DownLinkData';
 import { Component } from '../common/Component';
@@ -7,6 +7,7 @@ import { Decode } from './uplink/Decode';
 import { Encode } from './downlink/Encode';
 import { DeviceOperation } from './downlink/DeviceOperation';
 import { Result } from './Result';
+import { Logger } from '../common/Logger';
 
 export abstract class DeviceCodec implements Component {
     abstract getId(): string;
@@ -22,52 +23,62 @@ export abstract class DeviceCodec implements Component {
     abstract askDeviceConfig(devEui: string): DownlinkData;
     abstract getAvailableOperations(client: Client, model: string): Map<string, DeviceOperation>;
 
+    protected logger = Logger.getLogger("DeviceCodec");
+
     async decode(client: Client, decode: Decode): Promise<Result<string>> {
         let result: Result<string> = {success: true, message: "", response: null};
         try {
-            console.log(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui} with time ${decode.updateTime}`);
+            this.logger.info(`Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui} with time ${decode.updateTime}`);
             let datetime: Date;
             if (!decode.updateTime) {
-                console.log("No timestamp received, server timestamp will be used instead.");
+                this.logger.info("No timestamp received, server timestamp will be used instead.");
                 datetime = new Date();
             } else {
                 if (typeof decode.updateTime == "number") {
                     datetime = new Date(decode.updateTime);
                 } else {
-                    console.error("Bad type for time fields: " + typeof decode.updateTime);
+                    this.logger.error("Bad type for time fields: " + typeof decode.updateTime);
                     if (typeof decode.updateTime == "string") {
-                        console.log("Will try to parse time field to a number.");
+                        this.logger.info("Will try to parse time field to a number.");
                         datetime = new Date(parseInt(decode.updateTime));
                     }
                 }
             }
             if (!decode.payload) {
-                console.error("Payload is empty!");
+                this.logger.error("Payload is empty!");
                 result.success = false;
                 result.message += "Payload is empty!<br>";
             }
             var isHexa = decode.payload.match(/^[0-9a-fA-F]+$/);
             if (!isHexa || isHexa.length == 0) {
-                console.error("Payload is not in hexadecimal format!");
+                this.logger.error("Payload is not in hexadecimal format!");
                 result.success = false;
                 result.message += "Payload is not in hexadecimal format!<br>";
             }
             let device: IManagedObject = await this.getDevice(client, decode.deveui.toLowerCase());
             if (result.success) {
                 if (!device) {
-                    console.error(`There is no device with DevEUI ${decode.deveui}`);
+                    this.logger.error(`There is no device with DevEUI ${decode.deveui}`);
                     result.success = false;
                     result.message += `There is no device with DevEUI ${decode.deveui}`;
                 } else {
                     let c8yData: C8YData = this._decode(client, device, decode.model, decode.fPort, datetime, decode.payload);
-                    console.log(c8yData);
+                    if (device.debug) {
+                        client.event.create({
+                            source: device,
+                            type: "LoRaDecodedPayload",
+                            text: "LoRa decoded payload",
+                            DecodedPayload: c8yData,
+                            time: new Date().toISOString()
+                        });
+                    }
+                    this.logger.info(c8yData);
                     this.processData(client, device, c8yData);
                     result.message = `Successfully processed payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui}`;
                     result.response = "OK";
                 }
             }
         } catch(e) {
-            //result = {success: false, message: e.message, response: null};
             result.success = false;
             result.message += e.message;
         }
@@ -80,7 +91,7 @@ export abstract class DeviceCodec implements Component {
             let data: DownlinkData = null;
             let mor: IManagedObject = await this.getDevice(client, encode.devEui.toLowerCase());
 
-            console.log(`Processing operation ${encode.operation} for device ${encode.devEui}`);
+            this.logger.info(`Processing operation ${encode.operation} for device ${encode.devEui}`);
 
             if (encode.operation.startsWith("raw ")) {
                 let tokens: string[] = encode.operation.split(" ");
@@ -97,13 +108,13 @@ export abstract class DeviceCodec implements Component {
                     data.devEui = encode.devEui;
                 }
             }
-            console.log(`Will send to LNS ${data.payload} on port ${data.fport}`);
+            this.logger.info(`Will send to LNS ${data.payload} on port ${data.fport}`);
             result = {success: true, message: `Successfully processed ${encode.operation} for device ${encode.devEui}`, response: data};
         } catch(e) {
             result = {success: false, message: e.message, response: null};
         }
 
-        console.log(result);
+        this.logger.info(result);
 
         return result;
     }
@@ -112,7 +123,7 @@ export abstract class DeviceCodec implements Component {
         subscriptionService.on('newMicroserviceSubscription', async (client: Client) => {
             try {
                 let tenant: string = (await client.tenant.current()).data.name;
-                console.log(`New tenant subscription detected: ${tenant}`);
+                this.logger.info(`New tenant subscription detected: ${tenant}`);
                 let id: IExternalIdentity = await this.findExternalId(client, this.getId(), DeviceCodec.CODEC_ID);
                 let mor: Partial<IManagedObject> = null;
                 if (!id) {
@@ -135,7 +146,7 @@ export abstract class DeviceCodec implements Component {
                             id: mor.id
                         }
                     }
-                    console.log(`Codec ${this.getName()} will be registered in tenant ${tenant}.`);
+                    this.logger.info(`Codec ${this.getName()} will be registered in tenant ${tenant}.`);
                     await client.identity.create(id);
                 } else {
                     mor = {
@@ -146,11 +157,11 @@ export abstract class DeviceCodec implements Component {
                             version: this.getVersion()
                         }
                     };
-                    console.log(`Codec ${this.getName()} already registered in tenant ${tenant}.`);
+                    this.logger.info(`Codec ${this.getName()} already registered in tenant ${tenant}.`);
                     await client.inventory.update(mor);
                 }
             } catch (e) {
-                console.log(e);
+                this.logger.error(e);
             }
         });
     }
@@ -177,7 +188,7 @@ export abstract class DeviceCodec implements Component {
         try {
             return (await client.identity.detail({ type: type, externalId: externalId })).data;
         } catch (e) {
-            console.log(e);
+            this.logger.error(e);
             return null;
         }
     }
@@ -186,25 +197,25 @@ export abstract class DeviceCodec implements Component {
         try {
             return (await client.inventory.detail((await this.findExternalId(client, devEui, DeviceCodec.DEVEUI_TYPE)).managedObject.id)).data;
         } catch (e) {
-            console.log(e);
+            this.logger.error(e);
             return null;
         }
     }
 
     protected async clearAlarm(client: Client, device: IManagedObject, alarmType: string) {
-        console.log("Will clear alarms of type " + alarmType + " on device " + device.name);
+        this.logger.info("Will clear alarms of type " + alarmType + " on device " + device.name);
         let alarms: IResultList<IAlarm> = await client.alarm.list({ source: device.id, type: alarmType, status: AlarmStatus.ACTIVE });
         if (alarms && alarms.data && alarms.data.length > 0) {
             alarms.data.forEach(async alarm => {
-                console.log("Found alarm:");
-                console.log(alarm);
+                this.logger.info("Found alarm:");
+                this.logger.info(alarm);
                 await client.alarm.update({
                     id: alarm.id,
                     status: AlarmStatus.CLEARED
                 });
             });
         } else {
-            console.log("No alarms to update with type " + alarmType + " on device " + device.name);
+            this.logger.info("No alarms to update with type " + alarmType + " on device " + device.name);
         }
     }
 

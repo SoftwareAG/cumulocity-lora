@@ -1,7 +1,8 @@
-import { Client, FetchClient, BasicAuth, ICredentials, IAuthentication } from '@c8y/client';
+import { Client, FetchClient, BasicAuth } from '@c8y/client';
 import { Request } from "express";
 import { EventEmitter } from "events";
 import cron from "node-cron";
+import { Logger } from './Logger';
 
 export class MicroserviceSubscriptionService extends EventEmitter {
     protected baseUrl: string = process.env.C8Y_BASEURL;
@@ -10,6 +11,7 @@ export class MicroserviceSubscriptionService extends EventEmitter {
     protected password: string = process.env.C8Y_BOOTSTRAP_PASSWORD;
     protected client: FetchClient;
     protected clients: Map<string, Client> = new Map<string, Client>();
+    protected logger = Logger.getLogger("MicroserviceSubscriptionService");
 
     constructor() {
         super();
@@ -43,9 +45,8 @@ export class MicroserviceSubscriptionService extends EventEmitter {
             this.clients = newClients;
         }).catch(e => {
             console.log(e);
+            this.logger.error(e);
         });
-
-        //let allUsers = await (await this.client.get("/application/currentApplication/subscriptions")).data;
     }
 
     getClients(): Map<string, Client> {
@@ -53,9 +54,9 @@ export class MicroserviceSubscriptionService extends EventEmitter {
     }
 
     getClient(request: Request): Promise<Client> {
-        console.log("Authorization: " + request.headers.authorization);
+        this.logger.info("Authorization: " + request.headers.authorization);
         let currentTenant: string = Buffer.from(request.headers.authorization.split(" ")[1], 'base64').toString('binary').split("/")[0];
-        console.log("Current Tenant: " + currentTenant);
+        this.logger.info("Current Tenant: " + currentTenant);
         let client: Client = this.clients.get(currentTenant);
         return new Promise<Client>((resolve, reject) => {
             if (client) {

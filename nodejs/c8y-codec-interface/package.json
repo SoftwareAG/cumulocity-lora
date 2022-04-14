@@ -1,6 +1,6 @@
 {
   "name": "lora-codec-interface",
-  "version": "1.0.38",
+  "version": "1.0.40",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,6 +30,7 @@
     "express": "^4.17.1",
     "inversify": "^5.0.5",
     "node-cron": "^3.0.0",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "winston": "^3.7.2"
   }
 }
