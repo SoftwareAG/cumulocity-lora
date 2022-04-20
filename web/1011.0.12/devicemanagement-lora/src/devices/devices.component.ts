@@ -230,8 +230,8 @@ export class DevicesComponent implements OnInit {
                     fragmentType: "status",
                     fragmentValue: "unprocessed",
                     type: "LoRaPayload",
-                    pageSize: pageSize})).data);
-                currentPage++;
+                    pageSize: pageSize,
+                    currentPage: ++currentPage})).data);
             }
         }
         console.log(this.unprocessedPayloads);
@@ -246,7 +246,7 @@ export class DevicesComponent implements OnInit {
                 payload: event.payload,
                 updateTime: new Date(event.time).getTime()
             }
-            console.log(toDecode);
+            //console.log(toDecode);
             let decodeResult = await this.codecService.decode(this.device.codec, toDecode);
             if (decodeResult.success) {
                 await this.eventService.update({id: event.id, processed: true, status: "processed"});

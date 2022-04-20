@@ -48,9 +48,9 @@ while (currentPage<=totalPages):
             status = "unprocessed"
             if "processed" in event and event["processed"]:
                 status = "processed"
-            updated_event = {"id": event["id"], "status": status}
+            updated_event = {"status": status}
             #print(updated_event)
-            requests.put(host + '/event/events', auth=auth, data=json.dumps(updated_event))
+            requests.put(host + f'/event/events/{event["id"]}', auth=auth, data=json.dumps(updated_event))
             cpt = cpt + 1
     currentPage = currentPage + 1
     events = requests.get(host + '/event/events?source=' + device + '&pageSize=100&currentpage=' + str(currentPage), auth=auth).json()
