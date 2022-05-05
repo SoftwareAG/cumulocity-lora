@@ -368,5 +368,6 @@ declare var Buffer: {
 export class AppModule extends HybridAppModule {
   constructor(protected upgrade: NgUpgradeModule) {
     super();
+    window['c8y'].collections.properties['managed-objects'].properties.c8y_LpwanDevice.properties.provisioned.type = 'boolean';
   }
 }
