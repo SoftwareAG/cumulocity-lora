@@ -37,4 +37,13 @@ under the License.
       <directory>src/test/java</directory>
     </fileSet>
   </fileSets>
+
+  <requiredProperties>
+    <requiredProperty key="connectorClass"/>
+    <requiredProperty key="integrationServiceClass"/>
+    <requiredProperty key="connectorPackage"/>
+    <requiredProperty key="connectorType"/>
+    <requiredProperty key="connectorName"/>
+    <requiredProperty key="connectorVersion"/>
+  </requiredProperties>
 </archetype-descriptor>

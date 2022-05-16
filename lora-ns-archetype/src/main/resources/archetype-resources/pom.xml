@@ -34,6 +34,11 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-joda</artifactId>
+			<version>2.13.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -49,10 +54,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>com.google.cloud.tools</groupId> <artifactId>jib-maven-plugin</artifactId> 
-				<version>2.4.0</version> <configuration> <outputPaths> <tar>target/image.tar</tar> 
-				</outputPaths> </configuration> <executions> <execution> <phase>package</phase> 
-				<goals> <goal>buildTar</goal> </goals> </execution> </executions> </plugin> -->
 
 			<plugin>
 				<groupId>com.nsn.cumulocity.clients-java</groupId>
