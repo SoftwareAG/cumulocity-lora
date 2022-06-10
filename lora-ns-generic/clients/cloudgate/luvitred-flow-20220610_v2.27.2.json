@@ -1,0 +1,1611 @@
+[
+  {
+    "id": "4abf2207.9d0a2c",
+    "type": "tab",
+    "order": 0,
+    "label": "Register gateway",
+    "disabled": false
+  },
+  {
+    "id": "a8965b1f.a9da98",
+    "type": "tab",
+    "order": 1,
+    "label": "Device management",
+    "disabled": false
+  },
+  {
+    "id": "6302784b.6e4c68",
+    "type": "TLS client",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "tlsver": "TLSv1_2",
+    "allowunauthorised": false,
+    "ciphers": "default",
+    "ca": "_NONE_",
+    "certificate": "_NONE_",
+    "sni": "",
+    "name": "",
+    "__users": [
+      "d4233e3a.538c"
+    ]
+  },
+  {
+    "id": "d4233e3a.538c",
+    "type": "mqtt-broker",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "broker": "mqtt.cumulocity.com",
+    "usetls": true,
+    "usessl": false,
+    "rejectunauthorized": true,
+    "tlsconfig": "6302784b.6e4c68",
+    "port": "8883",
+    "retryTime": 10,
+    "retryTimeMult": 2,
+    "retryTimeMax": 60,
+    "keepalive": 60,
+    "acktimeout": 20,
+    "poll": 60,
+    "inactivity": 20,
+    "will": false,
+    "willqos": "0",
+    "willretain": false,
+    "willtopic": "",
+    "willmessage": "",
+    "will_delay": "",
+    "will_expiry": "",
+    "contype": "continuous",
+    "immediate": false,
+    "clean": true,
+    "expiry": "",
+    "persistence": "",
+    "clientid": "",
+    "startdisabled": false,
+    "protover": "ver311",
+    "protolog": false,
+    "__users": [
+      "9249c202.65ea3",
+      "c734baaa.7d23c8",
+      "8817698f.c751a8",
+      "808adcfc.4ce96",
+      "7a2daafc.9eae74",
+      "7ded6d7c.23f5c4",
+      "7824007c.a112a",
+      "e4e5e4ba.ef3d58",
+      "a03fa2ab.3e5b7",
+      "51a66188.f8307"
+    ]
+  },
+  {
+    "id": "6d9123d6.800cfc",
+    "type": "lora fwd",
+    "__package": "luvitred/sensors",
+    "__version": "0.1.0",
+    "name": "",
+    "gwid": "",
+    "port": 1780,
+    "alive": 90,
+    "private": false,
+    "region": "EU",
+    "subband": "",
+    "__users": [
+      "adb86658.ae8db8"
+    ]
+  },
+  {
+    "id": "adb86658.ae8db8",
+    "type": "lora srv",
+    "__package": "luvitred/sensors",
+    "__version": "0.1.0",
+    "name": "",
+    "netid": "000000",
+    "nofwd": false,
+    "fwd": "6d9123d6.800cfc",
+    "db": true,
+    "dbloc": "FLASH",
+    "rxwindow": "usage",
+    "log": 3,
+    "__users": [
+      "2adfc905.f043a6"
+    ]
+  },
+  {
+    "id": "2adfc905.f043a6",
+    "type": "lora app",
+    "__package": "luvitred/sensors",
+    "__version": "0.1.0",
+    "name": "",
+    "srv": "adb86658.ae8db8",
+    "appeui": "1122334455667788",
+    "strict": false,
+    "imme": false,
+    "dsfreq": 0,
+    "rx2dr": -1,
+    "__users": [
+      "ab49cc8e.6de88"
+    ]
+  },
+  {
+    "id": "32cedaf3.cf84b6",
+    "type": "file operations",
+    "__package": "luvitred/core-storage",
+    "__version": "0.1.0",
+    "name": "",
+    "operation": "exists",
+    "sourcePath": "/etc/luvitred/store/c8y_config",
+    "sourcePathType": "str",
+    "sourceFilename": "",
+    "sourceFilenameType": "msg",
+    "destPath": "",
+    "destPathType": "str",
+    "destFilename": "",
+    "destFilenameType": "msg",
+    "x": 312.5,
+    "y": 300,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "3005bd3d.6cd182",
+        "36d6560.d83d1aa"
+      ]
+    ]
+  },
+  {
+    "id": "9c855b68.851998",
+    "type": "inject",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "key": "payload",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "fromval": 0,
+    "toval": 10,
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "x": 100,
+    "y": 300,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "e5839124.3b11"
+      ]
+    ]
+  },
+  {
+    "id": "3005bd3d.6cd182",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "payload",
+    "completetype": "msg",
+    "x": 475,
+    "y": 225,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "36d6560.d83d1aa",
+    "type": "switch",
+    "__package": "luvitred/core-logic",
+    "__version": "0.1.0",
+    "name": "",
+    "property": "payload",
+    "rules": [
+      {
+        "t": "true"
+      },
+      {
+        "t": "else"
+      }
+    ],
+    "checkall": "true",
+    "outputs": 2,
+    "x": 500,
+    "y": 300,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "3d7a662.7af7b9a",
+        "b28a1c0b.a379c"
+      ],
+      [
+        "c9ccdd93.2271",
+        "9249c202.65ea3",
+        "5e6b3372.869c1c"
+      ]
+    ]
+  },
+  {
+    "id": "3d7a662.7af7b9a",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "payload",
+    "completetype": "msg",
+    "x": 650,
+    "y": 250,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "c9ccdd93.2271",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "payload",
+    "completetype": "msg",
+    "x": 650,
+    "y": 350,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "9249c202.65ea3",
+    "type": "mqtt out",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "s/ucr",
+    "topic": "s/ucr",
+    "qos": "0",
+    "queueenabled": false,
+    "queue": "_ADD_",
+    "retain": "false",
+    "broker": "d4233e3a.538c",
+    "expiry": "",
+    "rtopic": "",
+    "ctype": "",
+    "x": 650,
+    "y": 425,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "b28a1c0b.a379c",
+    "type": "file in",
+    "__package": "luvitred/core-storage",
+    "__version": "0.1.0",
+    "name": "",
+    "filename": "/etc/luvitred/store/c8y_config",
+    "deletefile": false,
+    "readonstart": false,
+    "read": "message",
+    "x": 700,
+    "y": 175,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "9ec768e6.c99ad8",
+        "f6aa4251.7baea"
+      ]
+    ]
+  },
+  {
+    "id": "209cc3e3.0901cc",
+    "type": "file out",
+    "__package": "luvitred/core-storage",
+    "__version": "0.1.0",
+    "name": "",
+    "filename": "/etc/luvitred/store/c8y_config",
+    "appendNewline": false,
+    "overwriteFile": "true",
+    "log": true,
+    "x": 575,
+    "y": 500,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "2ac7959b.b476ca"
+      ]
+    ]
+  },
+  {
+    "id": "c734baaa.7d23c8",
+    "type": "mqtt in",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "s/dcr",
+    "topic": "s/dcr",
+    "qos": "2",
+    "broker": "d4233e3a.538c",
+    "no_local": false,
+    "rap": false,
+    "x": 75,
+    "y": 500,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "b11a5f8c.a1a86"
+      ]
+    ]
+  },
+  {
+    "id": "2ac7959b.b476ca",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "payload",
+    "completetype": "msg",
+    "x": 825,
+    "y": 500,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "9ec768e6.c99ad8",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "payload",
+    "completetype": "msg",
+    "x": 925,
+    "y": 175,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "f423b280.5208",
+    "type": "inject",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "key": "payload",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "fromval": 0,
+    "toval": 10,
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "x": 100,
+    "y": 125,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "8310b7d4.65a138"
+      ]
+    ]
+  },
+  {
+    "id": "8310b7d4.65a138",
+    "type": "file operations",
+    "__package": "luvitred/core-storage",
+    "__version": "0.1.0",
+    "name": "",
+    "operation": "delete",
+    "sourcePath": "/etc/luvitred/store/c8y_config",
+    "sourcePathType": "str",
+    "sourceFilename": "",
+    "sourceFilenameType": "msg",
+    "destPath": "",
+    "destPathType": "str",
+    "destFilename": "",
+    "destFilenameType": "msg",
+    "x": 262.5,
+    "y": 125,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "b11a5f8c.a1a86",
+    "type": "csv",
+    "__package": "luvitred/core-parsers",
+    "__version": "0.1.0",
+    "name": "",
+    "sep": ",",
+    "hdrin": false,
+    "hdrout": false,
+    "multi": "one",
+    "ret": "\\n",
+    "temp": "id,tenant,username,password",
+    "x": 225,
+    "y": 500,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "6f095eba.98563"
+      ]
+    ]
+  },
+  {
+    "id": "6f095eba.98563",
+    "type": "json",
+    "__package": "luvitred/core-parsers",
+    "__version": "0.1.0",
+    "name": "",
+    "data": "payload",
+    "datatype": "msg",
+    "x": 375,
+    "y": 500,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "209cc3e3.0901cc"
+      ]
+    ]
+  },
+  {
+    "id": "f6aa4251.7baea",
+    "type": "json",
+    "__package": "luvitred/core-parsers",
+    "__version": "0.1.0",
+    "name": "",
+    "data": "payload",
+    "datatype": "msg",
+    "x": 825,
+    "y": 275,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "8d15da29.dffe78"
+      ]
+    ]
+  },
+  {
+    "id": "8d15da29.dffe78",
+    "type": "global store",
+    "__package": "luvitred/core-logic",
+    "__version": "0.1.0",
+    "storein": "ram",
+    "keyname": "c8y_config",
+    "keynametype": "str",
+    "keypath": "payload",
+    "keypathtype": "msg",
+    "name": "",
+    "x": 900,
+    "y": 350,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "11ee214e.ea759f"
+      ]
+    ]
+  },
+  {
+    "id": "a7d619b9.2ba258",
+    "type": "global retrieve",
+    "__package": "luvitred/core-logic",
+    "__version": "0.1.0",
+    "retrievefrom": "ram",
+    "keyname": "c8y_config",
+    "keynametype": "str",
+    "keypath": "payload",
+    "keypathtype": "msg",
+    "name": "",
+    "x": 525,
+    "y": 50,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "782ca07f.3073"
+      ]
+    ]
+  },
+  {
+    "id": "e0aed594.f957b8",
+    "type": "inject",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "key": "payload",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "fromval": 0,
+    "toval": 10,
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "x": 325,
+    "y": 50,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "a7d619b9.2ba258"
+      ]
+    ]
+  },
+  {
+    "id": "782ca07f.3073",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "payload",
+    "completetype": "msg",
+    "x": 750,
+    "y": 50,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "5e6b3372.869c1c",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\nreturn\nend\nfunction endNode(msg)\n\tsend(msg)\nend\nmsg.myTimeout = setTimeout(5000, endNode, msg)\n",
+    "startnil": false,
+    "outputs": 1,
+    "x": 275,
+    "y": 400,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "d8c6f4c0.eccf18",
+        "32cedaf3.cf84b6"
+      ]
+    ]
+  },
+  {
+    "id": "d8c6f4c0.eccf18",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 450,
+    "y": 400,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "e1cd216d.f7e16",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "upsert connector",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.url = \"https://\" .. global.c8y_config.tenant .. \".cumulocity.com/identity/externalIds/c8y_Serial/\" .. msg.payload.serial\nmsg.headers = {\n\t[\"Authorization\"] = \"Basic \" .. base64encode(global.c8y_config.tenant .. \"/\" .. global.c8y_config.username .. \":\" .. global.c8y_config.password),\n\t[\"Accept\"] = \"application/json\"\n}\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 1312.5,
+    "y": 350,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "88dedc2a.4c3a",
+        "fd29ac90.f307b"
+      ]
+    ]
+  },
+  {
+    "id": "88dedc2a.4c3a",
+    "type": "http request",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "method": "GET",
+    "url": "",
+    "contenttype": "",
+    "timeout": "",
+    "followredirects": false,
+    "braindead": false,
+    "streamout": false,
+    "queueenabled": false,
+    "treaterror": true,
+    "treat500": false,
+    "treat400": false,
+    "donotvalidateserver": false,
+    "protolog": false,
+    "x": 1525,
+    "y": 350,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "3d8f32a9.fc674e",
+        "9c38c9dc.36fee8"
+      ]
+    ]
+  },
+  {
+    "id": "3d8f32a9.fc674e",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 1675,
+    "y": 300,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "fd29ac90.f307b",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 1475,
+    "y": 300,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "11ee214e.ea759f",
+    "type": "sysinfo",
+    "__package": "luvitred/cloudgate-sys",
+    "__version": "0.1.0",
+    "topic": "",
+    "dontfire": false,
+    "name": "",
+    "x": 1087.5,
+    "y": 350,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "4dec9837.146d68"
+      ]
+    ]
+  },
+  {
+    "id": "9c38c9dc.36fee8",
+    "type": "switch",
+    "__package": "luvitred/core-logic",
+    "__version": "0.1.0",
+    "name": "",
+    "property": "statusCode",
+    "rules": [
+      {
+        "t": "eq",
+        "v": 404
+      },
+      {
+        "t": "eq",
+        "v": 200
+      }
+    ],
+    "checkall": "true",
+    "outputs": 2,
+    "x": 1700,
+    "y": 350,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "38a75596.91b60a"
+      ],
+      [
+        "3fb42b8.dd3c6d4"
+      ]
+    ]
+  },
+  {
+    "id": "6e7acbc7.ea5064",
+    "type": "global store",
+    "__package": "luvitred/core-logic",
+    "__version": "0.1.0",
+    "storein": "ram",
+    "keyname": "connectorId",
+    "keynametype": "str",
+    "keypath": "payload.managedObject.id",
+    "keypathtype": "msg",
+    "name": "",
+    "x": 2100,
+    "y": 400,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "43f59b94.39b644"
+      ]
+    ]
+  },
+  {
+    "id": "38a75596.91b60a",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.url = \"https://\" .. global.c8y_config.tenant .. \".cumulocity.com/service/lora-ns-generic/lnsinstances\"\nmsg.payload = {\n\t['name'] = global.serial .. \" connector\",\n\t['properties'] = {[\"c8y_Serial\"] = global.serial,\n\t\t[\"owner\"] = global.c8y_config.username}};\nmsg.headers = {\n\t[\"Authorization\"] = \"Basic \" .. base64encode(global.c8y_config.tenant .. \"/\" .. global.c8y_config.username .. \":\" .. global.c8y_config.password),\n\t[\"Accept\"] = \"application/json\",\n\t[\"Content-Type\"] = \"application/json\"\n}\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 1850,
+    "y": 300,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "25c62ef.2ccf8d2"
+      ]
+    ]
+  },
+  {
+    "id": "4dec9837.146d68",
+    "type": "global store",
+    "__package": "luvitred/core-logic",
+    "__version": "0.1.0",
+    "storein": "ram",
+    "keyname": "serial",
+    "keynametype": "str",
+    "keypath": "payload.serial",
+    "keypathtype": "msg",
+    "name": "",
+    "x": 1200,
+    "y": 425,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "e1cd216d.f7e16"
+      ]
+    ]
+  },
+  {
+    "id": "25c62ef.2ccf8d2",
+    "type": "http request",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "method": "POST",
+    "url": "",
+    "contenttype": "",
+    "timeout": "",
+    "cookies": "_ADD_",
+    "followredirects": false,
+    "braindead": false,
+    "streamout": false,
+    "queueenabled": false,
+    "queue": "_ADD_",
+    "treaterror": true,
+    "treat500": false,
+    "treat400": false,
+    "donotvalidateserver": false,
+    "tlsclientconfig": "_ADD_",
+    "protolog": false,
+    "x": 2025,
+    "y": 300,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "9a5b4b94.071608",
+        "3fb42b8.dd3c6d4"
+      ]
+    ]
+  },
+  {
+    "id": "8817698f.c751a8",
+    "type": "mqtt control",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "broker": "d4233e3a.538c",
+    "x": 2425,
+    "y": 400,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "43f59b94.39b644",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.payload = {\n\t[\"command\"] = \"update\",\n\t[\"username\"] = global.c8y_config.tenant .. \"/\" .. global.c8y_config.username,\n\t[\"password\"] = global.c8y_config.password\n}\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 2250,
+    "y": 400,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "8817698f.c751a8"
+      ]
+    ]
+  },
+  {
+    "id": "9a5b4b94.071608",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 2225,
+    "y": 300,
+    "z": "4abf2207.9d0a2c",
+    "wires": []
+  },
+  {
+    "id": "808adcfc.4ce96",
+    "type": "mqtt in",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "topic": "s/ds",
+    "qos": "2",
+    "broker": "d4233e3a.538c",
+    "no_local": false,
+    "rap": false,
+    "x": 150,
+    "y": 150,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "725938b5.18fdb8",
+        "31b40a1a.018bc6"
+      ]
+    ]
+  },
+  {
+    "id": "725938b5.18fdb8",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 275,
+    "y": 100,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "31b40a1a.018bc6",
+    "type": "csv",
+    "__package": "luvitred/core-parsers",
+    "__version": "0.1.0",
+    "name": "",
+    "sep": ",",
+    "hdrin": false,
+    "hdrout": false,
+    "multi": "one",
+    "ret": "\\n",
+    "temp": "id,device,command",
+    "x": 325,
+    "y": 150,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "5e7efbd7.1c8f34",
+        "84bcd9b6.54dfc8"
+      ]
+    ]
+  },
+  {
+    "id": "b56de566.151668",
+    "type": "json",
+    "__package": "luvitred/core-parsers",
+    "__version": "0.1.0",
+    "name": "",
+    "data": "payload",
+    "datatype": "msg",
+    "x": 800,
+    "y": 100,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "2ec30a.eead9cf6",
+        "75c28d6c.618f44"
+      ]
+    ]
+  },
+  {
+    "id": "2ec30a.eead9cf6",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 925,
+    "y": 50,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "5e7efbd7.1c8f34",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 475,
+    "y": 100,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "84bcd9b6.54dfc8",
+    "type": "switch",
+    "__package": "luvitred/core-logic",
+    "__version": "0.1.0",
+    "name": "",
+    "property": "payload.id",
+    "rules": [
+      {
+        "t": "eq",
+        "v": 511
+      },
+      {
+        "t": "else"
+      }
+    ],
+    "checkall": "true",
+    "outputs": 2,
+    "x": 500,
+    "y": 150,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "31bc037.c6a3cfc"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "31bc037.c6a3cfc",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nif msg.payload.device == global.serial then\n\tmsg.payload = msg.payload.command:gsub(\"%'\", '\"')\n\tsendTo(1,msg)\nelse\n\tmsg.device = msg.payload.device\n\tmsg.command = msg.payload.command\n\tsendTo(2,msg)\nend\n",
+    "startnil": false,
+    "outputs": "2",
+    "x": 650,
+    "y": 150,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "b56de566.151668",
+        "39f7fa79.433306"
+      ],
+      [
+        "2a3feeff.029ea2",
+        "80785383.d69a7"
+      ]
+    ]
+  },
+  {
+    "id": "ab49cc8e.6de88",
+    "type": "lora-app",
+    "__package": "luvitred/sensors",
+    "__version": "0.1.0",
+    "name": "",
+    "app": "2adfc905.f043a6",
+    "x": 1200,
+    "y": 225,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "d19cb500.c0b128"
+      ]
+    ]
+  },
+  {
+    "id": "75c28d6c.618f44",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nif msg.payload.provision then\n\tmsg.app = {\n\t\tadd = {\n\t\t\tDevEUI = msg.payload.provision.deveui,\n\t\t\tAppKey = msg.payload.provision.appkey,\n\t\t\tota = true\n\t\t}\n\t}\nelseif msg.payload.deprovision then\n\tmsg.app = {\n\t\tdel = msg.payload.deprovision.deveui\n\t}\nelseif msg.payload.command then\n\tmsg.app = {\n\t\tqueue = {\n\t\t\t[msg.payload.command.deveui] = {\n\t\t\t\tdata = msg.payload.command.payload,\n\t\t\t\tport = msg.payload.command.fport\n\t\t\t}\n\t\t}\n\t}\nend\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 950,
+    "y": 100,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "ab49cc8e.6de88",
+        "e9a0d7e6.2279f8"
+      ]
+    ]
+  },
+  {
+    "id": "d19cb500.c0b128",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nlocal bin = stohex(msg.payload)\nmsg.payload = nil\nmsg.url = \"https://\" .. global.c8y_config.tenant .. \".cumulocity.com/service/lora-ns-generic/\" .. global.connectorId .. \"/uplink\"\nmsg.payload = {\n\tpayload = bin,\n\tdeveui = msg.DevEUI,\n\ttime = msg.timestamp * 1000,\n\tfport = msg.port\n}\nmsg.headers = {\n\t[\"Authorization\"] = \"Basic \" .. base64encode(global.c8y_config.tenant .. \"/\" .. global.c8y_config.username .. \":\" .. global.c8y_config.password),\n\t[\"Accept\"] = \"application/json\",\n\t[\"Content-Type\"] = \"application/json\"\n}\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 1375,
+    "y": 225,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "e7697d65.5d865",
+        "505a3f4c.53334"
+      ]
+    ]
+  },
+  {
+    "id": "505a3f4c.53334",
+    "type": "http request",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "method": "POST",
+    "url": "",
+    "contenttype": "",
+    "timeout": "",
+    "cookies": "_ADD_",
+    "followredirects": false,
+    "braindead": false,
+    "streamout": false,
+    "queueenabled": false,
+    "queue": "_ADD_",
+    "treaterror": true,
+    "treat500": false,
+    "treat400": false,
+    "donotvalidateserver": false,
+    "tlsclientconfig": "_ADD_",
+    "protolog": false,
+    "x": 1550,
+    "y": 225,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "ba0e4277.d7035"
+      ]
+    ]
+  },
+  {
+    "id": "ba0e4277.d7035",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 1725,
+    "y": 175,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "3fb42b8.dd3c6d4",
+    "type": "json",
+    "__package": "luvitred/core-parsers",
+    "__version": "0.1.0",
+    "name": "",
+    "data": "payload",
+    "datatype": "msg",
+    "x": 1925,
+    "y": 400,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "6e7acbc7.ea5064"
+      ]
+    ]
+  },
+  {
+    "id": "e7697d65.5d865",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "payload",
+    "completetype": "msg",
+    "x": 1525,
+    "y": 175,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "7a2daafc.9eae74",
+    "type": "mqtt out",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "topic": "s/us",
+    "qos": "2",
+    "queueenabled": false,
+    "queue": "_ADD_",
+    "retain": "false",
+    "broker": "d4233e3a.538c",
+    "expiry": "",
+    "rtopic": "",
+    "ctype": "",
+    "x": 1250,
+    "y": 100,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "e9a0d7e6.2279f8",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.payload = \"503,c8y_Command\"\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 1100,
+    "y": 100,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "7a2daafc.9eae74"
+      ]
+    ]
+  },
+  {
+    "id": "2a3feeff.029ea2",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.url = \"https://\" .. global.c8y_config.tenant .. \".cumulocity.com/identity/externalIds/c8y_Serial/\" .. msg.device\nmsg.headers = {\n\t[\"Authorization\"] = \"Basic \" .. base64encode(global.c8y_config.tenant .. \"/\" .. global.c8y_config.username .. \":\" .. global.c8y_config.password),\n\t[\"Accept\"] = \"application/json\",\n}\n\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 725,
+    "y": 250,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "33348887.618408"
+      ]
+    ]
+  },
+  {
+    "id": "33348887.618408",
+    "type": "http request",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "method": "GET",
+    "url": "",
+    "contenttype": "",
+    "timeout": "",
+    "followredirects": false,
+    "braindead": false,
+    "streamout": false,
+    "queueenabled": false,
+    "treaterror": true,
+    "treat500": false,
+    "treat400": false,
+    "donotvalidateserver": false,
+    "protolog": false,
+    "x": 900,
+    "y": 325,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "1ad107c5.ce4558"
+      ]
+    ]
+  },
+  {
+    "id": "514f3491.376d8c",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.url = \"https://\" .. global.c8y_config.tenant .. \".cumulocity.com/inventory/managedObjects/\" .. msg.payload.managedObject.id\nmsg.headers = {\n\t[\"Authorization\"] = \"Basic \" .. base64encode(global.c8y_config.tenant .. \"/\" .. global.c8y_config.username .. \":\" .. global.c8y_config.password),\n\t[\"Accept\"] = \"application/json\",\n}\n\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 1100,
+    "y": 325,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "52eb2661.ce6b88"
+      ]
+    ]
+  },
+  {
+    "id": "52eb2661.ce6b88",
+    "type": "http request",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "method": "GET",
+    "url": "",
+    "contenttype": "",
+    "timeout": "",
+    "followredirects": false,
+    "braindead": false,
+    "streamout": false,
+    "queueenabled": false,
+    "treaterror": true,
+    "treat500": false,
+    "treat400": false,
+    "donotvalidateserver": false,
+    "protolog": false,
+    "x": 1275,
+    "y": 325,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "74f9034f.402ccc"
+      ]
+    ]
+  },
+  {
+    "id": "829c0f02.ed9c5",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.url = \"https://\" .. global.c8y_config.tenant .. \".cumulocity.com/service/lora-codec-\" .. msg.payload.codec .. \"/encode\"\nmsg.payload = {\n\tdevEui = msg.device,\n\toperation = msg.command,\n\tmodel = (msg.payload.c8y_Hardware or {}).model\n}\nmsg.headers = {\n\t[\"Authorization\"] = \"Basic \" .. base64encode(global.c8y_config.tenant .. \"/\" .. global.c8y_config.username .. \":\" .. global.c8y_config.password),\n\t[\"Accept\"] = \"application/json\",\n\t[\"Content-Type\"] = \"application/json\"\n}\n\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 1450,
+    "y": 325,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "234069e7.4b10c6"
+      ]
+    ]
+  },
+  {
+    "id": "234069e7.4b10c6",
+    "type": "http request",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "method": "POST",
+    "url": "",
+    "contenttype": "",
+    "timeout": "",
+    "cookies": "_ADD_",
+    "followredirects": false,
+    "braindead": false,
+    "streamout": false,
+    "queueenabled": false,
+    "queue": "_ADD_",
+    "treaterror": true,
+    "treat500": false,
+    "treat400": false,
+    "donotvalidateserver": false,
+    "tlsclientconfig": "_ADD_",
+    "protolog": false,
+    "x": 1625,
+    "y": 325,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "18aa6aed.ec0865"
+      ]
+    ]
+  },
+  {
+    "id": "31d70f20.e49b3",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.app = {\n\tqueue = {\n\t\t[msg.device] = {\n\t\t\tdata = hextos(msg.payload.response.payload),\n\t\t\tfport = msg.payload.response.fport\n\t\t}\n\t}\n}\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 1800,
+    "y": 325,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "ab49cc8e.6de88",
+        "fbf829ac.668698",
+        "3bc5d55c.41d55a"
+      ]
+    ]
+  },
+  {
+    "id": "1ad107c5.ce4558",
+    "type": "json",
+    "__package": "luvitred/core-parsers",
+    "__version": "0.1.0",
+    "name": "",
+    "data": "payload",
+    "datatype": "msg",
+    "x": 1025,
+    "y": 275,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "514f3491.376d8c"
+      ]
+    ]
+  },
+  {
+    "id": "74f9034f.402ccc",
+    "type": "json",
+    "__package": "luvitred/core-parsers",
+    "__version": "0.1.0",
+    "name": "",
+    "data": "payload",
+    "datatype": "msg",
+    "x": 1375,
+    "y": 400,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "829c0f02.ed9c5"
+      ]
+    ]
+  },
+  {
+    "id": "18aa6aed.ec0865",
+    "type": "json",
+    "__package": "luvitred/core-parsers",
+    "__version": "0.1.0",
+    "name": "",
+    "data": "payload",
+    "datatype": "msg",
+    "x": 1725,
+    "y": 400,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "31d70f20.e49b3"
+      ]
+    ]
+  },
+  {
+    "id": "fbf829ac.668698",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 1975,
+    "y": 325,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "3bc5d55c.41d55a",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.payload = \"503,c8y_Command\"\nmsg.topic = \"s/us/\" .. msg.device\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 1875,
+    "y": 250,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "7ded6d7c.23f5c4"
+      ]
+    ]
+  },
+  {
+    "id": "7ded6d7c.23f5c4",
+    "type": "mqtt out",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "topic": "",
+    "qos": "2",
+    "queueenabled": false,
+    "queue": "_ADD_",
+    "retain": "false",
+    "broker": "d4233e3a.538c",
+    "expiry": "",
+    "rtopic": "",
+    "ctype": "",
+    "x": 2050,
+    "y": 250,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "7824007c.a112a",
+    "type": "mqtt out",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "topic": "s/us",
+    "qos": "2",
+    "queueenabled": false,
+    "queue": "_ADD_",
+    "retain": "false",
+    "broker": "d4233e3a.538c",
+    "expiry": "",
+    "rtopic": "",
+    "ctype": "",
+    "x": 750,
+    "y": 50,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "39f7fa79.433306",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.payload = \"501,c8y_Command\"\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 600,
+    "y": 50,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "7824007c.a112a"
+      ]
+    ]
+  },
+  {
+    "id": "80785383.d69a7",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.payload = \"501,c8y_Command\"\nmsg.topic = \"s/us/\" .. msg.device\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 800,
+    "y": 175,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "e4e5e4ba.ef3d58",
+        "244df282.7ca19e"
+      ]
+    ]
+  },
+  {
+    "id": "e4e5e4ba.ef3d58",
+    "type": "mqtt out",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "topic": "",
+    "qos": "2",
+    "queueenabled": false,
+    "queue": "_ADD_",
+    "retain": "false",
+    "broker": "d4233e3a.538c",
+    "expiry": "",
+    "rtopic": "",
+    "ctype": "",
+    "x": 975,
+    "y": 175,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "244df282.7ca19e",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 950,
+    "y": 225,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  },
+  {
+    "id": "a03fa2ab.3e5b7",
+    "type": "mqtt control",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "broker": "d4233e3a.538c",
+    "x": 275,
+    "y": 225,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "32cedaf3.cf84b6"
+      ]
+    ]
+  },
+  {
+    "id": "e5839124.3b11",
+    "type": "function",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "func": "if not msg then\n-- called on startup\nreturn\nend\nmsg.payload = {\n\tcommand = \"update\",\n\tusername = \"management/devicebootstrap\",\n\tpassword = \"Fhdt1bb1f\"\n}\nreturn msg",
+    "startnil": false,
+    "outputs": 1,
+    "x": 100,
+    "y": 225,
+    "z": "4abf2207.9d0a2c",
+    "wires": [
+      [
+        "a03fa2ab.3e5b7"
+      ]
+    ]
+  },
+  {
+    "id": "51a66188.f8307",
+    "type": "mqtt in",
+    "__package": "luvitred/core-io",
+    "__version": "0.1.0",
+    "name": "",
+    "topic": "s/e",
+    "qos": "2",
+    "broker": "d4233e3a.538c",
+    "no_local": false,
+    "rap": false,
+    "x": 175,
+    "y": 850,
+    "z": "a8965b1f.a9da98",
+    "wires": [
+      [
+        "7944631b.5b487c"
+      ]
+    ]
+  },
+  {
+    "id": "7944631b.5b487c",
+    "type": "debug",
+    "__package": "luvitred/core-core",
+    "__version": "0.1.0",
+    "name": "",
+    "active": true,
+    "highlight": "none",
+    "console": "false",
+    "complete": "true",
+    "completetype": "full",
+    "x": 350,
+    "y": 850,
+    "z": "a8965b1f.a9da98",
+    "wires": []
+  }
+]

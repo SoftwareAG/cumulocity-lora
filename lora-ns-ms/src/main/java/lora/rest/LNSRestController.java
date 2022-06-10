@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorRepresentation;
 import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.connector.LNSResponse;
@@ -96,7 +95,7 @@ public class LNSRestController {
 	}
 	
 	@GetMapping(value = "/lnsinstances", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, LNSConnector> getLnsInstances() {
+	public Map<String, LNSConnectorRepresentation> getLnsInstances() {
 		return lnsProxy.getConnectors();
 	}
 	

@@ -18,6 +18,7 @@ import com.cumulocity.sdk.client.notification.Subscription;
 import com.cumulocity.sdk.client.notification.SubscriptionListener;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ import lora.ns.operation.LNSOperationManager;
 
 @Service
 public class AgentService {
-	public Logger logger;
+	protected Logger logger = LoggerFactory.getLogger(AgentService.class);
 	@Autowired
 	private C8YUtils c8yUtils;
 	@Autowired
@@ -80,6 +81,12 @@ public class AgentService {
 				agent.set(new IsDevice());
 			}
 			inventoryApi.update(agent);
+			if (agent.hasProperty("gatewayScanRate")) {
+				lnsIntegrationService.setGatewayScanRate(Integer.valueOf(agent.getProperty("gatewayScanRate").toString()));
+			}
+			if (agent.hasProperty("gatewayScanStartDelay")) {
+				lnsIntegrationService.setGatewayScanStartDelay(Integer.valueOf(agent.getProperty("gatewayScanStartDelay").toString()));
+			}
 		}
 		agents.put(subscriptionsService.getTenant(), agent);
 		// We don't want the event listener to crash just because we can't subscribe to operation
@@ -88,15 +95,27 @@ public class AgentService {
 			deviceControlApi.getNotificationsSubscriber().subscribe(agent.getId(),
 					new OperationDispatcherSubscriptionListener(subscriptionsService.getTenant()));
 		} catch(Exception e) {
-			//logger.error("Can't subscribe to operation", e);
-			e.printStackTrace();
+			logger.error("Can't subscribe to operation", e);
 		}
 	}
 	
 	public ManagedObjectRepresentation getAgent() {
 		return agents.get(subscriptionsService.getTenant());
 	}
-	
+
+	public void setGatewayScanRate(Integer gatewayScanRate) {
+		ManagedObjectRepresentation agent = new ManagedObjectRepresentation();
+		agent.setId(getAgent().getId());
+		agent.setProperty("gatewayScanRate", gatewayScanRate);
+		inventoryApi.update(agent);
+	}
+
+	public void setGatewayScanStartDelay(Integer gatewayScanStartDelay) {
+		ManagedObjectRepresentation agent = new ManagedObjectRepresentation();
+		agent.setId(getAgent().getId());
+		agent.setProperty("gatewayScanStartDelay", gatewayScanStartDelay);
+		inventoryApi.update(agent);
+	}
 
 	public class OperationDispatcherSubscriptionListener
 			implements SubscriptionListener<GId, OperationRepresentation> {
@@ -115,9 +134,7 @@ public class AgentService {
 		@Override
 		public void onNotification(Subscription<GId> sub, OperationRepresentation operation) {
 			try {
-				subscriptionsService.runForTenant(tenant, () -> {
-					lnsOperationManager.executePending(operation);
-				});
+				subscriptionsService.runForTenant(tenant, () -> lnsOperationManager.executePending(operation));
 			} catch (SDKException e) {
 				logger.error("OperationDispatcher error!", e);
 			}

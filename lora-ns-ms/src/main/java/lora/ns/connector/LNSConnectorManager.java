@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
+import com.google.common.collect.Maps;
 
 @Component
 public class LNSConnectorManager {
@@ -25,6 +26,10 @@ public class LNSConnectorManager {
 		}
 		return Optional.ofNullable(result);
 	}
+
+	public void removeConnector(String lnsConnectorId) {
+		connectors.get(subscriptionsService.getTenant()).remove(lnsConnectorId);
+	}
 	
 	public void addConnector(LNSConnector connector) {
 		if (!connectors.containsKey(subscriptionsService.getTenant())) {
@@ -35,5 +40,14 @@ public class LNSConnectorManager {
 	
 	public Map<String, LNSConnector> getConnectors() {
 		return connectors.get(subscriptionsService.getTenant());
+	}
+
+	public Map<String, LNSConnectorRepresentation> getConnectorRepresentations() {
+		return Maps.transformValues(connectors.get(subscriptionsService.getTenant()), v -> {
+			LNSConnectorRepresentation connectorRepresentation = new LNSConnectorRepresentation();
+			connectorRepresentation.setName(v.getName());
+			connectorRepresentation.setProperties(v.getProperties());
+			return connectorRepresentation;
+		});
 	}
 }

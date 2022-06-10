@@ -297,14 +297,20 @@ export class LoraDevicesComponent {
             let createdDevice = (await this.inventory.create(device)).data;
             let deviceId = createdDevice.id;
 
-            let extId: IExternalIdentity = {
+            await this.identityService.create({
                 type: 'LoRa devEUI',
                 externalId: devEUI.toLowerCase(),
                 managedObject: {
                     id: deviceId
                 }
-            };
-            await this.identityService.create(extId);
+            });
+            await this.identityService.create({
+                type: 'c8y_Serial',
+                externalId: devEUI.toLowerCase(),
+                managedObject: {
+                    id: deviceId
+                }
+            });
         }
         this.dataGrid.reload();
         //this.loadDevices();

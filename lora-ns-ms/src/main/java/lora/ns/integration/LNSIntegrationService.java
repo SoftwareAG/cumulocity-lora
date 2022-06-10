@@ -5,6 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +17,7 @@ import java.util.Properties;
 import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
+import com.cumulocity.model.Agent;
 import com.cumulocity.model.idtype.GId;
 import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
@@ -38,12 +42,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
+import c8y.IsDevice;
 import lora.codec.uplink.C8YData;
 import lora.common.C8YUtils;
 import lora.ns.DeviceData;
@@ -75,10 +82,10 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	public static final String LNS_CONNECTOR_TYPE = "LNS Connector";
 
 	@Autowired
-	private C8YUtils c8yUtils;
+	protected C8YUtils c8yUtils;
 
 	@Autowired
-	private InventoryApi inventoryApi;
+	protected InventoryApi inventoryApi;
 
 	@Autowired
 	private MeasurementApi measurementApi;
@@ -153,8 +160,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		return result;
 	}
 
-	public Map<String, LNSConnector> getConnectors() {
-		return lnsConnectorManager.getConnectors();
+	public Map<String, LNSConnectorRepresentation> getConnectors() {
+		return lnsConnectorManager.getConnectorRepresentations();
 	}
 
 	@EventListener
@@ -193,7 +200,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			if (event != null) {
 				Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 				if (connector.isPresent()) {
-					lnsDeviceManager.upsertDevice(lnsInstanceId, event, agentService.getAgent());
+					lnsDeviceManager.upsertDevice(lnsInstanceId, event);
 				}
 			}
 		}
@@ -255,6 +262,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		mor.setType(LNS_CONNECTOR_TYPE);
 		mor.setName(connectorRepresentation.getName());
 		mor.setProperty(LNS_TYPE, this.getType());
+		mor.set(new IsDevice());
+		mor.set(new Agent());
 		mor = inventoryApi.create(mor);
 
 		ManagedObject agentApi = inventoryApi.getManagedObjectApi(agentService.getAgent().getId());
@@ -293,6 +302,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		if (connector.isPresent()) {
 			connector.get().removeRoutings(subscriptionsService.getTenant());
 			inventoryApi.delete(new GId(lnsConnectorId));
+			lnsConnectorManager.removeConnector(lnsConnectorId);
 		}
 	}
 
@@ -328,7 +338,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		return result[0];
 	}
 
-	@Scheduled(initialDelay = 10000, fixedDelay = 300000)
+	//@Scheduled(initialDelay = 10000, fixedDelay = 300000)
 	private void scanGateways() {
 		subscriptionsService.runForEachTenant(() -> {
 			logger.info("Scanning gateways in tenant {}", subscriptionsService.getTenant());
@@ -379,10 +389,45 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		});
 	}
 
+	private Integer gatewayScanRate = 300000;
+	private Integer gatewayScanStartDelay = 10000;
+
+	public Integer getGatewayScanRate() {
+		return gatewayScanRate;
+	}
+
+	public void setGatewayScanRate(Integer gatewayScanRate) {
+		this.gatewayScanRate = gatewayScanRate;
+	}
+
+	public Integer getGatewayScanStartDelay() {
+		return gatewayScanStartDelay;
+	}
+
+	public void setGatewayScanStartDelay(Integer gatewayScanStartDelay) {
+		this.gatewayScanStartDelay = gatewayScanStartDelay;
+	}
+
 	@Bean
 	public ThreadPoolTaskScheduler taskScheduler() {
 		ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+		taskScheduler.initialize();
 		taskScheduler.setPoolSize(20);
+		taskScheduler.schedule(this::scanGateways, new Trigger() {
+			@Override
+			public Date nextExecutionTime(TriggerContext triggerContext) {
+				Calendar nextExecutionTime =  new GregorianCalendar();
+				Date lastActualExecutionTime = triggerContext.lastActualExecutionTime();
+				if (lastActualExecutionTime != null) {
+					nextExecutionTime.setTime(lastActualExecutionTime);
+					nextExecutionTime.add(Calendar.MILLISECOND, gatewayScanRate);
+				} else {
+					nextExecutionTime.setTime(new Date());
+					nextExecutionTime.add(Calendar.MILLISECOND, gatewayScanStartDelay);
+				}
+				return nextExecutionTime.getTime();
+			}
+		});
 		return taskScheduler;
 	}
 

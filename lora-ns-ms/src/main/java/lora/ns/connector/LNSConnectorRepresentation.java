@@ -4,7 +4,7 @@ import java.util.Properties;
 
 public class LNSConnectorRepresentation {
 	private String name;
-	private Properties properties;
+	private Properties properties = new Properties();
 	public String getName() {
 		return name;
 	}

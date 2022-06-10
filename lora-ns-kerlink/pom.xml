@@ -17,6 +17,11 @@
 			<artifactId>lora-ns-ms</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-joda</artifactId>
+			<version>2.13.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

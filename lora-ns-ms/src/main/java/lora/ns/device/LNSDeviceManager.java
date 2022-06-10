@@ -42,7 +42,6 @@ import lora.codec.ms.CodecProxy;
 import lora.common.C8YUtils;
 import lora.common.ValidationResult;
 import lora.ns.DeviceData;
-import lora.ns.agent.AgentService;
 import lora.ns.connector.LNSConnector;
 import lora.ns.connector.LNSConnectorManager;
 import lora.ns.connector.LNSResponse;
@@ -98,11 +97,7 @@ public class LNSDeviceManager {
 	@Autowired
 	private LNSConnectorManager lnsConnectorManager;
 
-	@Autowired
-	private AgentService agentService;
-
-	private ManagedObjectRepresentation createDeviceWithName(String lnsInstanceId, DeviceData event,
-			ManagedObjectRepresentation agent) {
+	private ManagedObjectRepresentation createDeviceWithName(String lnsInstanceId, DeviceData event) {
 		String name = event.getDevEui();
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent()) {
@@ -111,14 +106,14 @@ public class LNSDeviceManager {
 				name = device.getResult().getName();
 			}
 		}
-		return createDevice(lnsInstanceId, name, event.getDevEui().toLowerCase(), agent);
+		return createDevice(lnsInstanceId, name, event.getDevEui().toLowerCase());
 	}
 
-	public void upsertDevice(String lnsInstanceId, DeviceData event, ManagedObjectRepresentation agent) {
+	public void upsertDevice(String lnsConnectorId, DeviceData event) {
 		try {
 			logger.info("Upsert device with devEui {} with Payload {} from fPort {}", event.getDevEui(),
 					event.getPayload(), event.getfPort());
-			ManagedObjectRepresentation mor = getOrCreateDevice(lnsInstanceId, event, agent);
+			ManagedObjectRepresentation mor = getOrCreateDevice(lnsConnectorId, event);
 			boolean useGatewayPosition = mor.hasProperty("useGatewayPosition") ? (Boolean)mor.get("useGatewayPosition") : true;
 			if (event.getModel() == null && mor.get(Hardware.class) != null) {
 				event.setModel(mor.get(Hardware.class).getModel());
@@ -132,8 +127,8 @@ public class LNSDeviceManager {
 				updateLocation(event, mor);
 			}
 			if (!mor.hasProperty(LNSIntegrationService.LNS_CONNECTOR_REF)
-					|| !mor.getProperty(LNSIntegrationService.LNS_CONNECTOR_REF).toString().equals(lnsInstanceId)) {
-				mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsInstanceId);
+					|| !mor.getProperty(LNSIntegrationService.LNS_CONNECTOR_REF).toString().equals(lnsConnectorId)) {
+				mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsConnectorId);
 				updateDevice(event.getDevEui(), mor);
 			}
 			DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
@@ -149,7 +144,7 @@ public class LNSDeviceManager {
 				mor.setProperty(PROVISIONED, true);
 				updateDevice(event.getDevEui(), mor);
 			}
-			addDeviceToAgent(agent, mor);
+			addDeviceToLNSConnector(lnsConnectorId, mor);
 			if (mor.get(Configuration.class) == null) {
 				getDeviceConfig(mor);
 			}
@@ -162,20 +157,19 @@ public class LNSDeviceManager {
 			// Case where device was deleted but is still in cache
 			if (e.getHttpStatus() == 422) {
 				logger.info("Device was deleted, trying to recreate it...");
-				createDeviceWithName(lnsInstanceId, event, agent);
-				getOrCreateDevice(lnsInstanceId, event, agent);
+				createDeviceWithName(lnsConnectorId, event);
+				getOrCreateDevice(lnsConnectorId, event);
 			}
 		}
 	}
 
-	private ManagedObjectRepresentation getOrCreateDevice(String lnsInstanceId, DeviceData event,
-			ManagedObjectRepresentation agent) {
+	private ManagedObjectRepresentation getOrCreateDevice(String lnsInstanceId, DeviceData event) {
 		ManagedObjectRepresentation mor = getDevice(event.getDevEui().toLowerCase());
 		if (mor == null) {
 			synchronized (event.getDevEui().intern()) {
 				mor = getDevice(event.getDevEui().toLowerCase());
 				if (mor == null) {
-					mor = createDeviceWithName(lnsInstanceId, event, agent);
+					mor = createDeviceWithName(lnsInstanceId, event);
 				}
 			}
 		}
@@ -198,12 +192,12 @@ public class LNSDeviceManager {
 		eventApi.create(locationUpdate);
 	}
 
-	public void addDeviceToAgent(ManagedObjectRepresentation agent, ManagedObjectRepresentation mor) {
-		ManagedObject agentApi = inventoryApi.getManagedObjectApi(agent.getId());
+	public void addDeviceToLNSConnector(String lnsConnectorId, ManagedObjectRepresentation mor) {
+		ManagedObject connectorApi = inventoryApi.getManagedObjectApi(GId.asGId(lnsConnectorId));
 		try {
-			agentApi.getChildDevice(mor.getId());
+			connectorApi.getChildDevice(mor.getId());
 		} catch (Exception e) {
-			agentApi.addChildDevice(mor.getId());
+			connectorApi.addChildDevice(mor.getId());
 		}
 	}
 
@@ -230,41 +224,22 @@ public class LNSDeviceManager {
 		 * ConcurrentReferenceHashMap<>()); }
 		 */
 		c8yUtils.createExternalId(mor, devEUI, C8YUtils.DEVEUI_TYPE);
+		c8yUtils.createExternalId(mor, devEUI, "c8y_Serial");
 		// deviceCache.get(subscriptionsService.getTenant()).put(devEUI, mor);
 
 		return mor;
 	}
 
-	public ManagedObjectRepresentation createDevice(String lnsConnectorId, String name, String devEUI,
-			ManagedObjectRepresentation agent) {
+	public ManagedObjectRepresentation createDevice(String lnsConnectorId, String name, String devEUI) {
 		ManagedObjectRepresentation mor = null;
-		if (lnsConnectorId != null && devEUI != null) {
-			mor = createDevice(devEUI, mor);
-			mor.setName(name);
-			mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsConnectorId);
-			mor.setLastUpdatedDateTime(null);
-			mor = inventoryApi.update(mor);
-			ManagedObject agentApi = inventoryApi.getManagedObjectApi(agent.getId());
-			agentApi.addChildDevice(mor.getId());
-			c8yUtils.createExternalId(mor, devEUI, C8YUtils.DEVEUI_TYPE);
-		} else {
-			if (lnsConnectorId == null) {
-				AlarmRepresentation alarm = new AlarmRepresentation();
-				alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
-				alarm.setType("Device provisioning error");
-				alarm.setText("Connector ID cannot be null");
-				alarm.setSource(agent);
-				alarmApi.create(alarm);
-			}
-			if (devEUI == null) {
-				AlarmRepresentation alarm = new AlarmRepresentation();
-				alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
-				alarm.setType("Device provisioning error");
-				alarm.setText("devEUI cannot be null");
-				alarm.setSource(agent);
-				alarmApi.create(alarm);
-			}
-		}
+		mor = createDevice(devEUI, mor);
+		mor.setName(name);
+		mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsConnectorId);
+		mor.setLastUpdatedDateTime(null);
+		mor = inventoryApi.update(mor);
+		addDeviceToLNSConnector(lnsConnectorId, mor);
+		c8yUtils.createExternalId(mor, devEUI, C8YUtils.DEVEUI_TYPE);
+		c8yUtils.createExternalId(mor, devEUI, "c8y_Serial");
 		/*
 		 * if (!deviceCache.containsKey(subscriptionsService.getTenant())) {
 		 * deviceCache.put(subscriptionsService.getTenant(), new
@@ -349,14 +324,14 @@ public class LNSDeviceManager {
 		}
 	}
 
-	private ManagedObjectRepresentation upsertDevice(String lnsInstanceId, DeviceProvisioning deviceProvisioning) {
+	private ManagedObjectRepresentation upsertDevice(String lnsConnectorId, DeviceProvisioning deviceProvisioning) {
 		ManagedObjectRepresentation mor;
 		mor = getDevice(deviceProvisioning.getDevEUI().toLowerCase());
 		if (mor == null) {
 			mor = createDevice(deviceProvisioning.getDevEUI(), null);
 		}
-		mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsInstanceId);
-		addDeviceToAgent(agentService.getAgent(), mor);
+		mor.setProperty(LNSIntegrationService.LNS_CONNECTOR_REF, lnsConnectorId);
+		addDeviceToLNSConnector(lnsConnectorId, mor);
 		if (deviceProvisioning.getCodec() != null) {
 			mor.setProperty("codec", deviceProvisioning.getCodec());
 		}
@@ -383,7 +358,7 @@ public class LNSDeviceManager {
 		ValidationResult validationResult = deviceProvisioning.validate();
 		if (validationResult.isOk() && connector.isPresent()) {
 			LNSResponse<Void> result = connector.get().provisionDevice(deviceProvisioning);
-			if (result.isOk()) {
+			if (result.isOk() || result.getMessage().equals("Not implemented.")) {
 				mor = upsertDevice(lnsConnectorId, deviceProvisioning);
 				EventRepresentation event = new EventRepresentation();
 				event.setType("Device provisioned");
@@ -393,6 +368,16 @@ public class LNSDeviceManager {
 				eventApi.create(event);
 				getDeviceConfig(mor);
 				response.setResult(mor);
+				if (result.getMessage().equals("Not implemented.")) {
+					OperationRepresentation op = new OperationRepresentation();
+					op.setDeviceId(GId.asGId(lnsConnectorId));
+					op.set(new Command("{'provision':{'deveui':'" + deviceProvisioning.getDevEUI() + "', 'appeui': '" + deviceProvisioning.getAppEUI() + "', 'appkey': '" + deviceProvisioning.getAppKey() + "'}}"));
+					deviceControlApi.create(op);
+					ManagedObjectRepresentation updateOwner = new ManagedObjectRepresentation();
+					updateOwner.setId(mor.getId());
+					updateOwner.setOwner(inventoryApi.get(GId.asGId(lnsConnectorId)).getOwner());
+					inventoryApi.update(updateOwner);
+				}
 			} else {
 				response.setOk(false);
 				response.setMessage(result.getMessage());
@@ -418,7 +403,9 @@ public class LNSDeviceManager {
 			if (mor != null) {
 				alarm.setSource(mor);
 			} else {
-				alarm.setSource(agentService.getAgent());
+				ManagedObjectRepresentation connectorMor = new ManagedObjectRepresentation();
+				connectorMor.setId(GId.asGId(lnsConnectorId));
+				alarm.setSource(connectorMor);
 			}
 			alarmApi.create(alarm);
 		}
@@ -430,7 +417,7 @@ public class LNSDeviceManager {
 		LNSResponse<Void> result = new LNSResponse<>();
 		if (connector.isPresent()) {
 			result = connector.get().deprovisionDevice(deveui);
-			if (result.isOk()) {
+			if (result.isOk() || result.getMessage().equals("Not implemented.")) {
 				ManagedObjectRepresentation mor = getDevice(deveui);
 				mor.removeProperty("c8y_RequiredInterval");
 				mor.setProperty("provisioned", false);
@@ -441,6 +428,12 @@ public class LNSDeviceManager {
 					e.printStackTrace();
 					result.setOk(false);
 					result.setMessage(e.getMessage());
+				}
+				if (result.getMessage().equals("Not implemented.")) {
+					OperationRepresentation op = new OperationRepresentation();
+					op.setDeviceId(GId.asGId(lnsInstanceId));
+					op.set(new Command("{'deprovision':{'deveui':'" + deveui + "'}}"));
+					deviceControlApi.create(op);
 				}
 			}
 		} else {

@@ -33,9 +33,9 @@ public class ObjeniousIntegrationService extends LNSIntegrationService<Objenious
 		wizard.add(new ConnectorWizardStep1());
 		wizard.add(new ConnectorWizardStep2());
 		deviceProvisioningAdditionalProperties.add(new PropertyDescription("deviceProfile", "Device profile", true, null, "/deviceProfiles", null, null, null, null, null, PropertyType.LIST, false));
-		payloadSimulationFields.add(new PropertyDescription("deveui", "Device EUI", true, null, null, null, null, null, null, null, PropertyType.TEXT, false));
-		payloadSimulationFields.add(new PropertyDescription("name", "Device name", true, null, null, null, null, null, null, null, PropertyType.TEXT, false));
-		payloadSimulationFields.add(new PropertyDescription("port", "Port", true, null, null, null, null, null, null, null, PropertyType.INTEGER, false));
+		payloadSimulationFields.add(PropertyDescription.text("deveui", "Device EUI", true).withPattern("[a-fA-F0-9]{16}"));
+		payloadSimulationFields.add(PropertyDescription.text("name", "Device name", true));
+		payloadSimulationFields.add(PropertyDescription.integer("port", "Port", true));
 		payloadSimulationFields.add(new PropertyDescription("rssi", "RSSI", true, null, null, null, null, null, null, null, PropertyType.NUMBER, false));
 		payloadSimulationFields.add(new PropertyDescription("snr", "SNR", true, null, null, null, null, null, null, null, PropertyType.NUMBER, false));
 		payloadSimulationFields.add(new PropertyDescription("noise", "Noise", true, null, null, null, null, null, null, null, PropertyType.NUMBER, false));

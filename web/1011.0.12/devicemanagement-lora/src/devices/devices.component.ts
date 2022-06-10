@@ -174,7 +174,7 @@ export class DevicesComponent implements OnInit {
         let operation: IOperation = {
             deviceId: this.device.id,
             c8y_Command: {
-                text: '{"' + command + '":' + params + '}'
+                text: "{'" + command + "':" + params + "}"
             },
             description: "Execute command " + command
         }

@@ -67,9 +67,11 @@ public class C8YData {
 		}
 		m.set(measurementValueMap, fragment);
 		m.setType(fragment);
-		ManagedObjectRepresentation source = new ManagedObjectRepresentation();
-		source.setId(mor.getId());
-		m.setSource(source);
+		if (mor != null) {
+			ManagedObjectRepresentation source = new ManagedObjectRepresentation();
+			source.setId(mor.getId());
+			m.setSource(source);
+		}
 		m.setDateTime(time);
 
 		return m;
@@ -102,9 +104,11 @@ public class C8YData {
 
 	private EventRepresentation createEvent(ManagedObjectRepresentation mor, String eventType, String eventText, Map<String, Object> properties, DateTime dateTime) {
         EventRepresentation eventRepresentation = new EventRepresentation();
-		ManagedObjectRepresentation source = new ManagedObjectRepresentation();
-		source.setId(mor.getId());
-        eventRepresentation.setSource(source);
+		if (mor != null) {
+			ManagedObjectRepresentation source = new ManagedObjectRepresentation();
+			source.setId(mor.getId());
+			eventRepresentation.setSource(source);
+		}
         eventRepresentation.setDateTime(dateTime);
         eventRepresentation.setText(eventText);
         eventRepresentation.setType(eventType);
