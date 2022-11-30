@@ -1,7 +1,6 @@
 package lora.ns.connector;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 
 import lora.codec.downlink.DownlinkData;
@@ -20,8 +19,8 @@ public interface LNSConnector {
 	LNSResponse<EndDevice> getDevice(String devEui);
 	LNSResponse<String> sendDownlink(DownlinkData downlinkData);
 	LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning);
-	LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password);
-	LNSResponse<Void> removeRoutings(String tenant);
+	LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password);
+	LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds);
 	LNSResponse<Void> deprovisionDevice(String deveui);
 	LNSResponse<List<Gateway>> getGateways();
     Properties mergeProperties(Properties properties);

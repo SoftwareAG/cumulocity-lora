@@ -283,10 +283,10 @@ public class TTNConnector extends LNSAbstractConnector {
         }
 
         @Override
-        public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+        public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
                 logger.info("Configuring routings to: {} with credentials: {}:{} on TTN app {}", url, login, password,
                                 properties.getProperty(APPID));
-                LNSResponse<Void> result = new LNSResponse<>();
+                LNSResponse<List<String>> result = new LNSResponse<>();
                 try {
 
                         ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc
@@ -332,7 +332,7 @@ public class TTNConnector extends LNSAbstractConnector {
         }
 
         @Override
-        public LNSResponse<Void> removeRoutings(String tenant) {
+        public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
                 LNSResponse<Void> result = new LNSResponse<>();
                 try {
                         ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc

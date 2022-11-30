@@ -274,9 +274,9 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+	public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
-		LNSResponse<Void> result = new LNSResponse<Void>();
+		LNSResponse<List<String>> result = new LNSResponse<>();
 		LNSResponse<Void> resultDownlink = configureRouting(url + "/downlink", tenant, login, password, tenant + "-" + this.getId() + "-downlink",
 				MessageTypeEnum.DOWNLINK);
 		LNSResponse<Void> resultUplink = configureRouting(url + "/uplink", tenant, login, password, tenant + "-" + this.getId() + "-uplink",
@@ -322,7 +322,7 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings(String tenant) {
+	public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
 		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		var resultUplink = removeRouting(tenant + "-" + this.getId() + "-uplink");
 		var resultDownlink = removeRouting(tenant + "-" + this.getId() + "-downlink");

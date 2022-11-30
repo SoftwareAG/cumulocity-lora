@@ -1,20 +1,22 @@
 module lora_interface {
-    requires rest.representation;
-    requires joda.time;
-    requires core.model;
-    requires device.capability.model;
-    requires org.slf4j;
-    requires svenson;
-    requires java.client;
-    requires com.fasterxml.jackson.core;
-    requires com.fasterxml.jackson.databind;
-    requires microservice.subscription;
-    requires microservice.context;
-    requires spring.beans;
-    requires spring.web;
-    requires spring.core;
-    requires spring.context;
-    requires com.google.common;
+    // both modules will be replaced in 10.15 by requires transitive java.client.model;
+    requires transitive rest.representation;
+    requires transitive core.model;
+
+    requires transitive org.joda.time;
+    requires transitive device.capability.model;
+    requires transitive org.slf4j;
+    requires transitive svenson;
+    requires transitive java.client;
+    requires transitive com.fasterxml.jackson.core;
+    requires transitive com.fasterxml.jackson.databind;
+    requires transitive microservice.subscription;
+    requires transitive microservice.context;
+    requires transitive spring.beans;
+    requires transitive spring.web;
+    requires transitive spring.core;
+    requires transitive spring.context;
+    requires transitive com.google.common;
     requires transitive lombok;
 
     exports lora.codec;

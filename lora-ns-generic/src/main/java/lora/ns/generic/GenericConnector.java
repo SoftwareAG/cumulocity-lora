@@ -50,12 +50,12 @@ public class GenericConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
+        return new LNSResponse<List<String>>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings(String tenant) {
+	public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
         return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 

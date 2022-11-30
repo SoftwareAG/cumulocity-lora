@@ -191,10 +191,10 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 		return result;
 	}
 
-	public LNSResponse<Void> configureRouting(String url, String tenant, String login, String password, String subscriptions) {
+	public LNSResponse<List<String>> configureRouting(String url, String tenant, String login, String password, String subscriptions) {
 		assert orbiwiseService != null : "orbiwiseService is not initialized";
 
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
+		LNSResponse<List<String>> result = new LNSResponse<List<String>>().withOk(true);
 
 		Pushmode pushmode = new Pushmode();
 		pushmode.setAuth_string(
@@ -228,13 +228,13 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+	public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
 		return configureRouting(url, tenant, login, password, "payloads_dl,payloads_ul");
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings(String tenant) {
+	public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
 		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		try {
 			var response = orbiwiseService.stopRouting().execute();

@@ -1,5 +1,6 @@
 package lora.codec.ms;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -8,8 +9,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.UnknownContentTypeException;
 
 import lombok.extern.slf4j.Slf4j;
 import lora.codec.Result;
@@ -71,10 +74,17 @@ public class CodecProxy implements Component {
 			ResponseEntity<Result<DownlinkData>> response = restTemplate.exchange(System.getenv(C8Y_BASEURL) +  SERVICE_LORA_CODEC + id + "/encode", HttpMethod.POST, new HttpEntity<Encode>(data, headers), new ParameterizedTypeReference<Result<DownlinkData>>(){});
 			log.info("Answer of encoder is {} with content {}", response.getStatusCode(), response.getBody());
 			result = response.getBody();
-		} catch(HttpClientErrorException e) {
+		} catch(RestClientResponseException e) {
 			e.printStackTrace();
 			log.error(e.getResponseBodyAsString());
 			result = new Result<>(false, e.getResponseBodyAsString(), null);
+		} catch(UnknownContentTypeException e) {
+			e.printStackTrace();
+			log.error(e.getResponseBodyAsString());
+			result = new Result<>(false, e.getResponseBodyAsString(), null);
+		} catch(ResourceAccessException e) {
+			e.printStackTrace();
+			result = new Result<>(false, e.getMessage(), null);
 		}
 		return result;
 	}
@@ -93,16 +103,23 @@ public class CodecProxy implements Component {
 			ResponseEntity<Result<String>> response = restTemplate.exchange(System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/decode", HttpMethod.POST, new HttpEntity<Decode>(data, headers), new ParameterizedTypeReference<Result<String>>(){});
 			result = response.getBody();
 			log.info("Answer of decoder is {} with content {}", response.getStatusCode(), result != null ? result.getResponse() : "");
-		} catch(HttpClientErrorException e) {
+		} catch(RestClientResponseException e) {
 			e.printStackTrace();
 			log.error(e.getResponseBodyAsString());
 			result = new Result<>(false, e.getResponseBodyAsString(), null);
+		} catch(UnknownContentTypeException e) {
+			e.printStackTrace();
+			log.error(e.getResponseBodyAsString());
+			result = new Result<>(false, e.getResponseBodyAsString(), null);
+		} catch(ResourceAccessException e) {
+			e.printStackTrace();
+			result = new Result<>(false, e.getMessage(), null);
 		}
 		return result;
 	}
 	
 	public Map<String, DeviceOperationElement> getAvailableOperations(String model) {
-		Map<String, DeviceOperationElement> result = null;
+		Map<String, DeviceOperationElement> result = new HashMap<>();
 		RestTemplate restTemplate = new RestTemplate();
 		try {
 			HttpHeaders headers = new HttpHeaders();
@@ -113,9 +130,14 @@ public class CodecProxy implements Component {
 			ResponseEntity<Map<String, DeviceOperationElement>> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<Map<String, DeviceOperationElement>>(){});
 			log.info("Answer of decoder is {} with content {}", response.getStatusCode(), response.getBody());
 			result = response.getBody();
-		} catch(HttpClientErrorException e) {
+		} catch(RestClientResponseException e) {
 			e.printStackTrace();
 			log.error(e.getResponseBodyAsString());
+		} catch(UnknownContentTypeException e) {
+			e.printStackTrace();
+			log.error(e.getResponseBodyAsString());
+		} catch(ResourceAccessException e) {
+			e.printStackTrace();
 		}
 		return result;
 	}

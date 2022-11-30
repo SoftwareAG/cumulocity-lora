@@ -191,8 +191,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
+	public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
+		LNSResponse<List<String>> result = new LNSResponse<List<String>>().withOk(true);
 		log.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
 		String connectionId = null;
 
@@ -269,7 +269,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings(String tenant) {
+	public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
 		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		try {
 			Response<List<DeviceCreate>> response = actilityCoreService.getDevices().execute();

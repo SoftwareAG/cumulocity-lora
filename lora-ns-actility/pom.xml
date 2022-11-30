@@ -47,11 +47,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>com.google.cloud.tools</groupId> <artifactId>jib-maven-plugin</artifactId> 
-				<version>2.4.0</version> <configuration> <outputPaths> <tar>target/image.tar</tar> 
-				</outputPaths> </configuration> <executions> <execution> <phase>package</phase> 
-				<goals> <goal>buildTar</goal> </goals> </execution> </executions> </plugin> -->
-
 			<plugin>
 				<groupId>com.nsn.cumulocity.clients-java</groupId>
 				<artifactId>microservice-package-maven-plugin</artifactId>

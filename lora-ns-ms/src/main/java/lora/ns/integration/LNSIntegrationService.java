@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -13,6 +14,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.TriggerContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
@@ -35,20 +50,6 @@ import com.cumulocity.sdk.client.inventory.ManagedObject;
 import com.cumulocity.sdk.client.inventory.ManagedObjectCollection;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
 import com.cumulocity.sdk.client.option.TenantOptionApi;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.TriggerContext;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import c8y.IsDevice;
 import lora.codec.uplink.C8YData;
@@ -184,6 +185,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 				properties.setProperty(option.getKey(), option.getValue());
 			}
 			instance.setProperties(properties);
+			if (mor.hasProperty("routeIds")) {
+				instance.getProperties().put("routeIds", mor.getProperty("routeIds"));
+			}
 			lnsConnectorManager.addConnector(instance);
 			lnsGatewayManager.upsertGateways(instance);
 			configureRoutings(instance.getId(), event.getCredentials());
@@ -252,8 +256,12 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		logger.info("Connector URL is {}", url);
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent()) {
-			connector.get().configureRoutings(url, subscriptionsService.getTenant(), credentials.getUsername(),
+			var response = connector.get().configureRoutings(url, subscriptionsService.getTenant(), credentials.getUsername(),
 					credentials.getPassword());
+			ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
+			mor.setId(GId.asGId(connector.get().getId()));
+			mor.setProperty("routeIds", response.getResult());
+			inventoryApi.update(mor);
 		}
 	}
 
@@ -297,10 +305,23 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		return mor;
 	}
 
+	private List<String> getRouteIds(LNSConnector connector) {
+		List<String> result = new ArrayList<>();
+		ManagedObjectRepresentation mor = inventoryApi.get(GId.asGId(connector.getId()));
+		if (mor.hasProperty("routeIds")) {
+			Object p = mor.getProperty("routeIds");
+			if (p instanceof List) {
+				result = (List<String>)p;
+			}
+		}
+
+		return result;
+	}
+
 	public void removeLnsConnector(String lnsConnectorId) {
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
 		if (connector.isPresent()) {
-			connector.get().removeRoutings(subscriptionsService.getTenant());
+			connector.get().removeRoutings(subscriptionsService.getTenant(), getRouteIds(connector.get()));
 			inventoryApi.delete(new GId(lnsConnectorId));
 			lnsConnectorManager.removeConnector(lnsConnectorId);
 		}

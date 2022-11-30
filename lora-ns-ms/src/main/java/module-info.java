@@ -1,26 +1,9 @@
 module lora.ns.ms {
     requires transitive lora_interface;
     requires org.apache.commons.codec;
-    requires transitive rest.representation;
-    requires joda.time;
-    requires core.model;
-    requires device.capability.model;
-    requires org.slf4j;
-    requires svenson;
-    requires java.client;
-    requires com.fasterxml.jackson.core;
-    requires com.fasterxml.jackson.databind;
-    requires microservice.subscription;
-    requires microservice.context;
-    requires spring.beans;
-    requires spring.web;
-    requires spring.core;
-    requires transitive spring.context;
-    requires spring.security.core;
-    requires spring.security.config;
-    requires spring.security.web;
-    requires com.google.common;
-    requires transitive lombok;
+    requires transitive spring.security.core;
+    requires transitive spring.security.config;
+    requires transitive spring.security.web;
     requires transitive thymeleaf;
     requires transitive thymeleaf.spring5;
 
