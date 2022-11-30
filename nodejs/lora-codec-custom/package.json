@@ -16,7 +16,7 @@
   "dependencies": {
     "@c8y/client": "^1014.0.172",
     "lora-codec-interface": "^1.0.41",
-    "vm2": "^3.9.2"
+    "vm2": "^3.9.11"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",
