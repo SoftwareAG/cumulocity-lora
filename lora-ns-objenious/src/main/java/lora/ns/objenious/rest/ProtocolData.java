@@ -2,20 +2,17 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Protocol specific data. 
+ * Protocol specific data.
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class ProtocolData   {
+public class ProtocolData {
   @JsonProperty("deveui")
   private String deveui = null;
 
@@ -65,9 +62,9 @@ public class ProtocolData   {
 
   /**
    * deveui (hexadecimal format, bigendian) (LoRa devices)
+   * 
    * @return deveui
-  **/
-
+   **/
 
   public String getDeveui() {
     return deveui;
@@ -84,9 +81,9 @@ public class ProtocolData   {
 
   /**
    * appeui (hexadecimal format, bigendian) (LoRa devices)
+   * 
    * @return appeui
-  **/
-
+   **/
 
   public String getAppeui() {
     return appeui;
@@ -103,9 +100,9 @@ public class ProtocolData   {
 
   /**
    * AppNonce in hexadecimal/bigendian (LoRa)
+   * 
    * @return appnonce
-  **/
-
+   **/
 
   public String getAppnonce() {
     return appnonce;
@@ -122,9 +119,9 @@ public class ProtocolData   {
 
   /**
    * DevNonce in hexadecimal/bigendian (LoRa)
+   * 
    * @return devnonce
-  **/
-
+   **/
 
   public String getDevnonce() {
     return devnonce;
@@ -141,9 +138,9 @@ public class ProtocolData   {
 
   /**
    * DevAddr in hexadecimal/bigendian (LoRa)
+   * 
    * @return devaddr
-  **/
-
+   **/
 
   public String getDevaddr() {
     return devaddr;
@@ -160,9 +157,9 @@ public class ProtocolData   {
 
   /**
    * NetID in hexadecimal/bigendian (LoRa)
+   * 
    * @return netid
-  **/
-
+   **/
 
   public String getNetid() {
     return netid;
@@ -179,9 +176,9 @@ public class ProtocolData   {
 
   /**
    * spreading factor (LoRa)
+   * 
    * @return sf
-  **/
-
+   **/
 
   public Integer getSf() {
     return sf;
@@ -198,9 +195,9 @@ public class ProtocolData   {
 
   /**
    * Rssi (LoRa)
+   * 
    * @return rssi
-  **/
-
+   **/
 
   public Double getRssi() {
     return rssi;
@@ -217,9 +214,9 @@ public class ProtocolData   {
 
   /**
    * Snr (LoRa)
+   * 
    * @return snr
-  **/
-
+   **/
 
   public Double getSnr() {
     return snr;
@@ -236,9 +233,9 @@ public class ProtocolData   {
 
   /**
    * Identifier of the gateway which has the best SNR
+   * 
    * @return bestGatewayId
-  **/
-
+   **/
 
   public String getBestGatewayId() {
     return bestGatewayId;
@@ -256,10 +253,10 @@ public class ProtocolData   {
   /**
    * Number of gateways (LoRa)
    * minimum: 0
+   * 
    * @return gateways
-  **/
+   **/
 
-@Min(0)
   public Integer getGateways() {
     return gateways;
   }
@@ -275,9 +272,9 @@ public class ProtocolData   {
 
   /**
    * Signal (LoRa)
+   * 
    * @return signal
-  **/
-
+   **/
 
   public Double getSignal() {
     return signal;
@@ -294,9 +291,9 @@ public class ProtocolData   {
 
   /**
    * Noise (LoRa)
+   * 
    * @return noise
-  **/
-
+   **/
 
   public Double getNoise() {
     return noise;
@@ -315,10 +312,10 @@ public class ProtocolData   {
    * the port the message was sent to (LoRa)
    * minimum: 1
    * maximum: 223
+   * 
    * @return port
-  **/
+   **/
 
-@Min(1) @Max(223) 
   public Integer getPort() {
     return port;
   }
@@ -326,7 +323,6 @@ public class ProtocolData   {
   public void setPort(Integer port) {
     this.port = port;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -355,14 +351,15 @@ public class ProtocolData   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(deveui, appeui, appnonce, devnonce, devaddr, netid, sf, rssi, snr, bestGatewayId, gateways, signal, noise, port);
+    return Objects.hash(deveui, appeui, appnonce, devnonce, devaddr, netid, sf, rssi, snr, bestGatewayId, gateways,
+        signal, noise, port);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ProtocolData {\n");
-    
+
     sb.append("    deveui: ").append(toIndentedString(deveui)).append("\n");
     sb.append("    appeui: ").append(toIndentedString(appeui)).append("\n");
     sb.append("    appnonce: ").append(toIndentedString(appnonce)).append("\n");
@@ -392,4 +389,3 @@ public class ProtocolData   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

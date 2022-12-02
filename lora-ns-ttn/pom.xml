@@ -11,12 +11,12 @@
 
 	<artifactId>lora-ns-ttn</artifactId>
 
-    <properties>
-        <io.grpc.version>1.37.0</io.grpc.version>
-        <os-maven-plugin.version>1.6.1</os-maven-plugin.version>
-        <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
+	<properties>
+		<io.grpc.version>1.37.0</io.grpc.version>
+		<os-maven-plugin.version>1.6.1</os-maven-plugin.version>
+		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 		<pgv.version>0.3.0</pgv.version>
-    </properties>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -27,23 +27,24 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.9.1</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty-shaded</artifactId>
-            <version>${io.grpc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-protobuf</artifactId>
-            <version>${io.grpc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-stub</artifactId>
-            <version>${io.grpc.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-netty-shaded</artifactId>
+			<version>${io.grpc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-protobuf</artifactId>
+			<version>${io.grpc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-stub</artifactId>
+			<version>${io.grpc.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.github.saikocat</groupId>
 			<artifactId>gogoproto-java</artifactId>
@@ -62,13 +63,13 @@
 	</dependencies>
 
 	<build>
-        <extensions>
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-                <version>${os-maven-plugin.version}</version>
-            </extension>
-        </extensions>
+		<extensions>
+			<extension>
+				<groupId>kr.motd.maven</groupId>
+				<artifactId>os-maven-plugin</artifactId>
+				<version>${os-maven-plugin.version}</version>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -78,16 +79,16 @@
 					<release>11</release>
 				</configuration>
 			</plugin>
-            <plugin>
-                <groupId>org.xolstice.maven.plugins</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-                <version>${protobuf-maven-plugin.version}</version>
-                <configuration>
-                    <protocArtifact>
+			<plugin>
+				<groupId>org.xolstice.maven.plugins</groupId>
+				<artifactId>protobuf-maven-plugin</artifactId>
+				<version>${protobuf-maven-plugin.version}</version>
+				<configuration>
+					<protocArtifact>
                         com.google.protobuf:protoc:3.12.4:exe:${os.detected.classifier}
                     </protocArtifact>
-                    <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>
+					<pluginId>grpc-java</pluginId>
+					<pluginArtifact>
                         io.grpc:protoc-gen-grpc-java:${io.grpc.version}:exe:${os.detected.classifier}
                     </pluginArtifact>
 					<additionalProtoPathElements>
@@ -95,19 +96,20 @@
 							${user.home}/go/src/
 						</additionalProtoPathElement>
 					</additionalProtoPathElements>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>compile-custom</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>compile-custom</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-boot-dependencies.version}</version>
 				<executions>
 					<execution>
 						<goals>

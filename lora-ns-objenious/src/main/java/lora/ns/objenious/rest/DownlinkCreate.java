@@ -3,8 +3,6 @@ package lora.ns.objenious.rest;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -17,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class DownlinkCreate   {
+public class DownlinkCreate {
   @JsonProperty("command_id")
   private Integer commandId = null;
 
@@ -34,11 +32,14 @@ public class DownlinkCreate   {
   private Boolean confirmed = null;
 
   /**
-   * The validity of the downlink. Possible values are \"next_join\" (the downlink will be canceled if the devices re-joins, mandatory for encrypted downlink) and \"expiration\" (default - the downlink will be retried if the device re-joins).
+   * The validity of the downlink. Possible values are \"next_join\" (the downlink
+   * will be canceled if the devices re-joins, mandatory for encrypted downlink)
+   * and \"expiration\" (default - the downlink will be retried if the device
+   * re-joins).
    */
   public enum ValidUntilEnum {
     NEXT_JOIN("next_join"),
-    
+
     EXPIRATION("expiration");
 
     private String value;
@@ -80,9 +81,9 @@ public class DownlinkCreate   {
 
   /**
    * The command id (optional); if not set, a command_id will be generated.
+   * 
    * @return commandId
-  **/
-
+   **/
 
   public Integer getCommandId() {
     return commandId;
@@ -98,10 +99,11 @@ public class DownlinkCreate   {
   }
 
   /**
-   * The cleartext payload (hexadecimal); it will be encrypted by the platform. Either cleartext or encrypted must be set.
+   * The cleartext payload (hexadecimal); it will be encrypted by the platform.
+   * Either cleartext or encrypted must be set.
+   * 
    * @return cleartext
-  **/
-
+   **/
 
   public String getCleartext() {
     return cleartext;
@@ -117,10 +119,11 @@ public class DownlinkCreate   {
   }
 
   /**
-   * The encrypted payload (hexadecimal); it will be sent as is. Either cleartext or encrypted must be set.
+   * The encrypted payload (hexadecimal); it will be sent as is. Either cleartext
+   * or encrypted must be set.
+   * 
    * @return encrypted
-  **/
-
+   **/
 
   public String getEncrypted() {
     return encrypted;
@@ -137,9 +140,9 @@ public class DownlinkCreate   {
 
   /**
    * If encrypted is set, fcntdown is mandatory.
+   * 
    * @return fcntdown
-  **/
-
+   **/
 
   public Integer getFcntdown() {
     return fcntdown;
@@ -156,9 +159,9 @@ public class DownlinkCreate   {
 
   /**
    * If set to true, the device will confirm that the downlink has been received.
+   * 
    * @return confirmed
-  **/
-
+   **/
 
   public Boolean isConfirmed() {
     return confirmed;
@@ -174,10 +177,13 @@ public class DownlinkCreate   {
   }
 
   /**
-   * The validity of the downlink. Possible values are \"next_join\" (the downlink will be canceled if the devices re-joins, mandatory for encrypted downlink) and \"expiration\" (default - the downlink will be retried if the device re-joins).
+   * The validity of the downlink. Possible values are \"next_join\" (the downlink
+   * will be canceled if the devices re-joins, mandatory for encrypted downlink)
+   * and \"expiration\" (default - the downlink will be retried if the device
+   * re-joins).
+   * 
    * @return validUntil
-  **/
-
+   **/
 
   public ValidUntilEnum getValidUntil() {
     return validUntil;
@@ -194,10 +200,9 @@ public class DownlinkCreate   {
 
   /**
    * The expiration date of the downlink.
+   * 
    * @return expiration
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getExpiration() {
     return expiration;
@@ -214,10 +219,9 @@ public class DownlinkCreate   {
 
   /**
    * Get protocolData
+   * 
    * @return protocolData
-  **/
-
-  @Valid
+   **/
 
   public DownlinkCreateProtocolData getProtocolData() {
     return protocolData;
@@ -226,7 +230,6 @@ public class DownlinkCreate   {
   public void setProtocolData(DownlinkCreateProtocolData protocolData) {
     this.protocolData = protocolData;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -256,7 +259,7 @@ public class DownlinkCreate   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class DownlinkCreate {\n");
-    
+
     sb.append("    commandId: ").append(toIndentedString(commandId)).append("\n");
     sb.append("    cleartext: ").append(toIndentedString(cleartext)).append("\n");
     sb.append("    encrypted: ").append(toIndentedString(encrypted)).append("\n");
@@ -280,4 +283,3 @@ public class DownlinkCreate   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

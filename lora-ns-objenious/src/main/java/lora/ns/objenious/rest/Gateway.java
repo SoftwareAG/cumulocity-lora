@@ -3,14 +3,11 @@ package lora.ns.objenious.rest;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-
 
 /**
  * Gateway
@@ -18,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class Gateway   {
+public class Gateway {
   @JsonProperty("id")
   private Integer id = null;
 
@@ -60,9 +57,9 @@ public class Gateway   {
    */
   public enum StatusEnum {
     ACTIVE("active"),
-    
+
     INACTIVE("inactive"),
-    
+
     ALERT("alert");
 
     private String value;
@@ -101,9 +98,9 @@ public class Gateway   {
 
   /**
    * Gateway identifier
+   * 
    * @return id
-  **/
-
+   **/
 
   public Integer getId() {
     return id;
@@ -120,9 +117,9 @@ public class Gateway   {
 
   /**
    * Gateway name
+   * 
    * @return gatewayId
-  **/
-
+   **/
 
   public String getGatewayId() {
     return gatewayId;
@@ -139,9 +136,9 @@ public class Gateway   {
 
   /**
    * Gateway label
+   * 
    * @return gatewayName
-  **/
-
+   **/
 
   public String getGatewayName() {
     return gatewayName;
@@ -158,9 +155,9 @@ public class Gateway   {
 
   /**
    * Gateway type
+   * 
    * @return gatewayType
-  **/
-
+   **/
 
   public String getGatewayType() {
     return gatewayType;
@@ -177,9 +174,9 @@ public class Gateway   {
 
   /**
    * Gateway label
+   * 
    * @return serialNumber
-  **/
-
+   **/
 
   public String getSerialNumber() {
     return serialNumber;
@@ -196,10 +193,9 @@ public class Gateway   {
 
   /**
    * Get group
+   * 
    * @return group
-  **/
-
-  @Valid
+   **/
 
   public Ref getGroup() {
     return group;
@@ -216,10 +212,9 @@ public class Gateway   {
 
   /**
    * Last message date
+   * 
    * @return lastMessage
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getLastMessage() {
     return lastMessage;
@@ -236,10 +231,9 @@ public class Gateway   {
 
   /**
    * Deployment date
+   * 
    * @return deployedAt
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getDeployedAt() {
     return deployedAt;
@@ -256,9 +250,9 @@ public class Gateway   {
 
   /**
    * Gateway latitude
+   * 
    * @return lat
-  **/
-
+   **/
 
   public Double getLat() {
     return lat;
@@ -275,9 +269,9 @@ public class Gateway   {
 
   /**
    * Gateway longitude
+   * 
    * @return lng
-  **/
-
+   **/
 
   public Double getLng() {
     return lng;
@@ -294,9 +288,9 @@ public class Gateway   {
 
   /**
    * Gateway version
+   * 
    * @return version
-  **/
-
+   **/
 
   public String getVersion() {
     return version;
@@ -313,9 +307,9 @@ public class Gateway   {
 
   /**
    * Gateway ICCID
+   * 
    * @return iccid
-  **/
-
+   **/
 
   public String getIccid() {
     return iccid;
@@ -332,9 +326,9 @@ public class Gateway   {
 
   /**
    * The gateway status
+   * 
    * @return status
-  **/
-
+   **/
 
   public StatusEnum getStatus() {
     return status;
@@ -351,9 +345,9 @@ public class Gateway   {
 
   /**
    * URL of ressource
+   * 
    * @return link
-  **/
-
+   **/
 
   public String getLink() {
     return link;
@@ -362,7 +356,6 @@ public class Gateway   {
   public void setLink(String link) {
     this.link = link;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -390,14 +383,15 @@ public class Gateway   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, gatewayId, gatewayName, serialNumber, group, lastMessage, deployedAt, lat, lng, version, iccid, status, link);
+    return Objects.hash(id, gatewayId, gatewayName, serialNumber, group, lastMessage, deployedAt, lat, lng, version,
+        iccid, status, link);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Gateway {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    gatewayId: ").append(toIndentedString(gatewayId)).append("\n");
     sb.append("    gatewayName: ").append(toIndentedString(gatewayName)).append("\n");
@@ -427,4 +421,3 @@ public class Gateway   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

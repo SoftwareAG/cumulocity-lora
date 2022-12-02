@@ -3,8 +3,6 @@ package lora.ns.objenious.rest;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class Values   {
+public class Values {
   @JsonProperty("timestamp")
   private OffsetDateTime timestamp = null;
 
@@ -35,10 +33,9 @@ public class Values   {
 
   /**
    * Date of measure
+   * 
    * @return timestamp
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getTimestamp() {
     return timestamp;
@@ -55,9 +52,9 @@ public class Values   {
 
   /**
    * List of values sent by the device
+   * 
    * @return data
-  **/
-
+   **/
 
   public Object getData() {
     return data;
@@ -74,9 +71,9 @@ public class Values   {
 
   /**
    * Device latitude (if device has been located)
+   * 
    * @return lat
-  **/
-
+   **/
 
   public Double getLat() {
     return lat;
@@ -93,9 +90,9 @@ public class Values   {
 
   /**
    * Device longitude (if device has been located)
+   * 
    * @return lng
-  **/
-
+   **/
 
   public Double getLng() {
     return lng;
@@ -104,7 +101,6 @@ public class Values   {
   public void setLng(Double lng) {
     this.lng = lng;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -130,7 +126,7 @@ public class Values   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Values {\n");
-    
+
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
     sb.append("    data: ").append(toIndentedString(data)).append("\n");
     sb.append("    lat: ").append(toIndentedString(lat)).append("\n");
@@ -150,4 +146,3 @@ public class Values   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

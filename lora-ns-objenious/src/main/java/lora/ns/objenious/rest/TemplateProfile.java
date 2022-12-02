@@ -2,8 +2,6 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class TemplateProfile   {
+public class TemplateProfile {
   @JsonProperty("id")
   private Integer id = null;
 
@@ -49,9 +47,9 @@ public class TemplateProfile   {
 
   /**
    * Template profile identifier
+   * 
    * @return id
-  **/
-
+   **/
 
   public Integer getId() {
     return id;
@@ -68,9 +66,9 @@ public class TemplateProfile   {
 
   /**
    * Template profile name
+   * 
    * @return name
-  **/
-
+   **/
 
   public String getName() {
     return name;
@@ -87,9 +85,9 @@ public class TemplateProfile   {
 
   /**
    * Template profile brand
+   * 
    * @return brand
-  **/
-
+   **/
 
   public String getBrand() {
     return brand;
@@ -106,9 +104,9 @@ public class TemplateProfile   {
 
   /**
    * Template profile model
+   * 
    * @return model
-  **/
-
+   **/
 
   public String getModel() {
     return model;
@@ -125,9 +123,9 @@ public class TemplateProfile   {
 
   /**
    * Template profile firmware version
+   * 
    * @return firmwareVersion
-  **/
-
+   **/
 
   public String getFirmwareVersion() {
     return firmwareVersion;
@@ -144,9 +142,9 @@ public class TemplateProfile   {
 
   /**
    * Template profile hardware version
+   * 
    * @return hardwareVersion
-  **/
-
+   **/
 
   public String getHardwareVersion() {
     return hardwareVersion;
@@ -163,9 +161,9 @@ public class TemplateProfile   {
 
   /**
    * Template profile class
+   * 
    * @return propertyClass
-  **/
-
+   **/
 
   public String getPropertyClass() {
     return propertyClass;
@@ -182,10 +180,9 @@ public class TemplateProfile   {
 
   /**
    * Get attributes
+   * 
    * @return attributes
-  **/
-
-  @Valid
+   **/
 
   public AttributeList getAttributes() {
     return attributes;
@@ -202,10 +199,9 @@ public class TemplateProfile   {
 
   /**
    * Get properties
+   * 
    * @return properties
-  **/
-
-  @Valid
+   **/
 
   public CustomFields getProperties() {
     return properties;
@@ -214,7 +210,6 @@ public class TemplateProfile   {
   public void setProperties(CustomFields properties) {
     this.properties = properties;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -238,14 +233,15 @@ public class TemplateProfile   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, brand, model, firmwareVersion, hardwareVersion, propertyClass, attributes, properties);
+    return Objects.hash(id, name, brand, model, firmwareVersion, hardwareVersion, propertyClass, attributes,
+        properties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TemplateProfile {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    brand: ").append(toIndentedString(brand)).append("\n");
@@ -270,4 +266,3 @@ public class TemplateProfile   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

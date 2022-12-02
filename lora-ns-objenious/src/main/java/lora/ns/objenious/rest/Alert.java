@@ -3,8 +3,6 @@ package lora.ns.objenious.rest;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -161,8 +159,6 @@ public class Alert {
 	 * @return group
 	 **/
 
-	@Valid
-
 	public Ref getGroup() {
 		return group;
 	}
@@ -181,8 +177,6 @@ public class Alert {
 	 * 
 	 * @return scenario
 	 **/
-
-	@Valid
 
 	public Ref getScenario() {
 		return scenario;
@@ -203,8 +197,6 @@ public class Alert {
 	 * @return device
 	 **/
 
-	@Valid
-
 	public Ref getDevice() {
 		return device;
 	}
@@ -223,8 +215,6 @@ public class Alert {
 	 * 
 	 * @return profile
 	 **/
-
-	@Valid
 
 	public Ref getProfile() {
 		return profile;
@@ -302,8 +292,6 @@ public class Alert {
 	 * @return startAt
 	 **/
 
-	@Valid
-
 	public OffsetDateTime getStartAt() {
 		return startAt;
 	}
@@ -322,8 +310,6 @@ public class Alert {
 	 * 
 	 * @return endAt
 	 **/
-
-	@Valid
 
 	public OffsetDateTime getEndAt() {
 		return endAt;
@@ -382,8 +368,6 @@ public class Alert {
 	 * @return acknowledgedAt
 	 **/
 
-	@Valid
-
 	public OffsetDateTime getAcknowledgedAt() {
 		return acknowledgedAt;
 	}
@@ -402,8 +386,6 @@ public class Alert {
 	 * 
 	 * @return measure
 	 **/
-
-	@Valid
 
 	public Measure getMeasure() {
 		return measure;

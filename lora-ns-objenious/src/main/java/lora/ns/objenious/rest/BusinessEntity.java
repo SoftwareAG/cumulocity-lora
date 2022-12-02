@@ -2,8 +2,6 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class BusinessEntity   {
+public class BusinessEntity {
   @JsonProperty("id")
   private Integer id = null;
 
@@ -49,9 +47,9 @@ public class BusinessEntity   {
 
   /**
    * Business entity identifier
+   * 
    * @return id
-  **/
-
+   **/
 
   public Integer getId() {
     return id;
@@ -68,9 +66,9 @@ public class BusinessEntity   {
 
   /**
    * URL of ressource
+   * 
    * @return link
-  **/
-
+   **/
 
   public String getLink() {
     return link;
@@ -87,9 +85,9 @@ public class BusinessEntity   {
 
   /**
    * Business entity name
+   * 
    * @return name
-  **/
-
+   **/
 
   public String getName() {
     return name;
@@ -106,9 +104,9 @@ public class BusinessEntity   {
 
   /**
    * Color to custom the header and menu of SPOT (hex)
+   * 
    * @return primaryColor
-  **/
-
+   **/
 
   public String getPrimaryColor() {
     return primaryColor;
@@ -125,9 +123,9 @@ public class BusinessEntity   {
 
   /**
    * Color to custom the buttons of SPOT (hex)
+   * 
    * @return secondaryColor
-  **/
-
+   **/
 
   public String getSecondaryColor() {
     return secondaryColor;
@@ -144,9 +142,9 @@ public class BusinessEntity   {
 
   /**
    * Color to custom the navbar of SPOT (hex)
+   * 
    * @return navbarColor
-  **/
-
+   **/
 
   public String getNavbarColor() {
     return navbarColor;
@@ -163,9 +161,9 @@ public class BusinessEntity   {
 
   /**
    * The id on the client platform
+   * 
    * @return customerReference
-  **/
-
+   **/
 
   public String getCustomerReference() {
     return customerReference;
@@ -182,9 +180,9 @@ public class BusinessEntity   {
 
   /**
    * URL of the logo
+   * 
    * @return logo
-  **/
-
+   **/
 
   public String getLogo() {
     return logo;
@@ -201,10 +199,9 @@ public class BusinessEntity   {
 
   /**
    * Get allowedPacks
+   * 
    * @return allowedPacks
-  **/
-
-  @Valid
+   **/
 
   public AllowedPackList getAllowedPacks() {
     return allowedPacks;
@@ -213,7 +210,6 @@ public class BusinessEntity   {
   public void setAllowedPacks(AllowedPackList allowedPacks) {
     this.allowedPacks = allowedPacks;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -237,14 +233,15 @@ public class BusinessEntity   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, link, name, primaryColor, secondaryColor, navbarColor, customerReference, logo, allowedPacks);
+    return Objects.hash(id, link, name, primaryColor, secondaryColor, navbarColor, customerReference, logo,
+        allowedPacks);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class BusinessEntity {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    link: ").append(toIndentedString(link)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
@@ -269,4 +266,3 @@ public class BusinessEntity   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

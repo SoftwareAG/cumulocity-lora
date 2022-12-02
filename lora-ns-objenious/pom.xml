@@ -20,16 +20,19 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.9.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-core</artifactId>
+			<version>2.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<version>${spring-boot-dependencies.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -49,6 +52,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-boot-dependencies.version}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -57,10 +61,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>com.google.cloud.tools</groupId> <artifactId>jib-maven-plugin</artifactId> 
-				<version>2.4.0</version> <configuration> <outputPaths> <tar>target/image.tar</tar> 
-				</outputPaths> </configuration> <executions> <execution> <phase>package</phase> 
-				<goals> <goal>buildTar</goal> </goals> </execution> </executions> </plugin> -->
 
 			<plugin>
 				<groupId>com.nsn.cumulocity.clients-java</groupId>
@@ -81,7 +81,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 
 
 </project>

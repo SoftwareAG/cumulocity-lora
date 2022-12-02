@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,9 +14,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class AttributeList   {
+public class AttributeList {
   @JsonProperty("attributes")
-  @Valid
   private List<Attribute> attributes = null;
 
   public AttributeList attributes(List<Attribute> attributes) {
@@ -36,10 +33,9 @@ public class AttributeList   {
 
   /**
    * Get attributes
+   * 
    * @return attributes
-  **/
-
-  @Valid
+   **/
 
   public List<Attribute> getAttributes() {
     return attributes;
@@ -48,7 +44,6 @@ public class AttributeList   {
   public void setAttributes(List<Attribute> attributes) {
     this.attributes = attributes;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -71,7 +66,7 @@ public class AttributeList   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class AttributeList {\n");
-    
+
     sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -88,4 +83,3 @@ public class AttributeList   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

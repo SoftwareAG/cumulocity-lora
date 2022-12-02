@@ -3,9 +3,6 @@ package lora.ns.objenious.rest;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class DeviceCreate   {
+public class DeviceCreate {
   @JsonProperty("label")
   private String label = null;
 
@@ -51,10 +48,9 @@ public class DeviceCreate   {
 
   /**
    * Device name
+   * 
    * @return label
-  **/
-  @NotNull
-
+   **/
 
   public String getLabel() {
     return label;
@@ -71,10 +67,9 @@ public class DeviceCreate   {
 
   /**
    * (LoRa devices) the device deveui in hexadecimal/bigendian
+   * 
    * @return deveui
-  **/
-  @NotNull
-
+   **/
 
   public String getDeveui() {
     return deveui;
@@ -91,10 +86,9 @@ public class DeviceCreate   {
 
   /**
    * (LoRa devices) the device appeui in hexadecimal/bigendian
+   * 
    * @return appeui
-  **/
-  @NotNull
-
+   **/
 
   public String getAppeui() {
     return appeui;
@@ -111,10 +105,9 @@ public class DeviceCreate   {
 
   /**
    * Application key
+   * 
    * @return appkey
-  **/
-  @NotNull
-
+   **/
 
   public String getAppkey() {
     return appkey;
@@ -131,9 +124,9 @@ public class DeviceCreate   {
 
   /**
    * Group identifier
+   * 
    * @return groupId
-  **/
-
+   **/
 
   public Integer getGroupId() {
     return groupId;
@@ -150,10 +143,9 @@ public class DeviceCreate   {
 
   /**
    * Device profile identifier
+   * 
    * @return profileId
-  **/
-  @NotNull
-
+   **/
 
   public Integer getProfileId() {
     return profileId;
@@ -170,10 +162,9 @@ public class DeviceCreate   {
 
   /**
    * Latitude for stationary devices
+   * 
    * @return lat
-  **/
-
-  @Valid
+   **/
 
   public BigDecimal getLat() {
     return lat;
@@ -190,10 +181,9 @@ public class DeviceCreate   {
 
   /**
    * Longitude for stationary devices
+   * 
    * @return lng
-  **/
-
-  @Valid
+   **/
 
   public BigDecimal getLng() {
     return lng;
@@ -210,10 +200,9 @@ public class DeviceCreate   {
 
   /**
    * Get properties
+   * 
    * @return properties
-  **/
-
-  @Valid
+   **/
 
   public PropertiesCreate getProperties() {
     return properties;
@@ -222,7 +211,6 @@ public class DeviceCreate   {
   public void setProperties(PropertiesCreate properties) {
     this.properties = properties;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -253,7 +241,7 @@ public class DeviceCreate   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class DeviceCreate {\n");
-    
+
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    deveui: ").append(toIndentedString(deveui)).append("\n");
     sb.append("    appeui: ").append(toIndentedString(appeui)).append("\n");
@@ -278,4 +266,3 @@ public class DeviceCreate   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

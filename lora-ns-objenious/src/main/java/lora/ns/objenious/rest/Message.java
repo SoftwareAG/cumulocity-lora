@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -19,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class Message   {
+public class Message {
   @JsonProperty("id")
   private String id = null;
 
@@ -28,11 +26,11 @@ public class Message   {
    */
   public enum TypeEnum {
     JOIN("join"),
-    
+
     UPLINK("uplink"),
-    
+
     DOWNLINK("downlink"),
-    
+
     EXTERNAL("external");
 
     private String value;
@@ -74,7 +72,6 @@ public class Message   {
   private String payloadCleartext = null;
 
   @JsonProperty("payload")
-  @Valid
   private List<MessagePayload> payload = null;
 
   @JsonProperty("protocol_data")
@@ -100,15 +97,15 @@ public class Message   {
    */
   public enum GeolocationTypeEnum {
     NONE("none"),
-    
+
     FIXED("fixed"),
-    
+
     NETWORK("network"),
-    
+
     DEVICE("device"),
-    
+
     TDOA("tdoa"),
-    
+
     ZONE("zone");
 
     private String value;
@@ -147,9 +144,9 @@ public class Message   {
 
   /**
    * Message identifier
+   * 
    * @return id
-  **/
-
+   **/
 
   public String getId() {
     return id;
@@ -166,9 +163,9 @@ public class Message   {
 
   /**
    * Type of message (join, uplink, downlink, external)
+   * 
    * @return type
-  **/
-
+   **/
 
   public TypeEnum getType() {
     return type;
@@ -185,10 +182,9 @@ public class Message   {
 
   /**
    * Date of message
+   * 
    * @return timestamp
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getTimestamp() {
     return timestamp;
@@ -205,9 +201,9 @@ public class Message   {
 
   /**
    * The uplink/downlink counter (uplink/downlink)
+   * 
    * @return count
-  **/
-
+   **/
 
   public Integer getCount() {
     return count;
@@ -224,9 +220,9 @@ public class Message   {
 
   /**
    * The encrypted payload, hexadecimal (uplink)
+   * 
    * @return payloadEncrypted
-  **/
-
+   **/
 
   public String getPayloadEncrypted() {
     return payloadEncrypted;
@@ -243,9 +239,9 @@ public class Message   {
 
   /**
    * The cleartext payload, hexadecimal (uplink)
+   * 
    * @return payloadCleartext
-  **/
-
+   **/
 
   public String getPayloadCleartext() {
     return payloadCleartext;
@@ -270,10 +266,9 @@ public class Message   {
 
   /**
    * decoded payload values (uplink)
+   * 
    * @return payload
-  **/
-
-  @Valid
+   **/
 
   public List<MessagePayload> getPayload() {
     return payload;
@@ -290,10 +285,9 @@ public class Message   {
 
   /**
    * Get protocolData
+   * 
    * @return protocolData
-  **/
-
-  @Valid
+   **/
 
   public ProtocolData getProtocolData() {
     return protocolData;
@@ -310,9 +304,9 @@ public class Message   {
 
   /**
    * The command id (downlink)
+   * 
    * @return commandId
-  **/
-
+   **/
 
   public Integer getCommandId() {
     return commandId;
@@ -329,10 +323,9 @@ public class Message   {
 
   /**
    * Date the downlink was sent (downlink)
+   * 
    * @return deliveredAt
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getDeliveredAt() {
     return deliveredAt;
@@ -349,9 +342,9 @@ public class Message   {
 
   /**
    * The error message in case of an error (join/downlink)
+   * 
    * @return error
-  **/
-
+   **/
 
   public String getError() {
     return error;
@@ -368,9 +361,9 @@ public class Message   {
 
   /**
    * Device latitude (if device has been located - join/uplink)
+   * 
    * @return lat
-  **/
-
+   **/
 
   public Double getLat() {
     return lat;
@@ -387,9 +380,9 @@ public class Message   {
 
   /**
    * Device longitude (if device has been located - join/uplink)
+   * 
    * @return lng
-  **/
-
+   **/
 
   public Double getLng() {
     return lng;
@@ -406,9 +399,9 @@ public class Message   {
 
   /**
    * Geolocation type (uplink)
+   * 
    * @return geolocationType
-  **/
-
+   **/
 
   public GeolocationTypeEnum getGeolocationType() {
     return geolocationType;
@@ -425,10 +418,9 @@ public class Message   {
 
   /**
    * Get macCommand
+   * 
    * @return macCommand
-  **/
-
-  @Valid
+   **/
 
   public MacCommand getMacCommand() {
     return macCommand;
@@ -437,7 +429,6 @@ public class Message   {
   public void setMacCommand(MacCommand macCommand) {
     this.macCommand = macCommand;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -467,14 +458,15 @@ public class Message   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, type, timestamp, count, payloadEncrypted, payloadCleartext, payload, protocolData, commandId, deliveredAt, error, lat, lng, geolocationType, macCommand);
+    return Objects.hash(id, type, timestamp, count, payloadEncrypted, payloadCleartext, payload, protocolData,
+        commandId, deliveredAt, error, lat, lng, geolocationType, macCommand);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Message {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
@@ -505,4 +497,3 @@ public class Message   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

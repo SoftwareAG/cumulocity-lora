@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,9 +14,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class GatewayList   {
+public class GatewayList {
   @JsonProperty("locations")
-  @Valid
   private List<Gateway> locations = null;
 
   @JsonProperty("start_exclusive")
@@ -39,10 +36,9 @@ public class GatewayList   {
 
   /**
    * Get locations
+   * 
    * @return locations
-  **/
-
-  @Valid
+   **/
 
   public List<Gateway> getLocations() {
     return locations;
@@ -59,9 +55,9 @@ public class GatewayList   {
 
   /**
    * the start_exclusive value to be used for the next page
+   * 
    * @return startExclusive
-  **/
-
+   **/
 
   public String getStartExclusive() {
     return startExclusive;
@@ -70,7 +66,6 @@ public class GatewayList   {
   public void setStartExclusive(String startExclusive) {
     this.startExclusive = startExclusive;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -94,7 +89,7 @@ public class GatewayList   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class GatewayList {\n");
-    
+
     sb.append("    locations: ").append(toIndentedString(locations)).append("\n");
     sb.append("    startExclusive: ").append(toIndentedString(startExclusive)).append("\n");
     sb.append("}");
@@ -112,4 +107,3 @@ public class GatewayList   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

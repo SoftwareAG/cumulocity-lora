@@ -2,9 +2,6 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -19,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 @JsonInclude(Include.NON_NULL)
-public class ScenarioRoutingCreateUpdate   {
+public class ScenarioRoutingCreateUpdate {
   @JsonProperty("name")
   private String name = null;
 
@@ -37,9 +34,9 @@ public class ScenarioRoutingCreateUpdate   {
    */
   public enum MessageTypeEnum {
     ALL("all"),
-    
+
     UPLINK("uplink"),
-    
+
     DOWNLINK("downlink");
 
     private String value;
@@ -73,7 +70,7 @@ public class ScenarioRoutingCreateUpdate   {
    */
   public enum FormatTypeEnum {
     MESSAGES("messages"),
-    
+
     VALUES("values");
 
     private String value;
@@ -127,10 +124,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * Routing scenario name
+   * 
    * @return name
-  **/
-  @NotNull
-
+   **/
 
   public String getName() {
     return name;
@@ -147,10 +143,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * Group identifier
+   * 
    * @return groupId
-  **/
-  @NotNull
-
+   **/
 
   public Integer getGroupId() {
     return groupId;
@@ -166,10 +161,11 @@ public class ScenarioRoutingCreateUpdate   {
   }
 
   /**
-   * Device profile identifier, If set to null, it concerns all profiles of the group 
+   * Device profile identifier, If set to null, it concerns all profiles of the
+   * group
+   * 
    * @return profileId
-  **/
-
+   **/
 
   public Integer getProfileId() {
     return profileId;
@@ -186,10 +182,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * If set to true, the scenario is active
+   * 
    * @return enabled
-  **/
-  @NotNull
-
+   **/
 
   public Boolean isEnabled() {
     return enabled;
@@ -206,10 +201,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * Type of messages that are routed
+   * 
    * @return messageType
-  **/
-  @NotNull
-
+   **/
 
   public MessageTypeEnum getMessageType() {
     return messageType;
@@ -226,10 +220,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * Format of the payload send in the body of the request
+   * 
    * @return formatType
-  **/
-  @NotNull
-
+   **/
 
   public FormatTypeEnum getFormatType() {
     return formatType;
@@ -246,10 +239,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * Get azureEventhub
+   * 
    * @return azureEventhub
-  **/
-
-  @Valid
+   **/
 
   public RoutingAzureEventHub getAzureEventhub() {
     return azureEventhub;
@@ -266,10 +258,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * Get azureIothub
+   * 
    * @return azureIothub
-  **/
-
-  @Valid
+   **/
 
   public RoutingAzureIotHub getAzureIothub() {
     return azureIothub;
@@ -286,10 +277,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * Get http
+   * 
    * @return http
-  **/
-
-  @Valid
+   **/
 
   public RoutingHttp getHttp() {
     return http;
@@ -306,10 +296,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * Get googlePubsub
+   * 
    * @return googlePubsub
-  **/
-
-  @Valid
+   **/
 
   public RoutingGooglePubSub getGooglePubsub() {
     return googlePubsub;
@@ -326,10 +315,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * Get googleIotcore
+   * 
    * @return googleIotcore
-  **/
-
-  @Valid
+   **/
 
   public RoutingGoogleIotCore getGoogleIotcore() {
     return googleIotcore;
@@ -346,10 +334,9 @@ public class ScenarioRoutingCreateUpdate   {
 
   /**
    * Get awsIotcore
+   * 
    * @return awsIotcore
-  **/
-
-  @Valid
+   **/
 
   public RoutingAwsIotCore getAwsIotcore() {
     return awsIotcore;
@@ -358,7 +345,6 @@ public class ScenarioRoutingCreateUpdate   {
   public void setAwsIotcore(RoutingAwsIotCore awsIotcore) {
     this.awsIotcore = awsIotcore;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -385,14 +371,15 @@ public class ScenarioRoutingCreateUpdate   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, groupId, profileId, enabled, messageType, formatType, azureEventhub, azureIothub, http, googlePubsub, googleIotcore, awsIotcore);
+    return Objects.hash(name, groupId, profileId, enabled, messageType, formatType, azureEventhub, azureIothub, http,
+        googlePubsub, googleIotcore, awsIotcore);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ScenarioRoutingCreateUpdate {\n");
-    
+
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
     sb.append("    profileId: ").append(toIndentedString(profileId)).append("\n");
@@ -420,4 +407,3 @@ public class ScenarioRoutingCreateUpdate   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class BusinessEntityUpdate   {
+public class BusinessEntityUpdate {
   @JsonProperty("name")
   private String name = null;
 
@@ -33,7 +31,6 @@ public class BusinessEntityUpdate   {
   private String customerReference = null;
 
   @JsonProperty("allowed_packs")
-  @Valid
   private List<Integer> allowedPacks = null;
 
   public BusinessEntityUpdate name(String name) {
@@ -43,9 +40,9 @@ public class BusinessEntityUpdate   {
 
   /**
    * Business entity name
+   * 
    * @return name
-  **/
-
+   **/
 
   public String getName() {
     return name;
@@ -62,9 +59,9 @@ public class BusinessEntityUpdate   {
 
   /**
    * Color to custom the header and menu of SPOT (hex)
+   * 
    * @return primaryColor
-  **/
-
+   **/
 
   public String getPrimaryColor() {
     return primaryColor;
@@ -81,9 +78,9 @@ public class BusinessEntityUpdate   {
 
   /**
    * Color to custom the buttons of SPOT (hex)
+   * 
    * @return secondaryColor
-  **/
-
+   **/
 
   public String getSecondaryColor() {
     return secondaryColor;
@@ -100,9 +97,9 @@ public class BusinessEntityUpdate   {
 
   /**
    * Color to custom the navbar of SPOT (hex)
+   * 
    * @return navbarColor
-  **/
-
+   **/
 
   public String getNavbarColor() {
     return navbarColor;
@@ -119,9 +116,9 @@ public class BusinessEntityUpdate   {
 
   /**
    * The id on the client platform
+   * 
    * @return customerReference
-  **/
-
+   **/
 
   public String getCustomerReference() {
     return customerReference;
@@ -146,9 +143,9 @@ public class BusinessEntityUpdate   {
 
   /**
    * Array of packId (get from GET /available-packs)
+   * 
    * @return allowedPacks
-  **/
-
+   **/
 
   public List<Integer> getAllowedPacks() {
     return allowedPacks;
@@ -157,7 +154,6 @@ public class BusinessEntityUpdate   {
   public void setAllowedPacks(List<Integer> allowedPacks) {
     this.allowedPacks = allowedPacks;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -185,7 +181,7 @@ public class BusinessEntityUpdate   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class BusinessEntityUpdate {\n");
-    
+
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    primaryColor: ").append(toIndentedString(primaryColor)).append("\n");
     sb.append("    secondaryColor: ").append(toIndentedString(secondaryColor)).append("\n");
@@ -207,4 +203,3 @@ public class BusinessEntityUpdate   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

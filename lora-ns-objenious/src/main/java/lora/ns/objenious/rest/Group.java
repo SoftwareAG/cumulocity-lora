@@ -2,8 +2,6 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -16,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class Group   {
+public class Group {
   @JsonProperty("id")
   private Integer id = null;
 
@@ -36,9 +34,9 @@ public class Group   {
 
   /**
    * Group identifier
+   * 
    * @return id
-  **/
-
+   **/
 
   public Integer getId() {
     return id;
@@ -55,9 +53,9 @@ public class Group   {
 
   /**
    * URL of ressource
+   * 
    * @return link
-  **/
-
+   **/
 
   public String getLink() {
     return link;
@@ -74,9 +72,9 @@ public class Group   {
 
   /**
    * Group name
+   * 
    * @return name
-  **/
-
+   **/
 
   public String getName() {
     return name;
@@ -93,10 +91,9 @@ public class Group   {
 
   /**
    * Get parent
+   * 
    * @return parent
-  **/
-
-  @Valid
+   **/
 
   public Ref getParent() {
     return parent;
@@ -105,7 +102,6 @@ public class Group   {
   public void setParent(Ref parent) {
     this.parent = parent;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -131,7 +127,7 @@ public class Group   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Group {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    link: ").append(toIndentedString(link)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
@@ -151,4 +147,3 @@ public class Group   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

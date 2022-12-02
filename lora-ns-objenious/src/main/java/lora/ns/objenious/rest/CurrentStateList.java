@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,9 +14,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class CurrentStateList   {
+public class CurrentStateList {
   @JsonProperty("states")
-  @Valid
   private List<CurrentState> states = null;
 
   public CurrentStateList states(List<CurrentState> states) {
@@ -36,10 +33,9 @@ public class CurrentStateList   {
 
   /**
    * Get states
+   * 
    * @return states
-  **/
-
-  @Valid
+   **/
 
   public List<CurrentState> getStates() {
     return states;
@@ -48,7 +44,6 @@ public class CurrentStateList   {
   public void setStates(List<CurrentState> states) {
     this.states = states;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -71,7 +66,7 @@ public class CurrentStateList   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class CurrentStateList {\n");
-    
+
     sb.append("    states: ").append(toIndentedString(states)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -88,4 +83,3 @@ public class CurrentStateList   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

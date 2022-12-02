@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,9 +14,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class AllowedPackList   {
+public class AllowedPackList {
   @JsonProperty("packs")
-  @Valid
   private List<Pack> packs = null;
 
   public AllowedPackList packs(List<Pack> packs) {
@@ -36,10 +33,9 @@ public class AllowedPackList   {
 
   /**
    * Get packs
+   * 
    * @return packs
-  **/
-
-  @Valid
+   **/
 
   public List<Pack> getPacks() {
     return packs;
@@ -48,7 +44,6 @@ public class AllowedPackList   {
   public void setPacks(List<Pack> packs) {
     this.packs = packs;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -71,7 +66,7 @@ public class AllowedPackList   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class AllowedPackList {\n");
-    
+
     sb.append("    packs: ").append(toIndentedString(packs)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -88,4 +83,3 @@ public class AllowedPackList   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

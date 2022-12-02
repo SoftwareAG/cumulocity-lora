@@ -3,8 +3,6 @@ package lora.ns.objenious.rest;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -17,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class Downlink   {
+public class Downlink {
   @JsonProperty("command_id")
   private Integer commandId = null;
 
@@ -31,11 +29,14 @@ public class Downlink   {
   private Boolean confirmed = null;
 
   /**
-   * The validity of the downlink. Possible values are \"next_join\" (the downlink will be canceled if the devices re-joins, mandatory for encrypted downlink) and \"expiration\" (default - the downlink will be retried if the device re-joins).
+   * The validity of the downlink. Possible values are \"next_join\" (the downlink
+   * will be canceled if the devices re-joins, mandatory for encrypted downlink)
+   * and \"expiration\" (default - the downlink will be retried if the device
+   * re-joins).
    */
   public enum ValidUntilEnum {
     NEXT_JOIN("next_join"),
-    
+
     EXPIRATION("expiration");
 
     private String value;
@@ -75,19 +76,19 @@ public class Downlink   {
    */
   public enum StatusEnum {
     QUEUED("queued"),
-    
+
     SENT("sent"),
-    
+
     ERROR("error"),
-    
+
     RETRYING("retrying"),
-    
+
     CANCELED("canceled"),
-    
+
     TIMEOUT("timeout"),
-    
+
     CONFIRMED("confirmed"),
-    
+
     SENDING("sending");
 
     private String value;
@@ -121,29 +122,29 @@ public class Downlink   {
    */
   public enum ErrorMsgEnum {
     BADPARAMETERFORMAT("BadParameterFormat"),
-    
+
     MISSINGPARAMETER("MissingParameter"),
-    
+
     FPORT_OUTOFRANGE("FPort_OutOfRange"),
-    
+
     FRMPAYLOAD_TOOLARGE("FRMPayload_TooLarge"),
-    
+
     EXPIRATIONDATE_OUTOFRANGE("ExpirationDate_OutOfRange"),
-    
+
     DEVADDR_BADVALUE("DevAddr_BadValue"),
-    
+
     FCNTDOWN_BADVALUE("FCntDown_BadValue"),
-    
+
     UNKNOWNDEVICE("UnknownDevice"),
-    
+
     TIMEOUT("Timeout"),
-    
+
     CANCELED("Canceled"),
-    
+
     LNSINTERNALERROR("LNSInternalError"),
-    
+
     INVALIDMIC("InvalidMIC"),
-    
+
     NOAVAILABLEDLRESOURCE("NoAvailableDLResource");
 
     private String value;
@@ -188,9 +189,9 @@ public class Downlink   {
 
   /**
    * The command id
+   * 
    * @return commandId
-  **/
-
+   **/
 
   public Integer getCommandId() {
     return commandId;
@@ -207,9 +208,9 @@ public class Downlink   {
 
   /**
    * The cleartext payload (hexadecimal);
+   * 
    * @return cleartext
-  **/
-
+   **/
 
   public String getCleartext() {
     return cleartext;
@@ -226,9 +227,9 @@ public class Downlink   {
 
   /**
    * The encrypted payload (hexadecimal);
+   * 
    * @return encrypted
-  **/
-
+   **/
 
   public String getEncrypted() {
     return encrypted;
@@ -245,9 +246,9 @@ public class Downlink   {
 
   /**
    * If set to true, the device confirmed that the downlink has been received.
+   * 
    * @return confirmed
-  **/
-
+   **/
 
   public Boolean isConfirmed() {
     return confirmed;
@@ -263,10 +264,13 @@ public class Downlink   {
   }
 
   /**
-   * The validity of the downlink. Possible values are \"next_join\" (the downlink will be canceled if the devices re-joins, mandatory for encrypted downlink) and \"expiration\" (default - the downlink will be retried if the device re-joins).
+   * The validity of the downlink. Possible values are \"next_join\" (the downlink
+   * will be canceled if the devices re-joins, mandatory for encrypted downlink)
+   * and \"expiration\" (default - the downlink will be retried if the device
+   * re-joins).
+   * 
    * @return validUntil
-  **/
-
+   **/
 
   public ValidUntilEnum getValidUntil() {
     return validUntil;
@@ -283,10 +287,9 @@ public class Downlink   {
 
   /**
    * The expiration date of the downlink.
+   * 
    * @return expiration
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getExpiration() {
     return expiration;
@@ -303,10 +306,9 @@ public class Downlink   {
 
   /**
    * Get protocolData
+   * 
    * @return protocolData
-  **/
-
-  @Valid
+   **/
 
   public DownlinkCreateProtocolData getProtocolData() {
     return protocolData;
@@ -323,9 +325,9 @@ public class Downlink   {
 
   /**
    * Status of the downlink
+   * 
    * @return status
-  **/
-
+   **/
 
   public StatusEnum getStatus() {
     return status;
@@ -342,9 +344,9 @@ public class Downlink   {
 
   /**
    * Error of the downlink
+   * 
    * @return errorMsg
-  **/
-
+   **/
 
   public ErrorMsgEnum getErrorMsg() {
     return errorMsg;
@@ -361,10 +363,9 @@ public class Downlink   {
 
   /**
    * Date of created downlink
+   * 
    * @return createdAt
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getCreatedAt() {
     return createdAt;
@@ -381,10 +382,9 @@ public class Downlink   {
 
   /**
    * Date of dequeued downlink
+   * 
    * @return dequeuedAt
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getDequeuedAt() {
     return dequeuedAt;
@@ -401,10 +401,9 @@ public class Downlink   {
 
   /**
    * Date of delivered downlink
+   * 
    * @return deliveredAt
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getDeliveredAt() {
     return deliveredAt;
@@ -413,7 +412,6 @@ public class Downlink   {
   public void setDeliveredAt(OffsetDateTime deliveredAt) {
     this.deliveredAt = deliveredAt;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -440,14 +438,15 @@ public class Downlink   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(commandId, cleartext, encrypted, confirmed, validUntil, expiration, protocolData, status, errorMsg, createdAt, dequeuedAt, deliveredAt);
+    return Objects.hash(commandId, cleartext, encrypted, confirmed, validUntil, expiration, protocolData, status,
+        errorMsg, createdAt, dequeuedAt, deliveredAt);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Downlink {\n");
-    
+
     sb.append("    commandId: ").append(toIndentedString(commandId)).append("\n");
     sb.append("    cleartext: ").append(toIndentedString(cleartext)).append("\n");
     sb.append("    encrypted: ").append(toIndentedString(encrypted)).append("\n");
@@ -475,4 +474,3 @@ public class Downlink   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

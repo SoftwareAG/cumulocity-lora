@@ -3,8 +3,6 @@ package lora.ns.objenious.rest;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -17,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class CurrentState   {
+public class CurrentState {
   @JsonProperty("id")
   private Integer id = null;
 
@@ -26,17 +24,17 @@ public class CurrentState   {
    */
   public enum StatusEnum {
     PROVISIONED("provisioned"),
-    
+
     JOINED("joined"),
-    
+
     ACTIVE("active"),
-    
+
     INACTIVE("inactive"),
-    
+
     ERROR("error"),
-    
+
     WARNING("warning"),
-    
+
     ALERT("alert");
 
     private String value;
@@ -94,15 +92,15 @@ public class CurrentState   {
    */
   public enum GeolocationTypeEnum {
     NONE("none"),
-    
+
     FIXED("fixed"),
-    
+
     NETWORK("network"),
-    
+
     DEVICE("device"),
-    
+
     TDOA("tdoa"),
-    
+
     ZONE("zone");
 
     private String value;
@@ -141,9 +139,9 @@ public class CurrentState   {
 
   /**
    * device identifier
+   * 
    * @return id
-  **/
-
+   **/
 
   public Integer getId() {
     return id;
@@ -160,9 +158,9 @@ public class CurrentState   {
 
   /**
    * The device status
+   * 
    * @return status
-  **/
-
+   **/
 
   public StatusEnum getStatus() {
     return status;
@@ -179,9 +177,9 @@ public class CurrentState   {
 
   /**
    * The current uplink counter
+   * 
    * @return uplinkCount
-  **/
-
+   **/
 
   public Integer getUplinkCount() {
     return uplinkCount;
@@ -198,10 +196,9 @@ public class CurrentState   {
 
   /**
    * Date of last uplink
+   * 
    * @return lastUplink
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getLastUplink() {
     return lastUplink;
@@ -218,9 +215,9 @@ public class CurrentState   {
 
   /**
    * The current downlink counter
+   * 
    * @return downlinkCount
-  **/
-
+   **/
 
   public Integer getDownlinkCount() {
     return downlinkCount;
@@ -237,10 +234,9 @@ public class CurrentState   {
 
   /**
    * Date of last downlink
+   * 
    * @return lastDownlink
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getLastDownlink() {
     return lastDownlink;
@@ -257,9 +253,9 @@ public class CurrentState   {
 
   /**
    * Last data received from the device
+   * 
    * @return data
-  **/
-
+   **/
 
   public Object getData() {
     return data;
@@ -276,9 +272,9 @@ public class CurrentState   {
 
   /**
    * Device latitude
+   * 
    * @return lat
-  **/
-
+   **/
 
   public Double getLat() {
     return lat;
@@ -295,9 +291,9 @@ public class CurrentState   {
 
   /**
    * Device longitude
+   * 
    * @return lng
-  **/
-
+   **/
 
   public Double getLng() {
     return lng;
@@ -314,10 +310,9 @@ public class CurrentState   {
 
   /**
    * Get protocolData
+   * 
    * @return protocolData
-  **/
-
-  @Valid
+   **/
 
   public ProtocolData getProtocolData() {
     return protocolData;
@@ -334,9 +329,9 @@ public class CurrentState   {
 
   /**
    * Geolocation type
+   * 
    * @return geolocationType
-  **/
-
+   **/
 
   public GeolocationTypeEnum getGeolocationType() {
     return geolocationType;
@@ -353,10 +348,9 @@ public class CurrentState   {
 
   /**
    * Get zone
+   * 
    * @return zone
-  **/
-
-  @Valid
+   **/
 
   public Ref getZone() {
     return zone;
@@ -365,7 +359,6 @@ public class CurrentState   {
   public void setZone(Ref zone) {
     this.zone = zone;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -392,14 +385,15 @@ public class CurrentState   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, status, uplinkCount, lastUplink, downlinkCount, lastDownlink, data, lat, lng, protocolData, geolocationType, zone);
+    return Objects.hash(id, status, uplinkCount, lastUplink, downlinkCount, lastDownlink, data, lat, lng, protocolData,
+        geolocationType, zone);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class CurrentState {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    uplinkCount: ").append(toIndentedString(uplinkCount)).append("\n");
@@ -427,4 +421,3 @@ public class CurrentState   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

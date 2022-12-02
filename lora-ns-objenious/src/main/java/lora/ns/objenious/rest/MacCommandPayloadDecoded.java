@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,12 +14,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class MacCommandPayloadDecoded   {
+public class MacCommandPayloadDecoded {
   @JsonProperty("channel_mask_control")
   private Integer channelMaskControl = null;
 
   @JsonProperty("channels")
-  @Valid
   private List<Integer> channels = null;
 
   @JsonProperty("data_rate")
@@ -45,10 +42,14 @@ public class MacCommandPayloadDecoded   {
   }
 
   /**
-   * encodes the channels usable for uplink access. A bit in the ChMask field set to 1 means that the corresponding channel can be used for uplink transmissions if this channel allows the data rate currently used by the end-device. A bit set to 0 means the corresponding channels should be avoided.
+   * encodes the channels usable for uplink access. A bit in the ChMask field set
+   * to 1 means that the corresponding channel can be used for uplink
+   * transmissions if this channel allows the data rate currently used by the
+   * end-device. A bit set to 0 means the corresponding channels should be
+   * avoided.
+   * 
    * @return channelMaskControl
-  **/
-
+   **/
 
   public Integer getChannelMaskControl() {
     return channelMaskControl;
@@ -73,9 +74,9 @@ public class MacCommandPayloadDecoded   {
 
   /**
    * array of channel
+   * 
    * @return channels
-  **/
-
+   **/
 
   public List<Integer> getChannels() {
     return channels;
@@ -91,10 +92,11 @@ public class MacCommandPayloadDecoded   {
   }
 
   /**
-   * spreading factor that will be used by the device (from SF7 or DR 5 to SF12 or DR0).
+   * spreading factor that will be used by the device (from SF7 or DR 5 to SF12 or
+   * DR0).
+   * 
    * @return dataRate
-  **/
-
+   **/
 
   public Integer getDataRate() {
     return dataRate;
@@ -111,9 +113,9 @@ public class MacCommandPayloadDecoded   {
 
   /**
    * type of mac command (LoRa devices)
+   * 
    * @return dataRateEu
-  **/
-
+   **/
 
   public String getDataRateEu() {
     return dataRateEu;
@@ -129,10 +131,15 @@ public class MacCommandPayloadDecoded   {
   }
 
   /**
-   * number of transmissions for each uplink message. This applies only to ―unconfirmed uplink frames. The default value is 1 corresponding to a single transmission of each frame. The valid range is [1:15]. If NbTrans==0 is received the end-device should use the default value. This field can be used 21 by the network manager to control the redundancy of the node uplinks to obtain a given Quality of Service.
+   * number of transmissions for each uplink message. This applies only to
+   * ―unconfirmed uplink frames. The default value is 1 corresponding to a single
+   * transmission of each frame. The valid range is [1:15]. If NbTrans==0 is
+   * received the end-device should use the default value. This field can be used
+   * 21 by the network manager to control the redundancy of the node uplinks to
+   * obtain a given Quality of Service.
+   * 
    * @return nbTrans
-  **/
-
+   **/
 
   public Integer getNbTrans() {
     return nbTrans;
@@ -149,9 +156,9 @@ public class MacCommandPayloadDecoded   {
 
   /**
    * transmission Power that will be used by the device.
+   * 
    * @return txPower
-  **/
-
+   **/
 
   public Integer getTxPower() {
     return txPower;
@@ -168,9 +175,9 @@ public class MacCommandPayloadDecoded   {
 
   /**
    * type of mac command (LoRa devices)
+   * 
    * @return txPowerEu
-  **/
-
+   **/
 
   public String getTxPowerEu() {
     return txPowerEu;
@@ -179,7 +186,6 @@ public class MacCommandPayloadDecoded   {
   public void setTxPowerEu(String txPowerEu) {
     this.txPowerEu = txPowerEu;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -208,7 +214,7 @@ public class MacCommandPayloadDecoded   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class MacCommandPayloadDecoded {\n");
-    
+
     sb.append("    channelMaskControl: ").append(toIndentedString(channelMaskControl)).append("\n");
     sb.append("    channels: ").append(toIndentedString(channels)).append("\n");
     sb.append("    dataRate: ").append(toIndentedString(dataRate)).append("\n");
@@ -231,4 +237,3 @@ public class MacCommandPayloadDecoded   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

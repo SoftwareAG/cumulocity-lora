@@ -2,8 +2,6 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -98,8 +96,6 @@ public class RoutingHttp {
 	 * 
 	 * @return headers
 	 **/
-
-	@Valid
 
 	public Headers getHeaders() {
 		return headers;

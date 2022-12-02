@@ -4,19 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Mac command. 
+ * Mac command.
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class MacCommand   {
+public class MacCommand {
   @JsonProperty("type")
   private String type = null;
 
@@ -24,7 +22,6 @@ public class MacCommand   {
   private String payload = null;
 
   @JsonProperty("payload_decoded")
-  @Valid
   private List<MacCommandPayloadDecoded> payloadDecoded = null;
 
   public MacCommand type(String type) {
@@ -33,10 +30,11 @@ public class MacCommand   {
   }
 
   /**
-   * type of mac command (LoRa devices). Requests the end-device to change data rate, transmit power, repetition rate or channel.
+   * type of mac command (LoRa devices). Requests the end-device to change data
+   * rate, transmit power, repetition rate or channel.
+   * 
    * @return type
-  **/
-
+   **/
 
   public String getType() {
     return type;
@@ -53,9 +51,9 @@ public class MacCommand   {
 
   /**
    * payload
+   * 
    * @return payload
-  **/
-
+   **/
 
   public String getPayload() {
     return payload;
@@ -80,10 +78,9 @@ public class MacCommand   {
 
   /**
    * decoded payload values
+   * 
    * @return payloadDecoded
-  **/
-
-  @Valid
+   **/
 
   public List<MacCommandPayloadDecoded> getPayloadDecoded() {
     return payloadDecoded;
@@ -92,7 +89,6 @@ public class MacCommand   {
   public void setPayloadDecoded(List<MacCommandPayloadDecoded> payloadDecoded) {
     this.payloadDecoded = payloadDecoded;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -117,7 +113,7 @@ public class MacCommand   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class MacCommand {\n");
-    
+
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    payload: ").append(toIndentedString(payload)).append("\n");
     sb.append("    payloadDecoded: ").append(toIndentedString(payloadDecoded)).append("\n");
@@ -136,4 +132,3 @@ public class MacCommand   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

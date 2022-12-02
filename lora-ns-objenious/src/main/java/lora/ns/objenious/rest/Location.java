@@ -3,8 +3,6 @@ package lora.ns.objenious.rest;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -17,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class Location   {
+public class Location {
   @JsonProperty("timestamp")
   private OffsetDateTime timestamp = null;
 
@@ -32,15 +30,15 @@ public class Location   {
    */
   public enum GeolocationTypeEnum {
     NONE("none"),
-    
+
     FIXED("fixed"),
-    
+
     NETWORK("network"),
-    
+
     DEVICE("device"),
-    
+
     TDOA("tdoa"),
-    
+
     ZONE("zone");
 
     private String value;
@@ -85,10 +83,9 @@ public class Location   {
 
   /**
    * Date of location
+   * 
    * @return timestamp
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getTimestamp() {
     return timestamp;
@@ -105,9 +102,9 @@ public class Location   {
 
   /**
    * Device latitude
+   * 
    * @return latitude
-  **/
-
+   **/
 
   public Double getLatitude() {
     return latitude;
@@ -124,9 +121,9 @@ public class Location   {
 
   /**
    * Device longitude
+   * 
    * @return longitude
-  **/
-
+   **/
 
   public Double getLongitude() {
     return longitude;
@@ -143,9 +140,9 @@ public class Location   {
 
   /**
    * Geolocation type
+   * 
    * @return geolocationType
-  **/
-
+   **/
 
   public GeolocationTypeEnum getGeolocationType() {
     return geolocationType;
@@ -162,9 +159,9 @@ public class Location   {
 
   /**
    * Geolocation precision (in meters)
+   * 
    * @return geolocationPrecision
-  **/
-
+   **/
 
   public Integer getGeolocationPrecision() {
     return geolocationPrecision;
@@ -181,9 +178,9 @@ public class Location   {
 
   /**
    * City name
+   * 
    * @return cityName
-  **/
-
+   **/
 
   public String getCityName() {
     return cityName;
@@ -200,9 +197,9 @@ public class Location   {
 
   /**
    * City code
+   * 
    * @return cityCode
-  **/
-
+   **/
 
   public Integer getCityCode() {
     return cityCode;
@@ -211,7 +208,6 @@ public class Location   {
   public void setCityCode(Integer cityCode) {
     this.cityCode = cityCode;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -240,7 +236,7 @@ public class Location   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Location {\n");
-    
+
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
     sb.append("    latitude: ").append(toIndentedString(latitude)).append("\n");
     sb.append("    longitude: ").append(toIndentedString(longitude)).append("\n");
@@ -263,4 +259,3 @@ public class Location   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

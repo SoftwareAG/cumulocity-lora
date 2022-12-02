@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -19,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class ZoneUpdate   {
+public class ZoneUpdate {
   @JsonProperty("name")
   private String name = null;
 
@@ -42,11 +40,15 @@ public class ZoneUpdate   {
   private BigDecimal radius = null;
 
   /**
-   * If set to \"gateway\", the zone will be defined by a list of gateways, and the geo polygon will be ignored. If set to \"geo\", it will be defined by a center and a radius (converted to a polygon).  A device will be considered inside a \"gateway\" zone when it will be received by one or more of its gateways (or the zone with the most gateways if multiple zones are eligible). 
+   * If set to \"gateway\", the zone will be defined by a list of gateways, and
+   * the geo polygon will be ignored. If set to \"geo\", it will be defined by a
+   * center and a radius (converted to a polygon). A device will be considered
+   * inside a \"gateway\" zone when it will be received by one or more of its
+   * gateways (or the zone with the most gateways if multiple zones are eligible).
    */
   public enum ZoneTypeEnum {
     GEO("geo"),
-    
+
     GATEWAY("gateway");
 
     private String value;
@@ -79,7 +81,6 @@ public class ZoneUpdate   {
   private String zoneColor = null;
 
   @JsonProperty("gateways")
-  @Valid
   private List<String> gateways = null;
 
   public ZoneUpdate name(String name) {
@@ -89,9 +90,9 @@ public class ZoneUpdate   {
 
   /**
    * Zone name
+   * 
    * @return name
-  **/
-
+   **/
 
   public String getName() {
     return name;
@@ -108,9 +109,9 @@ public class ZoneUpdate   {
 
   /**
    * Zone type
+   * 
    * @return type
-  **/
-
+   **/
 
   public String getType() {
     return type;
@@ -127,9 +128,9 @@ public class ZoneUpdate   {
 
   /**
    * Zone description
+   * 
    * @return description
-  **/
-
+   **/
 
   public String getDescription() {
     return description;
@@ -146,9 +147,9 @@ public class ZoneUpdate   {
 
   /**
    * Group identifier
+   * 
    * @return groupId
-  **/
-
+   **/
 
   public Integer getGroupId() {
     return groupId;
@@ -165,10 +166,9 @@ public class ZoneUpdate   {
 
   /**
    * Latitude of the zone's center
+   * 
    * @return lat
-  **/
-
-  @Valid
+   **/
 
   public BigDecimal getLat() {
     return lat;
@@ -185,10 +185,9 @@ public class ZoneUpdate   {
 
   /**
    * Longitude of the zone's center
+   * 
    * @return lng
-  **/
-
-  @Valid
+   **/
 
   public BigDecimal getLng() {
     return lng;
@@ -205,10 +204,9 @@ public class ZoneUpdate   {
 
   /**
    * The radius (in meters) to define the zone around the latitude and longitude
+   * 
    * @return radius
-  **/
-
-  @Valid
+   **/
 
   public BigDecimal getRadius() {
     return radius;
@@ -224,10 +222,14 @@ public class ZoneUpdate   {
   }
 
   /**
-   * If set to \"gateway\", the zone will be defined by a list of gateways, and the geo polygon will be ignored. If set to \"geo\", it will be defined by a center and a radius (converted to a polygon).  A device will be considered inside a \"gateway\" zone when it will be received by one or more of its gateways (or the zone with the most gateways if multiple zones are eligible). 
+   * If set to \"gateway\", the zone will be defined by a list of gateways, and
+   * the geo polygon will be ignored. If set to \"geo\", it will be defined by a
+   * center and a radius (converted to a polygon). A device will be considered
+   * inside a \"gateway\" zone when it will be received by one or more of its
+   * gateways (or the zone with the most gateways if multiple zones are eligible).
+   * 
    * @return zoneType
-  **/
-
+   **/
 
   public ZoneTypeEnum getZoneType() {
     return zoneType;
@@ -243,10 +245,10 @@ public class ZoneUpdate   {
   }
 
   /**
-   * The hexadecimal color of the zone if needed. Example: #0000ff 
+   * The hexadecimal color of the zone if needed. Example: #0000ff
+   * 
    * @return zoneColor
-  **/
-
+   **/
 
   public String getZoneColor() {
     return zoneColor;
@@ -271,9 +273,9 @@ public class ZoneUpdate   {
 
   /**
    * The list of gateways defining the zone.
+   * 
    * @return gateways
-  **/
-
+   **/
 
   public List<String> getGateways() {
     return gateways;
@@ -282,7 +284,6 @@ public class ZoneUpdate   {
   public void setGateways(List<String> gateways) {
     this.gateways = gateways;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -314,7 +315,7 @@ public class ZoneUpdate   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ZoneUpdate {\n");
-    
+
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
@@ -340,4 +341,3 @@ public class ZoneUpdate   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

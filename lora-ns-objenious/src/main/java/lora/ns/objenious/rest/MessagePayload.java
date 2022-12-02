@@ -3,8 +3,6 @@ package lora.ns.objenious.rest;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class MessagePayload   {
+public class MessagePayload {
   @JsonProperty("timestamp")
   private OffsetDateTime timestamp = null;
 
@@ -29,10 +27,9 @@ public class MessagePayload   {
 
   /**
    * Date of measure
+   * 
    * @return timestamp
-  **/
-
-  @Valid
+   **/
 
   public OffsetDateTime getTimestamp() {
     return timestamp;
@@ -49,9 +46,9 @@ public class MessagePayload   {
 
   /**
    * values
+   * 
    * @return data
-  **/
-
+   **/
 
   public Object getData() {
     return data;
@@ -60,7 +57,6 @@ public class MessagePayload   {
   public void setData(Object data) {
     this.data = data;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -84,7 +80,7 @@ public class MessagePayload   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class MessagePayload {\n");
-    
+
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
     sb.append("    data: ").append(toIndentedString(data)).append("\n");
     sb.append("}");
@@ -102,4 +98,3 @@ public class MessagePayload   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

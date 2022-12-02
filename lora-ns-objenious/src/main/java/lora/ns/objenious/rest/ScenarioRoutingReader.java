@@ -2,14 +2,10 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * ScenarioRouting
@@ -17,13 +13,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ScenarioRoutingReader   {
+public class ScenarioRoutingReader {
   @JsonProperty("id")
   private Integer id = null;
 
   @JsonProperty("name")
   private String name = null;
-
 
   public ScenarioRoutingReader id(Integer id) {
     this.id = id;
@@ -32,9 +27,9 @@ public class ScenarioRoutingReader   {
 
   /**
    * Routing scenario identifier
+   * 
    * @return id
-  **/
-
+   **/
 
   public Integer getId() {
     return id;
@@ -51,9 +46,9 @@ public class ScenarioRoutingReader   {
 
   /**
    * Routing scenario name
+   * 
    * @return name
-  **/
-
+   **/
 
   public String getName() {
     return name;
@@ -85,7 +80,7 @@ public class ScenarioRoutingReader   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ScenarioRoutingReader {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
@@ -103,4 +98,3 @@ public class ScenarioRoutingReader   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

@@ -2,8 +2,6 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -17,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Device   {
+public class Device {
   @JsonProperty("id")
   private Long id = null;
 
@@ -41,17 +39,17 @@ public class Device   {
    */
   public enum StatusEnum {
     PROVISIONED("provisioned"),
-    
+
     JOINED("joined"),
-    
+
     ACTIVE("active"),
-    
+
     INACTIVE("inactive"),
-    
+
     ERROR("error"),
-    
+
     WARNING("warning"),
-    
+
     ALERT("alert");
 
     private String value;
@@ -93,9 +91,9 @@ public class Device   {
 
   /**
    * Device identifier
+   * 
    * @return id
-  **/
-
+   **/
 
   public Long getId() {
     return id;
@@ -112,9 +110,9 @@ public class Device   {
 
   /**
    * URL of ressource
+   * 
    * @return link
-  **/
-
+   **/
 
   public String getLink() {
     return link;
@@ -131,9 +129,9 @@ public class Device   {
 
   /**
    * Device name
+   * 
    * @return label
-  **/
-
+   **/
 
   public String getLabel() {
     return label;
@@ -150,10 +148,9 @@ public class Device   {
 
   /**
    * Get group
+   * 
    * @return group
-  **/
-
-  @Valid
+   **/
 
   public Ref getGroup() {
     return group;
@@ -170,10 +167,9 @@ public class Device   {
 
   /**
    * Get profile
+   * 
    * @return profile
-  **/
-
-  @Valid
+   **/
 
   public Ref getProfile() {
     return profile;
@@ -190,10 +186,9 @@ public class Device   {
 
   /**
    * Get properties
+   * 
    * @return properties
-  **/
-
-  @Valid
+   **/
 
   public Properties getProperties() {
     return properties;
@@ -210,9 +205,9 @@ public class Device   {
 
   /**
    * The device status
+   * 
    * @return status
-  **/
-
+   **/
 
   public StatusEnum getStatus() {
     return status;
@@ -229,9 +224,9 @@ public class Device   {
 
   /**
    * If set to true, the device is enabled
+   * 
    * @return enabled
-  **/
-
+   **/
 
   public Boolean isEnabled() {
     return enabled;
@@ -248,9 +243,9 @@ public class Device   {
 
   /**
    * If set to true, the device is recycled
+   * 
    * @return recycled
-  **/
-
+   **/
 
   public Boolean isRecycled() {
     return recycled;
@@ -259,7 +254,6 @@ public class Device   {
   public void setRecycled(Boolean recycled) {
     this.recycled = recycled;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -290,7 +284,7 @@ public class Device   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Device {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    link: ").append(toIndentedString(link)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
@@ -315,4 +309,3 @@ public class Device   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

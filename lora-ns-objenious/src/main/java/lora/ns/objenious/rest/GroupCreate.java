@@ -2,8 +2,6 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class GroupCreate   {
+public class GroupCreate {
   @JsonProperty("name")
   private String name = null;
 
@@ -28,10 +26,9 @@ public class GroupCreate   {
 
   /**
    * Group name
+   * 
    * @return name
-  **/
-  @NotNull
-
+   **/
 
   public String getName() {
     return name;
@@ -48,10 +45,9 @@ public class GroupCreate   {
 
   /**
    * Parent group identifier
+   * 
    * @return parentGroupId
-  **/
-  @NotNull
-
+   **/
 
   public Integer getParentGroupId() {
     return parentGroupId;
@@ -60,7 +56,6 @@ public class GroupCreate   {
   public void setParentGroupId(Integer parentGroupId) {
     this.parentGroupId = parentGroupId;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -84,7 +79,7 @@ public class GroupCreate   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class GroupCreate {\n");
-    
+
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    parentGroupId: ").append(toIndentedString(parentGroupId)).append("\n");
     sb.append("}");
@@ -102,4 +97,3 @@ public class GroupCreate   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

@@ -3,8 +3,6 @@ package lora.ns.objenious.rest;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 
-public class DeviceUpdate   {
+public class DeviceUpdate {
   @JsonProperty("label")
   private String label = null;
 
@@ -44,9 +42,9 @@ public class DeviceUpdate   {
 
   /**
    * Device name
+   * 
    * @return label
-  **/
-
+   **/
 
   public String getLabel() {
     return label;
@@ -63,9 +61,9 @@ public class DeviceUpdate   {
 
   /**
    * Group identifier
+   * 
    * @return groupId
-  **/
-
+   **/
 
   public Integer getGroupId() {
     return groupId;
@@ -82,9 +80,9 @@ public class DeviceUpdate   {
 
   /**
    * Device profile identifier
+   * 
    * @return profileId
-  **/
-
+   **/
 
   public Integer getProfileId() {
     return profileId;
@@ -101,10 +99,9 @@ public class DeviceUpdate   {
 
   /**
    * Latitude for stationary devices
+   * 
    * @return lat
-  **/
-
-  @Valid
+   **/
 
   public BigDecimal getLat() {
     return lat;
@@ -121,10 +118,9 @@ public class DeviceUpdate   {
 
   /**
    * Longitude for stationary devices
+   * 
    * @return lng
-  **/
-
-  @Valid
+   **/
 
   public BigDecimal getLng() {
     return lng;
@@ -140,10 +136,11 @@ public class DeviceUpdate   {
   }
 
   /**
-   * Application key in hexadecimal (optional).  **WARNING:** If set, the device must send a new join request.
+   * Application key in hexadecimal (optional). **WARNING:** If set, the device
+   * must send a new join request.
+   * 
    * @return appkey
-  **/
-
+   **/
 
   public String getAppkey() {
     return appkey;
@@ -160,10 +157,9 @@ public class DeviceUpdate   {
 
   /**
    * Get properties
+   * 
    * @return properties
-  **/
-
-  @Valid
+   **/
 
   public PropertiesCreate getProperties() {
     return properties;
@@ -172,7 +168,6 @@ public class DeviceUpdate   {
   public void setProperties(PropertiesCreate properties) {
     this.properties = properties;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -201,7 +196,7 @@ public class DeviceUpdate   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class DeviceUpdate {\n");
-    
+
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
     sb.append("    profileId: ").append(toIndentedString(profileId)).append("\n");
@@ -224,4 +219,3 @@ public class DeviceUpdate   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

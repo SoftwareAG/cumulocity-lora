@@ -2,8 +2,6 @@ package lora.ns.objenious.rest;
 
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -17,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-13T14:17:01.165Z")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ScenarioRouting   {
+public class ScenarioRouting {
   @JsonProperty("id")
   private Integer id = null;
 
@@ -41,9 +39,9 @@ public class ScenarioRouting   {
    */
   public enum MessageTypeEnum {
     ALL("all"),
-    
+
     UPLINK("uplink"),
-    
+
     DOWNLINK("downlink");
 
     private String value;
@@ -77,7 +75,7 @@ public class ScenarioRouting   {
    */
   public enum FormatTypeEnum {
     MESSAGES("messages"),
-    
+
     VALUES("values");
 
     private String value;
@@ -131,9 +129,9 @@ public class ScenarioRouting   {
 
   /**
    * Routing scenario identifier
+   * 
    * @return id
-  **/
-
+   **/
 
   public Integer getId() {
     return id;
@@ -150,9 +148,9 @@ public class ScenarioRouting   {
 
   /**
    * URL of ressource
+   * 
    * @return link
-  **/
-
+   **/
 
   public String getLink() {
     return link;
@@ -169,9 +167,9 @@ public class ScenarioRouting   {
 
   /**
    * Routing scenario name
+   * 
    * @return name
-  **/
-
+   **/
 
   public String getName() {
     return name;
@@ -188,10 +186,9 @@ public class ScenarioRouting   {
 
   /**
    * Get group
+   * 
    * @return group
-  **/
-
-  @Valid
+   **/
 
   public Ref getGroup() {
     return group;
@@ -208,10 +205,9 @@ public class ScenarioRouting   {
 
   /**
    * Get profile
+   * 
    * @return profile
-  **/
-
-  @Valid
+   **/
 
   public Ref getProfile() {
     return profile;
@@ -228,9 +224,9 @@ public class ScenarioRouting   {
 
   /**
    * If set to true, the scenario is active
+   * 
    * @return enabled
-  **/
-
+   **/
 
   public Boolean isEnabled() {
     return enabled;
@@ -247,9 +243,9 @@ public class ScenarioRouting   {
 
   /**
    * If set to \"all\", all messages are routed
+   * 
    * @return messageType
-  **/
-
+   **/
 
   public MessageTypeEnum getMessageType() {
     return messageType;
@@ -266,9 +262,9 @@ public class ScenarioRouting   {
 
   /**
    * Format of the payload send in the body of the request
+   * 
    * @return formatType
-  **/
-
+   **/
 
   public FormatTypeEnum getFormatType() {
     return formatType;
@@ -285,10 +281,9 @@ public class ScenarioRouting   {
 
   /**
    * Get http
+   * 
    * @return http
-  **/
-
-  @Valid
+   **/
 
   public RoutingHttp getHttp() {
     return http;
@@ -305,10 +300,9 @@ public class ScenarioRouting   {
 
   /**
    * Get azureIothub
+   * 
    * @return azureIothub
-  **/
-
-  @Valid
+   **/
 
   public RoutingAzureIotHub getAzureIothub() {
     return azureIothub;
@@ -325,10 +319,9 @@ public class ScenarioRouting   {
 
   /**
    * Get azureEventhub
+   * 
    * @return azureEventhub
-  **/
-
-  @Valid
+   **/
 
   public RoutingAzureEventHub getAzureEventhub() {
     return azureEventhub;
@@ -345,10 +338,9 @@ public class ScenarioRouting   {
 
   /**
    * Get googlePubsub
+   * 
    * @return googlePubsub
-  **/
-
-  @Valid
+   **/
 
   public RoutingGooglePubSub getGooglePubsub() {
     return googlePubsub;
@@ -365,10 +357,9 @@ public class ScenarioRouting   {
 
   /**
    * Get googleIotcore
+   * 
    * @return googleIotcore
-  **/
-
-  @Valid
+   **/
 
   public RoutingGoogleIotCore getGoogleIotcore() {
     return googleIotcore;
@@ -385,10 +376,9 @@ public class ScenarioRouting   {
 
   /**
    * Get awsIotcore
+   * 
    * @return awsIotcore
-  **/
-
-  @Valid
+   **/
 
   public RoutingAwsIotCore getAwsIotcore() {
     return awsIotcore;
@@ -397,7 +387,6 @@ public class ScenarioRouting   {
   public void setAwsIotcore(RoutingAwsIotCore awsIotcore) {
     this.awsIotcore = awsIotcore;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -426,14 +415,15 @@ public class ScenarioRouting   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, link, name, group, profile, enabled, messageType, formatType, http, azureIothub, azureEventhub, googlePubsub, googleIotcore, awsIotcore);
+    return Objects.hash(id, link, name, group, profile, enabled, messageType, formatType, http, azureIothub,
+        azureEventhub, googlePubsub, googleIotcore, awsIotcore);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ScenarioRouting {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    link: ").append(toIndentedString(link)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
@@ -463,4 +453,3 @@ public class ScenarioRouting   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-
