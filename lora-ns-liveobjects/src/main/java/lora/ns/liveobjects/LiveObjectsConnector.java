@@ -39,12 +39,13 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 	public LiveObjectsConnector(ManagedObjectRepresentation instance) {
 		super(instance);
 	}
-    @Override
-	protected void init() {
-        // Configure LNS API access here
-    }
 
-    @Override
+	@Override
+	protected void init() {
+		// Configure LNS API access here
+	}
+
+	@Override
 	public LNSResponse<List<EndDevice>> getDevices() {
 		return new LNSResponse<List<EndDevice>>().withOk(false).withMessage("Not implemented.");
 	}
@@ -52,7 +53,7 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 	@Override
 	public LNSResponse<EndDevice> getDevice(String devEui) {
 		return new LNSResponse<EndDevice>().withOk(false).withMessage("Not implemented.");
-    }
+	}
 
 	@Override
 	public LNSResponse<String> sendDownlink(DownlinkData operation) {
@@ -61,78 +62,88 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 
 	@Override
 	public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
-	public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
-		LNSResponse<List<String>> response = new LNSResponse<List<String>>().withOk(true);
-		String authorization = "Basic " + Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes());
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+		LNSResponse<Void> response = new LNSResponse<Void>().withOk(true);
+		String authorization = "Basic "
+				+ Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes());
 		try {
 			Response<ActionPolicy> result = service.createActionPolicy(new ActionPolicy()
-				.withId(null)
-				.withName("Cumulocity webhook for tenant " + tenant)
-				.withEnabled(true)
-				.withActions(new Actions()
-					.withHttpPush(new HttpPushAction()
-						.withWebhookUrl(url + "/uplink").withHeaders(Map.of("Authorization", authorization))))
-				.withTriggers(new ActionTriggers()
-					.withLoraNetwork(new LoraNetworkTrigger()
-						.withFilter(new LoraNetworkFilter()
-							.withMessageTypes(List.of(MessageType.UNCONFIRMED_DATA_UP, MessageType.CONFIRMED_DATA_UP)))))).execute();
+					.withId(null)
+					.withName("Cumulocity webhook for tenant " + tenant)
+					.withEnabled(true)
+					.withActions(new Actions()
+							.withHttpPush(new HttpPushAction()
+									.withWebhookUrl(url + "/uplink")
+									.withHeaders(Map.of("Authorization", authorization))))
+					.withTriggers(new ActionTriggers()
+							.withLoraNetwork(new LoraNetworkTrigger()
+									.withFilter(new LoraNetworkFilter()
+											.withMessageTypes(List.of(MessageType.UNCONFIRMED_DATA_UP,
+													MessageType.CONFIRMED_DATA_UP))))))
+					.execute();
 			if (!result.isSuccessful()) {
 				response.setOk(false);
 				response.setMessage(result.errorBody().string());
 			} else {
-				response.setResult(new ArrayList<>());
-				response.getResult().add(result.body().getId());
+				this.setProperty("uplinkRouteId", result.body().getId());
 				result = service.createActionPolicy(new ActionPolicy()
-				.withId(null)
-				.withName("Cumulocity webhook for tenant " + tenant)
-				.withEnabled(true)
-				.withActions(new Actions()
-					.withHttpPush(new HttpPushAction()
-						.withWebhookUrl(url + "/downlink").withHeaders(Map.of("Authorization", authorization))))
-				.withTriggers(new ActionTriggers()
-					.withLoraNetwork(new LoraNetworkTrigger()
-						.withFilter(new LoraNetworkFilter()
-							.withMessageTypes(List.of(MessageType.CONFIRMED_DATA_DOWN, MessageType.UNCONFIRMED_DATA_DOWN)))))).execute();
+						.withId(null)
+						.withName("Cumulocity webhook for tenant " + tenant)
+						.withEnabled(true)
+						.withActions(new Actions()
+								.withHttpPush(new HttpPushAction()
+										.withWebhookUrl(url + "/downlink")
+										.withHeaders(Map.of("Authorization", authorization))))
+						.withTriggers(new ActionTriggers()
+								.withLoraNetwork(new LoraNetworkTrigger()
+										.withFilter(new LoraNetworkFilter()
+												.withMessageTypes(List.of(MessageType.CONFIRMED_DATA_DOWN,
+														MessageType.UNCONFIRMED_DATA_DOWN))))))
+						.execute();
 				if (!result.isSuccessful()) {
 					response.setOk(false);
 					response.setMessage(result.errorBody().string());
 				} else {
-					response.getResult().add(result.body().getId());
+					this.setProperty("downlinkRouteId", result.body().getId());
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			response.withOk(false).withMessage(e.getMessage());
 		}
-        return response;
+		return response;
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	public LNSResponse<Void> removeRoutings() {
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
 	public LNSResponse<Void> deprovisionDevice(String deveui) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
 	public LNSResponse<List<Gateway>> getGateways() {
-        return new LNSResponse<List<Gateway>>().withOk(false).withMessage("Not implemented.");
+		return new LNSResponse<List<Gateway>>().withOk(false).withMessage("Not implemented.");
 	}
 
-    @Override
+	@Override
 	public LNSResponse<Void> provisionGateway(GatewayProvisioning gatewayProvisioning) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
-    @Override
+	@Override
 	public LNSResponse<Void> deprovisionGateway(String id) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	}
+
+	public boolean hasGatewayManagementCapability() {
+		return false;
 	}
 }

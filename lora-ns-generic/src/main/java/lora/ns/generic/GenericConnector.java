@@ -24,12 +24,13 @@ public class GenericConnector extends LNSAbstractConnector {
 	public GenericConnector(ManagedObjectRepresentation instance) {
 		super(instance);
 	}
-    @Override
-	protected void init() {
-        // Configure LNS API access here
-    }
 
-    @Override
+	@Override
+	protected void init() {
+		// Configure LNS API access here
+	}
+
+	@Override
 	public LNSResponse<List<EndDevice>> getDevices() {
 		return new LNSResponse<List<EndDevice>>().withOk(false).withMessage("Not implemented.");
 	}
@@ -37,7 +38,7 @@ public class GenericConnector extends LNSAbstractConnector {
 	@Override
 	public LNSResponse<EndDevice> getDevice(String devEui) {
 		return new LNSResponse<EndDevice>().withOk(false).withMessage("Not implemented.");
-    }
+	}
 
 	@Override
 	public LNSResponse<String> sendDownlink(DownlinkData operation) {
@@ -46,36 +47,40 @@ public class GenericConnector extends LNSAbstractConnector {
 
 	@Override
 	public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
-	public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
-        return new LNSResponse<List<String>>().withOk(false).withMessage("Not implemented.");
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	public LNSResponse<Void> removeRoutings() {
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
 	public LNSResponse<Void> deprovisionDevice(String deveui) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
 	@Override
 	public LNSResponse<List<Gateway>> getGateways() {
-        return new LNSResponse<List<Gateway>>().withOk(false).withMessage("Not implemented.");
+		return new LNSResponse<List<Gateway>>().withOk(false).withMessage("Not implemented.");
 	}
 
-    @Override
+	@Override
 	public LNSResponse<Void> provisionGateway(GatewayProvisioning gatewayProvisioning) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
 	}
 
-    @Override
+	@Override
 	public LNSResponse<Void> deprovisionGateway(String id) {
-        return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	}
+
+	public boolean hasGatewayManagementCapability() {
+		return false;
 	}
 }

@@ -1,54 +1,65 @@
-import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule as NgRouterModule } from '@angular/router';
-import { UpgradeModule as NgUpgradeModule } from '@angular/upgrade/static';
-import { CoreModule, HOOK_NAVIGATOR_NODES, HOOK_ROUTE, PluginsModule, RouterModule, ViewContext, DynamicFormsModule } from '@c8y/ngx-components';
-import { AssetsNavigatorModule } from '@c8y/ngx-components/assets-navigator';
-import { SubAssetsModule } from '@c8y/ngx-components/sub-assets';
-import { ChildDevicesModule } from '@c8y/ngx-components/child-devices';
-import { DeviceGridExampleModule } from '@c8y/ngx-components/device-grid-example';
-import { DeviceProfileModule } from '@c8y/ngx-components/device-profile';
-import { DeviceShellModule } from '@c8y/ngx-components/device-shell';
-import { OperationsModule } from '@c8y/ngx-components/operations';
-import { ImpactProtocolModule } from '@c8y/ngx-components/protocol-impact';
-import { OpcuaProtocolModule } from '@c8y/ngx-components/protocol-opcua';
-import { RepositoryModule } from '@c8y/ngx-components/repository';
-import { ServicesModule } from '@c8y/ngx-components/services';
-import { TrustedCertificatesModule } from '@c8y/ngx-components/trusted-certificates';
+import { NgModule } from "@angular/core";
+import { ReactiveFormsModule } from "@angular/forms";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { RouterModule as NgRouterModule } from "@angular/router";
+import { UpgradeModule as NgUpgradeModule } from "@angular/upgrade/static";
+import {
+  CoreModule,
+  HOOK_NAVIGATOR_NODES,
+  HOOK_ROUTE,
+  PluginsModule,
+  RouterModule,
+  ViewContext,
+  DynamicFormsModule,
+} from "@c8y/ngx-components";
+import { AssetsNavigatorModule } from "@c8y/ngx-components/assets-navigator";
+import { SubAssetsModule } from "@c8y/ngx-components/sub-assets";
+import { ChildDevicesModule } from "@c8y/ngx-components/child-devices";
+import { DeviceGridExampleModule } from "@c8y/ngx-components/device-grid-example";
+import { DeviceProfileModule } from "@c8y/ngx-components/device-profile";
+import { DeviceShellModule } from "@c8y/ngx-components/device-shell";
+import { OperationsModule } from "@c8y/ngx-components/operations";
+import { ImpactProtocolModule } from "@c8y/ngx-components/protocol-impact";
+import { OpcuaProtocolModule } from "@c8y/ngx-components/protocol-opcua";
+import { RepositoryModule } from "@c8y/ngx-components/repository";
+import { ServicesModule } from "@c8y/ngx-components/services";
+import { TrustedCertificatesModule } from "@c8y/ngx-components/trusted-certificates";
 import {
   DashboardUpgradeModule,
   HybridAppModule,
   UpgradeModule,
-  UPGRADE_ROUTES
-} from '@c8y/ngx-components/upgrade';
-import { BinaryFileDownloadModule } from '@c8y/ngx-components/binary-file-download';
-import { SearchModule } from '@c8y/ngx-components/search';
-import { LpwanProtocolModule } from '@c8y/ngx-components/protocol-lpwan';
+  UPGRADE_ROUTES,
+} from "@c8y/ngx-components/upgrade";
+import { BinaryFileDownloadModule } from "@c8y/ngx-components/binary-file-download";
+import { SearchModule } from "@c8y/ngx-components/search";
+import { LpwanProtocolModule } from "@c8y/ngx-components/protocol-lpwan";
 import {
   DeviceManagementHomeDashboardModule,
-  DeviceInfoDashboardModule
-} from '@c8y/ngx-components/context-dashboard';
-import { DiagnosticsModule } from '@c8y/ngx-components/diagnostics';
+  DeviceInfoDashboardModule,
+} from "@c8y/ngx-components/context-dashboard";
+import { DiagnosticsModule } from "@c8y/ngx-components/diagnostics";
 
-import { FormlyModule } from '@ngx-formly/core';
-import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { PopoverModule } from 'ngx-bootstrap/popover';
-import { TimepickerModule } from 'ngx-bootstrap/timepicker';
-import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
-import { LoraNavigationFactory } from './factories/Navigation';
-import { LoRaConfigComponent } from './src/config/config.component';
-import { DevicesComponent } from './src/devices/devices.component';
-import { LoraGuard } from './src/devices/lora.guard';
-import { PanelWrapperComponent } from './src/devices/panel-wrapper.component';
-import { GroupsComponent } from './src/groups/groups.component';
-import { LoraCodecsComponent } from './src/onboarding/codecs/codecs.component';
-import { RepeatTypeComponent } from './src/onboarding/codecs/repeat-section.type';
-import { LoraDevicesComponent, PropertyPipe } from './src/onboarding/devices/devices.component';
-import { LoraGatewaysComponent } from './src/onboarding/gateways/gateways.component';
-import { LNSEditComponent } from './src/onboarding/lns/lns-edit.component';
-import { LNSComponent } from './src/onboarding/lns/lns.component';
+import { FormlyModule } from "@ngx-formly/core";
+import { BsDatepickerModule } from "ngx-bootstrap/datepicker";
+import { ModalModule } from "ngx-bootstrap/modal";
+import { PopoverModule } from "ngx-bootstrap/popover";
+import { TimepickerModule } from "ngx-bootstrap/timepicker";
+import { MonacoEditorModule, NgxMonacoEditorConfig } from "ngx-monaco-editor";
+import { LoraNavigationFactory } from "./factories/Navigation";
+import { LoRaConfigComponent } from "./src/config/config.component";
+import { DevicesComponent } from "./src/devices/devices.component";
+import { LoraGuard } from "./src/devices/lora.guard";
+import { PanelWrapperComponent } from "./src/devices/panel-wrapper.component";
+import { GroupsComponent } from "./src/groups/groups.component";
+import { LoraCodecsComponent } from "./src/onboarding/codecs/codecs.component";
+import { RepeatTypeComponent } from "./src/onboarding/codecs/repeat-section.type";
+import {
+  LoraDevicesComponent,
+  PropertyPipe,
+} from "./src/onboarding/devices/devices.component";
+import { LoraGatewaysComponent } from "./src/onboarding/gateways/gateways.component";
+import { LNSEditComponent } from "./src/onboarding/lns/lns-edit.component";
+import { LNSComponent } from "./src/onboarding/lns/lns.component";
 
 const monacoConfig: NgxMonacoEditorConfig = {
   //baseUrl: 'app-name/assets', // configure base path for monaco editor default: './assets'
@@ -77,7 +88,7 @@ class DownlinkData {
   payload: string;
 }
 `);
-monaco.languages.typescript.javascriptDefaults.addExtraLib(`// Buffer class
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(`// Buffer class
 type BufferEncoding = "ascii" | "utf8" | "utf16le" | "ucs2" | "base64" | "latin1" | "binary" | "hex";
 interface Buffer extends Uint8Array {
     write(string: string, offset?: number, length?: number, encoding?: string): number;
@@ -273,48 +284,64 @@ declare var Buffer: {
     poolSize: number;
 };
 `);
-}
+  },
 };
 
 @NgModule({
-  declarations: [GroupsComponent, DevicesComponent, LoraDevicesComponent, LoraGatewaysComponent, LNSComponent, LNSEditComponent, LoraCodecsComponent, LoRaConfigComponent, PropertyPipe, RepeatTypeComponent, PanelWrapperComponent],
+  declarations: [
+    GroupsComponent,
+    DevicesComponent,
+    LoraDevicesComponent,
+    LoraGatewaysComponent,
+    LNSComponent,
+    LNSEditComponent,
+    LoraCodecsComponent,
+    LoRaConfigComponent,
+    PropertyPipe,
+    RepeatTypeComponent,
+    PanelWrapperComponent,
+  ],
   entryComponents: [GroupsComponent, DevicesComponent],
   imports: [
     // Upgrade module must be the first
     UpgradeModule,
     BrowserAnimationsModule,
     RouterModule.forRoot(),
-    NgRouterModule.forRoot([
-      {
-        path: 'lora-device',
-        component: LoraDevicesComponent
-      },
-      {
-        path: 'lora-gateway',
-        component: LoraGatewaysComponent
-      },
-      {
-        path: 'lns',
-        component: LNSComponent
-      },
-      {
-        path: 'lns/:lnsid',
-        component: LNSEditComponent
-      },
-      {
-        path: 'codecs',
-        component: LoraCodecsComponent
-      },
-      {
-        path: 'config',
-        component: LoRaConfigComponent
-      },
-      { path: 'health', component: GroupsComponent },
-      { path: 'lora_command', component: DevicesComponent },
-      ...UPGRADE_ROUTES], { enableTracing: false, useHash: true }),
+    NgRouterModule.forRoot(
+      [
+        {
+          path: "lora-device",
+          component: LoraDevicesComponent,
+        },
+        {
+          path: "lora-gateway",
+          component: LoraGatewaysComponent,
+        },
+        {
+          path: "lns",
+          component: LNSComponent,
+        },
+        {
+          path: "lns/:lnsid",
+          component: LNSEditComponent,
+        },
+        {
+          path: "codecs",
+          component: LoraCodecsComponent,
+        },
+        {
+          path: "config",
+          component: LoRaConfigComponent,
+        },
+        { path: "health", component: GroupsComponent },
+        { path: "lora_command", component: DevicesComponent },
+        ...UPGRADE_ROUTES,
+      ],
+      { enableTracing: false, useHash: true }
+    ),
     CoreModule.forRoot(),
     AssetsNavigatorModule.config({
-      smartGroups: true
+      smartGroups: true,
     }),
     OperationsModule,
     OpcuaProtocolModule,
@@ -343,45 +370,55 @@ declare var Buffer: {
     ReactiveFormsModule,
     DynamicFormsModule,
     FormlyModule.forRoot({
-      types: [
-        { name: 'repeat', component: RepeatTypeComponent },
-      ],
-      wrappers: [
-        { name: 'panel', component: PanelWrapperComponent },
-      ],    })
+      types: [{ name: "repeat", component: RepeatTypeComponent }],
+      wrappers: [{ name: "panel", component: PanelWrapperComponent }],
+    }),
   ],
   providers: [
     LoraGuard,
-    { provide: HOOK_NAVIGATOR_NODES, useClass: LoraNavigationFactory, multi: true },
     {
-      provide: HOOK_ROUTE,          // 1.
-      useValue: [{                       // 2.
-        context: ViewContext.Group,     // 3.
-        path: 'health',                   // 4.
-        component: GroupsComponent,       // 5.
-        label: 'Health',                  // 6.
-        priority: 100,
-        icon: 'heart'
-      }],
-      multi: true
-    }, {
-      provide: HOOK_ROUTE,          // 1.
-      useValue: [{                       // 2.
-        context: ViewContext.Device,     // 3.
-        path: 'lora_command',                   // 4.
-        component: DevicesComponent,       // 5.
-        label: 'LoRa',                  // 6.
-        priority: 100,
-        icon: 'c8y-energy',
-        canActivate: [LoraGuard]
-      }],
-      multi: true
-    }
-  ]
+      provide: HOOK_NAVIGATOR_NODES,
+      useClass: LoraNavigationFactory,
+      multi: true,
+    },
+    {
+      provide: HOOK_ROUTE, // 1.
+      useValue: [
+        {
+          // 2.
+          context: ViewContext.Group, // 3.
+          path: "health", // 4.
+          component: GroupsComponent, // 5.
+          label: "Health", // 6.
+          priority: 100,
+          icon: "heart",
+        },
+      ],
+      multi: true,
+    },
+    {
+      provide: HOOK_ROUTE, // 1.
+      useValue: [
+        {
+          // 2.
+          context: ViewContext.Device, // 3.
+          path: "lora_command", // 4.
+          component: DevicesComponent, // 5.
+          label: "LoRa", // 6.
+          priority: 100,
+          icon: "c8y-energy",
+          canActivate: [LoraGuard],
+        },
+      ],
+      multi: true,
+    },
+  ],
 })
 export class AppModule extends HybridAppModule {
   constructor(protected upgrade: NgUpgradeModule) {
     super();
-    window['c8y'].collections.properties['managed-objects'].properties.c8y_LpwanDevice.properties.provisioned.type = 'boolean';
+    window["c8y"].collections.properties[
+      "managed-objects"
+    ].properties.c8y_LpwanDevice.properties.provisioned.type = "boolean";
   }
 }

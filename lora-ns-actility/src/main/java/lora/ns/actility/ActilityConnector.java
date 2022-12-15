@@ -5,13 +5,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Random;
 
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
-
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import c8y.ConnectionState;
 import lombok.extern.slf4j.Slf4j;
@@ -115,7 +116,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	public LNSResponse<List<EndDevice>> getDevices() {
-		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true).withResult(new ArrayList<EndDevice>());
+		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true)
+				.withResult(new ArrayList<EndDevice>());
 
 		return result;
 	}
@@ -151,7 +153,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 			securityParams.setAsId("cumulocity");
 			securityParams.setAsKey(downlinkAsKey);
 			message.setSecurityParams(securityParams);
-			Response<DownlinkMessage> response = actilityCoreService.sendDownlink(operation.getDevEui(), message).execute();
+			Response<DownlinkMessage> response = actilityCoreService.sendDownlink(operation.getDevEui(), message)
+					.execute();
 			log.info("Response from Thingpark was {}", response.code());
 			result.withOk(true).withResult(String.valueOf(downlinkCounter));
 		} catch (Exception e) {
@@ -191,8 +194,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
-		LNSResponse<List<String>> result = new LNSResponse<List<String>>().withOk(true);
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		log.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
 		String connectionId = null;
 
@@ -268,8 +271,11 @@ public class ActilityConnector extends LNSAbstractConnector {
 		return result;
 	}
 
+	@Autowired
+	private MicroserviceSubscriptionsService subscriptionsService;
+
 	@Override
-	public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
+	public LNSResponse<Void> removeRoutings() {
 		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		try {
 			Response<List<DeviceCreate>> response = actilityCoreService.getDevices().execute();
@@ -294,7 +300,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 			if (response.isSuccessful()) {
 				response.body().forEach(connection -> {
 					log.info("Found Connection {}", connection.getName());
-					if (connection.getName().equals(tenant + "-" + this.getId())) {
+					if (connection.getName().equals(subscriptionsService.getTenant() + "-" + this.getId())) {
 						try {
 							actilityCoreService.deleteConnection(connection.getId()).execute();
 						} catch (Exception e) {
@@ -335,7 +341,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 		try {
 			Response<List<BaseStation>> response = actilityCoreService.getBaseStations().execute();
 			if (response.isSuccessful()) {
-				for (BaseStation baseStation: response.body()) {
+				for (BaseStation baseStation : response.body()) {
 					Response<BaseStation> r = actilityCoreService.getBaseStation(baseStation.getRef()).execute();
 					if (r.isSuccessful()) {
 						baseStation = r.body();
@@ -353,22 +359,29 @@ public class ActilityConnector extends LNSAbstractConnector {
 						}
 						if (baseStation.getStatistics() != null) {
 							C8YData data = new C8YData();
-							if (baseStation.getStatistics().getConnectionState() == ConnectionStateEnum.CNX && baseStation.getStatistics().getHealthState() == HealthStateEnum.ACTIVE) {
+							if (baseStation.getStatistics().getConnectionState() == ConnectionStateEnum.CNX
+									&& baseStation.getStatistics().getHealthState() == HealthStateEnum.ACTIVE) {
 								g.setStatus(ConnectionState.AVAILABLE);
 							} else {
 								g.setStatus(ConnectionState.UNAVAILABLE);
 							}
 							if (baseStation.getStatistics().getTemperature() != null) {
-								data.addMeasurement(null, "Temperature", "T", "°C", BigDecimal.valueOf(baseStation.getStatistics().getTemperature()), new DateTime());
+								data.addMeasurement(null, "Temperature", "T", "°C",
+										BigDecimal.valueOf(baseStation.getStatistics().getTemperature()),
+										new DateTime());
 							}
 							if (baseStation.getStatistics().getCpUUsage() != null) {
-								data.addMeasurement(null, "CPU", "Usage", "%", BigDecimal.valueOf(baseStation.getStatistics().getCpUUsage()), new DateTime());
+								data.addMeasurement(null, "CPU", "Usage", "%",
+										BigDecimal.valueOf(baseStation.getStatistics().getCpUUsage()), new DateTime());
 							}
 							if (baseStation.getStatistics().getRaMUsage() != null) {
-								data.addMeasurement(null, "RAM", "Usage", "%", BigDecimal.valueOf(baseStation.getStatistics().getRaMUsage()), new DateTime());
+								data.addMeasurement(null, "RAM", "Usage", "%",
+										BigDecimal.valueOf(baseStation.getStatistics().getRaMUsage()), new DateTime());
 							}
 							if (baseStation.getStatistics().getBatteryLevel() != null) {
-								data.addMeasurement(null, "Battery", "level", "%", BigDecimal.valueOf(baseStation.getStatistics().getBatteryLevel()), new DateTime());
+								data.addMeasurement(null, "Battery", "level", "%",
+										BigDecimal.valueOf(baseStation.getStatistics().getBatteryLevel()),
+										new DateTime());
 							}
 							g.setData(data);
 						}
@@ -416,7 +429,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 			if (gatewayProvisioning.getLng() != null) {
 				baseStation.setGeoLongitude(gatewayProvisioning.getLng().floatValue());
 			}
-			baseStation.setBaseStationProfileId(gatewayProvisioning.getAdditionalProperties().getProperty("gatewayProfile"));
+			baseStation.setBaseStationProfileId(
+					gatewayProvisioning.getAdditionalProperties().getProperty("gatewayProfile"));
 			baseStation.setRfRegionId(gatewayProvisioning.getAdditionalProperties().getProperty("rfRegion"));
 			Response<BaseStation> response = actilityCoreService.createBaseStation(baseStation).execute();
 			if (!response.isSuccessful()) {
@@ -453,7 +467,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 			if (response.isSuccessful()) {
 				result = response.body();
 			} else {
-				log.error("Error while retrieving the list of base station profiles: {}", response.errorBody().string());
+				log.error("Error while retrieving the list of base station profiles: {}",
+						response.errorBody().string());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -474,5 +489,9 @@ public class ActilityConnector extends LNSAbstractConnector {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	public boolean hasGatewayManagementCapability() {
+		return true;
 	}
 }

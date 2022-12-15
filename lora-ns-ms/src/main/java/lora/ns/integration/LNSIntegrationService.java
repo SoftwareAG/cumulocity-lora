@@ -19,6 +19,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.Trigger;
@@ -115,8 +117,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	@Autowired
 	private LNSGatewayManager lnsGatewayManager;
 
-    @Autowired
-    protected SpringTemplateEngine mMessageTemplateEngine;
+	@Autowired
+	protected SpringTemplateEngine mMessageTemplateEngine;
 
 	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<>();
 
@@ -147,17 +149,24 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		return mMessageTemplateEngine.process("payload.json", context);
 	}
 
+	@Autowired
+	private ApplicationContext applicationContext;
+
 	protected I getInstance(ManagedObjectRepresentation instance) {
 		@SuppressWarnings("unchecked")
 		Class<I> instanceType = (Class<I>) ((ParameterizedType) getClass().getGenericSuperclass())
 				.getActualTypeArguments()[0];
 		I result = null;
+		AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
 		try {
 			result = instanceType.getConstructor(instance.getClass()).newInstance(instance);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
+		beanFactory.autowireBean(result);
+		beanFactory.initializeBean(result, "connector-" + result.getId());
+
 		return result;
 	}
 
@@ -180,14 +189,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		for (ManagedObjectRepresentation mor : col.get(queryParam).allPages()) {
 			logger.info("Retrieved connector: {} of type {}", mor.getName(), mor.getProperty(LNS_TYPE));
 			LNSConnector instance = getInstance(mor);
-			Properties properties = new Properties();
-			for (OptionRepresentation option : tenantOptionApi.getAllOptionsForCategory(instance.getId())) {
-				properties.setProperty(option.getKey(), option.getValue());
-			}
-			instance.setProperties(properties);
-			if (mor.hasProperty("routeIds")) {
-				instance.getProperties().put("routeIds", mor.getProperty("routeIds"));
-			}
 			lnsConnectorManager.addConnector(instance);
 			lnsGatewayManager.upsertGateways(instance);
 			configureRoutings(instance.getId(), event.getCredentials());
@@ -242,7 +243,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	public LNSResponse<List<EndDevice>> getDevices(String lnsInstanceId) {
-		LNSResponse<List<EndDevice>> result = new LNSResponse<>("No connector found with id " + lnsInstanceId, false, null);
+		LNSResponse<List<EndDevice>> result = new LNSResponse<>("No connector found with id " + lnsInstanceId, false,
+				null);
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent()) {
 			result = connector.get().getDevices();
@@ -256,12 +258,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		logger.info("Connector URL is {}", url);
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent()) {
-			var response = connector.get().configureRoutings(url, subscriptionsService.getTenant(), credentials.getUsername(),
+			connector.get().configureRoutings(url, subscriptionsService.getTenant(),
+					credentials.getUsername(),
 					credentials.getPassword());
-			ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
-			mor.setId(GId.asGId(connector.get().getId()));
-			mor.setProperty("routeIds", response.getResult());
-			inventoryApi.update(mor);
 		}
 	}
 
@@ -305,29 +304,18 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		return mor;
 	}
 
-	private List<String> getRouteIds(LNSConnector connector) {
-		List<String> result = new ArrayList<>();
-		ManagedObjectRepresentation mor = inventoryApi.get(GId.asGId(connector.getId()));
-		if (mor.hasProperty("routeIds")) {
-			Object p = mor.getProperty("routeIds");
-			if (p instanceof List) {
-				result = (List<String>)p;
-			}
-		}
-
-		return result;
-	}
-
 	public void removeLnsConnector(String lnsConnectorId) {
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
 		if (connector.isPresent()) {
-			connector.get().removeRoutings(subscriptionsService.getTenant(), getRouteIds(connector.get()));
+			connector.get().removeRoutings();
 			inventoryApi.delete(new GId(lnsConnectorId));
 			lnsConnectorManager.removeConnector(lnsConnectorId);
+			AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
+			beanFactory.destroyBean(beanFactory.getBean("connector-" + lnsConnectorId));
 		}
 	}
 
-    public void updateLnsConnector(String lnsConnectorId, Properties properties) {
+	public void updateLnsConnector(String lnsConnectorId, Properties properties) {
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
 		if (connector.isPresent()) {
 			LNSConnector c = connector.get();
@@ -344,28 +332,33 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 				tenantOptionApi.save(option);
 			});
 		}
-    }
+	}
 
 	private boolean isPropertyEncrypted(String key) {
 		boolean[] result = { false };
 
 		wizard.forEach(step -> step.getPropertyDescriptions().forEach(p -> {
-				if (p.getName().equals(key)) {
-					result[0] = p.isEncrypted();
-				}
-			})
-		);
+			if (p.getName().equals(key)) {
+				result[0] = p.isEncrypted();
+			}
+		}));
 
 		return result[0];
 	}
 
-	//@Scheduled(initialDelay = 10000, fixedDelay = 300000)
+	@Scheduled(initialDelay = 10000, fixedDelay = 300000)
 	private void scanGateways() {
 		subscriptionsService.runForEachTenant(() -> {
-			logger.info("Scanning gateways in tenant {}", subscriptionsService.getTenant());
 			Map<String, LNSConnector> connectors = lnsConnectorManager.getConnectors();
 			if (connectors != null) {
-				connectors.values().forEach(c -> lnsGatewayManager.upsertGateways(c));
+				connectors.values().forEach(c -> {
+					if (c.hasGatewayManagementCapability()) {
+						logger.info("Scanning gateways in tenant {} with connector {}",
+								subscriptionsService.getTenant(),
+								c.getName());
+						lnsGatewayManager.upsertGateways(c);
+					}
+				});
 			}
 		});
 	}
@@ -382,7 +375,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 								&& !opCollectionRepresentation.getOperations()
 										.isEmpty(); opCollectionRepresentation = oc
 												.getNextPage(opCollectionRepresentation)) {
-                                        logger.info("Processing pending operations on tenant {} - page {}", currentTenant, oc.get().getPageStatistics().getCurrentPage());
+					logger.info("Processing pending operations on tenant {} - page {}", currentTenant,
+							oc.get().getPageStatistics().getCurrentPage());
 					for (OperationRepresentation op : opCollectionRepresentation.getOperations()) {
 						lnsOperationManager.executePending(op);
 					}
@@ -437,7 +431,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		taskScheduler.schedule(this::scanGateways, new Trigger() {
 			@Override
 			public Date nextExecutionTime(TriggerContext triggerContext) {
-				Calendar nextExecutionTime =  new GregorianCalendar();
+				Calendar nextExecutionTime = new GregorianCalendar();
 				Date lastActualExecutionTime = triggerContext.lastActualExecutionTime();
 				if (lastActualExecutionTime != null) {
 					nextExecutionTime.setTime(lastActualExecutionTime);

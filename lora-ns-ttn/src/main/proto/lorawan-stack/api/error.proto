@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/struct.proto";
@@ -22,9 +23,13 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// TODO: Migrate away from GoGo Protobuf (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798).
+option (gogoproto.goproto_registration) = true;
+
 // Error details that are communicated over gRPC (and HTTP) APIs.
 // The messages (for translation) are stored as "error:<namespace>:<name>".
 message ErrorDetails {
+  option (thethings.flags.message) = { select: true, set: false };
   // Namespace of the error (typically the package name in The Things Stack).
   string namespace = 1;
   // Name of the error.
@@ -37,12 +42,13 @@ message ErrorDetails {
   google.protobuf.Struct attributes = 4;
   // The correlation ID of the error can be used to correlate the error to stack
   // traces the network may (or may not) store about recent errors.
-  string correlation_id = 5 [(gogoproto.customname) = "CorrelationID"];
+  string correlation_id = 5;
   // The error that caused this error.
-  ErrorDetails cause = 6;
+  ErrorDetails cause = 6 [
+    (thethings.flags.field) = { select: false }
+  ];
   // The status code of the error.
   uint32 code = 7;
   // The details of the error.
   repeated google.protobuf.Any details = 8;
 }
-

@@ -103,7 +103,8 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 
 	@Override
 	public LNSResponse<List<EndDevice>> getDevices() {
-		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true).withResult(new ArrayList<>());
+		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true)
+				.withResult(new ArrayList<>());
 		try {
 			var response = orbiwiseService.getDevices().execute();
 			if (response.isSuccessful()) {
@@ -132,7 +133,8 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 			var response = orbiwiseService.getDevice(devEui).execute();
 			if (response.isSuccessful()) {
 				Device device = response.body();
-				result.setResult(new EndDevice(devEui, devEui, DeviceClass.BY_VALUE.get(device.getLora_device_class()).name()));
+				result.setResult(
+						new EndDevice(devEui, devEui, DeviceClass.BY_VALUE.get(device.getLora_device_class()).name()));
 			} else {
 				result.withOk(false).withMessage(response.errorBody().string());
 			}
@@ -191,10 +193,11 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 		return result;
 	}
 
-	public LNSResponse<List<String>> configureRouting(String url, String tenant, String login, String password, String subscriptions) {
+	public LNSResponse<Void> configureRouting(String url, String tenant, String login, String password,
+			String subscriptions) {
 		assert orbiwiseService != null : "orbiwiseService is not initialized";
 
-		LNSResponse<List<String>> result = new LNSResponse<List<String>>().withOk(true);
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 
 		Pushmode pushmode = new Pushmode();
 		pushmode.setAuth_string(
@@ -228,13 +231,13 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
 		return configureRouting(url, tenant, login, password, "payloads_dl,payloads_ul");
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
+	public LNSResponse<Void> removeRoutings() {
 		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		try {
 			var response = orbiwiseService.stopRouting().execute();
@@ -274,5 +277,10 @@ public class OrbiwiseConnector extends LNSAbstractConnector {
 
 	public LNSResponse<Void> deprovisionGateway(String id) {
 		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	}
+
+	@Override
+	public boolean hasGatewayManagementCapability() {
+		return false;
 	}
 }

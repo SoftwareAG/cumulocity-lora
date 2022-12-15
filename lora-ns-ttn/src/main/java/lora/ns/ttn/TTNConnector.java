@@ -3,24 +3,25 @@ package lora.ns.ttn;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.google.common.io.BaseEncoding;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.Empty;
 import com.google.protobuf.FieldMask;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import c8y.ConnectionState;
 import io.grpc.ManagedChannel;
+import io.grpc.StatusRuntimeException;
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import lora.codec.downlink.DownlinkData;
@@ -32,11 +33,9 @@ import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
 import ttn.lorawan.v3.AppAsGrpc;
 import ttn.lorawan.v3.AppAsGrpc.AppAsBlockingStub;
-import ttn.lorawan.v3.ApplicationAccessGrpc;
-import ttn.lorawan.v3.ApplicationAccessGrpc.ApplicationAccessBlockingStub;
 import ttn.lorawan.v3.ApplicationOuterClass.Application;
 import ttn.lorawan.v3.ApplicationOuterClass.Applications;
-import ttn.lorawan.v3.ApplicationOuterClass.ListApplicationCollaboratorsRequest;
+import ttn.lorawan.v3.ApplicationOuterClass.GetApplicationRequest;
 import ttn.lorawan.v3.ApplicationOuterClass.ListApplicationsRequest;
 import ttn.lorawan.v3.ApplicationRegistryGrpc;
 import ttn.lorawan.v3.ApplicationRegistryGrpc.ApplicationRegistryBlockingStub;
@@ -61,10 +60,13 @@ import ttn.lorawan.v3.EndDeviceRegistryGrpc;
 import ttn.lorawan.v3.EndDeviceRegistryGrpc.EndDeviceRegistryBlockingStub;
 import ttn.lorawan.v3.GatewayOuterClass;
 import ttn.lorawan.v3.GatewayOuterClass.CreateGatewayRequest;
+import ttn.lorawan.v3.GatewayOuterClass.GatewayConnectionStats;
 import ttn.lorawan.v3.GatewayOuterClass.Gateways;
 import ttn.lorawan.v3.GatewayOuterClass.ListGatewaysRequest;
 import ttn.lorawan.v3.GatewayRegistryGrpc;
 import ttn.lorawan.v3.GatewayRegistryGrpc.GatewayRegistryBlockingStub;
+import ttn.lorawan.v3.GsGrpc;
+import ttn.lorawan.v3.GsGrpc.GsBlockingStub;
 import ttn.lorawan.v3.Identifiers.ApplicationIdentifiers;
 import ttn.lorawan.v3.Identifiers.EndDeviceIdentifiers;
 import ttn.lorawan.v3.Identifiers.GatewayIdentifiers;
@@ -79,9 +81,6 @@ import ttn.lorawan.v3.Messages.ApplicationDownlink;
 import ttn.lorawan.v3.Messages.DownlinkQueueRequest;
 import ttn.lorawan.v3.NsEndDeviceRegistryGrpc;
 import ttn.lorawan.v3.NsEndDeviceRegistryGrpc.NsEndDeviceRegistryBlockingStub;
-import ttn.lorawan.v3.RightsOuterClass.Collaborator;
-import ttn.lorawan.v3.RightsOuterClass.Collaborators;
-import ttn.lorawan.v3.RightsOuterClass.Right;
 
 public class TTNConnector extends LNSAbstractConnector {
 
@@ -141,18 +140,19 @@ public class TTNConnector extends LNSAbstractConnector {
                 try {
                         EndDeviceRegistryBlockingStub service = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
                                         .withCallCredentials(token);
-        
+
                         ttn.lorawan.v3.EndDeviceOuterClass.EndDevice device = service
                                         .get(GetEndDeviceRequest.newBuilder().setEndDeviceIds(getDeviceIds(devEui))
-                                                        .setFieldMask(FieldMask.newBuilder().addPaths("name").build()).build());
-        
+                                                        .setFieldMask(FieldMask.newBuilder().addPaths("name").build())
+                                                        .build());
+
                         EndDevice endDevice = new EndDevice(devEui, device.getName(),
                                         device.getSupportsClassC() ? "C" : device.getSupportsClassB() ? "B" : "A");
 
                         result.setOk(true);
                         result.setResult(endDevice);
 
-                } catch(Exception e) {
+                } catch (Exception e) {
                         e.printStackTrace();
                         result.setOk(false);
                         result.setMessage(e.getMessage());
@@ -172,16 +172,18 @@ public class TTNConnector extends LNSAbstractConnector {
                         ApplicationDownlink downlink = ApplicationDownlink.newBuilder().setFPort(operation.getFport())
                                         .setConfirmed(true)
                                         .setFrmPayload(ByteString.copyFrom(
-                                                        BaseEncoding.base16().decode(operation.getPayload().toUpperCase())))
+                                                        BaseEncoding.base16()
+                                                                        .decode(operation.getPayload().toUpperCase())))
                                         .addCorrelationIds("c8y:" + downlinkCorrelationId).build();
-        
-                        AppAsBlockingStub asService = AppAsGrpc.newBlockingStub(managedChannel).withCallCredentials(token);
-        
+
+                        AppAsBlockingStub asService = AppAsGrpc.newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
+
                         asService.downlinkQueuePush(DownlinkQueueRequest.newBuilder().addDownlinks(downlink)
                                         .setEndDeviceIds(getDeviceIds(operation.getDevEui())).build());
                         result.setOk(true);
                         result.setResult(downlinkCorrelationId);
-                } catch(Exception e) {
+                } catch (Exception e) {
                         e.printStackTrace();
                         result.setOk(false);
                         result.setMessage(e.getMessage());
@@ -224,9 +226,11 @@ public class TTNConnector extends LNSAbstractConnector {
                                         .setNetworkServerAddress(properties.getProperty("address"))
                                         .setSupportsJoin(true)
                                         .setLorawanVersion(MACVersion.valueOf(
-                                                        deviceProvisioning.getAdditionalProperties().getProperty("MACVersion")))
+                                                        deviceProvisioning.getAdditionalProperties()
+                                                                        .getProperty("MACVersion")))
                                         .setLorawanPhyVersion(PHYVersion.valueOf(
-                                                        deviceProvisioning.getAdditionalProperties().getProperty("PHYVersion")))
+                                                        deviceProvisioning.getAdditionalProperties()
+                                                                        .getProperty("PHYVersion")))
                                         .setFrequencyPlanId(deviceProvisioning.getAdditionalProperties()
                                                         .getProperty("frequencyPlan"))
                                         .setIds(EndDeviceIdentifiers.newBuilder()
@@ -236,11 +240,13 @@ public class TTNConnector extends LNSAbstractConnector {
                                                                         .build())
                                                         .setDevEui(ByteString
                                                                         .copyFrom(BaseEncoding.base16()
-                                                                                        .decode(deviceProvisioning.getDevEUI()
+                                                                                        .decode(deviceProvisioning
+                                                                                                        .getDevEUI()
                                                                                                         .toUpperCase())))
                                                         .setJoinEui(ByteString
                                                                         .copyFrom(BaseEncoding.base16()
-                                                                                        .decode(deviceProvisioning.getAppEUI()
+                                                                                        .decode(deviceProvisioning
+                                                                                                        .getAppEUI()
                                                                                                         .toUpperCase())))
                                                         .build())
                                         .setRootKeys(RootKeys.newBuilder()
@@ -282,11 +288,14 @@ public class TTNConnector extends LNSAbstractConnector {
                 return result;
         }
 
+        @Autowired
+        private MicroserviceSubscriptionsService subscriptionsService;
+
         @Override
-        public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
+        public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
                 logger.info("Configuring routings to: {} with credentials: {}:{} on TTN app {}", url, login, password,
                                 properties.getProperty(APPID));
-                LNSResponse<List<String>> result = new LNSResponse<>();
+                LNSResponse<Void> result = new LNSResponse<>();
                 try {
 
                         ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc
@@ -299,18 +308,22 @@ public class TTNConnector extends LNSAbstractConnector {
                                                                         .setApplicationId(properties.getProperty(APPID))
                                                                         .build())
                                                         .build())
-                                        .setBaseUrl(url).setUplinkMessage(Message.newBuilder().setPath("/uplink").build())
+                                        .setBaseUrl(url)
+                                        .setUplinkMessage(Message.newBuilder().setPath("/uplink").build())
                                         .setDownlinkAck(Message.newBuilder().setPath("/downlink").build())
                                         .setDownlinkNack(Message.newBuilder().setPath("/downlink").build())
                                         .setDownlinkSent(Message.newBuilder().setPath("/downlink").build())
                                         .setDownlinkFailed(Message.newBuilder().setPath("/downlink").build())
-                                        .setDownlinkQueued(Message.newBuilder().setPath("/downlink").build()).setFormat("json")
+                                        .setDownlinkQueued(Message.newBuilder().setPath("/downlink").build())
+                                        .setFormat("json")
                                         .putHeaders("Authorization", "Basic "
                                                         + Base64.getEncoder().encodeToString(
-                                                                        (tenant + "/" + login + ":" + password).getBytes()))
+                                                                        (tenant + "/" + login + ":" + password)
+                                                                                        .getBytes()))
                                         .build();
                         app.set(SetApplicationWebhookRequest.newBuilder().setWebhook(webhook)
-                                        .setFieldMask(FieldMask.newBuilder().addPaths("base_url").addPaths("downlink_ack")
+                                        .setFieldMask(FieldMask.newBuilder().addPaths("base_url")
+                                                        .addPaths("downlink_ack")
                                                         .addPaths("downlink_api_key").addPaths("downlink_failed")
                                                         .addPaths("downlink_nack")
                                                         .addPaths("downlink_queued").addPaths("downlink_sent")
@@ -322,7 +335,7 @@ public class TTNConnector extends LNSAbstractConnector {
                                                         .addPaths("service_data").addPaths("uplink_message").build())
                                         .build());
                         result.setOk(true);
-                } catch(Exception e) {
+                } catch (Exception e) {
                         e.printStackTrace();
                         result.setOk(false);
                         result.setMessage(e.getMessage());
@@ -332,14 +345,15 @@ public class TTNConnector extends LNSAbstractConnector {
         }
 
         @Override
-        public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
+        public LNSResponse<Void> removeRoutings() {
                 LNSResponse<Void> result = new LNSResponse<>();
                 try {
                         ApplicationWebhookRegistryBlockingStub app = ApplicationWebhookRegistryGrpc
                                         .newBlockingStub(managedChannel)
                                         .withCallCredentials(token);
-        
-                        app.delete(ApplicationWebhookIdentifiers.newBuilder().setWebhookId(tenant + "-" + this.getId())
+
+                        app.delete(ApplicationWebhookIdentifiers.newBuilder()
+                                        .setWebhookId(subscriptionsService.getTenant() + "-" + this.getId())
                                         .build());
                         result.setOk(true);
                 } catch (Exception e) {
@@ -355,23 +369,26 @@ public class TTNConnector extends LNSAbstractConnector {
         public LNSResponse<Void> deprovisionDevice(String deveui) {
                 LNSResponse<Void> result = new LNSResponse<>();
                 try {
-                        JsEndDeviceRegistryBlockingStub service1 = JsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+                        JsEndDeviceRegistryBlockingStub service1 = JsEndDeviceRegistryGrpc
+                                        .newBlockingStub(managedChannel)
                                         .withCallCredentials(token);
-                        AsEndDeviceRegistryBlockingStub service2 = AsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+                        AsEndDeviceRegistryBlockingStub service2 = AsEndDeviceRegistryGrpc
+                                        .newBlockingStub(managedChannel)
                                         .withCallCredentials(token);
-                        NsEndDeviceRegistryBlockingStub service3 = NsEndDeviceRegistryGrpc.newBlockingStub(managedChannel)
+                        NsEndDeviceRegistryBlockingStub service3 = NsEndDeviceRegistryGrpc
+                                        .newBlockingStub(managedChannel)
                                         .withCallCredentials(token);
                         EndDeviceRegistryBlockingStub service4 = EndDeviceRegistryGrpc.newBlockingStub(managedChannel)
                                         .withCallCredentials(token);
-        
+
                         EndDeviceIdentifiers ids = getDeviceIds(deveui);
-        
+
                         service2.delete(ids);
                         service3.delete(ids);
                         service1.delete(ids);
                         service4.delete(ids);
                         result.setOk(true);
-                } catch(Exception e) {
+                } catch (Exception e) {
                         e.printStackTrace();
                         result.setOk(false);
                         result.setMessage(e.getMessage());
@@ -388,11 +405,25 @@ public class TTNConnector extends LNSAbstractConnector {
                                         .newBlockingStub(managedChannel).withCallCredentials(token);
                         ListGatewaysRequest request = ListGatewaysRequest.newBuilder().build();
                         Gateways gateways = gatewayRegistry.list(request);
+                        final GsBlockingStub gatewayServer = GsGrpc.newBlockingStub(managedChannel)
+                                        .withCallCredentials(token);
                         result.setOk(true);
                         result.setResult(gateways.getGatewaysList().stream().map(g -> {
-                                return new Gateway(g.getIds().getEui().toStringUtf8(), g.getIds().getGatewayId(), g.getName(),
+                                // logger.info("Retrieved gateway: {}", g.toString());
+                                boolean connected = true;
+                                try {
+                                        GatewayConnectionStats stats = gatewayServer
+                                                        .getGatewayConnectionStats(g.getIds());
+                                        // logger.info("Gateway status: {}", stats.toString());
+                                } catch (StatusRuntimeException e) {
+                                        // e.printStackTrace();
+                                        connected = false;
+                                }
+                                return new Gateway(g.getIds().getGatewayId(), g.getIds().getGatewayId(),
+                                                g.getName(),
                                                 null, null, g.getVersionIds().getBrandId(),
-                                                g.isInitialized() ? ConnectionState.AVAILABLE : ConnectionState.UNAVAILABLE,
+                                                connected ? ConnectionState.AVAILABLE
+                                                                : ConnectionState.UNAVAILABLE,
                                                 new C8YData());
                         }).collect(Collectors.toList()));
                 } catch (Exception e) {
@@ -415,25 +446,23 @@ public class TTNConnector extends LNSAbstractConnector {
         private OrganizationOrUserIdentifiers getCurrentUserOrOrganization() {
                 OrganizationOrUserIdentifiers result = null;
 
-                ApplicationAccessBlockingStub applicationAccess = ApplicationAccessGrpc.newBlockingStub(managedChannel)
-                                .withCallCredentials(token);
-                Collaborators collaborators = applicationAccess.listCollaborators(ListApplicationCollaboratorsRequest
-                                .newBuilder().setApplicationIds(ApplicationIdentifiers.newBuilder()
+                ApplicationRegistryBlockingStub applicationRegistry = ApplicationRegistryGrpc
+                                .newBlockingStub(managedChannel).withCallCredentials(token);
+                Application application = applicationRegistry.get(GetApplicationRequest.newBuilder()
+                                .setApplicationIds(ApplicationIdentifiers.newBuilder()
                                                 .setApplicationId(properties.getProperty(APPID)).build())
+                                .setFieldMask(FieldMask.newBuilder().addPaths("administrative_contact")
+                                                .addPaths("technical_contact").build())
                                 .build());
-                for (Collaborator collaborator : collaborators.getCollaboratorsList()) {
-                        for (Right right : collaborator.getRightsList()) {
-                                if (right == Right.RIGHT_GATEWAY_ALL) {
-                                        result = collaborator.getIds();
-                                }
-                        }
-                }
+
+                result = application.getAdministrativeContact();
 
                 return result;
         }
 
         public LNSResponse<Void> provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
                 LNSResponse<Void> result = new LNSResponse<>();
+
                 if (getCurrentUserOrOrganization() == null) {
                         result.setOk(false);
                         result.setMessage("no user with gateway creation rights was found.");
@@ -454,6 +483,7 @@ public class TTNConnector extends LNSAbstractConnector {
                                                         .getAdditionalProperties().getProperty("public")))
                                         .setFrequencyPlanId(gatewayProvisioning.getAdditionalProperties()
                                                         .getProperty("frequencyPlan"))
+                                        .setName(gatewayProvisioning.getName())
                                         .build();
                         CreateGatewayRequest request = CreateGatewayRequest.newBuilder()
                                         .setGateway(gateway)
@@ -471,19 +501,23 @@ public class TTNConnector extends LNSAbstractConnector {
         public LNSResponse<Void> deprovisionGateway(String id) {
                 LNSResponse<Void> result = new LNSResponse<>();
                 try {
-                        GatewayRegistryBlockingStub gatewayRegistry = GatewayRegistryGrpc.newBlockingStub(managedChannel)
+                        GatewayRegistryBlockingStub gatewayRegistry = GatewayRegistryGrpc
+                                        .newBlockingStub(managedChannel)
                                         .withCallCredentials(token);
                         gatewayRegistry.delete(GatewayIdentifiers.newBuilder()
-                                        .setEui(ByteString
-                                                        .copyFrom(BaseEncoding.base16().decode(id.toUpperCase())))
+                                        .setGatewayId(id)
                                         .build());
 
                         result.setOk(true);
-                } catch(Exception e) {
+                } catch (Exception e) {
                         e.printStackTrace();
                         result.setOk(false);
                         result.setMessage(e.getMessage());
                 }
                 return result;
+        }
+
+        public boolean hasGatewayManagementCapability() {
+                return true;
         }
 }

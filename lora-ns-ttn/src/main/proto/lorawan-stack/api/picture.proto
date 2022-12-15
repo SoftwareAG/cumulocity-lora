@@ -15,18 +15,22 @@
 syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// TODO: Migrate away from GoGo Protobuf (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798).
+option (gogoproto.goproto_registration) = true;
+
 message Picture {
   message Embedded {
     // MIME type of the picture.
-    string mime_type = 1;
+    string mime_type = 1 [(validate.rules).string.max_len = 32];
     // Picture data. A data URI can be constructed as follows:
     // `data:<mime_type>;base64,<data>`.
-    bytes data = 2;
+    bytes data = 2 [(validate.rules).bytes.max_len = 8388608];
   }
 
   // Embedded picture.

@@ -11,19 +11,36 @@ import lora.ns.gateway.GatewayProvisioning;
 
 public interface LNSConnector {
 	String getId();
+
 	String getType();
+
 	String getName();
+
+	boolean hasGatewayManagementCapability();
+
 	LNSResponse<List<EndDevice>> getDevices();
+
 	void setProperties(Properties properties);
+
 	Properties getProperties();
+
 	LNSResponse<EndDevice> getDevice(String devEui);
+
 	LNSResponse<String> sendDownlink(DownlinkData downlinkData);
+
 	LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning);
-	LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password);
-	LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds);
+
+	LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password);
+
+	LNSResponse<Void> removeRoutings();
+
 	LNSResponse<Void> deprovisionDevice(String deveui);
+
 	LNSResponse<List<Gateway>> getGateways();
-    Properties mergeProperties(Properties properties);
+
+	Properties mergeProperties(Properties properties);
+
 	LNSResponse<Void> provisionGateway(GatewayProvisioning gatewayProvisioning);
+
 	LNSResponse<Void> deprovisionGateway(String id);
 }

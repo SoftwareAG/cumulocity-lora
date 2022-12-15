@@ -5,14 +5,15 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
+
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 
 import c8y.ConnectionState;
 import lora.codec.downlink.DownlinkData;
@@ -38,11 +39,11 @@ import lora.ns.objenious.rest.ScenarioRouting;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate.FormatTypeEnum;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate.MessageTypeEnum;
-import lora.ns.objenious.rest.ScenarioRoutingReader;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -107,7 +108,8 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 	@Override
 	public LNSResponse<List<EndDevice>> getDevices() {
-		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true).withResult(new ArrayList<>());
+		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true)
+				.withResult(new ArrayList<>());
 		try {
 			retrofit2.Response<List<Device>> response = objeniousService.getDevices().execute();
 			if (response.isSuccessful()) {
@@ -207,7 +209,8 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 				deviceCreate.setLat(deviceProvisioning.getLat());
 				deviceCreate.setLng(deviceProvisioning.getLng());
 				deviceCreate.setGroupId(Integer.parseInt(properties.getProperty("groupId")));
-				deviceCreate.setProfileId(Integer.valueOf(deviceProvisioning.getAdditionalProperties().getProperty("deviceProfile")));
+				deviceCreate.setProfileId(
+						Integer.valueOf(deviceProvisioning.getAdditionalProperties().getProperty("deviceProfile")));
 				retrofit2.Response<Device> response = objeniousService.createDevice(deviceCreate).execute();
 				if (!response.isSuccessful()) {
 					logger.error(response.errorBody().string());
@@ -241,7 +244,12 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 		LNSResponse<Void> result = new LNSResponse<Void>().withOk(false);
 
-		removeRouting(name);
+		if (name.endsWith("downlink")) {
+			this.getProperty("downlinkRouteId")
+					.ifPresent(downlinkRoutingId -> removeRouting(downlinkRoutingId.toString()));
+		} else {
+			this.getProperty("uplinkRouteId").ifPresent(uplinkRoutingId -> removeRouting(uplinkRoutingId.toString()));
+		}
 
 		RoutingHttp routingHttp = new RoutingHttp();
 		routingHttp.setUrl(url);
@@ -264,6 +272,12 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 			if (!response.isSuccessful()) {
 				logger.error("Error from Objenious: {}", response.errorBody().string());
 				result.withOk(false).withMessage(response.errorBody().string());
+			} else {
+				if (name.endsWith("downlink")) {
+					this.setProperty("downlinkRouteId", response.body().getId());
+				} else {
+					this.setProperty("uplinkRouteId", response.body().getId());
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -274,12 +288,14 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
-		LNSResponse<List<String>> result = new LNSResponse<>();
-		LNSResponse<Void> resultDownlink = configureRouting(url + "/downlink", tenant, login, password, tenant + "-" + this.getId() + "-downlink",
+		LNSResponse<Void> result = new LNSResponse<>();
+		LNSResponse<Void> resultDownlink = configureRouting(url + "/downlink", tenant, login, password,
+				tenant + "-" + this.getId() + "-downlink",
 				MessageTypeEnum.DOWNLINK);
-		LNSResponse<Void> resultUplink = configureRouting(url + "/uplink", tenant, login, password, tenant + "-" + this.getId() + "-uplink",
+		LNSResponse<Void> resultUplink = configureRouting(url + "/uplink", tenant, login, password,
+				tenant + "-" + this.getId() + "-uplink",
 				MessageTypeEnum.UPLINK);
 
 		result.setOk(resultDownlink.isOk() && resultUplink.isOk());
@@ -296,46 +312,42 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		return result;
 	}
 
-	private LNSResponse<Void> removeRouting(String name) {
+	private LNSResponse<Void> removeRouting(String id) {
 		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		try {
-			retrofit2.Response<List<ScenarioRoutingReader>> response = objeniousService.getRouting().execute();
-			if (response.isSuccessful()) {
-				List<ScenarioRoutingReader> routings = response.body();
-				if (routings != null) {
-					routings.stream().filter(routing -> routing.getName().equals(name)).forEach(routing -> {
-						try {
-							objeniousService.deleteRouting(routing.getId()).execute();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					});
-				}
-			} else {
+			retrofit2.Response<ResponseBody> response = objeniousService.deleteRouting(Integer.parseInt(id)).execute();
+			if (!response.isSuccessful()) {
+				logger.error("Error from Objenious: {}", response.errorBody().string());
 				result.withOk(false).withMessage(response.errorBody().string());
 			}
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			result.withOk(false).withMessage(e1.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.withOk(false).withMessage(e.getMessage());
 		}
 		return result;
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
-		var resultUplink = removeRouting(tenant + "-" + this.getId() + "-uplink");
-		var resultDownlink = removeRouting(tenant + "-" + this.getId() + "-downlink");
-		result.setOk(resultUplink.isOk() && resultDownlink.isOk());
-		if (!result.isOk()) {
-			result.setMessage("");
+	public LNSResponse<Void> removeRoutings() {
+		final LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
+		Optional<Object> uplinkRouteId = getProperty("uplinkRouteId");
+		Optional<Object> downlinkRouteId = getProperty("downlinkRouteId");
+		uplinkRouteId.ifPresent(id -> {
+			var resultUplink = removeRouting(id.toString());
+			result.setOk(resultUplink.isOk());
+			result.setMessage(resultUplink.getMessage());
+		});
+		downlinkRouteId.ifPresent(id -> {
+			var resultDownlink = removeRouting(id.toString());
+			result.setOk(result.isOk() && resultDownlink.isOk());
 			if (!resultDownlink.isOk()) {
-				result.setMessage(resultDownlink.getMessage());
+				if (!result.isOk()) {
+					result.setMessage(result.getMessage() + "\n" + resultDownlink.getMessage());
+				} else {
+					result.setMessage(resultDownlink.getMessage());
+				}
 			}
-			if (!resultUplink.isOk()) {
-				result.setMessage(result.getMessage() + "\n" + resultUplink.getMessage());
-			}
-		}
+		});
 		return result;
 	}
 
@@ -371,28 +383,34 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		logger.info("Getting list of gateways with connector {}...", this.getName());
 		LNSResponse<List<Gateway>> result = new LNSResponse<List<Gateway>>().withOk(true).withResult(new ArrayList<>());
 		try {
-			retrofit2.Response<List<lora.ns.objenious.rest.Gateway>> response = objeniousService.getGateways().execute();
+			retrofit2.Response<List<lora.ns.objenious.rest.Gateway>> response = objeniousService.getGateways()
+					.execute();
 			if (response.isSuccessful()) {
-				response.body().forEach(g -> {
-					logger.info("Got gateway {}", g.getGatewayName());
-					C8YData data = new C8YData();
-					ConnectionState state = ConnectionState.AVAILABLE;
-					switch(g.getStatus()) {
-						case ACTIVE:
-							state = ConnectionState.AVAILABLE;
-							break;
-						case ALERT:
-							state = ConnectionState.AVAILABLE;
-							break;
-						case INACTIVE:
-							state = ConnectionState.UNAVAILABLE;
-							break;
-						default:
-							break;
-					}
-					Gateway gateway = new Gateway(g.getGatewayId(), g.getSerialNumber(), g.getGatewayName(), BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(), state, data);
-					result.getResult().add(gateway);
-				});
+				if (response.body() != null) {
+					response.body().forEach(g -> {
+						logger.info("Got gateway {}", g.getGatewayName());
+						C8YData data = new C8YData();
+						ConnectionState state = ConnectionState.AVAILABLE;
+						switch (g.getStatus()) {
+							case ACTIVE:
+								state = ConnectionState.AVAILABLE;
+								break;
+							case ALERT:
+								state = ConnectionState.AVAILABLE;
+								break;
+							case INACTIVE:
+								state = ConnectionState.UNAVAILABLE;
+								break;
+							default:
+								break;
+						}
+						Gateway gateway = new Gateway(g.getGatewayId(), g.getSerialNumber(), g.getGatewayName(),
+								BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(),
+								state,
+								data);
+						result.getResult().add(gateway);
+					});
+				}
 			} else {
 				logger.error("Couldn't retrieve gateways with connector {}", this.getName());
 				result.withOk(false).withMessage(response.errorBody().string());
@@ -423,5 +441,9 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 	public LNSResponse<Void> deprovisionGateway(String id) {
 		return new LNSResponse<Void>().withOk(false).withMessage("Not supported");
+	}
+
+	public boolean hasGatewayManagementCapability() {
+		return false;
 	}
 }

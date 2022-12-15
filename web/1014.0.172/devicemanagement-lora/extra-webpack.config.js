@@ -11,7 +11,7 @@ module.exports = function config(env) {
                 patterns: [
                     { from: 'node_modules/monaco-editor', to:  path.join(__dirname, './dist/apps/devicemanagement-lora/assets/monaco-editor') },
                 ],
-            })
+            }, {debug: true})
         ],
     }
 };

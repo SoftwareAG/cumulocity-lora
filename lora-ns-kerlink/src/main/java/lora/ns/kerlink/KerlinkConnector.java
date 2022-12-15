@@ -103,7 +103,8 @@ public class KerlinkConnector extends LNSAbstractConnector {
 	}
 
 	public LNSResponse<List<EndDevice>> getDevices() {
-		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true).withResult(new ArrayList<>());
+		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true)
+				.withResult(new ArrayList<>());
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -111,16 +112,18 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
 		RestTemplate restTemplate = new RestTemplate();
 		try {
-			ResponseEntity<PaginatedDto<EndDeviceDto>> response = restTemplate.exchange(baseUrl + "/endDevices", HttpMethod.GET,
+			ResponseEntity<PaginatedDto<EndDeviceDto>> response = restTemplate.exchange(baseUrl + "/endDevices",
+					HttpMethod.GET,
 					new HttpEntity<String>("", headers), new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>() {
 					});
 			if (response.hasBody()) {
 				for (EndDeviceDto endDeviceDto : response.getBody().getList()) {
 					result.getResult()
-							.add(new EndDevice(endDeviceDto.getDevEui(), endDeviceDto.getName(), endDeviceDto.getClassType()));
+							.add(new EndDevice(endDeviceDto.getDevEui(), endDeviceDto.getName(),
+									endDeviceDto.getClassType()));
 				}
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			result.withOk(false).withMessage(e.getMessage());
 		}
@@ -194,12 +197,13 @@ public class KerlinkConnector extends LNSAbstractConnector {
 		dto.setAppEui(deviceProvisioning.getAppEUI());
 		dto.setAppKey(deviceProvisioning.getAppKey());
 		try {
-			ResponseEntity<String> res = restTemplate.exchange(baseUrl + "/endDevices/" + deviceProvisioning.getDevEUI(),
+			ResponseEntity<String> res = restTemplate.exchange(
+					baseUrl + "/endDevices/" + deviceProvisioning.getDevEUI(),
 					HttpMethod.PUT, new HttpEntity<EndDeviceDto>(dto, headers), String.class);
 			if (res.getStatusCodeValue() != 201) {
 				result.withOk(false).withMessage(res.getBody());
 			}
-		} catch(HttpClientErrorException e) {
+		} catch (HttpClientErrorException e) {
 			e.printStackTrace();
 			logger.error(e.getResponseBodyAsString());
 			result.withOk(false).withMessage(e.getResponseBodyAsString());
@@ -216,8 +220,8 @@ public class KerlinkConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<List<String>> configureRoutings(String url, String tenant, String login, String password) {
-		LNSResponse<List<String>> result = new LNSResponse<List<String>>().withOk(true);
+	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		if (jwt == null || jwt.isExpired()) {
 			login();
 		}
@@ -279,7 +283,7 @@ public class KerlinkConnector extends LNSAbstractConnector {
 					"/downlink", "/uplink", url, tenant + "/" + login, password);
 			logger.info("Will create a new push configuration: {}", currentPushConfigurationDto.toString());
 			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-			List<MediaType> mediaTypes = new ArrayList<MediaType>();
+			List<MediaType> mediaTypes = new ArrayList<>();
 			mediaTypes.add(MediaType.APPLICATION_JSON);
 			headers.setAccept(mediaTypes);
 			ObjectMapper mapper = new ObjectMapper();
@@ -298,11 +302,13 @@ public class KerlinkConnector extends LNSAbstractConnector {
 				String[] tokens = response.getHeaders().getLocation().getPath().split("/");
 				configId = Integer.parseInt(tokens[tokens.length - 1]);
 			} else {
-				result.withOk(false).withMessage("Something was wrong while creating the push config: " + response.getBody());
+				result.withOk(false)
+						.withMessage("Something was wrong while creating the push config: " + response.getBody());
 				logger.error("Something was wrong while creating the push config: {}", response.getBody());
 			}
 		}
 		if (configId != null) {
+			this.setProperty("configId", configId);
 			headers = new HttpHeaders();
 			headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
 			ClusterDto cluster = restTemplate.exchange(baseUrl + "/clusters/" + clusterId, HttpMethod.GET,
@@ -315,7 +321,8 @@ public class KerlinkConnector extends LNSAbstractConnector {
 			ResponseEntity<String> response = restTemplate.exchange(baseUrl + "/clusters/" + clusterId,
 					HttpMethod.PATCH, new HttpEntity<ClusterDto>(cluster, headers), String.class);
 			if (response.getStatusCode() != HttpStatus.NO_CONTENT) {
-				result.withOk(false).withMessage("Something was wrong while updating the cluster: " + response.getBody());
+				result.withOk(false)
+						.withMessage("Something was wrong while updating the cluster: " + response.getBody());
 				logger.error("Something was wrong while updating the cluster: {}", response.getBody());
 			}
 		}
@@ -323,25 +330,18 @@ public class KerlinkConnector extends LNSAbstractConnector {
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings(String tenant, List<String> routeIds) {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
-		if (jwt == null || jwt.isExpired()) {
-			login();
-		}
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
-		RestTemplate restTemplate = new RestTemplate();
-		PaginatedDto<PushConfigurationDto> pushConfigurationDtos = restTemplate
-				.exchange(baseUrl + "/pushConfigurations", HttpMethod.GET, new HttpEntity<String>("", headers),
-						new ParameterizedTypeReference<PaginatedDto<PushConfigurationDto>>() {
-						})
-				.getBody();
-		for (PushConfigurationDto pushConfigurationDto : pushConfigurationDtos.getList()) {
-			if (pushConfigurationDto.getName().equals(tenant + "-" + this.getId())) {
-				restTemplate.exchange(baseUrl + "/pushConfigurations/" + pushConfigurationDto.getId(),
-						HttpMethod.DELETE, new HttpEntity<String>("", headers), String.class);
+	public LNSResponse<Void> removeRoutings() {
+		final LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
+		this.getProperty("configId").ifPresent(configId -> {
+			if (jwt == null || jwt.isExpired()) {
+				login();
 			}
-		}
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Authorization", jwt.getTokenType() + " " + jwt.getToken());
+			RestTemplate restTemplate = new RestTemplate();
+			restTemplate.exchange(baseUrl + "/pushConfigurations/" + configId,
+					HttpMethod.DELETE, new HttpEntity<String>("", headers), String.class);
+		});
 		return result;
 	}
 
@@ -395,7 +395,8 @@ public class KerlinkConnector extends LNSAbstractConnector {
 				}).getBody();
 		C8YData c8yData = new C8YData();
 		for (GatewayDto gatewayDto : gatewaysDto.getList()) {
-			result.getResult().add(new Gateway(gatewayDto.getEui(), gatewayDto.getEui(), gatewayDto.getName(), gatewayDto.getLatitude(),
+			result.getResult().add(new Gateway(gatewayDto.getEui(), gatewayDto.getEui(), gatewayDto.getName(),
+					gatewayDto.getLatitude(),
 					gatewayDto.getLongitude(), gatewayDto.getDescription(), ConnectionState.AVAILABLE, c8yData));
 		}
 		return result;
@@ -407,5 +408,9 @@ public class KerlinkConnector extends LNSAbstractConnector {
 
 	public LNSResponse<Void> deprovisionGateway(String id) {
 		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented");
+	}
+
+	public boolean hasGatewayManagementCapability() {
+		return false;
 	}
 }

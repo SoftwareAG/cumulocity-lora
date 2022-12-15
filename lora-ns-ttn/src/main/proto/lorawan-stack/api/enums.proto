@@ -17,11 +17,15 @@ syntax = "proto3";
 package ttn.lorawan.v3;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// TODO: Migrate away from GoGo Protobuf (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798).
+option (gogoproto.goproto_registration) = true;
+
 enum DownlinkPathConstraint {
-  option (gogoproto.goproto_enum_prefix) = false;
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "DOWNLINK_PATH_CONSTRAINT" };
 
   // Indicates that the gateway can be selected for downlink without constraints by the Network Server.
   DOWNLINK_PATH_CONSTRAINT_NONE = 0;
@@ -33,7 +37,7 @@ enum DownlinkPathConstraint {
 
 // State enum defines states that an entity can be in.
 enum State {
-  option (gogoproto.goproto_enum_prefix) = false;
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "STATE" };
 
   // Denotes that the entity has been requested and is pending review by an admin.
   STATE_REQUESTED = 0;
@@ -61,4 +65,5 @@ enum ClusterRole {
   GATEWAY_CONFIGURATION_SERVER = 10;
   QR_CODE_GENERATOR = 11;
   PACKET_BROKER_AGENT = 12;
+  DEVICE_REPOSITORY = 13;
 }

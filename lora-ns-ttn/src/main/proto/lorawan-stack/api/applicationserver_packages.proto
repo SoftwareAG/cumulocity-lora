@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -27,6 +28,9 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// TODO: Migrate away from GoGo Protobuf (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798).
+option (gogoproto.goproto_registration) = true;
+
 message ApplicationPackage {
   string name = 1 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   uint32 default_f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255}];
@@ -37,14 +41,23 @@ message ApplicationPackages {
 }
 
 message ApplicationPackageAssociationIdentifiers {
-  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
+  option (thethings.flags.message) = { select: true, set: true };
+  EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
   uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255}];
 }
 
 message ApplicationPackageAssociation {
-  ApplicationPackageAssociationIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  option (thethings.flags.message) = { select: true, set: true };
+  ApplicationPackageAssociationIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = { select: false, hidden: true }
+  ];
+  google.protobuf.Timestamp created_at = 2 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
+  google.protobuf.Timestamp updated_at = 3 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   string package_name = 4 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   google.protobuf.Struct data = 5;
 }
@@ -54,34 +67,43 @@ message ApplicationPackageAssociations {
 }
 
 message GetApplicationPackageAssociationRequest {
-  ApplicationPackageAssociationIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  ApplicationPackageAssociationIdentifiers ids = 1 [(validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message ListApplicationPackageAssociationRequest {
-  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
+  EndDeviceIdentifiers ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.
   // Each page is ordered by the FPort.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 3;
-  google.protobuf.FieldMask field_mask = 4 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 4;
 }
 
 message SetApplicationPackageAssociationRequest {
-  ApplicationPackageAssociation association = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  ApplicationPackageAssociation association = 1 [(validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message ApplicationPackageDefaultAssociationIdentifiers {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
+  option (thethings.flags.message) = { select: true, set: true };
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255}];
 }
 
 message ApplicationPackageDefaultAssociation {
-  ApplicationPackageDefaultAssociationIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  option (thethings.flags.message) = { select: true, set: true };
+  ApplicationPackageDefaultAssociationIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = { select: false, hidden: true }
+  ];
+  google.protobuf.Timestamp created_at = 2 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
+  google.protobuf.Timestamp updated_at = 3 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   string package_name = 4 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   google.protobuf.Struct data = 5;
 }
@@ -91,23 +113,23 @@ message ApplicationPackageDefaultAssociations {
 }
 
 message GetApplicationPackageDefaultAssociationRequest {
-  ApplicationPackageDefaultAssociationIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  ApplicationPackageDefaultAssociationIdentifiers ids = 1 [(validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message ListApplicationPackageDefaultAssociationRequest {
-  ApplicationIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
+  ApplicationIdentifiers ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.
   // Each page is ordered by the FPort.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 3;
-  google.protobuf.FieldMask field_mask = 4 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 4;
 }
 
 message SetApplicationPackageDefaultAssociationRequest {
-  ApplicationPackageDefaultAssociation default = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  ApplicationPackageDefaultAssociation default = 1 [(validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 service ApplicationPackageRegistry {

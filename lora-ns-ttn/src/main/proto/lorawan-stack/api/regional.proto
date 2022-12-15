@@ -22,6 +22,9 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+// TODO: Migrate away from GoGo Protobuf (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798).
+option (gogoproto.goproto_registration) = true;
+
 message ConcentratorConfig {
   message Channel {
     // Frequency (Hz).
@@ -38,22 +41,22 @@ message ConcentratorConfig {
     uint32 bandwidth = 3;
     uint32 spreading_factor = 4;
   }
-  LoRaStandardChannel lora_standard_channel = 2 [(gogoproto.customname) = "LoRaStandardChannel"];
+  LoRaStandardChannel lora_standard_channel = 2;
   message FSKChannel {
     // Frequency (Hz).
     uint64 frequency = 1;
     uint32 radio = 2;
   }
-  FSKChannel fsk_channel = 3 [(gogoproto.customname) = "FSKChannel"];
+  FSKChannel fsk_channel = 3;
 
   message LBTConfiguration {
     // Received signal strength (dBm).
-    float rssi_target = 1 [(gogoproto.customname) = "RSSITarget"];
+    float rssi_target = 1;
     // Received signal strength offset (dBm).
-    float rssi_offset = 2 [(gogoproto.customname) = "RSSIOffset"];
-    google.protobuf.Duration scan_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+    float rssi_offset = 2;
+    google.protobuf.Duration scan_time = 3;
   }
-  LBTConfiguration lbt = 4 [(gogoproto.customname) = "LBT"];
+  LBTConfiguration lbt = 4;
 
   Channel ping_slot = 5;
 
