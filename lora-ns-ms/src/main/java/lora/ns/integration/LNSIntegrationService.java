@@ -54,6 +54,7 @@ import com.cumulocity.sdk.client.measurement.MeasurementApi;
 import com.cumulocity.sdk.client.option.TenantOptionApi;
 
 import c8y.IsDevice;
+import lombok.extern.slf4j.Slf4j;
 import lora.codec.uplink.C8YData;
 import lora.common.C8YUtils;
 import lora.ns.DeviceData;
@@ -71,6 +72,7 @@ import lora.ns.operation.LNSOperationManager;
 import lora.ns.operation.OperationData;
 
 @EnableScheduling
+@Slf4j
 public abstract class LNSIntegrationService<I extends LNSConnector> {
 	public static final String LNS_EXT_ID = "LoRa Network Server type";
 
@@ -128,8 +130,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	protected LinkedList<PropertyDescription> payloadSimulationFields = new LinkedList<>();
 
-	protected final Logger logger = LoggerFactory.getLogger(LNSIntegrationService.class);
-
 	public abstract String getType();
 
 	public abstract String getName();
@@ -145,7 +145,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	public String getSimulatedPayload(Map<String, Object> fields) {
 		final Context context = new Context();
 		context.setVariables(fields);
-		logger.info(context.toString());
+		log.info(context.toString());
 		return mMessageTemplateEngine.process("payload.json", context);
 	}
 
@@ -176,7 +176,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	@EventListener
 	private void init(MicroserviceSubscriptionAddedEvent event) {
-		logger.info("Looking for LNS Connectors in tenant {}", subscriptionsService.getTenant());
+		log.info("Looking for LNS Connectors in tenant {}", subscriptionsService.getTenant());
 		InventoryFilter filter = new InventoryFilter().byType(LNS_CONNECTOR_TYPE);
 		ManagedObjectCollection col = inventoryApi.getManagedObjectsByFilter(filter);
 		QueryParam queryParam = null;
@@ -187,7 +187,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			e.printStackTrace();
 		}
 		for (ManagedObjectRepresentation mor : col.get(queryParam).allPages()) {
-			logger.info("Retrieved connector: {} of type {}", mor.getName(), mor.getProperty(LNS_TYPE));
+			log.info("Retrieved connector: {} of type {}", mor.getName(), mor.getProperty(LNS_TYPE));
 			LNSConnector instance = getInstance(mor);
 			lnsConnectorManager.addConnector(instance);
 			lnsGatewayManager.upsertGateways(instance);
@@ -197,7 +197,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	public void mapEventToC8Y(String eventString, String lnsInstanceId) {
-		logger.info("Following message was received from the LNS: {}", eventString);
+		log.info("Following message was received from the LNS: {}", eventString);
 		if (isOperationUpdate(eventString)) {
 			updateOperation(eventString, lnsInstanceId);
 		} else {
@@ -212,7 +212,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	public void updateOperation(String event, String lnsInstanceId) {
-		logger.info("LNS instance {} of type {} is known", lnsInstanceId, getType());
+		log.info("LNS instance {} of type {} is known", lnsInstanceId, getType());
 		OperationData data = processDownlinkEvent(event);
 		if (data.getStatus() != OperationStatus.FAILED) {
 			OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
@@ -224,7 +224,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
 				}
 			} else {
-				logger.error("Unknown operation {} from LNS", data.getCommandId());
+				log.error("Unknown operation {} from LNS", data.getCommandId());
 			}
 		} else {
 			if (data.getCommandId() != null) {
@@ -237,7 +237,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
 				}
 			} else {
-				logger.error("Unknown operation");
+				log.error("Unknown operation");
 			}
 		}
 	}
@@ -255,9 +255,10 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	private void configureRoutings(String lnsInstanceId, MicroserviceCredentials credentials) {
 		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getType() + "/"
 				+ lnsInstanceId;
-		logger.info("Connector URL is {}", url);
+		log.info("Connector URL is {}", url);
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent()) {
+			connector.get().removeRoutings();
 			connector.get().configureRoutings(url, subscriptionsService.getTenant(),
 					credentials.getUsername(),
 					credentials.getPassword());
@@ -353,7 +354,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			if (connectors != null) {
 				connectors.values().forEach(c -> {
 					if (c.hasGatewayManagementCapability()) {
-						logger.info("Scanning gateways in tenant {} with connector {}",
+						log.info("Scanning gateways in tenant {} with connector {}",
 								subscriptionsService.getTenant(),
 								c.getName());
 						lnsGatewayManager.upsertGateways(c);
@@ -367,21 +368,25 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	private void processPendingOperations() {
 		subscriptionsService.runForEachTenant(() -> {
 			String currentTenant = subscriptionsService.getTenant();
-			OperationCollection oc = deviceControlApi.getOperationsByFilter(new OperationFilter()
-					.byStatus(OperationStatus.PENDING).byAgent(agentService.getAgent().getId().getValue()));
-			if (oc != null) {
-				for (OperationCollectionRepresentation opCollectionRepresentation = oc
-						.get(); opCollectionRepresentation != null
-								&& !opCollectionRepresentation.getOperations()
-										.isEmpty(); opCollectionRepresentation = oc
-												.getNextPage(opCollectionRepresentation)) {
-					logger.info("Processing pending operations on tenant {} - page {}", currentTenant,
-							oc.get().getPageStatistics().getCurrentPage());
-					for (OperationRepresentation op : opCollectionRepresentation.getOperations()) {
-						lnsOperationManager.executePending(op);
+			lnsConnectorManager.getConnectors().values().forEach(connector -> {
+				log.info("Checking pending operations in tenant {} for connector {}", subscriptionsService.getTenant(),
+						connector.getName());
+				OperationCollection oc = deviceControlApi.getOperationsByFilter(new OperationFilter()
+						.byStatus(OperationStatus.PENDING).byAgent(connector.getId()));
+				if (oc != null) {
+					for (OperationCollectionRepresentation opCollectionRepresentation = oc
+							.get(); opCollectionRepresentation != null
+									&& !opCollectionRepresentation.getOperations()
+											.isEmpty(); opCollectionRepresentation = oc
+													.getNextPage(opCollectionRepresentation)) {
+						log.info("Processing pending operations on tenant {} - page {}", currentTenant,
+								oc.get().getPageStatistics().getCurrentPage());
+						for (OperationRepresentation op : opCollectionRepresentation.getOperations()) {
+							lnsOperationManager.executePending(op);
+						}
 					}
 				}
-			}
+			});
 		});
 	}
 

@@ -114,7 +114,8 @@ public class LNSDeviceManager {
 			logger.info("Upsert device with devEui {} with Payload {} from fPort {}", event.getDevEui(),
 					event.getPayload(), event.getfPort());
 			ManagedObjectRepresentation mor = getOrCreateDevice(lnsConnectorId, event);
-			boolean useGatewayPosition = mor.hasProperty("useGatewayPosition") ? (Boolean)mor.get("useGatewayPosition") : true;
+			boolean useGatewayPosition = mor.hasProperty("useGatewayPosition") ? (Boolean) mor.get("useGatewayPosition")
+					: true;
 			if (event.getModel() == null && mor.get(Hardware.class) != null) {
 				event.setModel(mor.get(Hardware.class).getModel());
 			}
@@ -205,7 +206,7 @@ public class LNSDeviceManager {
 		if (mor == null) {
 			mor = new ManagedObjectRepresentation();
 		}
-		//mor.setType("c8y_LoRaDevice");
+		// mor.setType("c8y_LoRaDevice");
 		mor.set(new LoRaDevice());
 		mor.set(new IsDevice());
 		SupportedOperations supportedOperations = new SupportedOperations();
@@ -349,8 +350,9 @@ public class LNSDeviceManager {
 		updateDevice(deviceProvisioning.getDevEUI(), mor);
 		return mor;
 	}
-	
-	public LNSResponse<ManagedObjectRepresentation> provisionDevice(String lnsConnectorId, DeviceProvisioning deviceProvisioning) {
+
+	public LNSResponse<ManagedObjectRepresentation> provisionDevice(String lnsConnectorId,
+			DeviceProvisioning deviceProvisioning) {
 		logger.info("Will provision device on LNS connector {}: {}", lnsConnectorId, deviceProvisioning);
 		LNSResponse<ManagedObjectRepresentation> response = new LNSResponse<ManagedObjectRepresentation>().withOk(true);
 		ManagedObjectRepresentation mor = null;
@@ -368,10 +370,12 @@ public class LNSDeviceManager {
 				eventApi.create(event);
 				getDeviceConfig(mor);
 				response.setResult(mor);
-				if (result.getMessage().equals("Not implemented.")) {
+				if (result.getMessage() != null && result.getMessage().equals("Not implemented.")) {
 					OperationRepresentation op = new OperationRepresentation();
 					op.setDeviceId(GId.asGId(lnsConnectorId));
-					op.set(new Command("{'provision':{'deveui':'" + deviceProvisioning.getDevEUI() + "', 'appeui': '" + deviceProvisioning.getAppEUI() + "', 'appkey': '" + deviceProvisioning.getAppKey() + "'}}"));
+					op.set(new Command("{'provision':{'deveui':'" + deviceProvisioning.getDevEUI() + "', 'appeui': '"
+							+ deviceProvisioning.getAppEUI() + "', 'appkey': '" + deviceProvisioning.getAppKey()
+							+ "'}}"));
 					deviceControlApi.create(op);
 					ManagedObjectRepresentation updateOwner = new ManagedObjectRepresentation();
 					updateOwner.setId(mor.getId());
@@ -429,7 +433,7 @@ public class LNSDeviceManager {
 					result.setOk(false);
 					result.setMessage(e.getMessage());
 				}
-				if (result.getMessage().equals("Not implemented.")) {
+				if (result.getMessage() != null && result.getMessage().equals("Not implemented.")) {
 					OperationRepresentation op = new OperationRepresentation();
 					op.setDeviceId(GId.asGId(lnsInstanceId));
 					op.set(new Command("{'deprovision':{'deveui':'" + deveui + "'}}"));

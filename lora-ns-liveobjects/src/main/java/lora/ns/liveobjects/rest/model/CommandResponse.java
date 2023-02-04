@@ -1,11 +1,10 @@
 package lora.ns.liveobjects.rest.model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
@@ -13,7 +12,10 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
+@EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Actions {
-    List<HttpPushAction> httpPush;
+public class CommandResponse extends Command {
+    private String id;
+    private String targetDeviceId;
+    private String status;
 }

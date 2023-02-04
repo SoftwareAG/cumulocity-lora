@@ -14,22 +14,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.nsn.cumulocity.clients-java</groupId>
-			<artifactId>microservice-autoconfigure</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.nsn.cumulocity.model</groupId>
-			<artifactId>device-capability-model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>retrofit</artifactId>
-			<version>2.7.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>converter-jackson</artifactId>
-			<version>2.7.2</version>
+			<groupId>com.softwareag</groupId>
+			<artifactId>lora-interface</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
@@ -49,31 +36,10 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot-dependencies.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>com.nsn.cumulocity.clients-java</groupId>
 				<artifactId>microservice-package-maven-plugin</artifactId>
-				<version>${c8y.version}</version>
-				<executions>
-					<execution>
-						<id>package</id>
-						<phase>package</phase>
-						<goals>
-							<goal>package</goal>
-						</goals>
-						<configuration>
-							<deleteImage>false</deleteImage>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

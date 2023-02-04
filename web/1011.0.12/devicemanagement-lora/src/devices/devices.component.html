@@ -23,7 +23,7 @@
 
 <c8y-title translate>LoRa device operations</c8y-title>
 
-<div class="car-group">
+<div class="card-group">
     <div class="col-sm-6">
         <div class="card" *ngIf="device != undefined">
             <div class="card-header separator">
@@ -162,8 +162,7 @@
                             <label class="c8y-checkbox"><input type="checkbox"
                                     [(ngModel)]="deviceProvisioningAdditionalProperties[property.name]"
                                     name="{{property.name}}" #{{property.name}}="ngModel" ngModel
-                                    required /><span></span>Provision device on
-                                LoRa network server</label>
+                                    required /><span></span>{{property.label}}</label>
                         </c8y-form-group>
                         <c8y-form-group *ngIf="property.type === 'LIST'">
                             <label for="{{property.name}}">{{property.label}}:</label>

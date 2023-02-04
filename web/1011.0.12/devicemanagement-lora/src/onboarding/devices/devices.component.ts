@@ -449,4 +449,10 @@ export class LoraDevicesComponent {
         this.bulkProperties = props.properties;
         this.bulkDeviceProvisioningAdditionalProperties = props.values;
     }
+
+    onPaste(e: ClipboardEvent) {
+        e.stopPropagation();
+        e.preventDefault();
+        console.log(e.clipboardData.getData('text'));
+    }
 }

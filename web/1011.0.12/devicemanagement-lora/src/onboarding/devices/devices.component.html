@@ -1,5 +1,72 @@
 <c8y-title translate>All devices</c8y-title>
-
+<div class="card">
+    <div class="card-header separator">
+        <h4 class="card-title">{{'Register devices' | translate}}</h4>
+    </div>
+    <div class="card-block">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Dev EUI</th>
+                    <th>App EUI</th>
+                    <th>App Key</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <c8y-form-group
+                            [hasError]="deviceName.invalid && (deviceName.dirty || deviceName.touched)">
+                            <input class="form-control" required #deviceName="ngModel" name="deviceName"
+                                [(ngModel)]="provisionDevice.deviceName" (change)="log(provision)" />
+                            <c8y-messages *ngIf="deviceName.invalid && (deviceName.dirty || deviceName.touched)">
+                                <c8y-message name="required" *ngIf="deviceName.errors?.required">The device name is required
+                                </c8y-message>
+                            </c8y-messages>
+                        </c8y-form-group>
+                    </td>
+                    <td>
+                        <c8y-form-group [hasError]="devEUI.invalid && (devEUI.dirty || devEUI.touched)">
+                            <input required pattern="[a-fA-F0-9]{16}" #devEUI="ngModel" name="devEUI"
+                                [(ngModel)]="provisionDevice.devEUI" class="form-control" maxlength="16"
+                                aria-describedby="devEUI-help" placeholder="0011223344556677" />
+                            <span id="devEUI-help" class="help-block">
+                                Required 64 bits hex number that uniquely identifies the device.
+                            </span>
+                            <c8y-messages *ngIf="devEUI.invalid && (devEUI.dirty || devEUI.touched)">
+                                <c8y-message name="required" *ngIf="devEUI.errors?.required">The device EUI is required
+                                </c8y-message>
+                                <c8y-message name="pattern" *ngIf="devEUI.errors?.pattern">The device EUI should contain exactly
+                                    8 bytes in hex format</c8y-message>
+                            </c8y-messages>
+                        </c8y-form-group>
+                    </td>
+                    <td>
+                        <c8y-form-group>
+                            <input class="form-control" #appEUI="ngModel" name="appEUI" [(ngModel)]="provisionDevice.appEUI"
+                                maxlength="16" />
+                            <span id="devEUI" class="help-block">
+                                64 bits hex number that uniquely identifies the application. Will be randomly generated if not
+                                provided.
+                            </span>
+                        </c8y-form-group>
+                    </td>
+                    <td>
+                        <c8y-form-group>
+                            <input class="form-control" #appKey="ngModel" name="appKey" [(ngModel)]="provisionDevice.appKey"
+                                aria-describedby="appKey" maxlength="32" />
+                            <span id="appKey" class="help-block">
+                                128 bits hex number used to encrypt communication. Will be randomly generated if not provided.
+                            </span>
+                        </c8y-form-group>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<input type="text" (paste)="onPaste($event)">
 <div class="row">
     <div class="card col-sm-4">
         <div class="card-header separator">

@@ -1,5 +1,6 @@
 package lora.ns.liveobjects.rest.model;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
@@ -13,6 +14,6 @@ import lombok.With;
 @With
 public class HttpPushAction {
     String webhookUrl;
-    Map<String, String> headers;
+    Map<String, List<String>> headers;
     Boolean retryOnFailure = true;
 }

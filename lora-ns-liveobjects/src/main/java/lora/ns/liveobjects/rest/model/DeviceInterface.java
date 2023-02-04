@@ -1,7 +1,5 @@
 package lora.ns.liveobjects.rest.model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
@@ -14,6 +12,8 @@ import lombok.With;
 @AllArgsConstructor
 @With
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Actions {
-    List<HttpPushAction> httpPush;
+public class DeviceInterface {
+    private String connector = "lora";
+    private Boolean enabled = true;
+    private DeviceInterfaceDefinition definition;
 }

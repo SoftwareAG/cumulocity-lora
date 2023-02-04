@@ -1443,10 +1443,10 @@
     xterm "3.14.5"
     zip-js "0.0.2"
 
-"@c8y/ngx-components@1014.0.172":
+"@c8y/ngx-components@file:../../../../cumulocity-ui/1014.0.172/cumulocity-ui/packages/ngx-components/dist/c8y-ngx-components-1014.0.172.tgz":
   version "1014.0.172"
-  resolved "https://registry.npmjs.org/@c8y/ngx-components/-/ngx-components-1014.0.172.tgz"
-  integrity sha512-t2WEv9ZF2iMCtN4iHGj4L1q4alVyxzU+BCPK2cYqFXz7NHQL86fJ1CuLlIt9QeNBnQjN6fo0ecIDiIInAAkvIQ==
+  resolved "file:../../../../cumulocity-ui/1014.0.172/cumulocity-ui/packages/ngx-components/dist/c8y-ngx-components-1014.0.172.tgz"
+  integrity sha512-66anh7iEbHiZyDLXYUZDFymqdLYlTJNC6Mq05mSoRGdPl4ocfeWwfvXEEEGXot9QFvenm13cAPcIT6B2rowU9g==
   dependencies:
     "@c8y/client" "1014.0.172"
     "@ngx-formly/core" "5.10.13"
@@ -2053,15 +2053,6 @@
     "@types/webpack-sources" "*"
     anymatch "^3.0.0"
     source-map "^0.6.0"
-
-"@types/webpack@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.npmjs.org/@types/webpack/-/webpack-5.28.0.tgz"
-  integrity sha512-8cP0CzcxUiFuA9xGJkfeVpqmWTk9nx6CWwamRGCj95ph1SmlRRk9KlCZ6avhCbZd4L68LvYT6l1kpdEnQXrF8w==
-  dependencies:
-    "@types/node" "*"
-    tapable "^2.2.0"
-    webpack "^5"
 
 "@types/yargs-parser@*":
   version "21.0.0"
@@ -7907,10 +7898,10 @@ moment@2.29.2:
   resolved "https://registry.npmjs.org/moment/-/moment-2.29.2.tgz"
   integrity sha512-UgzG4rvxYpN15jgCmVJwac49h9ly9NurikMWGPdVxm8GZD6XjkKPxDTjQQ43gtGgnV3X0cAyWDdP2Wexoquifg==
 
-monaco-editor@^0.24.0, monaco-editor@0.34.1:
-  version "0.34.1"
-  resolved "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.34.1.tgz"
-  integrity sha512-FKc80TyiMaruhJKKPz5SpJPIjL+dflGvz4CpuThaPMc94AyN7SeC9HQ8hrvaxX7EyHdJcUY5i4D0gNyJj1vSZQ==
+monaco-editor@^0.24.0, monaco-editor@0.24.0:
+  version "0.24.0"
+  resolved "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.24.0.tgz"
+  integrity sha512-o1f0Lz6ABFNTtnEqqqvlY9qzNx24rQZx1RgYNQ8SkWkE+Ka63keHH/RqxQ4QhN4fs/UYOnvAtEUZsPrzccH++A==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
@@ -11712,7 +11703,7 @@ webpack-subresource-integrity@1.5.2:
   dependencies:
     webpack-sources "^1.3.0"
 
-"webpack@^4.0.0 || ^5.0.0", webpack@^5, webpack@^5.0.0, webpack@^5.1.0, webpack@^5.30.0, "webpack@>= 1.12.11 < 6", webpack@>=2, webpack@>=4.0.1:
+"webpack@^4.0.0 || ^5.0.0", webpack@^5.0.0, webpack@^5.1.0, webpack@^5.30.0, "webpack@>= 1.12.11 < 6", webpack@>=2, webpack@>=4.0.1:
   version "5.75.0"
   resolved "https://registry.npmjs.org/webpack/-/webpack-5.75.0.tgz"
   integrity sha512-piaIaoVJlqMsPtX/+3KTTO6jfvrSYgauFVdt8cr9LTHKmcq/AMd4mhzsiP7ZF/PGRNPGA8336jldh9l2Kt2ogQ==

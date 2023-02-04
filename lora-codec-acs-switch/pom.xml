@@ -30,34 +30,11 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot-dependencies.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>com.nsn.cumulocity.clients-java</groupId>
 				<artifactId>microservice-package-maven-plugin</artifactId>
-				<version>${c8y.version}</version>
-				<executions>
-					<execution>
-						<id>package</id>
-						<phase>package</phase>
-						<goals>
-							<goal>package</goal>
-						</goals>
-						<configuration>
-							<deleteImage>false</deleteImage>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
-
-
 </project>
