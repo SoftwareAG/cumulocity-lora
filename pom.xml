@@ -60,6 +60,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>com.softwareag</groupId>
+        <artifactId>common-resources</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.nsn.cumulocity.clients-java</groupId>
         <artifactId>java-client</artifactId>
         <version>${c8y.version}</version>
@@ -85,13 +90,6 @@
     </dependencies>
   </dependencyManagement>
   <build>
-    <extensions>
-      <extension>
-        <groupId>com.softwareag</groupId>
-        <artifactId>lora-interface</artifactId>
-        <version>${project.version}</version>
-      </extension>
-    </extensions>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -119,33 +117,12 @@
               </goals>
               <configuration>
                 <deleteImage>false</deleteImage>
-                <srcDockerDir>${project.build.outputDirectory}/docker</srcDockerDir>
+                <srcDockerDir>${project.parent.basedir}/docker</srcDockerDir>
               </configuration>
             </execution>
           </executions>
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>extract-dockerfile</id>
-            <phase>package</phase>
-            <goals>
-              <goal>unpack-dependencies</goal>
-            </goals>
-            <configuration>
-              <type>jar</type>
-              <includeArtifactIds>lora-interface</includeArtifactIds>
-              <includes>docker/Dockerfile</includes>
-              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
   </build>
 </project>

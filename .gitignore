@@ -2,7 +2,6 @@
 /.project
 /.settings/
 /.vscode/
-/docker/
 web/1006.6.5/devicemanagement/dist
 web/1006.6.5/devicemanagement/node_modules
 web/1007.0.24/devicemanagement-lora/dist

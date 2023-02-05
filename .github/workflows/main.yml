@@ -15,8 +15,31 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
+  java_build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Build with Maven
+        run: |
+          cd lora-interface
+          mvn clean install
+          cd ..
+          mvn --batch-mode --update-snapshots verify
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: java-artifacts
+          path: */target/*.zip
+  node_build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -34,6 +57,19 @@ jobs:
             zip $codec image.tar cumulocity.json
             cd ..
           done
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-artifacts
+          path: nodejs/lora*/lora*.zip
+  web_build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
       - name: Build webapp
         run: |
           cd web/1014.0.172/devicemanagement-lora
@@ -41,70 +77,33 @@ jobs:
           npm run build
           cd dist/apps/devicemanagement-lora
           zip -r devicemanagement-lora *
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          java-version: '11'
-          distribution: 'adopt'
-      - name: Build with Maven
-        run: |
-          cd lora-interface
-          mvn clean install
-          cd ..
-          mvn --batch-mode --update-snapshots verify
+          name: web-artifact
+          path: web/1014.0.172/devicemanagement-lora/dist/apps/devicemanagement-lora/devicemanagement-lora.zip
+  create_release:
+    runs-on: ubuntu-latest
+    needs: [java_build, node_build, web_build]
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+      - run: ls -r
       - name: Create Release
-        uses: actions/github-script@v2
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            console.log('environment', process.versions);
-            
-            const fs = require('fs').promises;
-            
-            const { repo: { owner, repo }, sha } = context;
-            console.log({ owner, repo, sha });
-
-            const release = await github.repos.createRelease({
-              owner, repo,
-              tag_name: process.env.GITHUB_REF,
-              draft: true,
-              target_commitish: sha
-            });
-
-            console.log('created release', { release });
-
-            await github.repos.uploadReleaseAsset({
-              owner, repo,
-              release_id: release.data.id,
-              name: 'devicemanagement-lora.zip',
-              data: await fs.readFile('web/1014.0.172/devicemanagement-lora/dist/apps/devicemanagement-lora/devicemanagement-lora.zip')
-            });            
-        
-            for (let dir of await fs.readdir('.', {withFileTypes: true})) {
-              console.log('Reading dir ' + dir.name);
-              if (dir.isDirectory() && !dir.name.endsWith('archetype') && (dir.name.startsWith('lora-ns') || dir.name.startsWith('lora-codec') || dir.name.startsWith('github-proxy'))) {
-                for (let file of await fs.readdir(dir.name + "/target")) {
-                  if (file.endsWith('.zip')) {
-                    console.log('Uploading ' + dir.name + '/target/' + file + ' as asset ' + dir.name);
-                    await github.repos.uploadReleaseAsset({
-                      owner, repo,
-                      release_id: release.data.id,
-                      name: dir.name + '.zip',
-                      data: await fs.readFile(dir.name + '/target/' + file)
-                    });            
-                  }
-                }
-              }
-            }
-            
-            for (let dir of await fs.readdir('nodejs', {withFileTypes: true})) {
-              if (dir.isDirectory() && dir.name.startsWith('lora-codec')) {
-                console.log('Uploading ' + dir.name + '.zip as asset ' + dir.name);
-                await github.repos.uploadReleaseAsset({
-                  owner, repo,
-                  release_id: release.data.id,
-                  name: dir.name + '.zip',
-                  data: await fs.readFile('nodejs/' + dir.name + '/' + dir.name + '.zip')
-                });            
-              }
-            }
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Assets
+        id: upload-release-assets 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./*.zip
