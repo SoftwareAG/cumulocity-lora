@@ -95,6 +95,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             console.log('environment', process.versions);
+            console.log({context});
             
             const fs = require('fs').promises;
             
