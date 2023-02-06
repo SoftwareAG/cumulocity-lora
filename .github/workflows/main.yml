@@ -55,10 +55,6 @@ jobs:
             const { repo: { owner, repo }, sha } = context;
             console.log({ owner, repo, sha });
 
-            const release = await github.rest.repos.getReleaseByTag({
-              owner, repo, tag: process.env.GITHUB_REF
-            })
-
             for (let dir of await fs.readdir('.', {withFileTypes: true})) {
               console.log('Reading dir ' + dir.name);
               if (dir.isDirectory() && !dir.name.endsWith('archetype') && (dir.name.startsWith('lora-ns') || dir.name.startsWith('lora-codec') || dir.name.startsWith('github-proxy'))) {
@@ -67,7 +63,7 @@ jobs:
                     console.log('Uploading ' + dir.name + '/target/' + file + ' as asset ' + dir.name);
                     await github.rest.repos.uploadReleaseAsset({
                       owner, repo,
-                      release_id: release.data.id,
+                      release_id: context.create_release.create_release.outputs.id,
                       name: dir.name + '.zip',
                       data: await fs.readFile(dir.name + '/target/' + file)
                     });            
@@ -105,16 +101,12 @@ jobs:
             const { repo: { owner, repo }, sha } = context;
             console.log({ owner, repo, sha });
 
-            const release = await github.rest.repos.getReleaseByTag({
-              owner, repo, tag: process.env.GITHUB_REF
-            })
-
             for (let dir of await fs.readdir('nodejs', {withFileTypes: true})) {
               if (dir.isDirectory() && dir.name.startsWith('lora-codec')) {
                 console.log('Uploading ' + dir.name + '.zip as asset ' + dir.name);
                 await github.rest.repos.uploadReleaseAsset({
                   owner, repo,
-                  release_id: release.data.id,
+                  release_id: context.create_release.create_release.outputs.id,
                   name: dir.name + '.zip',
                   data: await fs.readFile('nodejs/' + dir.name + '/' + dir.name + '.zip')
                 });            
@@ -147,13 +139,9 @@ jobs:
             const { repo: { owner, repo }, sha } = context;
             console.log({ owner, repo, sha });
 
-            const release = await github.rest.repos.getReleaseByTag({
-              owner, repo, tag: process.env.GITHUB_REF
-            })
-
             await github.rest.repos.uploadReleaseAsset({
               owner, repo,
-              release_id: release.data.id,
+              release_id: context.create_release.create_release.outputs.id,
               name: 'devicemanagement-lora.zip',
               data: await fs.readFile('web/1014.0.172/devicemanagement-lora/dist/apps/devicemanagement-lora/devicemanagement-lora.zip')
             });            
