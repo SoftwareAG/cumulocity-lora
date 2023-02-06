@@ -17,6 +17,8 @@ on:
 jobs:
   create_release:
     runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{steps.create_release.outputs.id}}
     steps:
       - name: Create Release
         id: create_release
@@ -63,7 +65,7 @@ jobs:
                     console.log('Uploading ' + dir.name + '/target/' + file + ' as asset ' + dir.name);
                     await github.rest.repos.uploadReleaseAsset({
                       owner, repo,
-                      release_id: context.needs.create_release.create_release.outputs.id,
+                      release_id: context.needs.create_release.steps.create_release.outputs.id,
                       name: dir.name + '.zip',
                       data: await fs.readFile(dir.name + '/target/' + file)
                     });            
@@ -107,7 +109,7 @@ jobs:
                 console.log('Uploading ' + dir.name + '.zip as asset ' + dir.name);
                 await github.rest.repos.uploadReleaseAsset({
                   owner, repo,
-                  release_id: context.needs.create_release.create_release.outputs.id,
+                  release_id: context.needs.create_release.steps.create_release.outputs.id,
                   name: dir.name + '.zip',
                   data: await fs.readFile('nodejs/' + dir.name + '/' + dir.name + '.zip')
                 });            
@@ -142,7 +144,7 @@ jobs:
 
             await github.rest.repos.uploadReleaseAsset({
               owner, repo,
-              release_id: context.needs.create_release.create_release.outputs.id,
+              release_id: context.needs.create_release.steps.create_release.outputs.id,
               name: 'devicemanagement-lora.zip',
               data: await fs.readFile('web/1014.0.172/devicemanagement-lora/dist/apps/devicemanagement-lora/devicemanagement-lora.zip')
             });            
