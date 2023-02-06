@@ -47,6 +47,8 @@ jobs:
           mvn --batch-mode --update-snapshots verify
       - name: Create Release
         uses: actions/github-script@v6
+        env:
+          RELEASE_ID: ${{needs.create_release.outputs.release_id}}
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -65,7 +67,7 @@ jobs:
                     console.log('Uploading ' + dir.name + '/target/' + file + ' as asset ' + dir.name);
                     await github.rest.repos.uploadReleaseAsset({
                       owner, repo,
-                      release_id: context.needs.create_release.steps.create_release.outputs.id,
+                      release_id: process.env.RELEASE_ID,
                       name: dir.name + '.zip',
                       data: await fs.readFile(dir.name + '/target/' + file)
                     });            
@@ -93,12 +95,12 @@ jobs:
           done
       - name: Create Release
         uses: actions/github-script@v6
+        env:
+          RELEASE_ID: ${{needs.create_release.outputs.release_id}}
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             console.log('environment', process.versions);
-            console.log({process});
-            console.log(context.needs);
             
             const fs = require('fs').promises;
             
@@ -110,7 +112,7 @@ jobs:
                 console.log('Uploading ' + dir.name + '.zip as asset ' + dir.name);
                 await github.rest.repos.uploadReleaseAsset({
                   owner, repo,
-                  release_id: context.needs.create_release.outputs.release_id,
+                  release_id: process.env.RELEASE_ID,
                   name: dir.name + '.zip',
                   data: await fs.readFile('nodejs/' + dir.name + '/' + dir.name + '.zip')
                 });            
@@ -133,6 +135,8 @@ jobs:
           zip -r devicemanagement-lora *
       - name: Create Release
         uses: actions/github-script@v6
+        env:
+          RELEASE_ID: ${{needs.create_release.outputs.release_id}}
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -145,7 +149,7 @@ jobs:
 
             await github.rest.repos.uploadReleaseAsset({
               owner, repo,
-              release_id: context.needs.create_release.steps.create_release.outputs.id,
+              release_id: process.env.RELEASE_ID,
               name: 'devicemanagement-lora.zip',
               data: await fs.readFile('web/1014.0.172/devicemanagement-lora/dist/apps/devicemanagement-lora/devicemanagement-lora.zip')
             });            
