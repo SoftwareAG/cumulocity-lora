@@ -1,15 +1,14 @@
 import { NgModule } from "@angular/core";
-import { ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule as NgRouterModule } from "@angular/router";
 import { UpgradeModule as NgUpgradeModule } from "@angular/upgrade/static";
 import {
   CoreModule,
+  RouterModule,
   HOOK_NAVIGATOR_NODES,
   HOOK_ROUTE,
-  RouterModule,
-  ViewContext,
   DynamicFormsModule,
+  ViewContext,
 } from "@c8y/ngx-components";
 import { AssetsNavigatorModule } from "@c8y/ngx-components/assets-navigator";
 import { SubAssetsModule } from "@c8y/ngx-components/sub-assets";
@@ -17,6 +16,7 @@ import { ChildDevicesModule } from "@c8y/ngx-components/child-devices";
 import { DeviceGridExampleModule } from "@c8y/ngx-components/device-grid-example";
 import { DeviceProfileModule } from "@c8y/ngx-components/device-profile";
 import { DeviceShellModule } from "@c8y/ngx-components/device-shell";
+import { DeviceListModule } from "@c8y/ngx-components/device-list";
 import { OperationsModule } from "@c8y/ngx-components/operations";
 import { ImpactProtocolModule } from "@c8y/ngx-components/protocol-impact";
 import { OpcuaProtocolModule } from "@c8y/ngx-components/protocol-opcua";
@@ -36,6 +36,9 @@ import {
   DeviceManagementHomeDashboardModule,
   DeviceInfoDashboardModule,
 } from "@c8y/ngx-components/context-dashboard";
+import { RegisterDeviceModule } from "@c8y/ngx-components/register-device";
+import { SigfoxDeviceRegistrationModule } from "@c8y/ngx-components/sigfox-device-registration";
+import { ActilityDeviceRegistrationModule } from "@c8y/ngx-components/actility-device-registration";
 import { DiagnosticsModule } from "@c8y/ngx-components/diagnostics";
 
 import { FormlyModule } from "@ngx-formly/core";
@@ -359,14 +362,18 @@ declare var Buffer: {
     ChildDevicesModule,
     DeviceManagementHomeDashboardModule,
     DeviceInfoDashboardModule,
+    RegisterDeviceModule,
+    SigfoxDeviceRegistrationModule,
+    ActilityDeviceRegistrationModule,
     DeviceShellModule,
     DiagnosticsModule,
+    DeviceListModule,
+    DynamicFormsModule,
     MonacoEditorModule.forRoot(monacoConfig),
     BsDatepickerModule.forRoot(),
     TimepickerModule.forRoot(),
     ModalModule.forRoot(),
     PopoverModule,
-    ReactiveFormsModule,
     DynamicFormsModule,
     FormlyModule.forRoot({
       types: [{ name: "repeat", component: RepeatTypeComponent }],
@@ -416,8 +423,5 @@ declare var Buffer: {
 export class AppModule extends HybridAppModule {
   constructor(protected upgrade: NgUpgradeModule) {
     super();
-    window["c8y"].collections.properties[
-      "managed-objects"
-    ].properties.c8y_LpwanDevice.properties.provisioned.type = "boolean";
   }
 }
