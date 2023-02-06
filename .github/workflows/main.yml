@@ -55,7 +55,7 @@ jobs:
             const { repo: { owner, repo }, sha } = context;
             console.log({ owner, repo, sha });
 
-            const release = await github.repos.getReleaseByTag({
+            const release = await github.rest.repos.getReleaseByTag({
               owner, repo, tag: process.env.GITHUB_REF
             })
 
@@ -65,7 +65,7 @@ jobs:
                 for (let file of await fs.readdir(dir.name + "/target")) {
                   if (file.endsWith('.zip')) {
                     console.log('Uploading ' + dir.name + '/target/' + file + ' as asset ' + dir.name);
-                    await github.repos.uploadReleaseAsset({
+                    await github.rest.repos.uploadReleaseAsset({
                       owner, repo,
                       release_id: release.data.id,
                       name: dir.name + '.zip',
@@ -105,14 +105,14 @@ jobs:
             const { repo: { owner, repo }, sha } = context;
             console.log({ owner, repo, sha });
 
-            const release = await github.repos.getReleaseByTag({
+            const release = await github.rest.repos.getReleaseByTag({
               owner, repo, tag: process.env.GITHUB_REF
             })
 
             for (let dir of await fs.readdir('nodejs', {withFileTypes: true})) {
               if (dir.isDirectory() && dir.name.startsWith('lora-codec')) {
                 console.log('Uploading ' + dir.name + '.zip as asset ' + dir.name);
-                await github.repos.uploadReleaseAsset({
+                await github.rest.repos.uploadReleaseAsset({
                   owner, repo,
                   release_id: release.data.id,
                   name: dir.name + '.zip',
@@ -147,11 +147,11 @@ jobs:
             const { repo: { owner, repo }, sha } = context;
             console.log({ owner, repo, sha });
 
-            const release = await github.repos.getReleaseByTag({
+            const release = await github.rest.repos.getReleaseByTag({
               owner, repo, tag: process.env.GITHUB_REF
             })
 
-            await github.repos.uploadReleaseAsset({
+            await github.rest.repos.uploadReleaseAsset({
               owner, repo,
               release_id: release.data.id,
               name: 'devicemanagement-lora.zip',
