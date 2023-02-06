@@ -97,7 +97,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             console.log('environment', process.versions);
-            console.log({context});
+            console.log({context.needs});
             
             const fs = require('fs').promises;
             
@@ -109,7 +109,7 @@ jobs:
                 console.log('Uploading ' + dir.name + '.zip as asset ' + dir.name);
                 await github.rest.repos.uploadReleaseAsset({
                   owner, repo,
-                  release_id: context.needs.create_release.steps.create_release.outputs.id,
+                  release_id: context.needs.create_release.outputs.release_id,
                   name: dir.name + '.zip',
                   data: await fs.readFile('nodejs/' + dir.name + '/' + dir.name + '.zip')
                 });            
