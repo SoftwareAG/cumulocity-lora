@@ -1,8 +1,11 @@
 from genericpath import exists
 from getpass import getpass
-import json, os
+import json
+import os
 from typing import Optional
-import requests, sys, getopt
+import requests
+import sys
+import getopt
 from enum import Enum
 
 username = None
@@ -39,20 +42,23 @@ auth = (username, password)
 headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
 
 currentPage = 1
-events = requests.get(host + '/event/events?source=' + device + '&withTotalPages=true&pageSize=100&type=LoRaPayload', auth=auth).json()
+events = requests.get(
+    f'{host}/event/events?source={device}&withTotalPages=true&pageSize=100&type=LoRaPayload', auth=auth).json()
 totalPages = events["statistics"]["totalPages"]
 cpt = 0
-while (currentPage<=totalPages):
+while (currentPage <= totalPages):
     for event in events["events"]:
         if "status" not in event:
             status = "unprocessed"
             if "processed" in event and event["processed"]:
                 status = "processed"
             updated_event = {"status": status}
-            #print(updated_event)
-            requests.put(host + f'/event/events/{event["id"]}', auth=auth, data=json.dumps(updated_event))
+            # print(updated_event)
+            requests.put(
+                f'{host}/event/events/{event["id"]}', auth=auth, data=json.dumps(updated_event))
             cpt = cpt + 1
     currentPage = currentPage + 1
-    events = requests.get(host + '/event/events?source=' + device + '&pageSize=100&currentpage=' + str(currentPage), auth=auth).json()
+    events = requests.get(
+        f'{host}/event/events?source={device}&pageSize=100&currentpage={currentPage}', auth=auth).json()
 
 print(f"Processed {cpt} events")
