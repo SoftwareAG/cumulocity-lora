@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:alpine as build
 
 WORKDIR /usr/app
 
@@ -13,4 +13,12 @@ COPY ./lora-codec-custom/tsconfig.json ./lora-codec-custom/tsconfig.json
 COPY ./lora-codec-custom/src ./lora-codec-custom/src
 WORKDIR /usr/app/lora-codec-custom
 RUN npm install && tsc
-CMD ["npm", "start"]
+
+FROM node:alpine
+
+WORKDIR /usr/app
+COPY --from=build /usr/app/lora-codec-custom/dist ./
+COPY --from=build /usr/app/lora-codec-custom/node_modules ./node_modules
+RUN npm install pm2 -g
+
+CMD ["pm2-runtime", "index.js"]
