@@ -87,8 +87,15 @@ jobs:
       - name: Build Node.js codecs
         run: |
           cd nodejs
+          cd c8y-codec-interface
+          npm install
+          npm install typescript -g
+          tsc
+          cd ..
           for codec in lora-codec* ; do
             cd $codec
+            npm install
+            tsc
             docker build -t $codec .
             docker save $codec -o image.tar
             zip $codec image.tar cumulocity.json

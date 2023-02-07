@@ -19,7 +19,7 @@
     "lora-codec-interface": "file:../c8y-codec-interface"
   },
   "devDependencies": {
-    "@types/node": "^14.14.35",
+    "@types/node": "^18.11.9",
     "concurrently": "^6.0.0",
     "nodemon": "^2.0.7",
     "reflect-metadata": "^0.1.13",
