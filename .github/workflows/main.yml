@@ -63,14 +63,14 @@ jobs:
             for (let dir of await fs.readdir('./java', {withFileTypes: true})) {
               console.log('Reading dir ' + dir.name);
               if (dir.isDirectory() && !dir.name.endsWith('archetype') && (dir.name.startsWith('lora-ns') || dir.name.startsWith('lora-codec') || dir.name.startsWith('github-proxy'))) {
-                for (let file of await fs.readdir(dir.name + "/target")) {
+                for (let file of await fs.readdir('./java/' + dir.name + "/target")) {
                   if (file.endsWith('.zip')) {
                     console.log('Uploading ' + dir.name + '/target/' + file + ' as asset ' + dir.name);
                     await github.rest.repos.uploadReleaseAsset({
                       owner, repo,
                       release_id: process.env.RELEASE_ID,
                       name: dir.name + '.zip',
-                      data: await fs.readFile(dir.name + '/target/' + file)
+                      data: await fs.readFile('./java/' + dir.name + '/target/' + file)
                     });            
                   }
                 }
