@@ -17,8 +17,7 @@ RUN npm install && tsc
 FROM node:alpine
 
 WORKDIR /usr/app
-COPY --from=build /usr/app/lora-codec-adeunis/package.json ./
-COPY --from=build /usr/app/lora-codec-adeunis/dist ./dist
+COPY --from=build /usr/app/lora-codec-adeunis/dist ./
 COPY --from=build /usr/app/lora-codec-adeunis/node_modules ./node_modules
 RUN npm install pm2 -g
 
