@@ -1,0 +1,10 @@
+LICENSE
+README.md
+pyproject.toml
+src/c8y_ms_sdk/__init__.py
+src/c8y_ms_sdk/sdk.py
+src/c8y_ms_sdk.egg-info/PKG-INFO
+src/c8y_ms_sdk.egg-info/SOURCES.txt
+src/c8y_ms_sdk.egg-info/dependency_links.txt
+src/c8y_ms_sdk.egg-info/requires.txt
+src/c8y_ms_sdk.egg-info/top_level.txt

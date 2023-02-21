@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "lora-codec-interface"
+version = "0.1.0"
+description = ""
+authors = ["sagfcp <cyril.poder@softwareag.com>"]
+readme = "README.md"
+packages = [{include = "lora_codec_interface"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+c8y-ms-sdk = {path = "../c8y-ms-sdk/dist/c8y_ms_sdk-0.0.0-py3-none-any.whl"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

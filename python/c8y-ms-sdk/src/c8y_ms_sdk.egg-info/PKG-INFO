@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: c8y-ms-sdk
+Version: 0.0.0
+Summary: Cumulocity Microservice SDK to help build multi-tenant microservices in Python
+Author-email: Cyril Poder <cyril.poder@softwareag.com>
+Project-URL: Homepage, https://github.com/SoftwareAG/cumulocity-lora
+Project-URL: Bug Tracker, https://github.com/SoftwareAG/cumulocity-lora/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+Cumulocity Microservice SDK to help build multi-tenant microservices in Python.

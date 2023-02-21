@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "c8y_ms_sdk"
+authors = [
+  { name="Cyril Poder", email="cyril.poder@softwareag.com" },
+]
+description = "Cumulocity Microservice SDK to help build multi-tenant microservices in Python"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = ["requests", "events", "bottle", "logging", "apscheduler"]
+dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://github.com/SoftwareAG/cumulocity-lora"
+"Bug Tracker" = "https://github.com/SoftwareAG/cumulocity-lora/issues"

@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "lora-codec-nke"
+version = "0.1.0"
+description = ""
+authors = ["cpoder <cyril.poder@gmail.com>"]
+readme = "README.md"
+packages = [{include = "lora_codec_nke"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+construct = "^2.10.68"
+lora-codec-interface = {path = "../lora-codec-interface/dist/lora_codec_interface-0.1.0-py3-none-any.whl"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
