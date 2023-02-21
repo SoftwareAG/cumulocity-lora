@@ -19,26 +19,21 @@ public class LNSConnectorManager {
 	private MicroserviceSubscriptionsService subscriptionsService;
 
 	public Optional<LNSConnector> getConnector(String lnsConnectorId) {
-		LNSConnector result = null;
-		if (connectors.containsKey(subscriptionsService.getTenant())
-				&& connectors.get(subscriptionsService.getTenant()).containsKey(lnsConnectorId)) {
-			result = connectors.get(subscriptionsService.getTenant()).get(lnsConnectorId);
-		}
-		return Optional.ofNullable(result);
+		return Optional.ofNullable(getConnectors().get(lnsConnectorId));
 	}
 
 	public void removeConnector(String lnsConnectorId) {
-		connectors.get(subscriptionsService.getTenant()).remove(lnsConnectorId);
+		getConnectors().remove(lnsConnectorId);
 	}
-	
+
 	public void addConnector(LNSConnector connector) {
+		getConnectors().put(connector.getId(), connector);
+	}
+
+	public Map<String, LNSConnector> getConnectors() {
 		if (!connectors.containsKey(subscriptionsService.getTenant())) {
 			connectors.put(subscriptionsService.getTenant(), new HashMap<>());
 		}
-		connectors.get(subscriptionsService.getTenant()).put(connector.getId(), connector);
-	}
-	
-	public Map<String, LNSConnector> getConnectors() {
 		return connectors.get(subscriptionsService.getTenant());
 	}
 

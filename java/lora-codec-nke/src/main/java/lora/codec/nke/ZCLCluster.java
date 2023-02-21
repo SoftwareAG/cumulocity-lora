@@ -21,7 +21,7 @@ public enum ZCLCluster {
 	SensO(0x8003),
 	LoRaWAN(0x8004),
 	MultiBinaryInput(0x8005),
-	SerialInterface(0x8006), 
+	SerialInterface(0x8006),
 	SerialMasterSlave(0x8007),
 	DifferentialPressure(0x8008),
 	MultiMasterSlave(0x8009),
@@ -34,19 +34,23 @@ public enum ZCLCluster {
 	VoltageCurrentMetering(0x800B),
 	Concentration(0x800C);
 
-    private int clusterId;
-    private static final Map<Integer, ZCLCluster> clustersById = new HashMap<>();
-    static {
-        for (ZCLCluster c: values()) {
-            clustersById.put(c.clusterId, c);
-        }
-    }
+	private int clusterId;
+	private static final Map<Integer, ZCLCluster> clustersById = new HashMap<>();
+	static {
+		for (ZCLCluster c : values()) {
+			clustersById.put(c.clusterId, c);
+		}
+	}
 
-    ZCLCluster(int clusterId) {
-        this.clusterId = clusterId;
-    }
+	ZCLCluster(int clusterId) {
+		this.clusterId = clusterId;
+	}
 
-    public static ZCLCluster getClusterById(int clusterId) {
-        return clustersById.get(clusterId);
-    }
+	public static ZCLCluster getClusterById(int clusterId) {
+		return clustersById.get(clusterId);
+	}
+
+	public int getClusterId() {
+		return clusterId;
+	}
 }

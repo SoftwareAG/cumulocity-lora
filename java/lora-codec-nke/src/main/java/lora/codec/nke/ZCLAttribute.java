@@ -1,25 +1,25 @@
 package lora.codec.nke;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
-import lora.codec.downlink.DeviceOperation;
-
 public enum ZCLAttribute {
-    FirmwareVersion(0x0002, ZCLCluster.Basic),
-    KernelVersion(0x0003, ZCLCluster.Basic),
-    Manufacturer(0x0004, ZCLCluster.Basic),
-    ModelIdentifier(0x0005, ZCLCluster.Basic),
-    DateCode(0x0006, ZCLCluster.Basic),
-    MeasuredValue(0x0000, ZCLCluster.Temperature);
+    BasicFirmwareVersion(0x0002, ZCLCluster.Basic, ZCLCommand.ReadAttribute),
+    BasicKernelVersion(0x0003, ZCLCluster.Basic, ZCLCommand.ReadAttribute),
+    BasicManufacturer(0x0004, ZCLCluster.Basic, ZCLCommand.ReadAttribute),
+    BasicModelIdentifier(0x0005, ZCLCluster.Basic, ZCLCommand.ReadAttribute),
+    BasicDateCode(0x0006, ZCLCluster.Basic, ZCLCommand.ReadAttribute),
+    TemperatureMeasuredValue(0x0000, ZCLCluster.Temperature, ZCLCommand.ReadAttribute);
 
     private int attributeId;
     private ZCLCluster cluster;
-    protected Map<ZCLCommand, DeviceOperation> operations = new HashMap<>();
+    private ZCLCommand[] commands;
 
-    private static final Map<ZCLCluster, Map<Integer, ZCLAttribute>> attributesByClusterAndId = new HashMap<>();
+    private static final Map<ZCLCluster, Map<Integer, ZCLAttribute>> attributesByClusterAndId = new EnumMap<>(
+            ZCLCluster.class);
     static {
-        for(ZCLAttribute a: values()) {
+        for (ZCLAttribute a : values()) {
             if (!attributesByClusterAndId.containsKey(a.cluster)) {
                 attributesByClusterAndId.put(a.cluster, new HashMap<>());
             }
@@ -27,12 +27,21 @@ public enum ZCLAttribute {
         }
     }
 
-    ZCLAttribute(int attributeId, ZCLCluster cluster) {
+    ZCLAttribute(int attributeId, ZCLCluster cluster, ZCLCommand... commands) {
         this.attributeId = attributeId;
         this.cluster = cluster;
+        this.commands = commands;
     }
 
-    public Map<ZCLCommand, DeviceOperation> getDeviceOperations() {
-        return operations;
+    public ZCLCommand[] getAvailableCommands() {
+        return commands;
+    }
+
+    public int getAttributeId() {
+        return attributeId;
+    }
+
+    public ZCLCluster getCluster() {
+        return cluster;
     }
 }

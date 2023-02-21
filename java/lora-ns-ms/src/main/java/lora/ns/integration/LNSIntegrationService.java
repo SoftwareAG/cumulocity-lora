@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -16,8 +15,6 @@ import java.util.Optional;
 import java.util.Properties;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -37,6 +34,7 @@ import com.cumulocity.microservice.subscription.service.MicroserviceSubscription
 import com.cumulocity.model.Agent;
 import com.cumulocity.model.idtype.GId;
 import com.cumulocity.model.operation.OperationStatus;
+import com.cumulocity.rest.representation.event.EventRepresentation;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.cumulocity.rest.representation.operation.OperationCollectionRepresentation;
@@ -46,6 +44,7 @@ import com.cumulocity.sdk.client.QueryParam;
 import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
 import com.cumulocity.sdk.client.devicecontrol.OperationCollection;
 import com.cumulocity.sdk.client.devicecontrol.OperationFilter;
+import com.cumulocity.sdk.client.event.EventApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.inventory.InventoryFilter;
 import com.cumulocity.sdk.client.inventory.ManagedObject;
@@ -196,16 +195,29 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		agentService.registerAgent(this);
 	}
 
+	@Autowired
+	private EventApi eventApi;
+
 	public void mapEventToC8Y(String eventString, String lnsInstanceId) {
 		log.info("Following message was received from the LNS: {}", eventString);
+		EventRepresentation event = new EventRepresentation();
+		ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
+		mor.setId(GId.asGId(lnsInstanceId));
+		event.setSource(mor);
+		event.setProperty("event", eventString);
+		event.setType("raw LNS event");
+		event.setText("raw LNS event");
+		event.setDateTime(DateTime.now());
+		eventApi.create(event);
+
 		if (isOperationUpdate(eventString)) {
 			updateOperation(eventString, lnsInstanceId);
 		} else {
-			DeviceData event = processUplinkEvent(eventString);
-			if (event != null) {
+			DeviceData data = processUplinkEvent(eventString);
+			if (data != null) {
 				Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 				if (connector.isPresent()) {
-					lnsDeviceManager.upsertDevice(lnsInstanceId, event);
+					lnsDeviceManager.upsertDevice(lnsInstanceId, data);
 				}
 			}
 		}

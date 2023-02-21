@@ -34,6 +34,7 @@
     <module>lora-codec-example</module>
     <module>lora-ns-generic</module>
     <module>lora-ns-liveobjects</module>
+    <module>lora-ns-chirpstack</module>
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
