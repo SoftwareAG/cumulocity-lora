@@ -1,7 +1,10 @@
 package lora.ns.chirpstack;
 
+import java.util.Properties;
+
 import org.junit.jupiter.api.Test;
 
+import lora.codec.downlink.DownlinkData;
 import lora.ns.DeviceData;
 
 /**
@@ -30,22 +33,18 @@ public class AppTest {
      * properties.setProperty("application",
      * connector.getApplications().get(0).getId());
      * connector = new ChirpstackConnector(properties);
-     * DeviceProvisioning deviceProvisioning = new DeviceProvisioning();
-     * deviceProvisioning.setDevEUI("70B3D56371385764");
-     * deviceProvisioning.setAppKey("FA40269C2E066EBB32B6A1A642972AF7");
-     * deviceProvisioning.setName("Test device");
-     * deviceProvisioning.setAdditionalProperties(new Properties());
-     * deviceProvisioning.getAdditionalProperties().setProperty("deviceprofile",
-     * connector.getDeviceProfiles().get(0).getId());
-     * connector.provisionDevice(deviceProvisioning);
+     * System.out.println(connector.sendDownlink(new
+     * DownlinkData("70B3D56371385764", 1, "0203010202020304")));
+     * }
+     * 
+     * @Test
+     * public void testUplink() {
+     * String event =
+     * "{\"deduplicationId\":\"dfe1347a-6166-47ed-b257-19989ffd6f50\",\"time\":\"2023-02-21T08:28:02.300865126+00:00\",\"deviceInfo\":{\"tenantId\":\"52f14cd4-c6f1-4fbd-8f87-4025e1d49242\",\"tenantName\":\"ChirpStack\",\"applicationId\":\"274ec483-7c2c-47d6-823a-a58783d572f5\",\"applicationName\":\"Cumulocity\",\"deviceProfileId\":\"b8326b72-55e9-4cab-a5e7-6185b588c519\",\"deviceProfileName\":\"basic\",\"deviceName\":\"ACS-Switch 2\",\"devEui\":\"70b3d56371385764\",\"tags\":{}},\"devAddr\":\"0179cc11\",\"adr\":true,\"dr\":5,\"fCnt\":192,\"fPort\":1,\"confirmed\":false,\"data\":\"Qhi3RTQDAAAAkI4AAAAAZBYW\",\"rxInfo\":[{\"gatewayId\":\"1234567890abcdef\",\"uplinkId\":59760,\"rssi\":-67,\"snr\":11.0,\"channel\":6,\"location\":{\"latitude\":48.73955563887783,\"longitude\":1.9518036925618534},\"context\":\"RSpjVA==\",\"metadata\":{\"region_common_name\":\"EU868\",\"region_config_id\":\"eu868\"},\"crcStatus\":\"CRC_OK\"}],\"txInfo\":{\"frequency\":867700000,\"modulation\":{\"lora\":{\"bandwidth\":125000,\"spreadingFactor\":7,\"codeRate\":\"CR_4_5\"}}}}"
+     * ;
+     * ChirpstackIntegrationService service = new ChirpstackIntegrationService();
+     * DeviceData data = service.processUplinkEvent(event);
+     * System.out.println(data.toString());
      * }
      */
-
-    @Test
-    public void testUplink() {
-        String event = "";
-        ChirpstackIntegrationService service = new ChirpstackIntegrationService();
-        DeviceData data = service.processUplinkEvent(event);
-        System.out.println(data);
-    }
 }

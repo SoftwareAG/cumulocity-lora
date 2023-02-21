@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import com.cumulocity.model.measurement.MeasurementValue;
+import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,14 +113,32 @@ public class ChirpstackIntegrationService extends LNSIntegrationService<Chirpsta
 
 	@Override
 	public OperationData processDownlinkEvent(String event) {
+		ObjectMapper mapper = new ObjectMapper();
 		OperationData data = null;
-		// parse the event string here;
+		JsonNode rootNode;
+		try {
+			rootNode = mapper.readTree(event);
+			data = new OperationData();
+			data.setCommandId(rootNode.at("queueItemId").asText());
+			if (rootNode.has("acknowledged")) {
+				boolean ack = rootNode.at("acknowledged").asBoolean();
+				if (ack) {
+					data.setStatus(OperationStatus.SUCCESSFUL);
+				} else {
+					data.setStatus(OperationStatus.FAILED);
+				}
+			} else {
+				data.setStatus(OperationStatus.EXECUTING);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return data;
 	}
 
 	@Override
 	public boolean isOperationUpdate(String eventString) {
-		return false;
+		return eventString.contains("queueItemId");
 	}
 
 	@Override
