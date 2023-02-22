@@ -19,7 +19,9 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<archetype-descriptor xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<archetype-descriptor
+  xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
   name="${artifactId}">
 
@@ -30,20 +32,17 @@ under the License.
     <fileSet>
       <directory>src/main/configuration</directory>
     </fileSet>
-    <fileSet>
-      <directory>src/main/docker</directory>
-    </fileSet>
     <fileSet filtered="true" packaged="true">
       <directory>src/test/java</directory>
     </fileSet>
   </fileSets>
 
   <requiredProperties>
-    <requiredProperty key="connectorClass"/>
-    <requiredProperty key="integrationServiceClass"/>
-    <requiredProperty key="connectorPackage"/>
-    <requiredProperty key="connectorType"/>
-    <requiredProperty key="connectorName"/>
-    <requiredProperty key="connectorVersion"/>
+    <requiredProperty key="connectorClass" />
+    <requiredProperty key="integrationServiceClass" />
+    <requiredProperty key="connectorPackage" />
+    <requiredProperty key="connectorType" />
+    <requiredProperty key="connectorName" />
+    <requiredProperty key="connectorVersion" />
   </requiredProperties>
 </archetype-descriptor>
