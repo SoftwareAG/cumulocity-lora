@@ -119,9 +119,9 @@ public class ChirpstackIntegrationService extends LNSIntegrationService<Chirpsta
 		try {
 			rootNode = mapper.readTree(event);
 			data = new OperationData();
-			data.setCommandId(rootNode.at("queueItemId").asText());
+			data.setCommandId(rootNode.at("/queueItemId").asText());
 			if (rootNode.has("acknowledged")) {
-				boolean ack = rootNode.at("acknowledged").asBoolean();
+				boolean ack = rootNode.at("/acknowledged").asBoolean();
 				if (ack) {
 					data.setStatus(OperationStatus.SUCCESSFUL);
 				} else {

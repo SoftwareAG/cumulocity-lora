@@ -96,7 +96,8 @@ public class LNSOperationManager {
 					if (commandId != null) {
 						storeOperation(lnsConnectorId, c8yOperation, commandId);
 					} else {
-						logger.warn("Operation {} status won't be updated as no correlation Id was sent by LNS.", operation);
+						logger.warn("Operation {} status won't be updated as no correlation Id was sent by LNS.",
+								operation);
 					}
 				}
 			} catch (Exception e) {
@@ -113,7 +114,8 @@ public class LNSOperationManager {
 					operation, lnsConnectorId);
 			c8yOperation.setStatus(OperationStatus.PENDING.toString());
 			Command command = c8yOperation.get(Command.class);
-			command.setResult("Unable to send downlink as device is not properly configured with an existing connector. Next uplink from device might fix that and operation will be properly processed.");
+			command.setResult(
+					"Unable to send downlink as device is not properly configured with an existing connector. Next uplink from device might fix that and operation will be properly processed.");
 			c8yOperation.set(command);
 			deviceControlApi.update(c8yOperation);
 		}
@@ -165,6 +167,8 @@ public class LNSOperationManager {
 			mor.setId(GId.asGId(lnsConnectorId));
 			mor.setProperty(DOWNLINKS, downlinks);
 			inventoryApi.update(mor);
+			c8yOperation.setProperty("ExternalCommandId", commandId);
+			deviceControlApi.update(c8yOperation);
 		}
 	}
 

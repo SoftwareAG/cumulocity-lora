@@ -208,11 +208,14 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		event.setType("raw LNS event");
 		event.setText("raw LNS event");
 		event.setDateTime(DateTime.now());
-		eventApi.create(event);
 
 		if (isOperationUpdate(eventString)) {
+			event.setType("raw LNS down event");
+			event.setText("raw LNS down event");
 			updateOperation(eventString, lnsInstanceId);
 		} else {
+			event.setType("raw LNS up event");
+			event.setText("raw LNS up event");
 			DeviceData data = processUplinkEvent(eventString);
 			if (data != null) {
 				Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
@@ -221,6 +224,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 				}
 			}
 		}
+		eventApi.create(event);
 	}
 
 	public void updateOperation(String event, String lnsInstanceId) {
