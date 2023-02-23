@@ -35,10 +35,10 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "0.803.23",
+    "@angular-devkit/build-angular": "15.1.4",
     "@angular/compiler-cli": "8.2.13",
     "@angular/language-service": "8.2.13",
-    "@c8y/cli": "1009.0.18",
+    "@c8y/cli": "1015.0.277",
     "copy-webpack-plugin": "^6.0.2",
     "typescript": "3.5.3",
     "write-file-webpack-plugin": "^4.5.1"
