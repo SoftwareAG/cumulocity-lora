@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@adeunis/codecs": "^1.6.1",
-    "@c8y/client": "^1015.0.218",
+    "@c8y/client": "^1015.0.278",
     "lora-codec-interface": "file:../c8y-codec-interface"
   },
   "devDependencies": {

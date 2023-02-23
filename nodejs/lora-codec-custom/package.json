@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@c8y/client": "^1015.0.218",
+    "@c8y/client": "^1015.0.278",
     "lora-codec-interface": "file:../c8y-codec-interface",
     "vm2": "3.9.11"
   },
