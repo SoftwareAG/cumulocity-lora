@@ -459,6 +459,10 @@ public class ElsysCodec extends DeviceCodec {
 			result.setDevEui(encode.getDevEui());
 			result.setFport(6);
 			result.setPayload("3E01FE");
+		} else if (op.getId().equals("getsettings")) {
+			result.setDevEui(encode.getDevEui());
+			result.setFport(6);
+			result.setPayload("3E01F9");
 		}
 		return result;
 	}
