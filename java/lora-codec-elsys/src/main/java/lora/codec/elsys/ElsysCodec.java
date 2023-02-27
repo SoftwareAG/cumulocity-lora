@@ -75,8 +75,8 @@ public class ElsysCodec extends DeviceCodec {
 		MODE("Mode", (byte) 0x09, 1, ParamType.INTEGER, true),
 		ACK("ACK", (byte) 0x0A, 1, ParamType.BOOL, true),
 		DRDEF("DrDef", (byte) 0x0B, 1, ParamType.INTEGER, true),
-		DRMIN("DrDMin", (byte) 0x0C, 1, ParamType.INTEGER, true),
-		DRMAX("DrMax", (byte) 0x0D, 1, ParamType.INTEGER, true),
+		DRMIN("DrMin", (byte) 0x0D, 1, ParamType.INTEGER, true),
+		DRMAX("DrMax", (byte) 0x0C, 1, ParamType.INTEGER, true),
 		PIRCFG("PirCfg", (byte) 0x11, 1, ParamType.INTEGER, true),
 		CO2CFG("CO2Cfg", (byte) 0x12, 1, ParamType.INTEGER, true),
 		ACCCFG("AccCfg", (byte) 0x13, 4, null, true),
@@ -626,10 +626,22 @@ public class ElsysCodec extends DeviceCodec {
 			String payload = "";
 			int cpt = 0;
 			for (DeviceOperationElement elem : op.getElements()) {
+				log.info(elem.toString());
+				log.info("Processing parameter {} with value {}", elem.getName(), elem.getValue());
 				if (elem.getValue() != null) {
 					SETTING setting = SETTING.valueOf(elem.getId());
 					cpt += 1 + setting.size;
-					payload += String.format("%1$0" + setting.size + "X", elem.getValue());
+					int value = 0;
+					if (setting.type != null) {
+						switch (setting.type) {
+							case BOOL:
+								value = (boolean) elem.getValue() ? 1 : 0;
+								break;
+							case INTEGER:
+								value = (Integer) elem.getValue();
+						}
+					}
+					payload += String.format("%1$02X%2$0" + setting.size * 2 + "X", setting.id, value);
 				}
 			}
 			result.setPayload("3E" + String.format("%1$02X", cpt) + payload);

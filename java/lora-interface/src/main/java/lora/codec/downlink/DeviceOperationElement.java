@@ -150,4 +150,12 @@ public class DeviceOperationElement {
         this.elements.add(element);
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "DeviceOperationElement [id=" + id + ", name=" + name + ", type=" + type + ", value=" + value
+                + ", elements=" + elements + ", repeatable=" + repeatable + ", minOccur=" + minOccur + ", maxOccur="
+                + maxOccur + ", dependsOnParam=" + dependsOnParam + ", dependsOnParamId=" + dependsOnParamId
+                + ", dependsOnParamValue=" + dependsOnParamValue + ", required=" + required + "]";
+    }
 }

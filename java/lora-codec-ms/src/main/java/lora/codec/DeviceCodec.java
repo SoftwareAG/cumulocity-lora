@@ -51,7 +51,7 @@ public abstract class DeviceCodec implements Component {
 
 	@Autowired
 	protected C8YUtils c8yUtils;
-	
+
 	@Autowired
 	protected EventApi eventApi;
 
@@ -63,31 +63,36 @@ public abstract class DeviceCodec implements Component {
 
 	@Autowired
 	protected InventoryApi inventoryApi;
-	
-    @Autowired
-    protected MicroserviceSubscriptionsService subscriptionsService;
+
+	@Autowired
+	protected MicroserviceSubscriptionsService subscriptionsService;
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-		
+
 	protected Map<String, String> models = new HashMap<>();
 	protected Map<String, String> childrenNames = new HashMap<>();
 	protected Map<String, Map<String, DeviceOperation>> operations = new HashMap<>();
-	
-    protected abstract C8YData decode(ManagedObjectRepresentation mor, Decode decode);
+
+	protected abstract C8YData decode(ManagedObjectRepresentation mor, Decode decode);
+
 	protected abstract DownlinkData encode(ManagedObjectRepresentation mor, Encode encode);
+
 	public Map<String, String> getModels() {
 		return models;
 	}
+
 	public abstract DownlinkData askDeviceConfig(String devEui);
+
 	public Map<String, DeviceOperation> getAvailableOperations(String model) {
 		return operations.get(model);
 	}
+
 	protected Map<String, String> getChildDevicesNames() {
 		return childrenNames;
 	}
 
 	private Map<String, ManagedObjectRepresentation> codecs = new HashMap<>();
-	
+
 	@EventListener
 	private void registerCodec(MicroserviceSubscriptionAddedEvent event) {
 		var codec = c8yUtils.findExternalId(this.getId(), C8YUtils.CODEC_ID).map(extId -> {
@@ -103,7 +108,7 @@ public abstract class DeviceCodec implements Component {
 			mor.setType(C8YUtils.CODEC_TYPE);
 			mor.setName(getName());
 			mor = inventoryApi.create(mor);
-			
+
 			c8yUtils.createExternalId(mor, this.getId(), C8YUtils.CODEC_ID);
 
 			return mor;
@@ -111,9 +116,10 @@ public abstract class DeviceCodec implements Component {
 
 		codecs.put(event.getCredentials().getTenant(), codec);
 
-		logger.info("Codec {} successfully initialized in tenant {}", codec.getName(), event.getCredentials().getTenant());
+		logger.info("Codec {} successfully initialized in tenant {}", codec.getName(),
+				event.getCredentials().getTenant());
 	}
-	
+
 	@EventListener
 	private void unregisterCodec(MicroserviceSubscriptionRemovedEvent event) {
 		var codec = codecs.get(event.getTenant());
@@ -136,8 +142,8 @@ public abstract class DeviceCodec implements Component {
 			logger.error("Error on clearing Alarm", e);
 		}
 	}
-    
-    protected void processData(String deveui, ManagedObjectRepresentation rootDevice, C8YData c8yData) {
+
+	protected void processData(String deveui, ManagedObjectRepresentation rootDevice, C8YData c8yData) {
 		for (MeasurementRepresentation m : c8yData.getMeasurements()) {
 			measurementApi.createWithoutResponse(m);
 		}
@@ -191,8 +197,9 @@ public abstract class DeviceCodec implements Component {
 			}
 		}
 	}
-	
-	private ManagedObjectRepresentation getChildDevice(String deveui, ManagedObjectRepresentation rootDevice, String childPath) {
+
+	private ManagedObjectRepresentation getChildDevice(String deveui, ManagedObjectRepresentation rootDevice,
+			String childPath) {
 		String[] childIds = childPath.split("/");
 		ManagedObjectRepresentation currentDevice = rootDevice;
 
@@ -201,13 +208,13 @@ public abstract class DeviceCodec implements Component {
 			currentChild = currentChild.concat((currentChild.isEmpty() ? "" : "/")).concat(childId);
 			logger.info("Getting device {}.", currentChild);
 			currentDevice = c8yUtils.getChildDevice(currentChild).orElse(
-				c8yUtils.createChildDevice(currentDevice, deveui + "/" + currentChild, getChildDevicesNames().getOrDefault(currentChild, currentChild))
-			);
+					c8yUtils.createChildDevice(currentDevice, deveui + "/" + currentChild,
+							getChildDevicesNames().getOrDefault(currentChild, currentChild)));
 		}
 
 		return currentDevice;
 	}
-    
+
 	public Result<String> decode(Decode decode) {
 		Result<String> result = new Result<>(true, "Payload parsed with success", "OK");
 		try {
@@ -224,7 +231,8 @@ public abstract class DeviceCodec implements Component {
 					debug.setDateTime(DateTime.now());
 					eventApi.create(debug);
 				}
-				logger.info("Processing payload {} from port {} for device {}", decode.getPayload(), decode.getFPort(), decode.getDeveui());
+				logger.info("Processing payload {} from port {} for device {}", decode.getPayload(), decode.getFPort(),
+						decode.getDeveui());
 				processData(decode.getDeveui(), mor, c8yData);
 			} else {
 				result = new Result<>(false, "Couldn't find device " + decode.getDeveui(), "NOK");
@@ -235,7 +243,7 @@ public abstract class DeviceCodec implements Component {
 		}
 		return result;
 	}
-	
+
 	public Result<DownlinkData> encode(Encode encode) {
 		Result<DownlinkData> result = null;
 		try {
@@ -243,9 +251,9 @@ public abstract class DeviceCodec implements Component {
 			Optional<ManagedObjectRepresentation> device = c8yUtils.getDevice(encode.getDevEui());
 			if (device.isPresent()) {
 				ManagedObjectRepresentation mor = device.get();
-		
+
 				logger.info("Processing operation {} for device {}", encode.getOperation(), encode.getDevEui());
-				
+
 				if (encode.getOperation().startsWith("raw ")) {
 					data = encodeRaw(encode, data);
 				} else if (encode.getOperation().contains("get config")) {
@@ -265,7 +273,7 @@ public abstract class DeviceCodec implements Component {
 			e.printStackTrace();
 			result = new Result<>(false, "Couldn't process " + encode.toString(), null);
 		}
-		
+
 		return result;
 	}
 
@@ -275,7 +283,8 @@ public abstract class DeviceCodec implements Component {
 			data = new DownlinkData(encode.getDevEui(), Integer.parseInt(tokens[1]), tokens[2]);
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error("Can't process {}. Expected syntax is \"raw <port number> <hex payload>\"", encode.getOperation());
+			logger.error("Can't process {}. Expected syntax is \"raw <port number> <hex payload>\"",
+					encode.getOperation());
 		}
 		return data;
 	}
@@ -290,9 +299,10 @@ public abstract class DeviceCodec implements Component {
 			deviceOperation.setId(command);
 			JsonNode elements = root.get(command);
 			Iterator<Entry<String, JsonNode>> fields = elements.fields();
-			while(fields.hasNext()) {
+			while (fields.hasNext()) {
 				Entry<String, JsonNode> field = fields.next();
-				deviceOperation.getElements().add(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
+				deviceOperation.getElements()
+						.add(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -307,7 +317,7 @@ public abstract class DeviceCodec implements Component {
 			case ARRAY:
 				element.setType(ParamType.GROUP);
 				element.setId(nodeName);
-				for (JsonNode field: node) {
+				for (JsonNode field : node) {
 					element.getElements().add(convertJsonNodeToDeviceOperationElement(field, nodeName));
 				}
 				break;
@@ -319,6 +329,9 @@ public abstract class DeviceCodec implements Component {
 				if (node.isDouble() || node.isFloat() || node.isFloatingPointNumber()) {
 					element.setType(ParamType.FLOAT);
 					element.setValue(node.asDouble());
+				} else if (node.isInt()) {
+					element.setType(ParamType.INTEGER);
+					element.setValue(node.asInt());
 				}
 				break;
 			case STRING:
@@ -329,9 +342,10 @@ public abstract class DeviceCodec implements Component {
 				element.setType(ParamType.GROUP);
 				element.setId(nodeName);
 				Iterator<Entry<String, JsonNode>> fields = node.fields();
-				while(fields.hasNext()) {
+				while (fields.hasNext()) {
 					Entry<String, JsonNode> field = fields.next();
-					element.getElements().add(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
+					element.getElements()
+							.add(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
 				}
 				break;
 			case POJO:
@@ -340,7 +354,7 @@ public abstract class DeviceCodec implements Component {
 			case BINARY:
 			default:
 				break;
-				
+
 		}
 		return element;
 	}
