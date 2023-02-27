@@ -244,12 +244,15 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 
 		LNSResponse<Void> result = new LNSResponse<Void>().withOk(false);
 
-		if (name.endsWith("downlink")) {
-			this.getProperty("downlinkRouteId")
-					.ifPresent(downlinkRoutingId -> removeRouting(downlinkRoutingId.toString()));
-		} else {
-			this.getProperty("uplinkRouteId").ifPresent(uplinkRoutingId -> removeRouting(uplinkRoutingId.toString()));
-		}
+		/*
+		 * if (name.endsWith("downlink")) {
+		 * this.getProperty("downlinkRouteId")
+		 * .ifPresent(downlinkRoutingId -> removeRouting(downlinkRoutingId.toString()));
+		 * } else {
+		 * this.getProperty("uplinkRouteId").ifPresent(uplinkRoutingId ->
+		 * removeRouting(uplinkRoutingId.toString()));
+		 * }
+		 */
 
 		RoutingHttp routingHttp = new RoutingHttp();
 		routingHttp.setUrl(url);
@@ -290,6 +293,21 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	@Override
 	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
+
+		try {
+			this.objeniousService.getRouting().execute().body().forEach(routing -> {
+				if (routing.getName().contains(tenant)) {
+					try {
+						this.objeniousService.deleteRouting(routing.getId()).execute();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		LNSResponse<Void> result = new LNSResponse<>();
 		LNSResponse<Void> resultDownlink = configureRouting(url + "/downlink", tenant, login, password,
 				tenant + "-" + this.getId() + "-downlink",

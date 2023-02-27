@@ -1,8 +1,10 @@
 package lora.codec.elsys;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
@@ -11,12 +13,16 @@ import org.springframework.stereotype.Component;
 import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.rest.representation.event.EventRepresentation;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
+import c8y.Configuration;
 import c8y.Position;
 import lombok.extern.slf4j.Slf4j;
 import lora.codec.DeviceCodec;
 import lora.codec.downlink.DeviceOperation;
+import lora.codec.downlink.DeviceOperationElement;
+import lora.codec.downlink.DeviceOperationElement.ParamType;
 import lora.codec.downlink.DownlinkData;
 import lora.codec.downlink.Encode;
 import lora.codec.uplink.C8YData;
@@ -34,6 +40,18 @@ public class ElsysCodec extends DeviceCodec {
 
 		ops.put("reboot", new DeviceOperation("reboot", "Reboot"));
 		ops.put("getsettings", new DeviceOperation("getsettings", "Get settings"));
+		DeviceOperation setSettings = new DeviceOperation("setsettings", "Set settings");
+		ops.put("setsettings", setSettings);
+		for (SETTING setting : SETTING.BY_VALUE.values()) {
+			if (setting.writable) {
+				DeviceOperationElement elem = new DeviceOperationElement();
+				elem.setId(setting.name());
+				elem.setName(setting.label);
+				elem.setRequired(false);
+				elem.setType(setting.type != null ? setting.type : ParamType.STRING);
+				setSettings.addElement(elem);
+			}
+		}
 	}
 
 	@Override
@@ -49,6 +67,127 @@ public class ElsysCodec extends DeviceCodec {
 	@Override
 	public String getVersion() {
 		return "1.0";
+	}
+
+	enum SETTING {
+		OTA("OTA", (byte) 0x07, 1, ParamType.BOOL, true),
+		PORT("Port", (byte) 0x08, 1, ParamType.INTEGER, true),
+		MODE("Mode", (byte) 0x09, 1, ParamType.INTEGER, true),
+		ACK("ACK", (byte) 0x0A, 1, ParamType.BOOL, true),
+		DRDEF("DrDef", (byte) 0x0B, 1, ParamType.INTEGER, true),
+		DRMIN("DrDMin", (byte) 0x0C, 1, ParamType.INTEGER, true),
+		DRMAX("DrMax", (byte) 0x0D, 1, ParamType.INTEGER, true),
+		PIRCFG("PirCfg", (byte) 0x11, 1, ParamType.INTEGER, true),
+		CO2CFG("CO2Cfg", (byte) 0x12, 1, ParamType.INTEGER, true),
+		ACCCFG("AccCfg", (byte) 0x13, 4, null, true),
+		SPLPER("SplPer", (byte) 0x14, 4, ParamType.INTEGER, true),
+		TEMPPER("TempPer", (byte) 0x15, 4, ParamType.INTEGER, true),
+		RHPER("RHPer", (byte) 0x16, 4, ParamType.INTEGER, true),
+		LIGHTPER("LightPer", (byte) 0x17, 4, ParamType.INTEGER, true),
+		PIRPER("PirPer", (byte) 0x18, 4, ParamType.INTEGER, true),
+		CO2PER("CO2Per", (byte) 0x19, 4, ParamType.INTEGER, true),
+		ACCPER("AccPer", (byte) 0x1D, 4, ParamType.INTEGER, true),
+		VDDPER("VddPer", (byte) 0x1E, 4, ParamType.INTEGER, true),
+		SENDPER("SendPer", (byte) 0x1F, 4, ParamType.INTEGER, true),
+		LOCK("Lock", (byte) 0x20, 4, ParamType.INTEGER, true),
+		LINK("Link", (byte) 0x22, 4, null, true),
+		PLAN("Plan", (byte) 0x25, 1, ParamType.INTEGER, true),
+		SUBBAND("SubBand", (byte) 0x26, 1, ParamType.INTEGER, true),
+		LBT("LBT", (byte) 0x27, 1, ParamType.INTEGER, true),
+		SENSOR("Sensor", (byte) 245, 1, ParamType.INTEGER, false),
+		VERSION("Version", (byte) 251, 2, ParamType.INTEGER, false);
+
+		static final Map<Byte, SETTING> BY_VALUE = new HashMap<>();
+
+		static {
+			for (SETTING f : values()) {
+				BY_VALUE.put(f.id, f);
+			}
+		}
+
+		String label;
+		byte id;
+		int size;
+		ParamType type;
+		boolean writable;
+
+		private SETTING(String label, byte id, int size, ParamType type, boolean writable) {
+			this.label = label;
+			this.id = id;
+			this.size = size;
+			this.type = type;
+			this.writable = writable;
+		}
+	}
+
+	public static void parseCurrentSetting(ByteBuffer buffer, Map<String, Object> map) {
+		int type = buffer.get() & 0xff;
+		SETTING setting = SETTING.BY_VALUE.get((byte) type);
+		Object v = null;
+		if (setting != null) {
+			if (setting != SETTING.SENSOR) {
+				if (setting.size == 1) {
+					int value = buffer.get() & 0xff;
+					if (setting.type == ParamType.BOOL) {
+						v = value != 0 ? true : false;
+					} else {
+						v = value;
+					}
+				} else if (setting.size == 2) {
+					int value = buffer.getShort() & 0xffff;
+					v = value;
+				} else if (setting.size == 4) {
+					if (setting.type == null) {
+						int b1 = buffer.get() & 0xff;
+						int b2 = buffer.get() & 0xff;
+						int b3 = buffer.get() & 0xff;
+						int b4 = buffer.get() & 0xff;
+						v = List.of(b1, b2, b3, b4);
+					} else {
+						v = buffer.getInt();
+					}
+				}
+			} else {
+				v = getSensor(buffer.get());
+			}
+			map.put(setting.name(), v);
+		} else {
+			log.warn("Unupported type: {}", type);
+		}
+
+	}
+
+	public static String getSensor(byte t) {
+		switch (t) {
+			case 0:
+				return "Unknown";
+			case 1:
+				return "ESM5k";
+			case 10:
+				return "ELT1";
+			case 11:
+				return "ELT1HP";
+			case 12:
+				return "ELT2HP";
+			case 13:
+				return "ELT Lite";
+			case 20:
+				return "ERS";
+			case 21:
+				return "ERS CO2";
+			case 22:
+				return "ERS Lite";
+			case 23:
+				return "ERS Eye";
+			case 24:
+				return "ERS Desk";
+			case 25:
+				return "ERS Sound";
+			case 30:
+				return "EMS";
+			default:
+				return "" + t;
+		}
 	}
 
 	enum TYPE {
@@ -77,9 +216,12 @@ public class ElsysCodec extends DeviceCodec {
 			public void process(ManagedObjectRepresentation mor, String model, ByteBuffer buffer, C8YData c8yData,
 					DateTime time,
 					int offsetSize) {
-				BigDecimal x = BigDecimal.valueOf(buffer.get()).divide(BigDecimal.valueOf(63));
-				BigDecimal y = BigDecimal.valueOf(buffer.get()).divide(BigDecimal.valueOf(63));
-				BigDecimal z = BigDecimal.valueOf(buffer.get()).divide(BigDecimal.valueOf(63));
+				BigDecimal x = BigDecimal.valueOf(buffer.get()).divide(BigDecimal.valueOf(63.0), 2,
+						RoundingMode.HALF_UP);
+				BigDecimal y = BigDecimal.valueOf(buffer.get()).divide(BigDecimal.valueOf(63.0), 2,
+						RoundingMode.HALF_UP);
+				BigDecimal z = BigDecimal.valueOf(buffer.get()).divide(BigDecimal.valueOf(63.0), 2,
+						RoundingMode.HALF_UP);
 				c8yData.addMeasurement(mor, "Aceleration", new String[] { "X", "Y", "Z" },
 						new String[] { "G", "G", "G" }, new BigDecimal[] { x, y, z },
 						getTime(buffer, time, offsetSize));
@@ -391,6 +533,21 @@ public class ElsysCodec extends DeviceCodec {
 			public void process(ManagedObjectRepresentation mor, String model, ByteBuffer buffer, C8YData c8yData,
 					DateTime time,
 					int offsetSize) {
+				Map<String, Object> map = new HashMap<>();
+				int size = buffer.get();
+				while (buffer.hasRemaining()) {
+					parseCurrentSetting(buffer, map);
+				}
+				Configuration config = new Configuration();
+				ObjectMapper mapper = new ObjectMapper();
+				try {
+					config.setConfig(mapper.writeValueAsString(map));
+					mor.set(config);
+					c8yData.updateRootDevice(mor);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				c8yData.addEvent(mor, "settings", "Settings", map, getTime(buffer, time, offsetSize));
 			}
 		};
 
@@ -463,6 +620,19 @@ public class ElsysCodec extends DeviceCodec {
 			result.setDevEui(encode.getDevEui());
 			result.setFport(6);
 			result.setPayload("3E01F9");
+		} else if (op.getId().equals("setsettings")) {
+			result.setDevEui(encode.getDevEui());
+			result.setFport(6);
+			String payload = "";
+			int cpt = 0;
+			for (DeviceOperationElement elem : op.getElements()) {
+				if (elem.getValue() != null) {
+					SETTING setting = SETTING.valueOf(elem.getId());
+					cpt += 1 + setting.size;
+					payload += String.format("%1$0" + setting.size + "X", elem.getValue());
+				}
+			}
+			result.setPayload("3E" + String.format("%1$02X", cpt) + payload);
 		}
 		return result;
 	}

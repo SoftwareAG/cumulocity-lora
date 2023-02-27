@@ -83,6 +83,9 @@ export class DevicesComponent implements OnInit {
     let deviceId: string = this.route.snapshot.parent.data.contextData.id;
     const { data, res, paging } = await this.inventory.detail(deviceId);
     this.device = data;
+    if (this.device.c8y_Configuration && this.device.c8y_Configuration.config) {
+      this.parameterValues = JSON.parse(this.device.c8y_Configuration.config);
+    }
     this.debugMode = data.debug;
     this.selectedLnsConnectorId = this.device.lnsConnectorId;
     this.getUnprocessPayloads();
@@ -124,18 +127,21 @@ export class DevicesComponent implements OnInit {
       key: element.id,
       templateOptions: { label: element.name },
     };
+    if (element.value) {
+      field.defaultValue = element.value;
+    }
 
     switch (element.type) {
       case ParamType.STRING:
         field.type = "input";
         field.templateOptions.type = "text";
-        field.templateOptions.required = true;
+        field.templateOptions.required = element.required;
         break;
       case ParamType.INTEGER:
       case ParamType.FLOAT:
         field.type = "input";
         field.templateOptions.type = "number";
-        field.templateOptions.required = true;
+        field.templateOptions.required = element.required;
         break;
       case ParamType.BOOL:
         field.type = "checkbox";
@@ -143,6 +149,7 @@ export class DevicesComponent implements OnInit {
       case ParamType.DATE:
         field.type = "input";
         field.templateOptions.type = "date";
+        field.templateOptions.required = element.required;
         break;
       case ParamType.ENUM:
         field.type = "radio";
