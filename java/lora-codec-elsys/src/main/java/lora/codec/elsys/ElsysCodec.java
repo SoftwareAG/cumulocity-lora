@@ -48,7 +48,10 @@ public class ElsysCodec extends DeviceCodec {
 				elem.setId(setting.name());
 				elem.setName(setting.label);
 				elem.setRequired(false);
-				elem.setType(setting.type != null ? setting.type : ParamType.STRING);
+				elem.setType(setting.type);
+				if (setting.type == ParamType.ARRAY) {
+					elem.setMaxOccur(setting.size);
+				}
 				setSettings.addElement(elem);
 			}
 		}
@@ -79,7 +82,7 @@ public class ElsysCodec extends DeviceCodec {
 		DRMAX("DrMax", (byte) 0x0C, 1, ParamType.INTEGER, true),
 		PIRCFG("PirCfg", (byte) 0x11, 1, ParamType.INTEGER, true),
 		CO2CFG("CO2Cfg", (byte) 0x12, 1, ParamType.INTEGER, true),
-		ACCCFG("AccCfg", (byte) 0x13, 4, null, true),
+		ACCCFG("AccCfg", (byte) 0x13, 4, ParamType.ARRAY, true),
 		SPLPER("SplPer", (byte) 0x14, 4, ParamType.INTEGER, true),
 		TEMPPER("TempPer", (byte) 0x15, 4, ParamType.INTEGER, true),
 		RHPER("RHPer", (byte) 0x16, 4, ParamType.INTEGER, true),
@@ -90,7 +93,7 @@ public class ElsysCodec extends DeviceCodec {
 		VDDPER("VddPer", (byte) 0x1E, 4, ParamType.INTEGER, true),
 		SENDPER("SendPer", (byte) 0x1F, 4, ParamType.INTEGER, true),
 		LOCK("Lock", (byte) 0x20, 4, ParamType.INTEGER, true),
-		LINK("Link", (byte) 0x22, 4, null, true),
+		LINK("Link", (byte) 0x22, 4, ParamType.ARRAY, true),
 		PLAN("Plan", (byte) 0x25, 1, ParamType.INTEGER, true),
 		SUBBAND("SubBand", (byte) 0x26, 1, ParamType.INTEGER, true),
 		LBT("LBT", (byte) 0x27, 1, ParamType.INTEGER, true),
@@ -129,7 +132,7 @@ public class ElsysCodec extends DeviceCodec {
 				if (setting.size == 1) {
 					int value = buffer.get() & 0xff;
 					if (setting.type == ParamType.BOOL) {
-						v = value != 0 ? true : false;
+						v = value != 0;
 					} else {
 						v = value;
 					}
@@ -137,7 +140,7 @@ public class ElsysCodec extends DeviceCodec {
 					int value = buffer.getShort() & 0xffff;
 					v = value;
 				} else if (setting.size == 4) {
-					if (setting.type == null) {
+					if (setting.type == ParamType.ARRAY) {
 						int b1 = buffer.get() & 0xff;
 						int b2 = buffer.get() & 0xff;
 						int b3 = buffer.get() & 0xff;
@@ -627,19 +630,22 @@ public class ElsysCodec extends DeviceCodec {
 			int cpt = 0;
 			for (DeviceOperationElement elem : op.getElements()) {
 				log.info(elem.toString());
-				log.info("Processing parameter {} with value {}", elem.getName(), elem.getValue());
+				log.info("Processing parameter {} with value {}", elem.getId(), elem.getValue());
 				if (elem.getValue() != null) {
 					SETTING setting = SETTING.valueOf(elem.getId());
 					cpt += 1 + setting.size;
 					int value = 0;
-					if (setting.type != null) {
-						switch (setting.type) {
-							case BOOL:
-								value = (boolean) elem.getValue() ? 1 : 0;
-								break;
-							case INTEGER:
-								value = (Integer) elem.getValue();
-						}
+					switch (setting.type) {
+						case BOOL:
+							value = (boolean) elem.getValue() ? 1 : 0;
+							break;
+						case INTEGER:
+							value = (Integer) elem.getValue();
+							break;
+						case ARRAY:
+							for (int i : (List<Integer>) elem.getValue()) {
+								value = (value << 8) | (i & 0xff);
+							}
 					}
 					payload += String.format("%1$02X%2$0" + setting.size * 2 + "X", setting.id, value);
 				}

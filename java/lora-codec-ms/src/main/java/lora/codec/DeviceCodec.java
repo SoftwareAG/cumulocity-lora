@@ -2,11 +2,23 @@ package lora.codec;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionRemovedEvent;
@@ -24,16 +36,6 @@ import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import c8y.IsDevice;
 import lora.codec.downlink.DeviceOperation;
@@ -317,8 +319,14 @@ public abstract class DeviceCodec implements Component {
 			case ARRAY:
 				element.setType(ParamType.GROUP);
 				element.setId(nodeName);
+				element.setValue(new ArrayList<Object>());
 				for (JsonNode field : node) {
-					element.getElements().add(convertJsonNodeToDeviceOperationElement(field, nodeName));
+					if (field.isValueNode()) {
+						element.setType(ParamType.ARRAY);
+						((List<Object>) element.getValue()).add(field.asInt());
+					} else {
+						element.getElements().add(convertJsonNodeToDeviceOperationElement(field, nodeName));
+					}
 				}
 				break;
 			case BOOLEAN:

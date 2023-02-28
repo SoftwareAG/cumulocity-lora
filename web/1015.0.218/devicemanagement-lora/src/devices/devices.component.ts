@@ -192,6 +192,16 @@ export class DevicesComponent implements OnInit {
           );
         }
         break;
+      case ParamType.ARRAY:
+        field.wrappers = ["panel"];
+        field.fieldGroup = [];
+        for (let i = 0; i < element.maxOccur; i++) {
+          field.fieldGroup.push({
+            key: i,
+            type: "input",
+            templateOptions: { type: "number", required: element.required },
+          });
+        }
     }
 
     return field;

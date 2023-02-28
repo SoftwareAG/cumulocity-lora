@@ -12,10 +12,10 @@ import lora.codec.downlink.Encode;
 public class TestEncode {
     @Test
     public void testSetSettings() {
-        String settings = "{\"setsettings\":{\"PORT\":5,\"MODE\":1}}";
+        String settings = "{\"setsettings\":{\"PORT\":5,\"MODE\":1,\"ACCCFG\": [1,2,3,4]}}";
         ElsysCodec codec = new ElsysCodec();
         DownlinkData result = codec.encode(new ManagedObjectRepresentation(), new Encode("0", settings, "desk"));
         System.out.println(result.getPayload());
-        assertEquals("3E0408050901", result.getPayload());
+        assertEquals("3E09080509011301020304", result.getPayload());
     }
 }

@@ -21,4 +21,5 @@ export enum ParamType {
   DATE = "DATE",
   ENUM = "ENUM",
   GROUP = "GROUP",
+  ARRAY = "ARRAY",
 }

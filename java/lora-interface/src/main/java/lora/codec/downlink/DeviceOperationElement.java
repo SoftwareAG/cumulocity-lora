@@ -18,7 +18,7 @@ public class DeviceOperationElement {
     private Boolean required = true;
 
     public enum ParamType {
-        STRING, INTEGER, FLOAT, BOOL, DATE, ENUM, SEPARATOR, GROUP;
+        STRING, INTEGER, FLOAT, BOOL, DATE, ENUM, SEPARATOR, GROUP, ARRAY;
     }
 
     public DeviceOperationElement() {
@@ -153,9 +153,11 @@ public class DeviceOperationElement {
 
     @Override
     public String toString() {
-        return "DeviceOperationElement [id=" + id + ", name=" + name + ", type=" + type + ", value=" + value
-                + ", elements=" + elements + ", repeatable=" + repeatable + ", minOccur=" + minOccur + ", maxOccur="
-                + maxOccur + ", dependsOnParam=" + dependsOnParam + ", dependsOnParamId=" + dependsOnParamId
-                + ", dependsOnParamValue=" + dependsOnParamValue + ", required=" + required + "]";
+        return "DeviceOperationElement [\n\tid=" + id + ",\n\tname=" + name + ",\n\ttype=" + type + ",\n\tvalue="
+                + value
+                + ",\n\telements=" + elements + ",\n\trepeatable=" + repeatable + ",\n\tminOccur=" + minOccur
+                + ",\n\tmaxOccur="
+                + maxOccur + ",\n\tdependsOnParam=" + dependsOnParam + ",\n\tdependsOnParamId=" + dependsOnParamId
+                + ",\n\tdependsOnParamValue=" + dependsOnParamValue + ",\n\trequired=" + required + "\n]";
     }
 }
