@@ -1,5 +1,5 @@
 import { _ } from "@c8y/ngx-components";
-import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { Component, TemplateRef, ViewChild } from "@angular/core";
 import {
   InventoryService,
   IManagedObject,
@@ -25,8 +25,7 @@ import { LnsService } from "../../src/service/LnsService";
   selector: "devices",
   templateUrl: "./devices.component.html",
 })
-export class DevicesComponent implements OnInit {
-  async ngOnInit(): Promise<void> {}
+export class DevicesComponent {
   commands: {};
   device: IManagedObject;
   selectedLnsConnectorId: string;
@@ -181,7 +180,7 @@ export class DevicesComponent implements OnInit {
           };
           if (element.minOccur > 0) {
             field.defaultValue = [];
-            for (var i = 0; i < element.minOccur; i++) {
+            for (let i = 0; i < element.minOccur; i++) {
               field.defaultValue.push({});
             }
           }
@@ -194,10 +193,10 @@ export class DevicesComponent implements OnInit {
         break;
       case ParamType.ARRAY:
         field.wrappers = ["panel"];
-        field.fieldGroup = [];
+        field.fieldGroup = new Array<FormlyFieldConfig>();
         for (let i = 0; i < element.maxOccur; i++) {
           field.fieldGroup.push({
-            key: i,
+            key: "" + i,
             type: "input",
             templateOptions: { type: "number", required: element.required },
           });
@@ -318,7 +317,6 @@ export class DevicesComponent implements OnInit {
         payload: event.payload,
         updateTime: new Date(event.time).getTime(),
       };
-      //console.log(toDecode);
       let decodeResult = await this.codecService.decode(
         this.device.codec,
         toDecode

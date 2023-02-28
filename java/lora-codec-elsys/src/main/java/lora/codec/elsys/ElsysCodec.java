@@ -633,21 +633,23 @@ public class ElsysCodec extends DeviceCodec {
 				log.info("Processing parameter {} with value {}", elem.getId(), elem.getValue());
 				if (elem.getValue() != null) {
 					SETTING setting = SETTING.valueOf(elem.getId());
-					cpt += 1 + setting.size;
-					int value = 0;
-					switch (setting.type) {
-						case BOOL:
-							value = (boolean) elem.getValue() ? 1 : 0;
-							break;
-						case INTEGER:
-							value = (Integer) elem.getValue();
-							break;
-						case ARRAY:
-							for (int i : (List<Integer>) elem.getValue()) {
-								value = (value << 8) | (i & 0xff);
-							}
+					if (setting.writable) {
+						cpt += 1 + setting.size;
+						int value = 0;
+						switch (setting.type) {
+							case BOOL:
+								value = (boolean) elem.getValue() ? 1 : 0;
+								break;
+							case INTEGER:
+								value = (Integer) elem.getValue();
+								break;
+							case ARRAY:
+								for (int i : (List<Integer>) elem.getValue()) {
+									value = (value << 8) | (i & 0xff);
+								}
+						}
+						payload += String.format("%1$02X%2$0" + setting.size * 2 + "X", setting.id, value);
 					}
-					payload += String.format("%1$02X%2$0" + setting.size * 2 + "X", setting.id, value);
 				}
 			}
 			result.setPayload("3E" + String.format("%1$02X", cpt) + payload);

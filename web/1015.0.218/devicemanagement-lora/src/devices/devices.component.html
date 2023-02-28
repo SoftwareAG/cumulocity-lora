@@ -27,7 +27,7 @@
   <div class="col-sm-6">
     <div class="card" *ngIf="device != undefined">
       <div class="card-header separator">
-        <h4 class="card-title">{{'Configure device codec' | translate}}</h4>
+        <h4 class="card-title">{{ "Configure device codec" | translate }}</h4>
       </div>
       <div class="card-block">
         <c8y-form-group class="col-sm-12">
@@ -46,7 +46,7 @@
                 *ngFor="let codec of codecService.codecs"
                 [value]="codec.lora_codec_DeviceCodecRepresentation.id"
               >
-                {{codec.lora_codec_DeviceCodecRepresentation.name}}
+                {{ codec.lora_codec_DeviceCodecRepresentation.name }}
               </option>
             </select>
           </div>
@@ -59,7 +59,7 @@
                 Please select a model
               </option>
               <option *ngFor="let m of models | keyvalue" [value]="m.key">
-                {{m.value}}
+                {{ m.value }}
               </option>
             </select>
           </div>
@@ -110,10 +110,10 @@
   <div class="col-sm-6">
     <div class="card">
       <div class="card-header separator">
-        <h4 class="card-title">{{'Unprocessed payloads' | translate}}</h4>
+        <h4 class="card-title">{{ "Unprocessed payloads" | translate }}</h4>
       </div>
       <div class="card-block">
-        <span>{{unprocessedPayloads? unprocessedPayloads.length : 0}}</span>
+        <span>{{ unprocessedPayloads ? unprocessedPayloads.length : 0 }}</span>
         unprocessed payloads
       </div>
       <div class="card-footer">
@@ -137,7 +137,7 @@
   <div class="col-sm-6" *ngIf="device">
     <div class="card">
       <div class="card-header separator">
-        <h4 class="card-title">{{'LNS Connector' | translate}}</h4>
+        <h4 class="card-title">{{ "LNS Connector" | translate }}</h4>
       </div>
       <div class="card-block">
         <c8y-form-group
@@ -162,8 +162,8 @@
                 *ngFor="let instance of lnsService.lnsInstances"
                 [value]="instance.id"
               >
-                {{instance.name}} -
-                {{lnsService.proxyMap[instance.lnsType].name}}
+                {{ instance.name }} -
+                {{ lnsService.proxyMap[instance.lnsType].name }}
               </option>
             </select>
           </div>
@@ -212,34 +212,34 @@
             <c8y-form-group
               *ngIf="property.type === 'STRING' || property.type === 'TEXT'"
             >
-              <label for="{{property.name}}">{{property.label}}:</label>
+              <label for="{{ property.name }}">{{ property.label }}:</label>
               <input
                 class="form-control"
                 [(ngModel)]="
                   deviceProvisioningAdditionalProperties[property.name]
                 "
-                name="{{property.name}}"
+                name="{{ property.name }}"
                 #{{property.name}}="ngModel"
                 ngModel
                 required
               />
             </c8y-form-group>
             <c8y-form-group *ngIf="property.type === 'PASSWORD'">
-              <label for="{{property.name}}">{{property.label}}:</label>
+              <label for="{{ property.name }}">{{ property.label }}:</label>
               <input
                 class="form-control"
                 type="password"
                 [(ngModel)]="
                   deviceProvisioningAdditionalProperties[property.name]
                 "
-                name="{{property.name}}"
+                name="{{ property.name }}"
                 #{{property.name}}="ngModel"
                 ngModel
                 required
               />
             </c8y-form-group>
             <c8y-form-group *ngIf="property.type === 'NUMBER'">
-              <label for="{{property.name}}">{{property.label}}:</label>
+              <label for="{{ property.name }}">{{ property.label }}:</label>
               <input
                 class="form-control"
                 type="number"
@@ -247,21 +247,21 @@
                 [(ngModel)]="
                   deviceProvisioningAdditionalProperties[property.name]
                 "
-                name="{{property.name}}"
+                name="{{ property.name }}"
                 #{{property.name}}="ngModel"
                 ngModel
                 required
               />
             </c8y-form-group>
             <c8y-form-group *ngIf="property.type === 'INTEGER'">
-              <label for="{{property.name}}">{{property.label}}:</label>
+              <label for="{{ property.name }}">{{ property.label }}:</label>
               <input
                 class="form-control"
                 type="number"
                 [(ngModel)]="
                   deviceProvisioningAdditionalProperties[property.name]
                 "
-                name="{{property.name}}"
+                name="{{ property.name }}"
                 #{{property.name}}="ngModel"
                 ngModel
                 required
@@ -274,30 +274,30 @@
                   [(ngModel)]="
                     deviceProvisioningAdditionalProperties[property.name]
                   "
-                  name="{{property.name}}"
+                  name="{{ property.name }}"
                   #{{property.name}}="ngModel"
                   ngModel
                   required
-                /><span></span>{{property.label}}</label
+                /><span></span>{{ property.label }}</label
               >
             </c8y-form-group>
             <c8y-form-group *ngIf="property.type === 'LIST'">
-              <label for="{{property.name}}">{{property.label}}:</label>
+              <label for="{{ property.name }}">{{ property.label }}:</label>
               <select
                 [(ngModel)]="
                   deviceProvisioningAdditionalProperties[property.name]
                 "
                 class="form-control"
-                name="{{property.name}}"
+                name="{{ property.name }}"
                 #{{property.name}}="ngModel"
                 ngModel
                 required
               >
                 <option [ngValue]="undefined" [disabled]="true">
-                  Please select {{property.name}}
+                  Please select {{ property.name }}
                 </option>
                 <option *ngFor="let v of property.values" [value]="v.id">
-                  {{v.name}}
+                  {{ v.name }}
                 </option>
               </select>
             </c8y-form-group>
@@ -322,7 +322,9 @@
 <div class="row">
   <div class="card col-sm-12">
     <div class="card-header separator">
-      <h4 class="card-title">{{'Send a command to the device' | translate}}</h4>
+      <h4 class="card-title">
+        {{ "Send a command to the device" | translate }}
+      </h4>
     </div>
     <div class="card-block">
       <div class="col-sm-12">
@@ -336,7 +338,7 @@
               *ngFor="let command of commands | keyvalue"
               [value]="command.value?.id"
             >
-              {{command.value?.name}}
+              {{ command.value?.name }}
             </option>
           </select>
         </div>
@@ -378,11 +380,13 @@
     *ngIf="previewCommand !== undefined && previewCommand.success"
   >
     <div class="card-header separator">
-      <h4 class="card-title">{{'Preview' | translate}}</h4>
+      <h4 class="card-title">{{ "Preview" | translate }}</h4>
     </div>
     <div class="card-block">
-      <div class="col-sm-12">fPort: {{previewCommand.response.fport}}</div>
-      <div class="col-sm-12">Payload: {{previewCommand.response.payload}}</div>
+      <div class="col-sm-12">fPort: {{ previewCommand.response.fport }}</div>
+      <div class="col-sm-12" style="overflow-wrap: break-word">
+        Payload: {{ previewCommand.response.payload }}
+      </div>
     </div>
   </div>
   <ng-template #errorModal>
@@ -392,9 +396,9 @@
       </h4>
     </div>
     <div class="modal-body">
-      An error occurred while parsing the command: {{previewCommand.response
+      An error occurred while parsing the command: {{ previewCommand.response
       }}<br />
-      Cause: {{previewCommand.message}}<br />
+      Cause: {{ previewCommand.message }}<br />
     </div>
     <div class="modal-footer">
       <button
