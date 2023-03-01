@@ -102,7 +102,7 @@ public class LNSDeviceManager {
 		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
 		if (connector.isPresent()) {
 			LNSResponse<EndDevice> device = connector.get().getDevice(event.getDevEui());
-			if (device.isOk()) {
+			if (device.isOk() && device.getResult() != null) {
 				name = device.getResult().getName();
 			}
 		}

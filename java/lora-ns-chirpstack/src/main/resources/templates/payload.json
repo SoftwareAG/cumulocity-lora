@@ -1,0 +1,20 @@
+{
+    "deviceInfo": {
+        "devEui": "[(${deveui}?:'0000000000000000')]",
+    },
+    "fPort": [(${port
+        }?:'0')
+    ],
+    "rxInfo": [
+        {
+            "rssi": [(${rssi
+                }?:'0')
+            ],
+            "snr": [(${snr
+                }?:'0')
+            ]
+        }
+    ],
+    "data": "[(${payload}?:'0000')]",
+    "time": "[(${timestamp}?:${#calendars.formatISO(#calendars.createNow())})]"
+}

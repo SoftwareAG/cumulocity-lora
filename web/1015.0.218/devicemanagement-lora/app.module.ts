@@ -62,6 +62,7 @@ import {
 import { LoraGatewaysComponent } from "./src/onboarding/gateways/gateways.component";
 import { LNSEditComponent } from "./src/onboarding/lns/lns-edit.component";
 import { LNSComponent } from "./src/onboarding/lns/lns.component";
+import { SimulatorComponent } from "./src/simulator/simulator.component";
 
 const monacoConfig: NgxMonacoEditorConfig = {
   //baseUrl: 'app-name/assets', // configure base path for monaco editor default: './assets'
@@ -302,6 +303,7 @@ declare var Buffer: {
     PropertyPipe,
     RepeatTypeComponent,
     PanelWrapperComponent,
+    SimulatorComponent,
   ],
   entryComponents: [GroupsComponent, DevicesComponent],
   imports: [
@@ -334,6 +336,10 @@ declare var Buffer: {
         {
           path: "config",
           component: LoRaConfigComponent,
+        },
+        {
+          path: "lorasimulator",
+          component: SimulatorComponent,
         },
         { path: "health", component: GroupsComponent },
         { path: "lora_command", component: DevicesComponent },
