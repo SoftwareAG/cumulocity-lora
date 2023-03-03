@@ -1,15 +1,15 @@
 package lora.ns.chirpstack;
 
-import java.util.Properties;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-
-import lora.codec.downlink.DownlinkData;
-import lora.ns.DeviceData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * Unit test for simple App.
  */
+@SpringBootTest
 public class AppTest {
     /**
      * Rigorous Test :-)
@@ -47,4 +47,14 @@ public class AppTest {
      * System.out.println(data.toString());
      * }
      */
+
+    @Autowired
+    private ChirpstackIntegrationService service;
+
+    @Test
+    public void testSimulator() {
+        String payload = service.getSimulatedPayload(Map.of("payload", "AABBCCDD"));
+        System.out.println(payload);
+
+    }
 }

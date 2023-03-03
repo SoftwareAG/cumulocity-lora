@@ -81,7 +81,7 @@ public class LiveObjectsIntegrationService extends LNSIntegrationService<LiveObj
 			mv = new MeasurementValue();
 			mv.setValue(BigDecimal.valueOf(esp));
 			mv.setUnit("dBm");
-			measurementValueMap.put("noise", mv);
+			measurementValueMap.put("esp", mv);
 
 			mv = new MeasurementValue();
 			mv.setValue(BigDecimal.valueOf(snr));

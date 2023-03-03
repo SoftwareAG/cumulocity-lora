@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base16;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
@@ -154,5 +155,15 @@ public class ChirpstackIntegrationService extends LNSIntegrationService<Chirpsta
 	@Override
 	public String getVersion() {
 		return "1.0";
+	}
+
+	@Override
+	public String getSimulatedPayload(java.util.Map<String, Object> fields) {
+		if (fields.containsKey("payload")) {
+			fields = new HashMap<>(fields);
+			fields.put("payload",
+					Base64.getEncoder().encodeToString(new Base16().decode(fields.get("payload").toString())));
+		}
+		return super.getSimulatedPayload(fields);
 	}
 }

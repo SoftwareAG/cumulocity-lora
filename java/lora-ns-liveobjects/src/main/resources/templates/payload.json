@@ -1,0 +1,12 @@
+{
+    "devEUI": "[(${deveui}?:'0000000000000000')]",
+    "payload": "[(${payload}?:'0000')]",
+    "timestamp": "[(${timestamp}?:${#calendars.formatISO(#calendars.createNow())})]",
+    "port": [(${port}?:'0')],
+    "signal": {
+        "rssi": [(${rssi}?:'0')],
+        "snr": [(${snr}?:'0')],
+        "esp": [(${snr}?:'0')],
+        "sf": [(${snr}?:'12')]
+    }
+}

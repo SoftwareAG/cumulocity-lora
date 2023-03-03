@@ -1,0 +1,9 @@
+{
+    "cmd": "rx",
+    "EUI": "[(${deveui}?:'0000000000000000')]",
+    "data": "[(${payload}?:'0000')]",
+    "ts": "[(${timestamp}?:${#calendars.millisecond(#calendars.createNow())})]",
+    "port": [(${port}?:'0')],
+    "rssi": [(${rssi}?:'0')],
+    "snr": [(${snr}?:'0')]
+}

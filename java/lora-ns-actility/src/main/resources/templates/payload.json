@@ -1,24 +1,12 @@
 {
     "DevEUI_uplink": {
         "DevEUI": "[(${deveui}?:'0000000000000000')]",
-        "FPort": [(${port
-            }?:'0')
-        ],
-        "LrrRSSI": [(${rssi
-            }?:'0')
-        ],
-        "LrrSNR": [(${snr
-            }?:'0')
-        ],
-        "SpFact": [(${sf
-            }?:'12')
-        ],
-        "DevLAT": [(${lat
-            }?:'0.0')
-        ],
-        "DevLON": [(${lng
-            }?:'0.0')
-        ],
+        "FPort": [(${port}?:'0')],
+        "LrrRSSI": [(${rssi}?:'0')],
+        "LrrSNR": [(${snr}?:'0')],
+        "SpFact": [(${sf}?:'12')],
+        "DevLAT": [(${lat}?:'0.0')],
+        "DevLON": [(${lng}?:'0.0')],
         "payload_hex": "[(${payload}?:'0000')]",
         "Time": "[(${timestamp}?:${#calendars.formatISO(#calendars.createNow())})]"
     }

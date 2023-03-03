@@ -1,0 +1,14 @@
+{
+    "end_device_ids": {
+        "dev_eui": "[(${deveui}?:'0000000000000000')]"
+    },
+    "uplink_message": {
+        "frm_payload": "[(${payload}?:'0000')]",
+        "received_at": "[(${timestamp}?:${#calendars.millisecond(#calendars.createNow())})]",
+        "f_port": [(${port}?:'0')],
+        "rx_metadata": [{
+            "rssi": [(${rssi}?:'0')],
+            "snr": [(${snr}?:'0')]
+        }]
+    }
+}

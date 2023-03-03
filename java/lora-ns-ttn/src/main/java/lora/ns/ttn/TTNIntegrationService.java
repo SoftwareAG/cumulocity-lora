@@ -7,16 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base16;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import lora.ns.DeviceData;
 import lora.ns.connector.PropertyDescription;
@@ -31,12 +32,17 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 
 	{
 		wizard.add(new InstanceWizardStep());
-		deviceProvisioningAdditionalProperties.add(new PropertyDescription("MACVersion", "MAC Version", true, null, "/macversion", null, null, null, null, null, PropertyType.LIST, false));
-		deviceProvisioningAdditionalProperties.add(new PropertyDescription("PHYVersion", "PHY Version", true, null, "/phyversion", null, null, null, null, null, PropertyType.LIST, false));
-		deviceProvisioningAdditionalProperties.add(new PropertyDescription("frequencyPlan", "Frequency Plan", true, null, "/frequencyplan", null, null, null, null, null, PropertyType.LIST, false));
+		deviceProvisioningAdditionalProperties.add(new PropertyDescription("MACVersion", "MAC Version", true, null,
+				"/macversion", null, null, null, null, null, PropertyType.LIST, false));
+		deviceProvisioningAdditionalProperties.add(new PropertyDescription("PHYVersion", "PHY Version", true, null,
+				"/phyversion", null, null, null, null, null, PropertyType.LIST, false));
+		deviceProvisioningAdditionalProperties.add(new PropertyDescription("frequencyPlan", "Frequency Plan", true,
+				null, "/frequencyplan", null, null, null, null, null, PropertyType.LIST, false));
 
-		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("public", "Make status public", true, null, null, null, null, null, null, null, PropertyType.BOOLEAN, false));
-		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("frequencyPlan", "Frequency Plan", true, null, "/frequencyplan", null, null, null, null, null, PropertyType.LIST, false));
+		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("public", "Make status public", true, null,
+				null, null, null, null, null, null, PropertyType.BOOLEAN, false));
+		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("frequencyPlan", "Frequency Plan", true,
+				null, "/frequencyplan", null, null, null, null, null, PropertyType.LIST, false));
 	}
 
 	@Override
@@ -51,7 +57,9 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 			Double snr = rootNode.at("/uplink_message/rx_metadata/0/snr").asDouble();
 			logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
 			byte[] payload = Base64.getDecoder().decode(rootNode.at("/uplink_message/frm_payload").asText());
-			Long updateTime = rootNode.has("/uplink_message/received_at") ? new DateTime(rootNode.at("/uplink_message/received_at").asText()).getMillis() : new DateTime().getMillis();
+			Long updateTime = rootNode.has("/uplink_message/received_at")
+					? new DateTime(rootNode.at("/uplink_message/received_at").asText()).getMillis()
+					: new DateTime().getMillis();
 			logger.info("Update time is: {}", updateTime);
 
 			Double lat = rootNode.at("/uplink_message/locations/user/latitude").asDouble();
@@ -166,5 +174,15 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 	@Override
 	public String getVersion() {
 		return "1.0";
+	}
+
+	@Override
+	public String getSimulatedPayload(java.util.Map<String, Object> fields) {
+		if (fields.containsKey("payload")) {
+			fields = new HashMap<>(fields);
+			fields.put("payload",
+					Base64.getEncoder().encodeToString(new Base16().decode(fields.get("payload").toString())));
+		}
+		return super.getSimulatedPayload(fields);
 	}
 }

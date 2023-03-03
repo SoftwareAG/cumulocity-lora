@@ -1,0 +1,12 @@
+{
+    "endDevice": {
+        "devEui": "[(${deveui}?:'0000000000000000')]",
+    },
+    "payload": "[(${payload}?:'0000')]",
+    "recvTime": "[(${timestamp}?:${#calendars.millisecond(#calendars.createNow())})]",
+    "fPort": [(${port}?:'0')],
+    "gwInfo": [{
+        "rssi": [(${rssi}?:'0')],
+        "snr": [(${snr}?:'0')]
+    }]
+}
