@@ -51,6 +51,11 @@ public class ACSSwitchCodec extends DeviceCodec {
 			this.name = name;
 			this.value = value;
 		}
+
+		@Override
+		public String toString() {
+			return "ParamValue [offset=" + offset + ", length=" + length + ", name=" + name + ", value=" + value + "]";
+		}
 	}
 
 	enum PARAMETER {
@@ -81,12 +86,23 @@ public class ACSSwitchCodec extends DeviceCodec {
 			}
 		}
 
+		public static PARAMETER valueOf(DeviceOperationElement op) {
+			PARAMETER param = PARAMETER.valueOf(op.getId());
+			if (param.values != null) {
+				for (ParamValue val : param.values) {
+					val.value = (Integer) op.getElement(val.name).getValue();
+					System.out.println(val);
+				}
+			}
+			return param;
+		}
+
 		public String buildPayload(int value) {
 			byte[] payload = new byte[2 + length];
 			payload[0] = code;
 			payload[1] = length;
 			for (int i = 0; i < length; i++) {
-				payload[1 + length - i] = (byte) (value);
+				payload[1 + length - i] = (byte) (value & 0xff);
 				value >>= 8;
 			}
 			return BaseEncoding.base16().encode(payload);
@@ -95,6 +111,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 		public String buildPayload() {
 			int value = 0;
 			for (ParamValue v : values) {
+				System.out.println(v);
 				value |= (v.value & ((1 << v.length) - 1)) << v.offset;
 			}
 			return buildPayload(value);
@@ -412,6 +429,26 @@ public class ACSSwitchCodec extends DeviceCodec {
 					- new GregorianCalendar(2010, Calendar.JANUARY, 1).getTimeInMillis()) / 1000l);
 			data.setPayload("0301" + PARAMETER.RTC.buildPayload(timestamp));
 			data.setFport(1);
+			return data;
+		}
+		if (encode.getOperation().contains("set config")) {
+			String payload = "";
+			DeviceOperation op = this.convertJsonStringToDeviceOperation(encode.getOperation());
+			int cpt = 0;
+			for (DeviceOperationElement elem : op.getElements()) {
+				cpt++;
+				PARAMETER param = PARAMETER.valueOf(elem.getId());
+				if (param.values != null) {
+					for (ParamValue v : param.values) {
+						v.value = (Integer) elem.getElement(v.name).getValue();
+					}
+					payload += param.buildPayload();
+				} else {
+					payload += param.buildPayload((Integer) elem.getValue());
+				}
+			}
+			data.setFport(1);
+			data.setPayload(String.format("03%1$02X", cpt) + payload);
 			return data;
 		}
 		ObjectMapper mapper = new ObjectMapper();

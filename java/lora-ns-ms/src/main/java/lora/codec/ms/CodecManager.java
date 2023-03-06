@@ -4,11 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.codec.binary.Hex;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Service;
+
 import com.cumulocity.microservice.context.ContextService;
 import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAddedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.ID;
+import c8y.Configuration;
 import com.cumulocity.model.event.CumulocitySeverities;
 import com.cumulocity.rest.representation.alarm.AlarmRepresentation;
 import com.cumulocity.rest.representation.event.EventRepresentation;
@@ -22,12 +29,6 @@ import com.cumulocity.sdk.client.identity.IdentityApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.inventory.InventoryFilter;
 import com.cumulocity.sdk.client.inventory.ManagedObjectCollection;
-
-import org.apache.commons.codec.binary.Hex;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Service;
 
 import c8y.Command;
 import c8y.Hardware;
@@ -63,18 +64,18 @@ public class CodecManager {
 
 	@Autowired
 	private EventApi eventApi;
-	
+
 	@Autowired
 	private InventoryApi inventoryApi;
 
 	@Autowired
 	private IdentityApi identityApi;
-	
+
 	@Autowired
 	private AlarmApi alarmApi;
 
-    @Autowired
-    private MicroserviceSubscriptionsService subscriptionsService;
+	@Autowired
+	private MicroserviceSubscriptionsService subscriptionsService;
 
 	@Autowired
 	protected ContextService<MicroserviceCredentials> contextService;
@@ -146,7 +147,8 @@ public class CodecManager {
 		Optional<CodecProxy> result = Optional.empty();
 		if (device.hasProperty(PROPERTY_CODEC)) {
 			codec = getCodec(device.getProperty(PROPERTY_CODEC).toString());
-			Optional<MicroserviceCredentials> credentials = subscriptionsService.getCredentials(subscriptionsService.getTenant());
+			Optional<MicroserviceCredentials> credentials = subscriptionsService
+					.getCredentials(subscriptionsService.getTenant());
 			if (codec != null && credentials.isPresent()) {
 				String authentication = credentials.get().toCumulocityCredentials().getAuthenticationString();
 				codec.setAuthentication(authentication);
@@ -159,21 +161,22 @@ public class CodecManager {
 				}
 			}
 		} else {
-        	log.info("Device has no codec information. Payload will be stored for later parsing when Codec will be provided.");
+			log.info(
+					"Device has no codec information. Payload will be stored for later parsing when Codec will be provided.");
 		}
 		return result;
 	}
 
 	private MicroserviceCredentials createContextWithoutApiKey(MicroserviceCredentials source) {
 		return new MicroserviceCredentials(
-			source.getTenant(),
-			source.getUsername(),
-			source.getPassword(),
-			source.getOAuthAccessToken(),
-			"NOT_EXISTING", //added to replace context, check: com.cumulocity.microservice.context.annotation.EnableContextSupportConfiguration.contextScopeConfigurer
-			source.getTfaToken(),
-			null
-		);
+				source.getTenant(),
+				source.getUsername(),
+				source.getPassword(),
+				source.getOAuthAccessToken(),
+				"NOT_EXISTING", // added to replace context, check:
+								// com.cumulocity.microservice.context.annotation.EnableContextSupportConfiguration.contextScopeConfigurer
+				source.getTfaToken(),
+				null);
 	}
 
 	public void decode(ManagedObjectRepresentation mor, DeviceData event) {
@@ -188,7 +191,8 @@ public class CodecManager {
 		eventRepresentation.setProperty(PROPERTY_PROCESSED, false);
 		eventRepresentation.setProperty(PROPERTY_STATUS, VALUE_UNPROCESSED);
 		getCodec(mor).ifPresent(codec -> {
-			log.info("Codec {} will be used with device {} for decoding payload {} on port {}", mor.getProperty(PROPERTY_CODEC), event.getDevEui(), event.getPayload(), event.getfPort());
+			log.info("Codec {} will be used with device {} for decoding payload {} on port {}",
+					mor.getProperty(PROPERTY_CODEC), event.getDevEui(), event.getPayload(), event.getfPort());
 			Result<String> result = codec.decode(new Decode(event));
 			if (result.isSuccess()) {
 				eventRepresentation.setProperty(PROPERTY_PROCESSED, true);
@@ -208,19 +212,27 @@ public class CodecManager {
 		MicroserviceCredentials noAppKeyContext = createContextWithoutApiKey(contextService.getContext());
 		contextService.callWithinContext(noAppKeyContext, () -> eventApi.create(eventRepresentation));
 	}
-	
+
 	public DownlinkData encode(String devEui, OperationRepresentation operation) {
-		DownlinkData[] data = {null};
+		DownlinkData[] data = { null };
 		ManagedObjectRepresentation mor = inventoryApi.get(operation.getDeviceId());
 		getCodec(mor).ifPresent(codec -> {
-			log.info("Codec {} will be used with device {} for encoding operation {}", mor.getProperty(PROPERTY_CODEC), devEui, operation.toJSON());
 			Hardware hardware = mor.get(Hardware.class);
-			Result<DownlinkData> result = codec.encode(new Encode(devEui, operation.get(Command.class).getText(), hardware != null ? hardware.getModel() : null));
+			String command = "";
+			if (operation.get(Command.class) != null) {
+				command = operation.get(Command.class).getText();
+			} else if (operation.get(Configuration.class) != null) {
+				command = "{\"set config\": " + operation.get(Configuration.class).getConfig() + "}";
+			}
+			log.info("Codec {} will be used with device {} for encoding operation {}", mor.getProperty(PROPERTY_CODEC),
+					devEui, command);
+			Result<DownlinkData> result = codec
+					.encode(new Encode(devEui, command, hardware != null ? hardware.getModel() : null));
 			if (result.isSuccess()) {
 				if (result.getResponse() != null) {
-					log.info("Result of command \"{}\" is payload {}", operation.get(Command.class).getText(), result.getResponse().getPayload());
+					log.info("Result of command \"{}\" is payload {}", command, result.getResponse().getPayload());
 				} else {
-					log.info("Result of command \"{}\" is empty", operation.get(Command.class).getText());
+					log.info("Result of command \"{}\" is empty", command);
 				}
 				data[0] = result.getResponse();
 			} else {
@@ -235,12 +247,13 @@ public class CodecManager {
 		});
 		return data[0];
 	}
-	
+
 	public Map<String, DeviceOperationElement> getAvailableOperations(ManagedObjectRepresentation mor) {
 		Map<String, DeviceOperationElement> result = null;
 		if (mor.hasProperty(PROPERTY_CODEC)) {
 			CodecProxy codec = getCodec(mor.getProperty(PROPERTY_CODEC).toString());
-			Optional<MicroserviceCredentials> credentials = subscriptionsService.getCredentials(subscriptionsService.getTenant());
+			Optional<MicroserviceCredentials> credentials = subscriptionsService
+					.getCredentials(subscriptionsService.getTenant());
 			if (codec != null && credentials.isPresent()) {
 				String authentication = credentials.get().toCumulocityCredentials().getAuthenticationString();
 				codec.setAuthentication(authentication);
@@ -256,10 +269,10 @@ public class CodecManager {
 					log.error("Could not retrieve microservice credentials.");
 				}
 			}
-		}		
+		}
 		return result;
 	}
-	
+
 	public Map<String, CodecProxy> getCodecs() {
 		return codecInstances;
 	}

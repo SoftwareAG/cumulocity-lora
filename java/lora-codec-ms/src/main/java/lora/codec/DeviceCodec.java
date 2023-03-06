@@ -303,8 +303,7 @@ public abstract class DeviceCodec implements Component {
 			Iterator<Entry<String, JsonNode>> fields = elements.fields();
 			while (fields.hasNext()) {
 				Entry<String, JsonNode> field = fields.next();
-				deviceOperation.getElements()
-						.add(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
+				deviceOperation.addElement(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -325,7 +324,7 @@ public abstract class DeviceCodec implements Component {
 						element.setType(ParamType.ARRAY);
 						((List<Object>) element.getValue()).add(field.asInt());
 					} else {
-						element.getElements().add(convertJsonNodeToDeviceOperationElement(field, nodeName));
+						element.addElement(convertJsonNodeToDeviceOperationElement(field, nodeName));
 					}
 				}
 				break;
@@ -352,8 +351,7 @@ public abstract class DeviceCodec implements Component {
 				Iterator<Entry<String, JsonNode>> fields = node.fields();
 				while (fields.hasNext()) {
 					Entry<String, JsonNode> field = fields.next();
-					element.getElements()
-							.add(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
+					element.addElement(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
 				}
 				break;
 			case POJO:

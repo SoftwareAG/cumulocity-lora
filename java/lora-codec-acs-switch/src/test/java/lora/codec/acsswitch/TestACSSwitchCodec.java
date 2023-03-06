@@ -8,10 +8,13 @@ import java.util.Calendar;
 
 import org.junit.jupiter.api.Test;
 
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.google.common.io.BaseEncoding;
+
+import lora.codec.downlink.DownlinkData;
+import lora.codec.downlink.Encode;
 import lora.codec.uplink.C8YData;
 import lora.codec.uplink.Decode;
-
-import com.google.common.io.BaseEncoding;
 
 public class TestACSSwitchCodec {
 
@@ -48,7 +51,7 @@ public class TestACSSwitchCodec {
 		value = parameter.getValue(buffer);
 		assertEquals(1, value, "Wrong value");
 	}
-	
+
 	@Test
 	void receiveTwoParameters2() {
 		byte[] payload = BaseEncoding.base16().decode("82020102003c020201f0".toUpperCase());
@@ -73,7 +76,19 @@ public class TestACSSwitchCodec {
 	@Test
 	void testNormalPayload() {
 		ACSSwitchCodec codec = new ACSSwitchCodec();
-		C8YData data = codec.decode(null, new Decode("0", null, 1, "4200000a4c03000000001700000000611508", Calendar.getInstance().getTimeInMillis()));
+		C8YData data = codec.decode(null, new Decode("0", null, 1, "4200000a4c03000000001700000000611508",
+				Calendar.getInstance().getTimeInMillis()));
 		System.out.println(data);
+	}
+
+	@Test
+	void testSetConfig() {
+		ACSSwitchCodec codec = new ACSSwitchCodec();
+		Encode encode = new Encode("000000000000000",
+				"{\"set config\": {\"RTC\":415211437,\"PRESENCE_RANDOM_DELAY\":{\"min\":5,\"max\":6},\"PRESENCE_PERIOD\":55}}",
+				"default");
+		DownlinkData data = codec.encode(new ManagedObjectRepresentation(), encode);
+		System.out.println(data.getPayload());
+		assertEquals("0303030418BF9FAD0202050601020037", data.getPayload());
 	}
 }

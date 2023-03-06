@@ -1,12 +1,14 @@
 package lora.codec.downlink;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DeviceOperation {
 	private String id;
 	private String name;
-	private List<DeviceOperationElement> elements = new ArrayList<>();
+	private Map<String, DeviceOperationElement> elements = new HashMap<>();
 
 	public DeviceOperation() {
 	}
@@ -21,7 +23,9 @@ public class DeviceOperation {
 		super();
 		this.id = id;
 		this.name = name;
-		this.elements = elements;
+		for (DeviceOperationElement element : elements) {
+			this.elements.put(element.getId(), element);
+		}
 	}
 
 	public String getName() {
@@ -40,16 +44,22 @@ public class DeviceOperation {
 		this.id = id;
 	}
 
-	public List<DeviceOperationElement> getElements() {
-		return elements;
+	public Collection<DeviceOperationElement> getElements() {
+		return elements.values();
+	}
+
+	public DeviceOperationElement getElement(String id) {
+		return elements.get(id);
 	}
 
 	public void setElements(List<DeviceOperationElement> elements) {
-		this.elements = elements;
+		for (DeviceOperationElement element : elements) {
+			this.elements.put(element.getId(), element);
+		}
 	}
 
 	public DeviceOperation addElement(DeviceOperationElement element) {
-		this.elements.add(element);
+		this.elements.put(element.getId(), element);
 		return this;
 	}
 

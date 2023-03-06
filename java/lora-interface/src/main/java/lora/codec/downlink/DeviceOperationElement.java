@@ -1,14 +1,16 @@
 package lora.codec.downlink;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DeviceOperationElement {
     private String id;
     private String name;
     private ParamType type;
     private Object value;
-    private List<DeviceOperationElement> elements = new ArrayList<>();
+    private Map<String, DeviceOperationElement> elements = new HashMap<>();
     private Boolean repeatable = false;
     private Integer minOccur = 1;
     private Integer maxOccur = 1;
@@ -77,12 +79,18 @@ public class DeviceOperationElement {
         this.value = value;
     }
 
-    public List<DeviceOperationElement> getElements() {
-        return elements;
+    public Collection<DeviceOperationElement> getElements() {
+        return elements.values();
     }
 
     public void setElements(List<DeviceOperationElement> elements) {
-        this.elements = elements;
+        for (DeviceOperationElement element : elements) {
+            this.elements.put(element.getId(), element);
+        }
+    }
+
+    public DeviceOperationElement getElement(String id) {
+        return elements.get(id);
     }
 
     public Boolean getRepeatable() {
@@ -147,7 +155,7 @@ public class DeviceOperationElement {
     }
 
     public DeviceOperationElement addElement(DeviceOperationElement element) {
-        this.elements.add(element);
+        this.elements.put(element.getId(), element);
         return this;
     }
 

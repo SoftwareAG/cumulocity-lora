@@ -4,19 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
+import com.cumulocity.model.configuration.Configuration;
 import com.cumulocity.model.idtype.GId;
 import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.operation.OperationRepresentation;
 import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 
 import c8y.Command;
 import lora.codec.downlink.DownlinkData;
@@ -59,28 +60,32 @@ public class LNSOperationManager {
 		logger.info("Will execute operation {}", operation.toJSON());
 		if (lnsDeviceManager.getDeviceEui(operation.getDeviceId()) != null) {
 			logger.info("Processing operation {}", operation);
-			if (operation.get(Command.class) != null) {
-				DownlinkData encodedData = codecManager.encode(lnsDeviceManager.getDeviceEui(operation.getDeviceId()),
-						operation);
-				if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null
-						&& !encodedData.isSkipDownlink()) {
-					operation.setStatus(OperationStatus.EXECUTING.toString());
-					String lnsConnectorId = inventoryApi.get(operation.getDeviceId())
-							.getProperty(LNSIntegrationService.LNS_CONNECTOR_REF).toString();
-					processOperation(lnsConnectorId, encodedData, operation);
-				} else if (encodedData != null && encodedData.isSkipDownlink()) {
-					operation.setStatus(OperationStatus.SUCCESSFUL.toString());
+			DownlinkData encodedData = codecManager.encode(lnsDeviceManager.getDeviceEui(operation.getDeviceId()),
+					operation);
+			if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null
+					&& !encodedData.isSkipDownlink()) {
+				operation.setStatus(OperationStatus.EXECUTING.toString());
+				String lnsConnectorId = inventoryApi.get(operation.getDeviceId())
+						.getProperty(LNSIntegrationService.LNS_CONNECTOR_REF).toString();
+				processOperation(lnsConnectorId, encodedData, operation);
+			} else if (encodedData != null && encodedData.isSkipDownlink()) {
+				operation.setStatus(OperationStatus.SUCCESSFUL.toString());
+				if (operation.get(Command.class) != null) {
 					Command command = operation.get(Command.class);
-					command.setResult("Operation skipped.");
-					operation.set(command);
-				} else {
-					operation.setStatus(OperationStatus.FAILED.toString());
-					Command command = operation.get(Command.class);
-					command.setResult("Operation not supported.");
+					command.setResult("Command skipped.");
 					operation.set(command);
 				}
-				deviceControlApi.update(operation);
+			} else {
+				operation.setStatus(OperationStatus.FAILED.toString());
+				if (operation.get(Command.class) != null) {
+					Command command = operation.get(Command.class);
+					command.setResult("Command not supported.");
+					operation.set(command);
+				} else {
+					operation.setFailureReason("Command not supported.");
+				}
 			}
+			deviceControlApi.update(operation);
 		} else {
 			logger.info("Operation {} will be ignored", operation);
 		}

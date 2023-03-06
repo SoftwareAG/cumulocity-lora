@@ -24,7 +24,7 @@ import lora.common.Component;
 
 @Slf4j
 public class CodecProxy implements Component {
-	
+
 	/**
 	 *
 	 */
@@ -71,18 +71,21 @@ public class CodecProxy implements Component {
 			headers.set(HttpHeaders.AUTHORIZATION, authentication);
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 			headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-			ResponseEntity<Result<DownlinkData>> response = restTemplate.exchange(System.getenv(C8Y_BASEURL) +  SERVICE_LORA_CODEC + id + "/encode", HttpMethod.POST, new HttpEntity<Encode>(data, headers), new ParameterizedTypeReference<Result<DownlinkData>>(){});
+			ResponseEntity<Result<DownlinkData>> response = restTemplate.exchange(
+					System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/encode", HttpMethod.POST,
+					new HttpEntity<Encode>(data, headers), new ParameterizedTypeReference<Result<DownlinkData>>() {
+					});
 			log.info("Answer of encoder is {} with content {}", response.getStatusCode(), response.getBody());
 			result = response.getBody();
-		} catch(RestClientResponseException e) {
+		} catch (RestClientResponseException e) {
 			e.printStackTrace();
 			log.error(e.getResponseBodyAsString());
 			result = new Result<>(false, e.getResponseBodyAsString(), null);
-		} catch(UnknownContentTypeException e) {
+		} catch (UnknownContentTypeException e) {
 			e.printStackTrace();
 			log.error(e.getResponseBodyAsString());
 			result = new Result<>(false, e.getResponseBodyAsString(), null);
-		} catch(ResourceAccessException e) {
+		} catch (ResourceAccessException e) {
 			e.printStackTrace();
 			result = new Result<>(false, e.getMessage(), null);
 		}
@@ -100,24 +103,28 @@ public class CodecProxy implements Component {
 			HttpHeaders headers = new HttpHeaders();
 			headers.set(HttpHeaders.AUTHORIZATION, authentication);
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-			ResponseEntity<Result<String>> response = restTemplate.exchange(System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/decode", HttpMethod.POST, new HttpEntity<Decode>(data, headers), new ParameterizedTypeReference<Result<String>>(){});
+			ResponseEntity<Result<String>> response = restTemplate.exchange(
+					System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/decode", HttpMethod.POST,
+					new HttpEntity<Decode>(data, headers), new ParameterizedTypeReference<Result<String>>() {
+					});
 			result = response.getBody();
-			log.info("Answer of decoder is {} with content {}", response.getStatusCode(), result != null ? result.getResponse() : "");
-		} catch(RestClientResponseException e) {
+			log.info("Answer of decoder is {} with content {}", response.getStatusCode(),
+					result != null ? result.getResponse() : "");
+		} catch (RestClientResponseException e) {
 			e.printStackTrace();
 			log.error(e.getResponseBodyAsString());
 			result = new Result<>(false, e.getResponseBodyAsString(), null);
-		} catch(UnknownContentTypeException e) {
+		} catch (UnknownContentTypeException e) {
 			e.printStackTrace();
 			log.error(e.getResponseBodyAsString());
 			result = new Result<>(false, e.getResponseBodyAsString(), null);
-		} catch(ResourceAccessException e) {
+		} catch (ResourceAccessException e) {
 			e.printStackTrace();
 			result = new Result<>(false, e.getMessage(), null);
 		}
 		return result;
 	}
-	
+
 	public Map<String, DeviceOperationElement> getAvailableOperations(String model) {
 		Map<String, DeviceOperationElement> result = new HashMap<>();
 		RestTemplate restTemplate = new RestTemplate();
@@ -127,16 +134,20 @@ public class CodecProxy implements Component {
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 			String url = System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/operations/" + model;
 			log.info("Will get list of operations from URL {}", url);
-			ResponseEntity<Map<String, DeviceOperationElement>> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>("", headers), new ParameterizedTypeReference<Map<String, DeviceOperationElement>>(){});
-			log.info("Answer of decoder is {} with content {}", response.getStatusCode(), response.getBody());
+			ResponseEntity<Map<String, DeviceOperationElement>> response = restTemplate.exchange(url, HttpMethod.GET,
+					new HttpEntity<String>("", headers),
+					new ParameterizedTypeReference<Map<String, DeviceOperationElement>>() {
+					});
+			// log.info("Answer of decoder is {} with content {}", response.getStatusCode(),
+			// response.getBody());
 			result = response.getBody();
-		} catch(RestClientResponseException e) {
+		} catch (RestClientResponseException e) {
 			e.printStackTrace();
 			log.error(e.getResponseBodyAsString());
-		} catch(UnknownContentTypeException e) {
+		} catch (UnknownContentTypeException e) {
 			e.printStackTrace();
 			log.error(e.getResponseBodyAsString());
-		} catch(ResourceAccessException e) {
+		} catch (ResourceAccessException e) {
 			e.printStackTrace();
 		}
 		return result;
