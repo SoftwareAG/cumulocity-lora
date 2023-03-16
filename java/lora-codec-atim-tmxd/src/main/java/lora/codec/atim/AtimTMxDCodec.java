@@ -55,7 +55,9 @@ public class AtimTMxDCodec extends DeviceCodec {
 				buffer.get();
 				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
-				c8yData.addAlarm(mor, "LowTemperature", "Temperature is too low: " + t1.toString() + " °C, " + t2.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
+				c8yData.addAlarm(mor, "LowTemperature",
+						"Temperature is too low: " + t1.toString() + " °C, " + t2.toString() + " °C",
+						CumulocitySeverities.MAJOR, dateTime);
 			}
 		},
 		LOW_THRESHOLD_2_END(0x27) {
@@ -73,7 +75,9 @@ public class AtimTMxDCodec extends DeviceCodec {
 				buffer.get();
 				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
 				BigDecimal t2 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
-				c8yData.addAlarm(mor, "HighTemperature", "Temperature is too high: " + t1.toString() + " °C, " + t2.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
+				c8yData.addAlarm(mor, "HighTemperature",
+						"Temperature is too high: " + t1.toString() + " °C, " + t2.toString() + " °C",
+						CumulocitySeverities.MAJOR, dateTime);
 			}
 		},
 		HIGH_THRESHOLD_2_END(0x29) {
@@ -90,7 +94,8 @@ public class AtimTMxDCodec extends DeviceCodec {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
 				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
-				c8yData.addAlarm(mor, "LowTemperature", "Temperature is too low: " + t1.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
+				c8yData.addAlarm(mor, "LowTemperature", "Temperature is too low: " + t1.toString() + " °C",
+						CumulocitySeverities.MAJOR, dateTime);
 			}
 		},
 		LOW_THRESHOLD_1_END(0x27) {
@@ -107,7 +112,8 @@ public class AtimTMxDCodec extends DeviceCodec {
 				ByteBuffer buffer = ByteBuffer.wrap(payload);
 				buffer.get();
 				BigDecimal t1 = BigDecimal.valueOf(buffer.getShort()).multiply(BigDecimal.valueOf(0.0625));
-				c8yData.addAlarm(mor, "HighTemperature", "Temperature is too high: " + t1.toString() + " °C", CumulocitySeverities.MAJOR, dateTime);
+				c8yData.addAlarm(mor, "HighTemperature", "Temperature is too high: " + t1.toString() + " °C",
+						CumulocitySeverities.MAJOR, dateTime);
 			}
 		},
 		HIGH_THRESHOLD_1_END(0x29) {
@@ -120,22 +126,23 @@ public class AtimTMxDCodec extends DeviceCodec {
 		};
 
 		private static final Map<Integer, FRAME> BY_VALUE = new HashMap<>();
-		
+
 		static {
-			for(FRAME f : values()) {
+			for (FRAME f : values()) {
 				BY_VALUE.put(f.code, f);
 			}
 		}
-		
+
 		public int code;
-		
+
 		private FRAME(int code) {
 			this.code = code;
 		}
-		
+
 		abstract void process(C8YData c8yData, ManagedObjectRepresentation mor, byte[] payload, DateTime dateTime);
 
-		private static void createTemperatures(C8YData c8yData, ManagedObjectRepresentation mor, BigDecimal t1, BigDecimal t2, DateTime time) {
+		private static void createTemperatures(C8YData c8yData, ManagedObjectRepresentation mor, BigDecimal t1,
+				BigDecimal t2, DateTime time) {
 			MeasurementRepresentation m = new MeasurementRepresentation();
 			Map<String, MeasurementValue> measurementValueMap = new HashMap<>();
 			MeasurementValue mv = new MeasurementValue();
@@ -158,7 +165,7 @@ public class AtimTMxDCodec extends DeviceCodec {
 
 	@Override
 	public String getId() {
-		return "atimTMxDCodec";
+		return "atim-tmxd";
 	}
 
 	@Override
@@ -179,13 +186,13 @@ public class AtimTMxDCodec extends DeviceCodec {
 		int code = payload[0];
 
 		FRAME frame = FRAME.BY_VALUE.get(code);
-		
+
 		logger.info("Received frame {}", frame);
-		
+
 		if (frame != null) {
 			frame.process(c8yData, mor, payload, new DateTime(decode.getUpdateTime()));
 		}
-		
+
 		return c8yData;
 	}
 
@@ -206,7 +213,6 @@ public class AtimTMxDCodec extends DeviceCodec {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 	@Override
 	public Map<String, DeviceOperation> getAvailableOperations(String model) {

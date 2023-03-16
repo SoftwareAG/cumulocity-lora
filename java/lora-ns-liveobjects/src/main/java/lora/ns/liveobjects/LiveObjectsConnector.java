@@ -231,7 +231,7 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 	private LNSResponse<Void> removeRouting(String id) {
 		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
 		try {
-			Response<ResponseBody> response = service.deleteActionPolicy(id.toString()).execute();
+			Response<ResponseBody> response = service.deleteActionPolicy(id).execute();
 			if (!response.isSuccessful()) {
 				result.setOk(false);
 				result.setMessage(response.errorBody().string());

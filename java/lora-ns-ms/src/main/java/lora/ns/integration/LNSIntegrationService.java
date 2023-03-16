@@ -159,12 +159,12 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
 		try {
 			result = instanceType.getConstructor(instance.getClass()).newInstance(instance);
+			beanFactory.autowireBean(result);
+			beanFactory.initializeBean(result, "connector-" + result.getId());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
-		beanFactory.autowireBean(result);
-		beanFactory.initializeBean(result, "connector-" + result.getId());
 
 		return result;
 	}

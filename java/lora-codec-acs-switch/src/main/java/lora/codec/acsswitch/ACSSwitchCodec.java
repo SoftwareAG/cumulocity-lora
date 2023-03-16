@@ -475,7 +475,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 
 	@Override
 	public DownlinkData askDeviceConfig(String devEui) {
-		return new DownlinkData(devEui, 1, "0203010202020304");
+		return new DownlinkData(devEui, 1, "020201020202");
 	}
 
 	@Override
