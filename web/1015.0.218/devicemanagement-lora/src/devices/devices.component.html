@@ -92,18 +92,31 @@
   <div class="col-sm-6">
     <div class="card">
       <div class="card-header separator">
-        <h4 class="card-title">Debug mode</h4>
+        <h4 class="card-title">Codec options</h4>
       </div>
       <div class="card-block">
-        <label class="c8y-switch">
-          <input
-            type="checkbox"
-            checked="checked"
-            [(ngModel)]="debugMode"
-            (change)="switchDebugMode()"
-          />
-          <span></span> Enable debug mode
-        </label>
+        <div class="form-group">
+          <label class="c8y-switch">
+            <input
+              type="checkbox"
+              checked="checked"
+              [(ngModel)]="debugMode"
+              (change)="switchDebugMode()"
+            />
+            <span></span> Enable debug mode
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="c8y-switch">
+            <input
+              type="checkbox"
+              checked="checked"
+              [(ngModel)]="storeLast"
+              (change)="switchStoreLast()"
+            />
+            <span></span> Store last measurements on device
+          </label>
+        </div>
       </div>
     </div>
   </div>

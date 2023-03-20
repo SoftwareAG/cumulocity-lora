@@ -24,6 +24,7 @@ import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionAd
 import com.cumulocity.microservice.subscription.model.MicroserviceSubscriptionRemovedEvent;
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.event.CumulocityAlarmStatuses;
+import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.rest.representation.alarm.AlarmRepresentation;
 import com.cumulocity.rest.representation.event.EventRepresentation;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
@@ -34,6 +35,7 @@ import com.cumulocity.sdk.client.alarm.AlarmFilter;
 import com.cumulocity.sdk.client.event.EventApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -232,6 +234,35 @@ public abstract class DeviceCodec implements Component {
 					debug.setProperty("DecodedPayload", c8yData);
 					debug.setDateTime(DateTime.now());
 					eventApi.create(debug);
+				}
+				if (mor.hasProperty("storeLast") && mor.getProperty("storeLast").equals(true)) {
+					logger.info("Storing last measurements on device...");
+					ObjectMapper mapper = new ObjectMapper();
+					JsonNode root = mapper.readTree(mor.toJSON());
+					Map<String, Map<String, Map<String, Object>>> measurements = root.has("measurements")
+							? mapper.convertValue(root.at("/measurements"), Map.class)
+							: new HashMap<>();
+					c8yData.getMeasurements().forEach(m -> {
+						if (!measurements.containsKey(m.getType())) {
+							measurements.put(m.getType(), new HashMap<>());
+						}
+						Map<String, MeasurementValue> measurementValues = (Map<String, MeasurementValue>) m
+								.getProperty(m.getType());
+						for (String series : measurementValues.keySet()) {
+							if (!measurements.get(m.getType()).containsKey(series)) {
+								measurements.get(m.getType()).put(series, new HashMap<>());
+							}
+							measurements.get(m.getType()).get(series).put("time", m.getDateTime());
+							measurements.get(m.getType()).get(series)
+									.put("value", measurementValues.get(series).getValue());
+							measurements.get(m.getType()).get(series)
+									.put("unit", measurementValues.get(series).getUnit());
+						}
+					});
+					mor.setProperty("measurements", measurements);
+					logger.info("Storing {}", measurements);
+					mor.setLastUpdatedDateTime(null);
+					inventoryApi.update(mor);
 				}
 				logger.info("Processing payload {} from port {} for device {}", decode.getPayload(), decode.getFPort(),
 						decode.getDeveui());

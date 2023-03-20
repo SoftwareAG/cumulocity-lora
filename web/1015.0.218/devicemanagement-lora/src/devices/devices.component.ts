@@ -57,6 +57,7 @@ export class DevicesComponent {
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[][] = new Array<FormlyFieldConfig[]>();
   debugMode: boolean;
+  storeLast: boolean;
   codecChanged: boolean;
 
   constructor(
@@ -86,6 +87,7 @@ export class DevicesComponent {
       this.parameterValues = JSON.parse(this.device.c8y_Configuration.config);
     }
     this.debugMode = data.debug;
+    this.storeLast = data.storeLast;
     this.selectedLnsConnectorId = this.device.lnsConnectorId;
     this.getUnprocessPayloads();
     if (this.device.codec) {
@@ -376,6 +378,14 @@ export class DevicesComponent {
     let device: Partial<IManagedObject> = {
       id: this.device.id,
       debug: this.debugMode,
+    };
+    this.inventory.update(device);
+  }
+
+  async switchStoreLast() {
+    let device: Partial<IManagedObject> = {
+      id: this.device.id,
+      storeLast: this.storeLast,
     };
     this.inventory.update(device);
   }
