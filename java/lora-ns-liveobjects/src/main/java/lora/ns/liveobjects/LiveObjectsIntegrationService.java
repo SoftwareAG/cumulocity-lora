@@ -11,7 +11,9 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import com.cumulocity.model.measurement.MeasurementValue;
+import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
@@ -56,7 +58,7 @@ public class LiveObjectsIntegrationService extends LNSIntegrationService<LiveObj
 			rootNode = mapper.readTree(event);
 			String devEUI = rootNode.at("/devEUI").asText();
 			int fPort = rootNode.at("/port").asInt();
-			JsonNode payloadNode = rootNode.get("/payload");
+			JsonNode payloadNode = rootNode.get("payload");
 			byte[] payload = new byte[0];
 			if (payloadNode != null && !payloadNode.isNull()) {
 				payload = BaseEncoding.base16().decode(payloadNode.asText().toUpperCase());
@@ -108,8 +110,37 @@ public class LiveObjectsIntegrationService extends LNSIntegrationService<LiveObj
 
 	@Override
 	public OperationData processDownlinkEvent(String event) {
-		OperationData data = null;
-		// parse the event string here;
+		log.info("Will process downlink event {}", event);
+		OperationData data = new OperationData();
+		data.setStatus(OperationStatus.SUCCESSFUL);
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			JsonNode rootNode = mapper.readTree(event);
+			String commandId = rootNode.at("/id").asText();
+			String type = rootNode.at("/type").asText();
+			if (commandId != null && type.equals("commandStatus")) {
+				String commandStatus = rootNode.at("/status").asText();
+				data.setCommandId(commandId);
+				if (commandStatus.equals("PROCESSED")) {
+					data.setStatus(OperationStatus.SUCCESSFUL);
+				} else if (commandStatus.equals("ERROR")) {
+					data.setStatus(OperationStatus.FAILED);
+					data.setErrorMessage("Command failed");
+				} else if (commandStatus.equals("CANCELED")) {
+					data.setStatus(OperationStatus.FAILED);
+					data.setErrorMessage("Command was canceled");
+				} else if (commandStatus.equals("EXPIRED")) {
+					data.setStatus(OperationStatus.FAILED);
+					data.setErrorMessage("Command expired");
+				}
+			} else {
+				data.setStatus(OperationStatus.FAILED);
+				data.setErrorMessage("Unrecognized downlink event");
+			}
+		} catch (Exception e) {
+			log.error("Error on Mapping LoRa payload to Cumulocity", e);
+			data.setStatus(OperationStatus.FAILED);
+		}
 		return data;
 	}
 

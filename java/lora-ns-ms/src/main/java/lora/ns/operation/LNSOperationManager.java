@@ -103,6 +103,14 @@ public class LNSOperationManager {
 						logger.warn("Operation {} status won't be updated as no correlation Id was sent by LNS.",
 								operation);
 					}
+				} else {
+					logger.error("Unable to send downlink: {}", lnsResponse.getMessage());
+					c8yOperation.setStatus(OperationStatus.FAILED.toString());
+					c8yOperation.setFailureReason(lnsResponse.getMessage());
+					Command command = c8yOperation.get(Command.class);
+					command.setResult("Unable to send downlink: " + lnsResponse.getMessage());
+					c8yOperation.set(command);
+					deviceControlApi.update(c8yOperation);
 				}
 			} catch (Exception e) {
 				logger.error("Unable to send downlink", e);
