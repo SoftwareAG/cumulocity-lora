@@ -8,10 +8,10 @@ COPY ./c8y-codec-interface/src ./c8y-codec-interface/src
 WORKDIR /usr/app/c8y-codec-interface
 RUN npm install && npm install typescript -g && tsc
 WORKDIR /usr/app
-COPY ./lora-codec-adeunis/package.json ./lora-codec-adeunis/package.json
-COPY ./lora-codec-adeunis/tsconfig.json ./lora-codec-adeunis/tsconfig.json
-COPY ./lora-codec-adeunis/src ./lora-codec-adeunis/src
-WORKDIR /usr/app/lora-codec-adeunis
+COPY ./lora-codec-atim-acw/package.json ./lora-codec-atim-acw/package.json
+COPY ./lora-codec-atim-acw/tsconfig.json ./lora-codec-atim-acw/tsconfig.json
+COPY ./lora-codec-atim-acw/src ./lora-codec-atim-acw/src
+WORKDIR /usr/app/lora-codec-atim-acw
 RUN npm install && tsc
 
 FROM node:alpine
