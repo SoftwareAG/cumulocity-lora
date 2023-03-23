@@ -1,0 +1,28 @@
+{
+  "name": "lora-codec-atim-acw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "watch": "concurrently --kill-others npm:watch-*",
+    "watch-typescript": "tsc -w",
+    "watch-node": "nodemon dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@c8y/client": "^1015.0.278",
+    "lora-codec-interface": "file:../c8y-codec-interface"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "concurrently": "^6.0.0",
+    "nodemon": "^2.0.7",
+    "reflect-metadata": "^0.1.13",
+    "source-map-support": "^0.5.19",
+    "typescript": "^4.2.3"
+  }
+}
