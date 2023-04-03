@@ -130,11 +130,11 @@ jobs:
       - name: Build webapp
         run: |
           export NODE_OPTIONS=--openssl-legacy-provider
-          cd web/1015.0.218/devicemanagement-lora
+          cd web/1016/lora-plugin
           npm install --force
           npm run build
-          cd dist/apps/devicemanagement-lora
-          zip -r devicemanagement-lora *
+          cd dist/apps/lora-plugin
+          zip -r lora-plugin *
       - name: Create Release
         uses: actions/github-script@v6
         env:
