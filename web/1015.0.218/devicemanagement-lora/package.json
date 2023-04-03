@@ -38,7 +38,7 @@
     "ngx-monaco-editor": "12.0.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "12.2.14",
+    "@angular-devkit/build-angular": "15.2.4",
     "@angular/compiler-cli": "12.2.14",
     "@angular/language-service": "12.2.14",
     "@angular/service-worker": "12.2.14",
@@ -49,7 +49,7 @@
     "jest": "^27.4.5",
     "jest-preset-angular": "^11.0.1",
     "typescript": "4.2.4",
-    "@c8y/cli": "1015.0.309"
+    "@c8y/cli": "1015.334.0"
   },
   "c8y": {
     "application": {
