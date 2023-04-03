@@ -137,3 +137,7 @@ All LNS events will be available as events on the LNS connector managed object i
 Uplink events will also be available on the devices in a form that contains the fport, the payload in hex format, whether the payload was processed or not and other relevant information.
 
 ![](lora%20device%20raw%20payload.png)
+
+### Codec IDE
+
+The framework offers the ability to quickly build codec directly from Cumulocity UI with an integrated IDE based on Monaco Editor.

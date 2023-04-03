@@ -1,0 +1,427 @@
+<style>
+  .parameter-separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+  }
+
+  .parameter-separator::before,
+  .parameter-separator::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #000;
+  }
+
+  .parameter-separator:not(:empty)::before {
+    margin-right: 0.25em;
+  }
+
+  .parameter-separator:not(:empty)::after {
+    margin-left: 0.25em;
+  }
+</style>
+
+<c8y-title translate>LoRa device operations</c8y-title>
+
+<div class="card-group">
+  <div class="col-sm-6">
+    <div class="card" *ngIf="device != undefined">
+      <div class="card-header separator">
+        <h4 class="card-title">{{ "Configure device codec" | translate }}</h4>
+      </div>
+      <div class="card-block">
+        <c8y-form-group class="col-sm-12">
+          <div class="c8y-select-wrapper">
+            <label for="model">Type:</label>
+            <select
+              class="form-control"
+              [(ngModel)]="codec"
+              (change)="loadModels(codec)"
+              required
+            >
+              <option [ngValue]="undefined" [disabled]="true">
+                Please select a type
+              </option>
+              <option
+                *ngFor="let codec of codecService.codecs"
+                [value]="codec.lora_codec_DeviceCodecRepresentation.id"
+              >
+                {{ codec.lora_codec_DeviceCodecRepresentation.name }}
+              </option>
+            </select>
+          </div>
+        </c8y-form-group>
+        <c8y-form-group class="col-sm-12">
+          <div class="c8y-select-wrapper">
+            <label for="model">Model:</label>
+            <select class="form-control" [(ngModel)]="model">
+              <option [ngValue]="undefined" [disabled]="true">
+                Please select a model
+              </option>
+              <option *ngFor="let m of models | keyvalue" [value]="m.key">
+                {{ m.value }}
+              </option>
+            </select>
+          </div>
+        </c8y-form-group>
+        <c8y-form-group class="col-sm-12">
+          <label class="c8y-checkbox"
+            ><input
+              class="form-control"
+              type="checkbox"
+              [(ngModel)]="useGatewayPosition"
+              name="useGatewayPosition"
+            /><span></span>Use gateway position</label
+          >
+        </c8y-form-group>
+      </div>
+      <div class="card-footer">
+        <div class="form-group">
+          <button
+            type="button"
+            (click)="updateDeviceCodec()"
+            class="btn btn-primary"
+            [disabled]="!codecChanged"
+          >
+            Update device codec
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header separator">
+        <h4 class="card-title">Codec options</h4>
+      </div>
+      <div class="card-block">
+        <div class="form-group">
+          <label class="c8y-switch">
+            <input
+              type="checkbox"
+              checked="checked"
+              [(ngModel)]="debugMode"
+              (change)="switchDebugMode()"
+            />
+            <span></span> Enable debug mode
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="c8y-switch">
+            <input
+              type="checkbox"
+              checked="checked"
+              [(ngModel)]="storeLast"
+              (change)="switchStoreLast()"
+            />
+            <span></span> Store last measurements on device
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header separator">
+        <h4 class="card-title">{{ "Unprocessed payloads" | translate }}</h4>
+      </div>
+      <div class="card-block">
+        <span>{{ unprocessedPayloads ? unprocessedPayloads.length : 0 }}</span>
+        unprocessed payloads
+      </div>
+      <div class="card-footer">
+        <div class="form-group">
+          <button
+            type="button"
+            (click)="processPayloads()"
+            class="btn btn-primary"
+            [disabled]="
+              !unprocessedPayloads ||
+              !device.codec ||
+              unprocessedPayloads?.length == 0
+            "
+          >
+            Process unprocessed payloads
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6" *ngIf="device">
+    <div class="card">
+      <div class="card-header separator">
+        <h4 class="card-title">{{ "LNS Connector" | translate }}</h4>
+      </div>
+      <div class="card-block">
+        <c8y-form-group
+          [hasError]="
+            instanceSelect.invalid &&
+            (instanceSelect.dirty || instanceSelect.touched)
+          "
+        >
+          <div class="c8y-select-wrapper">
+            <label for="instanceSelect">LoRa network server connectors:</label>
+            <select
+              class="form-control"
+              name="instanceSelect"
+              #instanceSelect="ngModel"
+              [(ngModel)]="selectedLnsConnectorId"
+              (change)="loadProperties(instanceSelect.value)"
+            >
+              <option [ngValue]="undefined" [disabled]="true">
+                Please select a connector
+              </option>
+              <option
+                *ngFor="let instance of lnsService.lnsInstances"
+                [value]="instance.id"
+              >
+                {{ instance.name }} -
+                {{ lnsService.proxyMap[instance.lnsType].name }}
+              </option>
+            </select>
+          </div>
+          <c8y-messages
+            *ngIf="
+              instanceSelect.invalid &&
+              (instanceSelect.dirty || instanceSelect.touched)
+            "
+          >
+            <c8y-message name="required" *ngIf="instanceSelect.errors?.required"
+              >The connector is required
+            </c8y-message>
+          </c8y-messages>
+        </c8y-form-group>
+        <c8y-form-group class="col-sm-6">
+          <label for="appEUI">App EUI:</label>
+          <input
+            class="form-control"
+            #appEUI="ngModel"
+            name="appEUI"
+            [(ngModel)]="device.appEUI"
+            maxlength="16"
+          />
+          <span id="devEUI" class="help-block">
+            64 bits hex number that uniquely identifies the application. Will be
+            randomly generated if not provided.
+          </span>
+        </c8y-form-group>
+        <c8y-form-group class="col-sm-6">
+          <label for="appKey">App Key:</label>
+          <input
+            class="form-control"
+            #appKey="ngModel"
+            name="appKey"
+            [(ngModel)]="device.appKey"
+            aria-describedby="appKey"
+            maxlength="32"
+          />
+          <span id="appKey" class="help-block">
+            128 bits hex number used to encrypt communication. Will be randomly
+            generated if not provided.
+          </span>
+        </c8y-form-group>
+        <div *ngIf="properties !== undefined">
+          <div *ngFor="let property of properties" class="col-sm-6">
+            <c8y-form-group
+              *ngIf="property.type === 'STRING' || property.type === 'TEXT'"
+            >
+              <label for="{{ property.name }}">{{ property.label }}:</label>
+              <input
+                class="form-control"
+                [(ngModel)]="
+                  deviceProvisioningAdditionalProperties[property.name]
+                "
+                name="{{ property.name }}"
+                #{{property.name}}="ngModel"
+                ngModel
+                required
+              />
+            </c8y-form-group>
+            <c8y-form-group *ngIf="property.type === 'PASSWORD'">
+              <label for="{{ property.name }}">{{ property.label }}:</label>
+              <input
+                class="form-control"
+                type="password"
+                [(ngModel)]="
+                  deviceProvisioningAdditionalProperties[property.name]
+                "
+                name="{{ property.name }}"
+                #{{property.name}}="ngModel"
+                ngModel
+                required
+              />
+            </c8y-form-group>
+            <c8y-form-group *ngIf="property.type === 'NUMBER'">
+              <label for="{{ property.name }}">{{ property.label }}:</label>
+              <input
+                class="form-control"
+                type="number"
+                step="0.1"
+                [(ngModel)]="
+                  deviceProvisioningAdditionalProperties[property.name]
+                "
+                name="{{ property.name }}"
+                #{{property.name}}="ngModel"
+                ngModel
+                required
+              />
+            </c8y-form-group>
+            <c8y-form-group *ngIf="property.type === 'INTEGER'">
+              <label for="{{ property.name }}">{{ property.label }}:</label>
+              <input
+                class="form-control"
+                type="number"
+                [(ngModel)]="
+                  deviceProvisioningAdditionalProperties[property.name]
+                "
+                name="{{ property.name }}"
+                #{{property.name}}="ngModel"
+                ngModel
+                required
+              />
+            </c8y-form-group>
+            <c8y-form-group *ngIf="property.type === 'BOOLEAN'">
+              <label class="c8y-checkbox"
+                ><input
+                  type="checkbox"
+                  [(ngModel)]="
+                    deviceProvisioningAdditionalProperties[property.name]
+                  "
+                  name="{{ property.name }}"
+                  #{{property.name}}="ngModel"
+                  ngModel
+                  required
+                /><span></span>{{ property.label }}</label
+              >
+            </c8y-form-group>
+            <c8y-form-group *ngIf="property.type === 'LIST'">
+              <label for="{{ property.name }}">{{ property.label }}:</label>
+              <select
+                [(ngModel)]="
+                  deviceProvisioningAdditionalProperties[property.name]
+                "
+                class="form-control"
+                name="{{ property.name }}"
+                #{{property.name}}="ngModel"
+                ngModel
+                required
+              >
+                <option [ngValue]="undefined" [disabled]="true">
+                  Please select {{ property.name }}
+                </option>
+                <option *ngFor="let v of property.values" [value]="v.id">
+                  {{ v.name }}
+                </option>
+              </select>
+            </c8y-form-group>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="form-group">
+          <button
+            type="button"
+            (click)="updateConnector()"
+            class="btn btn-primary"
+          >
+            Update connector
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card col-sm-12">
+    <div class="card-header separator">
+      <h4 class="card-title">
+        {{ "Send a command to the device" | translate }}
+      </h4>
+    </div>
+    <div class="card-block">
+      <div class="col-sm-12">
+        <div class="c8y-select-wrapper">
+          <label for="model">Command:</label>
+          <select class="form-control" [(ngModel)]="commandChoice">
+            <option [value]="empty" [disabled]="true">
+              Please select a command
+            </option>
+            <option
+              *ngFor="let command of commands | keyvalue"
+              [value]="command.value?.id"
+            >
+              {{ command.value?.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="col-sm-12">
+        <form [formGroup]="form" *ngIf="fields">
+          <formly-form
+            [model]="parameterValues"
+            [fields]="fields[commandChoice]"
+            [options]="options"
+            [form]="form"
+          ></formly-form>
+        </form>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="form-group">
+        <button
+          [disabled]="!form.valid"
+          type="button"
+          (click)="preview(commandChoice, parameterValues)"
+          class="btn btn-primary"
+        >
+          Preview command
+        </button>
+        <button
+          [disabled]="!form.valid"
+          type="button"
+          (click)="send(commandChoice, parameterValues)"
+          class="btn btn-primary"
+        >
+          Send command
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    class="card col-sm-12"
+    *ngIf="previewCommand !== undefined && previewCommand.success"
+  >
+    <div class="card-header separator">
+      <h4 class="card-title">{{ "Preview" | translate }}</h4>
+    </div>
+    <div class="card-block">
+      <div class="col-sm-12">fPort: {{ previewCommand.response.fport }}</div>
+      <div class="col-sm-12" style="overflow-wrap: break-word">
+        Payload: {{ previewCommand.response.payload }}
+      </div>
+    </div>
+  </div>
+  <ng-template #errorModal>
+    <div class="modal-header">
+      <h4 id="dialog-name" class="modal-title pull-left">
+        <span class="label label-danger">Error</span>
+      </h4>
+    </div>
+    <div class="modal-body">
+      An error occurred while parsing the command: {{ previewCommand.response
+      }}<br />
+      Cause: {{ previewCommand.message }}<br />
+    </div>
+    <div class="modal-footer">
+      <button
+        class="btn btn-default"
+        (click)="errorModalRef.hide()"
+        translate=""
+        ng-reflect-translate=""
+      >
+        Close
+      </button>
+    </div>
+  </ng-template>
+</div>

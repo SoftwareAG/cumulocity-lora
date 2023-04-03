@@ -1,0 +1,169 @@
+<c8y-title translate>LNS uplink simulator</c8y-title>
+
+<div class="row">
+  <div class="card col-sm-12">
+    <div class="card-header separator">
+      <h4 class="card-title">Simulate an uplink</h4>
+    </div>
+    <form #sendPayloadForm="ngForm">
+      <div class="card-block">
+        <c8y-form-group
+          [hasError]="
+            instanceSelect.invalid &&
+            (instanceSelect.dirty || instanceSelect.touched)
+          "
+        >
+          <div class="c8y-select-wrapper">
+            <label for="instanceSelect">LoRa network server connectors:</label>
+            <select
+              class="form-control"
+              name="instanceSelect"
+              #instanceSelect="ngModel"
+              [(ngModel)]="instanceConnectorId"
+              (change)="
+                loadPayload(
+                  instanceSelect.value,
+                  devEUI.value,
+                  fport.value,
+                  devicePayload.value
+                )
+              "
+            >
+              <option [ngValue]="undefined" [disabled]="true">
+                Please select a connector
+              </option>
+              <option
+                *ngFor="let instance of lnsService.lnsInstances"
+                [value]="instance.id"
+              >
+                {{ instance.name }} -
+                {{ lnsService.proxyMap[instance.lnsType].name }}
+              </option>
+            </select>
+          </div>
+          <c8y-messages
+            *ngIf="
+              instanceSelect.invalid &&
+              (instanceSelect.dirty || instanceSelect.touched)
+            "
+          >
+            <c8y-message name="required" *ngIf="instanceSelect.errors?.required"
+              >The connector is required
+            </c8y-message>
+          </c8y-messages>
+        </c8y-form-group>
+        <c8y-form-group
+          class="col-sm-3"
+          [hasError]="devEUI.invalid && (devEUI.dirty || devEUI.touched)"
+        >
+          <label for="devEUI">Dev EUI:</label>
+          <input
+            pattern="[a-fA-F0-9]{16}"
+            name="devEUI"
+            #devEUI="ngModel"
+            [(ngModel)]="devEUIModel"
+            class="form-control"
+            maxlength="16"
+            aria-describedby="devEUI-help"
+            placeholder="0011223344556677"
+            (change)="
+              loadPayload(
+                instanceSelect.value,
+                devEUI.value,
+                fport.value,
+                devicePayload.value
+              )
+            "
+          />
+          <span id="devEUI-help" class="help-block">
+            64 bits hex number that uniquely identifies the device.
+          </span>
+          <c8y-messages
+            *ngIf="devEUI.invalid && (devEUI.dirty || devEUI.touched)"
+          >
+            <c8y-message name="pattern" *ngIf="devEUI.errors?.pattern"
+              >The device EUI should contain exactly 8 bytes in hex
+              format</c8y-message
+            >
+          </c8y-messages>
+        </c8y-form-group>
+        <c8y-form-group class="col-sm-1">
+          <label for="fport">fPort:</label>
+          <input
+            type="number"
+            name="fport"
+            #fport="ngModel"
+            [(ngModel)]="fportModel"
+            class="form-control"
+            (change)="
+              loadPayload(
+                instanceSelect.value,
+                devEUI.value,
+                fport.value,
+                devicePayload.value
+              )
+            "
+          />
+        </c8y-form-group>
+        <c8y-form-group
+          class="col-sm-8"
+          [hasError]="
+            devicePayload.invalid &&
+            (devicePayload.dirty || devicePayload.touched)
+          "
+        >
+          <label for="devicePayload">Device payload:</label>
+          <input
+            pattern="([a-fA-F0-9]{2})+"
+            name="devicePayload"
+            #devicePayload="ngModel"
+            [(ngModel)]="devicePayloadModel"
+            class="form-control"
+            maxlength="16"
+            placeholder="0011223344556677"
+            (change)="
+              loadPayload(
+                instanceSelect.value,
+                devEUI.value,
+                fport.value,
+                devicePayload.value
+              )
+            "
+          />
+          <c8y-messages
+            *ngIf="
+              devicePayload.invalid &&
+              (devicePayload.dirty || devicePayload.touched)
+            "
+          >
+            <c8y-message name="pattern" *ngIf="devicePayload.errors?.pattern"
+              >The device payload is an hexadecimal number</c8y-message
+            >
+          </c8y-messages>
+        </c8y-form-group>
+        <c8y-form-group class="col-sm-12">
+          <label for="payloadToSend">Payload:</label>
+          <ngx-monaco-editor
+            name="payloadToSend"
+            #payloadToSend="ngModel"
+            style="height: 20em"
+            [options]="editorOptions"
+            [(ngModel)]="payload"
+          >
+          </ngx-monaco-editor>
+        </c8y-form-group>
+      </div>
+      <div class="card-footer separator">
+        <div class="form-group">
+          <button
+            type="button"
+            (click)="sendPayload(instanceSelect.value)"
+            class="btn btn-primary"
+          >
+            Send payload
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
