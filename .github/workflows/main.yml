@@ -134,7 +134,7 @@ jobs:
           npm install --force
           npm run build
           cd dist/apps/lora-package
-          zip -r lora-plugin *
+          zip -r lora-package *
       - name: Create Release
         uses: actions/github-script@v6
         env:
@@ -152,8 +152,8 @@ jobs:
             await github.rest.repos.uploadReleaseAsset({
               owner, repo,
               release_id: process.env.RELEASE_ID,
-              name: 'devicemanagement-lora.zip',
-              data: await fs.readFile('web/1015.0.218/devicemanagement-lora/dist/apps/devicemanagement-lora/devicemanagement-lora.zip')
+              name: 'lora-package.zip',
+              data: await fs.readFile('web/1016/lora-package/dist/apps/lora-package/lora-package.zip')
             });            
   clean_up_if_failure:
     runs-on: ubuntu-latest
