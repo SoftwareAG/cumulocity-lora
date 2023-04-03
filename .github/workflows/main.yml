@@ -130,10 +130,10 @@ jobs:
       - name: Build webapp
         run: |
           export NODE_OPTIONS=--openssl-legacy-provider
-          cd web/1016/lora-plugin
+          cd web/1016/lora-package
           npm install --force
           npm run build
-          cd dist/apps/lora-plugin
+          cd dist/apps/lora-package
           zip -r lora-plugin *
       - name: Create Release
         uses: actions/github-script@v6
