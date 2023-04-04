@@ -1,7 +1,7 @@
 import { NgxMonacoEditorConfig } from "ngx-monaco-editor-v2";
 
 export const monacoConfig: NgxMonacoEditorConfig = {
-  baseUrl: "/apps/lora-package/assets", // configure base path for monaco editor default: './assets'
+  baseUrl: "/apps/sag-ps-iot-pkg-lora-package/assets", // configure base path for monaco editor default: './assets'
   //defaultOptions: { scrollBeyondLastLine: false }, // pass default options to be used
   onMonacoLoad: () => {
     let monaco = (window as any).monaco;
