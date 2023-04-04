@@ -141,3 +141,4 @@ Uplink events will also be available on the devices in a form that contains the 
 ### Codec IDE
 
 The framework offers the ability to quickly build codec directly from Cumulocity UI with an integrated IDE based on Monaco Editor.
+The IDE is accessible on LoRa/Custom codecs menu
