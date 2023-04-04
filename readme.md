@@ -141,4 +141,21 @@ Uplink events will also be available on the devices in a form that contains the 
 ### Codec IDE
 
 The framework offers the ability to quickly build codec directly from Cumulocity UI with an integrated IDE based on Monaco Editor.
-The IDE is accessible on LoRa/Custom codecs menu
+
+To enable this feature you need to install the custom codec microservice `lora-ns-custom`.
+
+The IDE is accessible on LoRa/Custom codecs menu and is devided in 3 parts:
+
+- Uplink processing (decoder)
+
+![](custom%20codecs%20decoder.png)
+
+- Downlink processing (encoder)
+
+![](custom%20codecs%20encoder.png)
+
+- Operations definition
+
+![](custom%20codecs%20operations.png)
+
+Once you're happy with your codec and you saved it, it will be accessible from any LoRa device Lora tab as a model of the custom codec.

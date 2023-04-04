@@ -1,6 +1,6 @@
 {
   "name": "lora-package",
-  "version": "0.30",
+  "version": "0.31",
   "description": "This is the Cumulocity LoRa plugin.",
   "scripts": {
     "start": "c8ycli server --env.extraWebpackConfig=./extra-webpack.config.js -u https://frpresales.eu-latest.cumulocity.com",
@@ -50,7 +50,7 @@
   "c8y": {
     "application": {
       "name": "LoRa plugin",
-      "description": "LoRa plugin",
+      "description": "Help you manage your LoRa devices and their codecs, gateways and connections to LNS, including TTN, Actility, Loriot, Chirpstack, Orange Live Objects, Objenious, Orbiwise Orbiwan, Kerlink Wanesy. It also includes a framework to build your own LNS connectors and codecs.",
       "contextPath": "sag-ps-iot-pkg-lora-package",
       "key": "sag-ps-iot-pkg-lora-package-application-key",
       "globalTitle": "LoRa plugin",
@@ -63,7 +63,7 @@
           "name": "LoRa plugin",
           "module": "LoraPluginModule",
           "path": "./plugin/lora-plugin.module.ts",
-          "description": "Help you manage your LoRa devices"
+          "description": "Help you manage your LoRa devices and their codecs, gateways and connections to LNS, including TTN, Actility, Loriot, Chirpstack, Orange Live Objects, Objenious, Orbiwise Orbiwan, Kerlink Wanesy. It also includes a framework to build your own LNS connectors and codecs."
         }
       ],
       "remotes": {
