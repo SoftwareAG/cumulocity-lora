@@ -1,8 +1,7 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 
-module.exports = function config(env) {
-    return {
+module.exports =  {
         output: {
             path: path.join(__dirname, './dist/apps/sag-ps-iot-pkg-lora-package')
         },
@@ -13,6 +12,5 @@ module.exports = function config(env) {
                     { context: path.resolve('../../..'), from: '*.png', to: 'assets/img'}
                 ],
             }, {debug: true})
-        ],
-    }
-};
+        ]
+    };
