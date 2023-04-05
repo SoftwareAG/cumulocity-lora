@@ -8,6 +8,13 @@ This plugin requires the microservice feature enabled on your tenant to work. If
 
 Once microservice feature is enabled, please install the github-proxy microservice that can be downloaded from this URL: https://github.com/SoftwareAG/cumulocity-lora/releases/download/v0.30/github-proxy.zip
 
+When the github-proxy microservice is installed, just go to devicemanagement application, then to lora/config menu.
+From there just select the microservices you want to install on your tenant.
+
+You'll see 2 kinds of microservices: LNS connectors, usually named lora-ns-, and codecs, usually named lora-codec-
+
+![](assets/img/config.png)
+
 ## User documentation
 
 ### Adding a new LNS connector
