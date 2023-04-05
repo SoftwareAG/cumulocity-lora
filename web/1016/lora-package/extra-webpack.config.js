@@ -10,7 +10,7 @@ module.exports = function config(env) {
             new CopyPlugin({
                 patterns: [
                     { from: 'node_modules/monaco-editor/min/vs', to:  'assets/monaco/min/vs' },
-                    { context: path.resolve('../../..'), from: '*.png', to: 'img'}
+                    { context: path.resolve('../../..'), from: '*.png', to: 'assets/img'}
                 ],
             }, {debug: true})
         ],
