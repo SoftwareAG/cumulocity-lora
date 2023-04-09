@@ -9,7 +9,9 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-public class Command {
-    private Request request;
-    private CommandPolicy policy;
+public class CommandPolicy {
+    Integer ackTimeoutInSeconds;
+    Integer expirationInSeconds;
+    Integer attempts;
+    String ackMode = "NETWORK";
 }

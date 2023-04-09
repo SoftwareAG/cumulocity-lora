@@ -25,6 +25,7 @@ import lora.ns.liveobjects.rest.model.ActionPolicy;
 import lora.ns.liveobjects.rest.model.ActionTriggers;
 import lora.ns.liveobjects.rest.model.Actions;
 import lora.ns.liveobjects.rest.model.Command;
+import lora.ns.liveobjects.rest.model.CommandPolicy;
 import lora.ns.liveobjects.rest.model.CommandResponse;
 import lora.ns.liveobjects.rest.model.ConnectivityPlan;
 import lora.ns.liveobjects.rest.model.CreateDevice;
@@ -111,7 +112,8 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 			Response<CommandResponse> response = service
 					.createCommand("urn:lo:nsid:lora:" + operation.getDevEui(),
 							new Command(new lora.ns.liveobjects.rest.model.Request()
-									.withValue(new RequestValue(operation.getPayload(), operation.getFport()))))
+									.withValue(new RequestValue(operation.getPayload(), operation.getFport())),
+									new CommandPolicy()))
 					.execute();
 			if (response.isSuccessful()) {
 				result.setResult(response.body().getId());
