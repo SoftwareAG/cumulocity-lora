@@ -13,5 +13,5 @@ public class CommandPolicy {
     Integer ackTimeoutInSeconds;
     Integer expirationInSeconds;
     Integer attempts;
-    String ackMode = "NETWORK";
+    String ackMode = "NONE";
 }

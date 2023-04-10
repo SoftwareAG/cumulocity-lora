@@ -9,7 +9,7 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-public class ActionTriggers {
-    LoraNetworkTrigger loraNetwork;
-    CommandStatusTrigger commandStatus;
+public class CommandStatusTrigger {
+    Integer version = 1;
+    CommandStatusFilter filter = new CommandStatusFilter();
 }

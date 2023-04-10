@@ -27,6 +27,7 @@ import lora.ns.liveobjects.rest.model.Actions;
 import lora.ns.liveobjects.rest.model.Command;
 import lora.ns.liveobjects.rest.model.CommandPolicy;
 import lora.ns.liveobjects.rest.model.CommandResponse;
+import lora.ns.liveobjects.rest.model.CommandStatusTrigger;
 import lora.ns.liveobjects.rest.model.ConnectivityPlan;
 import lora.ns.liveobjects.rest.model.CreateDevice;
 import lora.ns.liveobjects.rest.model.DeviceInterface;
@@ -191,10 +192,7 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 										.withWebhookUrl(url + "/downlink")
 										.withHeaders(Map.of("Authorization", List.of(authorization))))))
 						.withTriggers(new ActionTriggers()
-								.withLoraNetwork(new LoraNetworkTrigger()
-										.withFilter(new LoraNetworkFilter()
-												.withMessageTypes(List.of(MessageType.CONFIRMED_DATA_DOWN,
-														MessageType.UNCONFIRMED_DATA_DOWN))))))
+								.withCommandStatus(new CommandStatusTrigger())))
 						.execute();
 				if (!result.isSuccessful()) {
 					response.setOk(false);

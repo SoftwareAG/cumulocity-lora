@@ -9,7 +9,6 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-public class ActionTriggers {
-    LoraNetworkTrigger loraNetwork;
-    CommandStatusTrigger commandStatus;
+public class CommandStatusFilter {
+    String[] status = new String[] { "EXPIRED", "ERROR", "PROCESSED", "CANCELED" };
 }
