@@ -25,7 +25,7 @@ class NKECodec(DeviceCodec):
 
     def _decode(self, mor: ManagedObject, decode: Decode) -> C8YData:
         c8yData = C8YData()
-        json_string = Decoding_JSON(decode.payload)
+        json_string = Decoding_JSON(decode.payload, decode.model)
         logger.info(json_string)
         logger.info(datetime.fromtimestamp(decode.updateTime).isoformat())
         c8yData.measurements.append({"source": {"id": mor.id}, "type": "test", "test": {

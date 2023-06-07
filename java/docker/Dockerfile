@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine3.14 as base
+FROM openjdk:17-jdk-alpine3.14 AS base
 RUN jlink \
     --module-path /opt/java/jmods \
     --compress=2 \
@@ -13,4 +13,5 @@ ENV JAVA_HOME=/opt/jdk-mini
 ENV PATH="$PATH:$JAVA_HOME/bin"
 COPY etc/ /etc/@package.directory@/
 ADD resources/* /data/
-ENTRYPOINT ["java", "-XX:MinRAMPercentage=60.0", "-XX:MaxRAMPercentage=90.0", "-XX:+HeapDumpOnOutOfMemoryError", "-XshowSettings:vm", "-jar", "/data/@package.name@.jar"]
+RUN chmod +x /data/entrypoint.sh
+ENTRYPOINT /data/entrypoint.sh
