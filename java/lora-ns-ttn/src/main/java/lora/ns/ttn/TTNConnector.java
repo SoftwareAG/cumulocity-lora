@@ -403,7 +403,11 @@ public class TTNConnector extends LNSAbstractConnector {
                 try {
                         GatewayRegistryBlockingStub gatewayRegistry = ttn.lorawan.v3.GatewayRegistryGrpc
                                         .newBlockingStub(managedChannel).withCallCredentials(token);
-                        ListGatewaysRequest request = ListGatewaysRequest.newBuilder().build();
+                        ListGatewaysRequest request = ListGatewaysRequest.newBuilder()
+                                        .setFieldMask(FieldMask.newBuilder()
+                                                        .addPaths("name")
+                                                        .build())
+                                        .build();
                         Gateways gateways = gatewayRegistry.list(request);
                         final GsBlockingStub gatewayServer = GsGrpc.newBlockingStub(managedChannel)
                                         .withCallCredentials(token);
