@@ -7,6 +7,7 @@ import lora.ns.liveobjects.rest.model.Command;
 import lora.ns.liveobjects.rest.model.CommandResponse;
 import lora.ns.liveobjects.rest.model.ConnectivityPlan;
 import lora.ns.liveobjects.rest.model.CreateDevice;
+import lora.ns.liveobjects.rest.model.Group;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -44,4 +45,8 @@ public interface LiveObjectsService {
 	@Headers({ "Content-Type: application/json", "Accept: application/json" })
 	@GET("api/v1/deviceMgt/connectors/lora/profiles")
 	Call<List<String>> getProfiles();
+
+	@Headers({ "Content-Type: application/json", "Accept: application/json" })
+	@GET("api/v1/deviceMgt/groups")
+	Call<List<Group>> getGroups();
 }

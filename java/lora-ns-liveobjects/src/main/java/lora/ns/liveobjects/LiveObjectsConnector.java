@@ -30,8 +30,12 @@ import lora.ns.liveobjects.rest.model.CommandResponse;
 import lora.ns.liveobjects.rest.model.CommandStatusTrigger;
 import lora.ns.liveobjects.rest.model.ConnectivityPlan;
 import lora.ns.liveobjects.rest.model.CreateDevice;
+import lora.ns.liveobjects.rest.model.DataMessageFilter;
+import lora.ns.liveobjects.rest.model.DataMessageTrigger;
 import lora.ns.liveobjects.rest.model.DeviceInterface;
 import lora.ns.liveobjects.rest.model.DeviceInterfaceDefinition;
+import lora.ns.liveobjects.rest.model.Group;
+import lora.ns.liveobjects.rest.model.GroupPath;
 import lora.ns.liveobjects.rest.model.HttpPushAction;
 import lora.ns.liveobjects.rest.model.LoraNetworkFilter;
 import lora.ns.liveobjects.rest.model.LoraNetworkFilter.MessageType;
@@ -164,6 +168,9 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 		String authorization = "Basic "
 				+ Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes());
 		try {
+			DataMessageFilter dataMessageFilter = new DataMessageFilter();
+			dataMessageFilter.getGroupPaths().add(new GroupPath().withPath(properties.getProperty("groupId")));
+			dataMessageFilter.getConnectors().add("lora");
 			Response<ActionPolicy> result = service.createActionPolicy(new ActionPolicy()
 					.withId(null)
 					.withName("Cumulocity webhook for tenant " + tenant)
@@ -173,10 +180,8 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 									.withWebhookUrl(url + "/uplink")
 									.withHeaders(Map.of("Authorization", List.of(authorization))))))
 					.withTriggers(new ActionTriggers()
-							.withLoraNetwork(new LoraNetworkTrigger()
-									.withFilter(new LoraNetworkFilter()
-											.withMessageTypes(List.of(MessageType.UNCONFIRMED_DATA_UP,
-													MessageType.CONFIRMED_DATA_UP))))))
+							.withDataMessage(new DataMessageTrigger()
+									.withFilter(dataMessageFilter))))
 					.execute();
 			if (!result.isSuccessful()) {
 				response.setOk(false);
@@ -308,5 +313,20 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	public List<Group> getGroups() {
+		List<Group> groups = new ArrayList<>();
+
+		try {
+			Response<List<Group>> response = service.getGroups().execute();
+			if (response.isSuccessful()) {
+				groups = response.body();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return groups;
 	}
 }

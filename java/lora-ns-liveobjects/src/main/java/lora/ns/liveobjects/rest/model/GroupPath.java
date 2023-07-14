@@ -9,8 +9,7 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-public class ActionTriggers {
-    private LoraNetworkTrigger loraNetwork;
-    private CommandStatusTrigger commandStatus;
-    private DataMessageTrigger dataMessage;
+public class GroupPath {
+    private String path;
+    private boolean includeSubPath = true;
 }

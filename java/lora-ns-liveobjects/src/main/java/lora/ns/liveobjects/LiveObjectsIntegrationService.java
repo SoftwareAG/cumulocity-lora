@@ -1,6 +1,7 @@
 package lora.ns.liveobjects;
 
 import java.math.BigDecimal;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
@@ -43,6 +43,20 @@ public class LiveObjectsIntegrationService extends LNSIntegrationService<LiveObj
 				return propertyDescriptions;
 			}
 		});
+		wizard.add(new LNSConnectorWizardStep() {
+			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
+			{
+				propertyDescriptions.add(PropertyDescription.list("groupId", "Group", "/groups", true));
+			}
+
+			public String getName() {
+				return "step2";
+			}
+
+			public java.util.LinkedList<PropertyDescription> getPropertyDescriptions() {
+				return propertyDescriptions;
+			}
+		});
 		deviceProvisioningAdditionalProperties
 				.add(PropertyDescription.list("connectivityPlan", "Connectivity Plan", "/connectivityPlans", true));
 		deviceProvisioningAdditionalProperties
@@ -56,9 +70,12 @@ public class LiveObjectsIntegrationService extends LNSIntegrationService<LiveObj
 		JsonNode rootNode;
 		try {
 			rootNode = mapper.readTree(event);
-			String devEUI = rootNode.at("/devEUI").asText();
-			int fPort = rootNode.at("/port").asInt();
-			JsonNode payloadNode = rootNode.get("payload");
+			String devEUI = rootNode.at("/metadata/network/lora/devEUI").asText();
+			if (devEUI == null) {
+				throw new InvalidParameterException("DevEUI can't be null");
+			}
+			int fPort = rootNode.at("/metadata/network/lora/port").asInt();
+			JsonNode payloadNode = rootNode.at("/value/payload");
 			byte[] payload = new byte[0];
 			if (payloadNode != null && !payloadNode.isNull()) {
 				payload = BaseEncoding.base16().decode(payloadNode.asText().toUpperCase());
@@ -66,10 +83,10 @@ public class LiveObjectsIntegrationService extends LNSIntegrationService<LiveObj
 			Long updateTime = new DateTime(rootNode.at("/timestamp").asText()).getMillis();
 			log.info("Update time is: {}", updateTime);
 
-			double rssi = rootNode.at("/signal/rssi").asDouble();
-			double snr = rootNode.at("/signal/snr").asDouble();
-			double esp = rootNode.at("/signal/esp").asDouble();
-			double sf = rootNode.at("/signal/sf").asDouble();
+			double rssi = rootNode.at("/metadata/network/lora/rssi").asDouble();
+			double snr = rootNode.at("/metadata/network/lora/snr").asDouble();
+			double esp = rootNode.at("/metadata/network/lora/esp").asDouble();
+			double sf = rootNode.at("/metadata/network/lora/sf").asDouble();
 
 			List<MeasurementRepresentation> measurements = new ArrayList<>();
 			MeasurementRepresentation m = new MeasurementRepresentation();
