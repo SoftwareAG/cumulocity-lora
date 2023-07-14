@@ -348,6 +348,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 				option.setValue(v.toString());
 				tenantOptionApi.save(option);
 			});
+		} else {
+			log.error("No valid LNS Connector Id given: {}", lnsConnectorId);
 		}
 	}
 

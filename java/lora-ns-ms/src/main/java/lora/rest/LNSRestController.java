@@ -61,72 +61,76 @@ public class LNSRestController {
 	public LNSResponse<List<EndDevice>> getDevices(@PathVariable String lnsInstanceId) {
 		return lnsProxy.getDevices(lnsInstanceId);
 	}
-	
+
 	@PostMapping(value = "/{lnsInstanceId}/devices", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public LNSResponse<ManagedObjectRepresentation> provisionDevice(@RequestBody DeviceProvisioning deviceProvisioning, @PathVariable String lnsInstanceId) {
+	public LNSResponse<ManagedObjectRepresentation> provisionDevice(@RequestBody DeviceProvisioning deviceProvisioning,
+			@PathVariable String lnsInstanceId) {
 		return lnsDeviceManager.provisionDevice(lnsInstanceId, deviceProvisioning);
 	}
-	
+
 	@DeleteMapping(value = "/{lnsInstanceId}/devices/{deveui}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public LNSResponse<Void> deprovisionDevice(@PathVariable String lnsInstanceId, @PathVariable String deveui) {
 		return lnsDeviceManager.deprovisionDevice(lnsInstanceId, deveui);
 	}
-	
+
 	@PostMapping(value = "/{lnsInstanceId}/gateways", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public LNSResponse<ManagedObjectRepresentation> provisionGateway(@RequestBody GatewayProvisioning gatewayProvisioning, @PathVariable String lnsInstanceId) {
+	public LNSResponse<ManagedObjectRepresentation> provisionGateway(
+			@RequestBody GatewayProvisioning gatewayProvisioning, @PathVariable String lnsInstanceId) {
 		return lnsGatewayManager.provisionGateway(lnsInstanceId, gatewayProvisioning);
 	}
-	
+
 	@DeleteMapping(value = "/{lnsInstanceId}/gateways/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public LNSResponse<Void> deprovisionGateway(@PathVariable String lnsInstanceId, @PathVariable String id) {
 		return lnsGatewayManager.deprovisionGateway(lnsInstanceId, id);
 	}
 
 	@PostMapping(value = "/devices/{deveui}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> createDevice(@PathVariable String deveui, @RequestBody ManagedObjectRepresentation device) {
+	public ResponseEntity<String> createDevice(@PathVariable String deveui,
+			@RequestBody ManagedObjectRepresentation device) {
 		lnsDeviceManager.createDevice(deveui, device);
 		return ResponseEntity.ok().build();
 	}
 
 	@PutMapping(value = "/devices/{deveui}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> updateDevice(@PathVariable String deveui, @RequestBody ManagedObjectRepresentation device) {
+	public ResponseEntity<String> updateDevice(@PathVariable String deveui,
+			@RequestBody ManagedObjectRepresentation device) {
 		lnsDeviceManager.updateDevice(deveui, device);
 		return ResponseEntity.ok().build();
 	}
-	
+
 	@GetMapping(value = "/lnsinstances", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Map<String, LNSConnectorRepresentation> getLnsInstances() {
 		return lnsProxy.getConnectors();
 	}
-	
+
 	@PostMapping(value = "/lnsinstances", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ManagedObjectRepresentation addLnsConnector(@RequestBody LNSConnectorRepresentation connector) {
 		return lnsProxy.addLnsConnector(connector);
 	}
 
-	
-	@PutMapping(value = "/lnsinstances/{lnsInstanceId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> updateLnsConnector(@PathVariable String lnsConnectorId, @RequestBody Properties properties) {
+	@PutMapping(value = "/lnsinstances/{lnsConnectorId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> updateLnsConnector(@PathVariable String lnsConnectorId,
+			@RequestBody Properties properties) {
 		lnsProxy.updateLnsConnector(lnsConnectorId, properties);
 		return ResponseEntity.ok().build();
 	}
-	
-	@DeleteMapping(value = "/lnsinstances/{lnsInstanceId}", produces = MediaType.APPLICATION_JSON_VALUE)
+
+	@DeleteMapping(value = "/lnsinstances/{lnsConnectorId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> removeLnsConnector(@PathVariable String lnsConnectorId) {
 		lnsProxy.removeLnsConnector(lnsConnectorId);
 		return ResponseEntity.ok().build();
 	}
-	
+
 	@GetMapping(value = "/wizard", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<LNSConnectorWizardStep> getWizard() {
 		return lnsProxy.getInstanceWizard();
 	}
-	
+
 	@GetMapping(value = "/deviceProvisioningAdditionalProperties", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<PropertyDescription> getDeviceProvisioningAdditionalProperties() {
 		return lnsProxy.getDeviceProvisioningAdditionalProperties();
 	}
-	
+
 	@GetMapping(value = "/gatewayProvisioningAdditionalProperties", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<PropertyDescription> getGatewayProvisioningAdditionalProperties() {
 		return lnsProxy.getGatewayProvisioningAdditionalProperties();

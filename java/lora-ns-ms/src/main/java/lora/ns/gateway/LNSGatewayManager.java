@@ -51,11 +51,11 @@ public class LNSGatewayManager {
     @Autowired
     private EventApi eventApi;
 
-	@Autowired
-	protected AlarmApi alarmApi;
+    @Autowired
+    protected AlarmApi alarmApi;
 
-	@Autowired
-	protected MeasurementApi measurementApi;
+    @Autowired
+    protected MeasurementApi measurementApi;
 
     @Autowired
     private AgentService agentService;
@@ -76,7 +76,8 @@ public class LNSGatewayManager {
                 mor.setLastUpdatedDateTime(null);
                 mor.setProperty("gatewayAvailability", gateway.getStatus());
                 if (gateway.getLat() != null && gateway.getLng() != null) {
-                    log.info("Updating position of gateway {}: {}, {}", gateway.getName(), gateway.getLat(), gateway.getLng());
+                    log.info("Updating position of gateway {}: {}, {}", gateway.getName(), gateway.getLat(),
+                            gateway.getLng());
                     Position p = new Position();
                     p.setLat(gateway.getLat());
                     p.setLng(gateway.getLng());
@@ -90,12 +91,15 @@ public class LNSGatewayManager {
                     eventApi.create(locationUpdate);
                 }
                 inventoryApi.update(mor);
-                /*ManagedObject connectorMorApi = inventoryApi.getManagedObjectApi(agentService.getAgent().getId());
-                try {
-                    connectorMorApi.getChildDevice(mor.getId());
-                } catch (Exception e) {
-                    connectorMorApi.addChildDevice(mor.getId());
-                }*/
+                /*
+                 * ManagedObject connectorMorApi =
+                 * inventoryApi.getManagedObjectApi(agentService.getAgent().getId());
+                 * try {
+                 * connectorMorApi.getChildDevice(mor.getId());
+                 * } catch (Exception e) {
+                 * connectorMorApi.addChildDevice(mor.getId());
+                 * }
+                 */
                 log.info("Processing data for gateway {}", gateway.getName());
                 processData(mor, gateway.getData());
             }
@@ -119,12 +123,12 @@ public class LNSGatewayManager {
 
     public ManagedObjectRepresentation createGateway(String lnsConnectorId, GatewayProvisioning gatewayProvisioning) {
         return createGateway(lnsConnectorId, new Gateway(gatewayProvisioning.getGwEUI(),
-            gatewayProvisioning.getSerial(),
-            gatewayProvisioning.getName(),
-            gatewayProvisioning.getLat(),
-            gatewayProvisioning.getLng(),
-            gatewayProvisioning.getType(),
-            gatewayProvisioning.getStatus(), null));
+                gatewayProvisioning.getSerial(),
+                gatewayProvisioning.getName(),
+                gatewayProvisioning.getLat(),
+                gatewayProvisioning.getLng(),
+                gatewayProvisioning.getType(),
+                gatewayProvisioning.getStatus(), null));
     }
 
     public ManagedObjectRepresentation getGateway(String id) {
@@ -136,45 +140,46 @@ public class LNSGatewayManager {
         }
         return result;
     }
-    
+
     private void processData(ManagedObjectRepresentation gateway, C8YData c8yData) {
-		for (MeasurementRepresentation m : c8yData.getMeasurements()) {
+        for (MeasurementRepresentation m : c8yData.getMeasurements()) {
             m.setSource(gateway);
-			measurementApi.create(m);
-		}
-		for (EventRepresentation e : c8yData.getEvents()) {
+            measurementApi.create(m);
+        }
+        for (EventRepresentation e : c8yData.getEvents()) {
             e.setSource(gateway);
-			eventApi.create(e);
-		}
-		for (AlarmRepresentation a : c8yData.getAlarms()) {
+            eventApi.create(e);
+        }
+        for (AlarmRepresentation a : c8yData.getAlarms()) {
             a.setSource(gateway);
-			alarmApi.create(a);
-		}
-		for (String t : c8yData.getAlarmsToClear()) {
-			clearAlarm(gateway, t);
-		}
-	}
+            alarmApi.create(a);
+        }
+        for (String t : c8yData.getAlarmsToClear()) {
+            clearAlarm(gateway, t);
+        }
+    }
 
-	private void clearAlarm(ManagedObjectRepresentation gateway, String alarmType) {
-		try {
-			AlarmFilter filter = new AlarmFilter();
-			filter.byType(alarmType);
-			filter.bySource(gateway.getId());
-			filter.byStatus(CumulocityAlarmStatuses.ACTIVE);
-			for (AlarmRepresentation alarmRepresentation : alarmApi.getAlarmsByFilter(filter).get().allPages()) {
-				alarmRepresentation.setStatus(CumulocityAlarmStatuses.CLEARED.toString());
-				alarmApi.update(alarmRepresentation);
-			}
-		} catch (SDKException e) {
-			log.error("Error on clearing Alarm", e);
-		}
-	}
+    private void clearAlarm(ManagedObjectRepresentation gateway, String alarmType) {
+        try {
+            AlarmFilter filter = new AlarmFilter();
+            filter.byType(alarmType);
+            filter.bySource(gateway.getId());
+            filter.byStatus(CumulocityAlarmStatuses.ACTIVE);
+            for (AlarmRepresentation alarmRepresentation : alarmApi.getAlarmsByFilter(filter).get().allPages()) {
+                alarmRepresentation.setStatus(CumulocityAlarmStatuses.CLEARED.toString());
+                alarmApi.update(alarmRepresentation);
+            }
+        } catch (SDKException e) {
+            log.error("Error on clearing Alarm", e);
+        }
+    }
 
-	public LNSResponse<ManagedObjectRepresentation> provisionGateway(String lnsConnectorId, GatewayProvisioning gatewayProvisioning) {
-		LNSResponse<ManagedObjectRepresentation> response = new LNSResponse<ManagedObjectRepresentation>().withOk(true);
-		ManagedObjectRepresentation mor;
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		if (connector.isPresent()) {
+    public LNSResponse<ManagedObjectRepresentation> provisionGateway(String lnsConnectorId,
+            GatewayProvisioning gatewayProvisioning) {
+        LNSResponse<ManagedObjectRepresentation> response = new LNSResponse<ManagedObjectRepresentation>().withOk(true);
+        ManagedObjectRepresentation mor;
+        Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+        if (connector.isPresent()) {
             LNSResponse<Void> lnsResponse = connector.get().provisionGateway(gatewayProvisioning);
             if (lnsResponse.isOk()) {
                 mor = getGateway(gatewayProvisioning.getGwEUI().toLowerCase());
@@ -192,43 +197,44 @@ public class LNSGatewayManager {
                 response.setOk(false);
                 response.setMessage(lnsResponse.getMessage());
             }
-		} else {
+        } else {
             response.setOk(false);
-			AlarmRepresentation alarm = new AlarmRepresentation();
-			alarm.setType("Gateway provisioning error");
-			if (connector.isPresent()) {
-				response.setMessage("Couldn't provision gateway " + gatewayProvisioning.getGwEUI() + " in LNS connector "
-						+ lnsConnectorId);
-			} else {
-				response.setMessage("LNS connector Id '" + lnsConnectorId
-						+ "' doesn't exist. Please use a valid managed object Id.");
-			}
-			log.error(response.getMessage());
-			alarm.setText(response.getMessage());
-			alarm.setDateTime(new DateTime());
-			alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
-			mor = getGateway(gatewayProvisioning.getGwEUI().toLowerCase());
-			if (mor != null) {
-				alarm.setSource(mor);
-			} else {
-				alarm.setSource(agentService.getAgent());
-			}
-			alarmApi.create(alarm);
-		}
+            AlarmRepresentation alarm = new AlarmRepresentation();
+            alarm.setType("Gateway provisioning error");
+            if (connector.isPresent()) {
+                response.setMessage(
+                        "Couldn't provision gateway " + gatewayProvisioning.getGwEUI() + " in LNS connector "
+                                + lnsConnectorId);
+            } else {
+                response.setMessage("LNS connector Id '" + lnsConnectorId
+                        + "' doesn't exist. Please use a valid managed object Id.");
+            }
+            log.error(response.getMessage());
+            alarm.setText(response.getMessage());
+            alarm.setDateTime(new DateTime());
+            alarm.setSeverity(CumulocitySeverities.CRITICAL.name());
+            mor = getGateway(gatewayProvisioning.getGwEUI().toLowerCase());
+            if (mor != null) {
+                alarm.setSource(mor);
+            } else {
+                alarm.setSource(agentService.getAgent());
+            }
+            alarmApi.create(alarm);
+        }
 
-		return response;
-	}
+        return response;
+    }
 
-	public LNSResponse<Void> deprovisionGateway(String lnsConnectorId, String id) {
-		LNSResponse<Void> result = new LNSResponse<>();
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		if (connector.isPresent()) {
+    public LNSResponse<Void> deprovisionGateway(String lnsConnectorId, String id) {
+        LNSResponse<Void> result = new LNSResponse<>();
+        Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+        if (connector.isPresent()) {
             result = connector.get().deprovisionGateway(id);
-		} else {
+        } else {
             result.setOk(false);
             result.setMessage("No connector found with id " + lnsConnectorId);
         }
 
-		return result;
-	}
+        return result;
+    }
 }
