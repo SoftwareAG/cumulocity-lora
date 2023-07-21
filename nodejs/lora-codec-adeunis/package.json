@@ -15,7 +15,8 @@
   "license": "ISC",
   "dependencies": {
     "@adeunis/codecs": "^1.6.1",
-    "@c8y/client": "^1015.0.278",
+    "@c8y/client": "^1016.0.259",
+    "source-map-support": "^0.5.19",
     "lora-codec-interface": "file:../c8y-codec-interface"
   },
   "devDependencies": {
@@ -23,7 +24,6 @@
     "concurrently": "^6.0.0",
     "nodemon": "^2.0.7",
     "reflect-metadata": "^0.1.13",
-    "source-map-support": "^0.5.19",
     "typescript": "^4.2.3"
   }
 }

@@ -14,7 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@c8y/client": "^1015.0.278",
+    "@c8y/client": "^1016.0.259",
+    "source-map-support": "^0.5.19",
     "lora-codec-interface": "file:../c8y-codec-interface"
   },
   "devDependencies": {
@@ -22,7 +23,6 @@
     "concurrently": "^5.2.0",
     "nodemon": "^2.0.3",
     "reflect-metadata": "^0.1.13",
-    "source-map-support": "^0.5.19",
     "typescript": "^3.8.3"
   }
 }
