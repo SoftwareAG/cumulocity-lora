@@ -32,6 +32,7 @@ import lora.ns.liveobjects.rest.model.ConnectivityPlan;
 import lora.ns.liveobjects.rest.model.CreateDevice;
 import lora.ns.liveobjects.rest.model.DataMessageFilter;
 import lora.ns.liveobjects.rest.model.DataMessageTrigger;
+import lora.ns.liveobjects.rest.model.DeviceGroup;
 import lora.ns.liveobjects.rest.model.DeviceInterface;
 import lora.ns.liveobjects.rest.model.DeviceInterfaceDefinition;
 import lora.ns.liveobjects.rest.model.Group;
@@ -141,6 +142,7 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 			Response<CreateDevice> result = service.createDevice(new CreateDevice()
 					.withId("urn:lo:nsid:lora:" + deviceProvisioning.getDevEUI().toLowerCase())
 					.withName(deviceProvisioning.getName())
+					.withGroup(new DeviceGroup(properties.getProperty("groupId")))
 					.withInterfaces(List.of(new DeviceInterface()
 							.withDefinition(new DeviceInterfaceDefinition().withAppEUI(deviceProvisioning.getAppEUI())
 									.withAppKey(deviceProvisioning.getAppKey())
@@ -265,7 +267,7 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 			result.setMessage(e.getMessage());
 		}
 
-		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+		return result;
 	}
 
 	@Override

@@ -1,8 +1,5 @@
 package lora.ns.liveobjects.rest.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
@@ -15,9 +12,6 @@ import lombok.With;
 @AllArgsConstructor
 @With
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateDevice {
-    private String id;
-    private String name;
-    private DeviceGroup group;
-    private List<DeviceInterface> interfaces = new ArrayList<>();
+public class DeviceGroup {
+    private String path;
 }
