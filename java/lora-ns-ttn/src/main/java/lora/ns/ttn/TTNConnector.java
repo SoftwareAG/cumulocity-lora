@@ -33,9 +33,12 @@ import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
 import ttn.lorawan.v3.AppAsGrpc;
 import ttn.lorawan.v3.AppAsGrpc.AppAsBlockingStub;
+import ttn.lorawan.v3.ApplicationAccessGrpc;
+import ttn.lorawan.v3.ApplicationAccessGrpc.ApplicationAccessBlockingStub;
 import ttn.lorawan.v3.ApplicationOuterClass.Application;
 import ttn.lorawan.v3.ApplicationOuterClass.Applications;
 import ttn.lorawan.v3.ApplicationOuterClass.GetApplicationRequest;
+import ttn.lorawan.v3.ApplicationOuterClass.ListApplicationCollaboratorsRequest;
 import ttn.lorawan.v3.ApplicationOuterClass.ListApplicationsRequest;
 import ttn.lorawan.v3.ApplicationRegistryGrpc;
 import ttn.lorawan.v3.ApplicationRegistryGrpc.ApplicationRegistryBlockingStub;
@@ -71,6 +74,7 @@ import ttn.lorawan.v3.Identifiers.ApplicationIdentifiers;
 import ttn.lorawan.v3.Identifiers.EndDeviceIdentifiers;
 import ttn.lorawan.v3.Identifiers.GatewayIdentifiers;
 import ttn.lorawan.v3.Identifiers.OrganizationOrUserIdentifiers;
+import ttn.lorawan.v3.Identifiers.UserIdentifiers;
 import ttn.lorawan.v3.JsEndDeviceRegistryGrpc;
 import ttn.lorawan.v3.JsEndDeviceRegistryGrpc.JsEndDeviceRegistryBlockingStub;
 import ttn.lorawan.v3.Keys.KeyEnvelope;
@@ -80,7 +84,14 @@ import ttn.lorawan.v3.Lorawan.PHYVersion;
 import ttn.lorawan.v3.Messages.ApplicationDownlink;
 import ttn.lorawan.v3.Messages.DownlinkQueueRequest;
 import ttn.lorawan.v3.NsEndDeviceRegistryGrpc;
+import ttn.lorawan.v3.UserRegistryGrpc;
 import ttn.lorawan.v3.NsEndDeviceRegistryGrpc.NsEndDeviceRegistryBlockingStub;
+import ttn.lorawan.v3.RightsOuterClass.Collaborator;
+import ttn.lorawan.v3.RightsOuterClass.Collaborators;
+import ttn.lorawan.v3.RightsOuterClass.Right;
+import ttn.lorawan.v3.UserOuterClass.GetUserRequest;
+import ttn.lorawan.v3.UserOuterClass.User;
+import ttn.lorawan.v3.UserRegistryGrpc.UserRegistryBlockingStub;
 
 public class TTNConnector extends LNSAbstractConnector {
 
@@ -448,20 +459,48 @@ public class TTNConnector extends LNSAbstractConnector {
         }
 
         private OrganizationOrUserIdentifiers getCurrentUserOrOrganization() {
-                OrganizationOrUserIdentifiers result = null;
+                final OrganizationOrUserIdentifiers[] result = new OrganizationOrUserIdentifiers[1];
+                result[0] = null;
 
-                ApplicationRegistryBlockingStub applicationRegistry = ApplicationRegistryGrpc
-                                .newBlockingStub(managedChannel).withCallCredentials(token);
-                Application application = applicationRegistry.get(GetApplicationRequest.newBuilder()
+                ApplicationAccessBlockingStub applicationAccess = ApplicationAccessGrpc.newBlockingStub(managedChannel)
+                                .withCallCredentials(token);
+                Collaborators collaborators = applicationAccess.listCollaborators(ListApplicationCollaboratorsRequest
+                                .newBuilder()
                                 .setApplicationIds(ApplicationIdentifiers.newBuilder()
                                                 .setApplicationId(properties.getProperty(APPID)).build())
-                                .setFieldMask(FieldMask.newBuilder().addPaths("administrative_contact")
-                                                .addPaths("technical_contact").build())
                                 .build());
+                collaborators.getCollaboratorsList().forEach(collaborator -> {
+                        logger.info("Checking rights of collaborator {}", collaborator.getIds());
+                        if ((collaborator.getIds().hasUserIds()
+                                        && isAdmin(collaborator.getIds().getUserIds()))
+                                        || collaborator.getIds().getOrganizationIds() != null) {
+                                result[0] = collaborator.getIds();
+                        }
+                });
+                /*
+                 * ApplicationRegistryBlockingStub applicationRegistry = ApplicationRegistryGrpc
+                 * .newBlockingStub(managedChannel).withCallCredentials(token);
+                 * Application application =
+                 * applicationRegistry.get(GetApplicationRequest.newBuilder()
+                 * .setApplicationIds(ApplicationIdentifiers.newBuilder()
+                 * .setApplicationId(properties.getProperty(APPID)).build())
+                 * .setFieldMask(FieldMask.newBuilder().addPaths("administrative_contact")
+                 * .addPaths("technical_contact").build())
+                 * .build());
+                 * 
+                 * result = application.getAdministrativeContact();
+                 */
 
-                result = application.getAdministrativeContact();
+                return result[0];
+        }
 
-                return result;
+        private boolean isAdmin(UserIdentifiers ids) {
+                logger.info("Checking if {} is admin...", ids);
+                UserRegistryBlockingStub userRegistry = UserRegistryGrpc.newBlockingStub(managedChannel)
+                                .withCallCredentials(token);
+                User user = userRegistry.get(GetUserRequest.newBuilder().setUserIds(ids)
+                                .setFieldMask(FieldMask.newBuilder().addPaths("admin")).build());
+                return user.getAdmin();
         }
 
         public LNSResponse<Void> provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
