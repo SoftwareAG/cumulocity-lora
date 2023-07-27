@@ -477,16 +477,21 @@ public class TTNConnector extends LNSAbstractConnector {
                 collaborators.getCollaboratorsList().forEach(collaborator -> {
                         logger.info("Checking API Keys of collaborator {}", collaborator.getIds());
                         if (collaborator.getIds().hasOrganizationIds()) {
-                                APIKey apiKey = organizationAccess.getAPIKey(GetOrganizationAPIKeyRequest
-                                                .newBuilder()
-                                                .setKeyId(keyId)
-                                                .setOrganizationIds(collaborator.getIds().getOrganizationIds())
-                                                .build());
-                                if (apiKey != null) {
-                                        logger.info("Collaborator {} matches current API Key", collaborator);
-                                        result[0] = OrganizationOrUserIdentifiers.newBuilder()
+                                try {
+                                        APIKey apiKey = organizationAccess.getAPIKey(GetOrganizationAPIKeyRequest
+                                                        .newBuilder()
+                                                        .setKeyId(keyId)
                                                         .setOrganizationIds(collaborator.getIds().getOrganizationIds())
-                                                        .build();
+                                                        .build());
+                                        if (apiKey != null) {
+                                                logger.info("Collaborator {} matches current API Key", collaborator);
+                                                result[0] = OrganizationOrUserIdentifiers.newBuilder()
+                                                                .setOrganizationIds(collaborator.getIds()
+                                                                                .getOrganizationIds())
+                                                                .build();
+                                        }
+                                } catch (StatusRuntimeException e) {
+                                        logger.info("Wrong collaborator (no right to get API Keys)");
                                 }
                         }
                 });

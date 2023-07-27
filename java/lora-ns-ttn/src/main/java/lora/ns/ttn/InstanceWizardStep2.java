@@ -10,7 +10,7 @@ public class InstanceWizardStep2 implements LNSConnectorWizardStep {
 	protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 	{
 		propertyDescriptions.add(new PropertyDescription("appid", "Application ID", true, null, "/apps", null, null,
-				null, null, null, PropertyType.LIST, false));
+				null, null, null, PropertyType.LIST, true));
 	}
 
 	@Override
