@@ -9,8 +9,8 @@ import lora.ns.connector.PropertyDescription.PropertyType;
 public class InstanceWizardStep2 implements LNSConnectorWizardStep {
 	protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 	{
-		propertyDescriptions.add(new PropertyDescription("appid", "Application ID", true, null, "/apps", null, null,
-				null, null, null, PropertyType.LIST, true));
+		propertyDescriptions.add(new PropertyDescription("appid", "Application", true, null, "/apps", null, null,
+				null, null, null, PropertyType.LIST, false));
 	}
 
 	@Override
