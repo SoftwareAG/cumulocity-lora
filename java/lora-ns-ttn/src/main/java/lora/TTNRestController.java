@@ -28,21 +28,6 @@ public class TTNRestController {
 	@Autowired
 	private LNSConnectorManager lnsConnectorManager;
 
-	@PostMapping(value = "/applications", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<Application> getApplications(@RequestBody Properties properties) {
-		TTNConnector connector = new TTNConnector(properties);
-		return connector.getApplications();
-	}
-
-	@PostMapping(value = "/{lnsConnectorId}/applications", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<Application> getApplications(@PathVariable String lnsConnectorId, @RequestBody Properties properties) {
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		if (connector.isPresent()) {
-            properties = connector.get().mergeProperties(properties);
-		}
-		return new TTNConnector(properties).getApplications();
-	}
-
 	@GetMapping(value = "/{lnsConnectorId}/macversion", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<IdNameEntry> getMACVersions(@PathVariable String lnsConnectorId) {
 		List<IdNameEntry> result = new ArrayList<>();
@@ -77,5 +62,40 @@ public class TTNRestController {
 		}
 
 		return result;
+	}
+
+	/***
+	 * Should be used when updating the connector to get the list of available
+	 * applications.
+	 * 
+	 * @param lnsConnectorId
+	 * @param properties
+	 * @return
+	 */
+	@PostMapping(value = "/{lnsConnectorId}/apps", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public List<IdNameEntry> getApps(@PathVariable String lnsConnectorId, @RequestBody Properties properties) {
+		List<IdNameEntry> result = new ArrayList<>();
+		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
+		if (connector.isPresent()) {
+			properties = connector.get().mergeProperties(properties);
+			result = new TTNConnector(properties).getApplications().stream()
+					.map(a -> new IdNameEntry(a.getIds().getApplicationId(), a.getName())).collect(Collectors.toList());
+		}
+
+		return result;
+	}
+
+	/***
+	 * Retrieves the list of application in TTN when
+	 * creating
+	 * a new TTN connector.
+	 * 
+	 * @param properties
+	 * @return
+	 */
+	@PostMapping(value = "/apps", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public List<IdNameEntry> getApps(@RequestBody Properties properties) {
+		return new TTNConnector(properties).getApplications().stream()
+				.map(a -> new IdNameEntry(a.getIds().getApplicationId(), a.getName())).collect(Collectors.toList());
 	}
 }

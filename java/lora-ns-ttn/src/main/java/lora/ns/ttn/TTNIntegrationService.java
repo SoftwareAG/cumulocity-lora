@@ -31,7 +31,8 @@ public class TTNIntegrationService extends LNSIntegrationService<TTNConnector> {
 	private final Logger logger = LoggerFactory.getLogger(TTNIntegrationService.class);
 
 	{
-		wizard.add(new InstanceWizardStep());
+		wizard.add(new InstanceWizardStep1());
+		wizard.add(new InstanceWizardStep2());
 		deviceProvisioningAdditionalProperties.add(new PropertyDescription("MACVersion", "MAC Version", true, null,
 				"/macversion", null, null, null, null, null, PropertyType.LIST, false));
 		deviceProvisioningAdditionalProperties.add(new PropertyDescription("PHYVersion", "PHY Version", true, null,
