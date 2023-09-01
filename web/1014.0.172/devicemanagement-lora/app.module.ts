@@ -59,6 +59,7 @@ import {
 import { LoraGatewaysComponent } from "./src/onboarding/gateways/gateways.component";
 import { LNSEditComponent } from "./src/onboarding/lns/lns-edit.component";
 import { LNSComponent } from "./src/onboarding/lns/lns.component";
+import { SelectTypeComponent } from "./src/onboarding/codecs/select.type";
 
 const monacoConfig: NgxMonacoEditorConfig = {
   //baseUrl: 'app-name/assets', // configure base path for monaco editor default: './assets'
@@ -298,6 +299,7 @@ declare var Buffer: {
     LoRaConfigComponent,
     PropertyPipe,
     RepeatTypeComponent,
+    SelectTypeComponent,
     PanelWrapperComponent,
   ],
   entryComponents: [GroupsComponent, DevicesComponent],
@@ -369,7 +371,10 @@ declare var Buffer: {
     ReactiveFormsModule,
     DynamicFormsModule,
     FormlyModule.forRoot({
-      types: [{ name: "repeat", component: RepeatTypeComponent }],
+      types: [
+        { name: "repeat", component: RepeatTypeComponent },
+        { name: "select", component: SelectTypeComponent },
+      ],
       wrappers: [{ name: "panel", component: PanelWrapperComponent }],
     }),
   ],

@@ -1,16 +1,13 @@
-import { Component } from '@angular/core';
-import { FieldWrapper } from '@ngx-formly/core';
+import { Component } from "@angular/core";
+import { FieldWrapper } from "@ngx-formly/core";
 
 @Component({
-  selector: 'formly-wrapper-panel',
+  selector: "formly-wrapper-panel",
   template: `
-    <div class="card">
-      <h3 class="card-header">{{ to.label }}</h3>
-      <div class="card-body">
-        <ng-container #fieldComponent></ng-container>
-      </div>
-    </div>
+    <fieldset>
+      <div class="legend form-block center">{{ to.label }}</div>
+      <ng-container #fieldComponent></ng-container>
+    </fieldset>
   `,
 })
-export class PanelWrapperComponent extends FieldWrapper {
-}
+export class PanelWrapperComponent extends FieldWrapper {}
