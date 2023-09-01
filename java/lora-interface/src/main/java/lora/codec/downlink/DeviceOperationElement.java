@@ -1,7 +1,7 @@
 package lora.codec.downlink;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,17 +10,19 @@ public class DeviceOperationElement {
     private String name;
     private ParamType type;
     private Object value;
-    private Map<String, DeviceOperationElement> elements = new HashMap<>();
+    private Map<String, DeviceOperationElement> elements = new LinkedHashMap<>();
     private Boolean repeatable = false;
     private Integer minOccur = 1;
     private Integer maxOccur = 1;
+    private Integer min;
+    private Integer max;
     private Boolean dependsOnParam = false;
     private String dependsOnParamId;
     private String dependsOnParamValue;
     private Boolean required = true;
 
     public enum ParamType {
-        STRING, INTEGER, FLOAT, BOOL, DATE, ENUM, SEPARATOR, GROUP, ARRAY;
+        STRING, INTEGER, FLOAT, BOOL, DATE, ENUM, GROUP, ARRAY;
     }
 
     public DeviceOperationElement() {
@@ -157,6 +159,22 @@ public class DeviceOperationElement {
     public DeviceOperationElement addElement(DeviceOperationElement element) {
         this.elements.put(element.getId(), element);
         return this;
+    }
+
+    public Integer getMin() {
+        return min;
+    }
+
+    public void setMin(Integer min) {
+        this.min = min;
+    }
+
+    public Integer getMax() {
+        return max;
+    }
+
+    public void setMax(Integer max) {
+        this.max = max;
     }
 
     @Override
