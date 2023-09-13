@@ -154,6 +154,9 @@ export class DevicesComponent {
         break;
       case ParamType.ENUM:
         field.type = "radio";
+        if (element.value.length > 3) {
+          field.type = "select";
+        }
         field.templateOptions.options = element.value.map((e) => {
           return { label: e, value: e };
         });

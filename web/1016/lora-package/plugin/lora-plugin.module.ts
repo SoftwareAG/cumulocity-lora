@@ -35,6 +35,7 @@ import { LNSComponent } from "../src/onboarding/lns/lns.component";
 import { SimulatorComponent } from "../src/simulator/simulator.component";
 
 import { monacoConfig } from "./monacoConfig";
+import { SelectTypeComponent } from "../src/onboarding/codecs/select.type";
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { monacoConfig } from "./monacoConfig";
     LoRaConfigComponent,
     PropertyPipe,
     RepeatTypeComponent,
+    SelectTypeComponent,
     PanelWrapperComponent,
     SimulatorComponent,
   ],
@@ -95,7 +97,10 @@ import { monacoConfig } from "./monacoConfig";
     ModalModule.forRoot(),
     PopoverModule,
     FormlyModule.forRoot({
-      types: [{ name: "repeat", component: RepeatTypeComponent }],
+      types: [
+        { name: "repeat", component: RepeatTypeComponent },
+        { name: "select", component: SelectTypeComponent },
+      ],
       wrappers: [{ name: "panel", component: PanelWrapperComponent }],
     }),
   ],

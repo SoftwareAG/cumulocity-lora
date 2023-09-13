@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from "@angular/core";
+import { Component } from "@angular/core";
 import { FetchClient, IManagedObject, InventoryService } from "@c8y/client";
 import { DeviceOperation } from "./DeviceOperation";
 import { DeviceOperationElement, ParamType } from "./DeviceOperationElement";
@@ -53,8 +53,7 @@ export class LoraCodecsComponent {
 
   constructor(
     private inventory: InventoryService,
-    private fetchClient: FetchClient,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private fetchClient: FetchClient
   ) {
     this.loadCodecs();
   }
@@ -127,23 +126,6 @@ export class LoraCodecsComponent {
   onUploadEditorLoad(e) {
     console.log("In onUploadEditorLoad");
     console.log(e);
-    /*monaco.languages.typescript.javascriptDefaults.addExtraLib(`
-        class IManagedObject {
-          id: string;
-          name: string;
-        }
-        let mo: IManagedObject;
-        let payload: string;
-        let time: Date;
-        let fport: number;
-        class C8YData {
-          morToUpdate?: IManagedObject;
-          addMeasurement(mor: IManagedObject, fragment: string, series: string, unit: string, value: number, time: Date): void;
-          addMeasurements(mor: IManagedObject, fragment: string, serieses: string[], units: string[], values: number[], time: Date): void;
-          addEvent(mor: IManagedObject, eventType: string, eventText: string, properties: {}, dateTime: Date): void;
-          addAlarm(mor: IManagedObject, alarmType: string, alarmText: string, severity: Severity, dateTime: Date): void;
-          clearAlarm(alarmType: string): void;
-        }`);*/
   }
 
   goToUplink() {
