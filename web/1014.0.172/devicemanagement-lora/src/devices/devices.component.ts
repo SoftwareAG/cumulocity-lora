@@ -26,7 +26,6 @@ import { LnsService } from "../../src/service/LnsService";
   templateUrl: "./devices.component.html",
 })
 export class DevicesComponent implements OnInit {
-  async ngOnInit(): Promise<void> {}
   commands: {};
   device: IManagedObject;
   selectedLnsConnectorId: string;
@@ -71,12 +70,14 @@ export class DevicesComponent implements OnInit {
     private eventService: EventService
   ) {
     console.log(route.snapshot.parent.data.contextData.id);
-    // _ annotation to mark this string as translatable string.
-    this.init();
   }
 
-  async init() {
+  async ngOnInit(): Promise<void> {
     await this.getCodecAndModel();
+  }
+
+  resetModel() {
+    this.parameterValues = {};
   }
 
   async getCodecAndModel() {

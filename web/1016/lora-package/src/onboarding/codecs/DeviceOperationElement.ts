@@ -10,6 +10,8 @@ export class DeviceOperationElement {
   dependsOnParam: boolean = false;
   dependsOnParamId: string;
   dependsOnParamValue: string;
+  min: number;
+  max: number;
   required: boolean = true;
 }
 

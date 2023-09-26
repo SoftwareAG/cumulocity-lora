@@ -308,7 +308,11 @@
         <div class="form-group">
           <div class="c8y-select-wrapper">
             <label for="model">Command:</label>
-            <select class="form-control" [(ngModel)]="commandChoice">
+            <select
+              class="form-control"
+              [(ngModel)]="commandChoice"
+              (change)="resetModel()"
+            >
               <option [value]="empty" [disabled]="true">
                 Please select a command
               </option>

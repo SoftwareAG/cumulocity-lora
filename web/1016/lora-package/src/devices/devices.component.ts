@@ -1,5 +1,5 @@
 import { _ } from "@c8y/ngx-components";
-import { Component, TemplateRef, ViewChild } from "@angular/core";
+import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import {
   InventoryService,
   IManagedObject,
@@ -25,7 +25,7 @@ import { LnsService } from "../../src/service/LnsService";
   selector: "devices",
   templateUrl: "./devices.component.html",
 })
-export class DevicesComponent {
+export class DevicesComponent implements OnInit {
   commands: {};
   device: IManagedObject;
   selectedLnsConnectorId: string;
@@ -71,12 +71,14 @@ export class DevicesComponent {
     private eventService: EventService
   ) {
     console.log(route.snapshot.parent.data.contextData.id);
-    // _ annotation to mark this string as translatable string.
-    this.init();
   }
 
-  async init() {
+  async ngOnInit(): Promise<void> {
     await this.getCodecAndModel();
+  }
+
+  resetModel() {
+    this.parameterValues = {};
   }
 
   async getCodecAndModel() {
@@ -143,6 +145,8 @@ export class DevicesComponent {
         field.type = "input";
         field.templateOptions.type = "number";
         field.templateOptions.required = element.required;
+        field.templateOptions.min = element.min;
+        field.templateOptions.max = element.max;
         break;
       case ParamType.BOOL:
         field.type = "checkbox";
