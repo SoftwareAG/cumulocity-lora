@@ -44,7 +44,7 @@ class AdeunisCodec extends DeviceCodec {
     operations.set("get config", {
       id: "get config",
       name: "get config",
-      elements: null,
+      elements: [],
     });
     return operations;
   }
