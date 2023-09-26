@@ -129,13 +129,13 @@ export class DevicesComponent implements OnInit {
       case ParamType.STRING:
         field.type = "input";
         field.templateOptions.type = "text";
-        field.templateOptions.required = true;
+        field.templateOptions.required = element.required;
         break;
       case ParamType.INTEGER:
       case ParamType.FLOAT:
         field.type = "input";
         field.templateOptions.type = "number";
-        field.templateOptions.required = true;
+        field.templateOptions.required = element.required;
         field.templateOptions.min = element.min;
         field.templateOptions.max = element.max;
         break;

@@ -12,6 +12,7 @@ export class DeviceOperationElement {
   dependsOnParamValue: string;
   min: number;
   max: number;
+  required: boolean = true;
 }
 
 export enum ParamType {
