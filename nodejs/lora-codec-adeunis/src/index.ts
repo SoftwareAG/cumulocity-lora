@@ -25,7 +25,7 @@ class AdeunisCodec extends DeviceCodec {
   }
   getModels(client: Client): Map<string, string> {
     let models: Map<string, string> = new Map<string, string>();
-    for (var model in codec.DecoderProducts) {
+    for (let model in codec.DecoderProducts) {
       models.set(model, model);
     }
     return models;
@@ -105,8 +105,8 @@ class AdeunisCodec extends DeviceCodec {
         time
       );
     }
-    if (result.type && result.type.includes("configuration")) {
-      mo["c8y_Configuration"] = JSON.stringify(result);
+    if (result.type?.includes("configuration")) {
+      mo["c8y_Configuration"] = { config: JSON.stringify(result) };
       if (result.calculatedSendingPeriod) {
         let requiredAvailability: number = result.calculatedSendingPeriod.value;
         if (result.calculatedSendingPeriod.unit === "s") {
