@@ -47,9 +47,20 @@ public abstract class LNSAbstractConnector implements LNSConnector, Initializing
 			ManagedObjectRepresentation mor = inventoryApi.get(GId.asGId(this.getId()));
 			if (mor.hasProperty(key)) {
 				result = mor.getProperty(key);
+				properties.put(key, result);
 			}
 		}
 		return Optional.ofNullable(result);
+	}
+
+	protected void removeProperty(String key) {
+		if (properties.containsKey(key)) {
+			properties.remove(key);
+			ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
+			mor.setId(GId.asGId(this.getId()));
+			mor.setProperty(key, null);
+			this.inventoryApi.update(mor);
+		}
 	}
 
 	protected void setProperty(String key, Object value) {
@@ -57,6 +68,7 @@ public abstract class LNSAbstractConnector implements LNSConnector, Initializing
 		mor.setId(GId.asGId(this.getId()));
 		mor.setProperty(key, value);
 		this.inventoryApi.update(mor);
+		this.properties.put(key, value);
 	}
 
 	@Override

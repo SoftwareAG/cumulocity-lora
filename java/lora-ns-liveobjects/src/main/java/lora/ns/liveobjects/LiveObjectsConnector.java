@@ -224,12 +224,14 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 			LNSResponse<Void> uplinkResult = removeRouting(id.toString());
 			result.setOk(uplinkResult.isOk());
 			result.setMessage(uplinkResult.getMessage());
+			removeProperty("uplinkRouteId");
 		});
 		if (result.isOk()) {
 			downlinkRouteId.ifPresent(id -> {
 				LNSResponse<Void> downlinkResult = removeRouting(id.toString());
 				result.setOk(downlinkResult.isOk());
 				result.setMessage(downlinkResult.getMessage());
+				removeProperty("downlinkRouteId");
 			});
 		}
 		return result;
