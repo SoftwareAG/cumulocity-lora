@@ -112,14 +112,14 @@ class AdeunisCodec extends DeviceCodec {
         if (result.calculatedSendingPeriod.unit === "s") {
           requiredAvailability = requiredAvailability / 60.0;
         }
-        mo["c8y_RequiredAvailability"] = requiredAvailability;
+        mo["c8y_RequiredAvailability"] = { "responseInterval": requiredAvailability}; 
       }
       if (result.transmissionPeriod) {
         let requiredAvailability: number = result.transmissionPeriod.value;
         if (result.transmissionPeriod.unit === "s") {
           requiredAvailability = requiredAvailability / 60.0;
         }
-        mo["c8y_RequiredAvailability"] = requiredAvailability;
+        mo["c8y_RequiredAvailability"] = { "responseInterval": requiredAvailability}; 
       }
       c8yData.morToUpdate = mo;
     }
