@@ -68,7 +68,7 @@ export class CustomCodec {
   }
 
   public decode(
-    device: IManagedObject,
+    device: Partial<IManagedObject>,
     fport: number,
     time: Date,
     payload: string
@@ -78,7 +78,10 @@ export class CustomCodec {
     return this.vm.run(this.decodeScript)(device, fport, time, payload);
   }
 
-  public encode(device: IManagedObject, operation: string): DownlinkData {
+  public encode(
+    device: Partial<IManagedObject>,
+    operation: string
+  ): DownlinkData {
     console.log("Calling encoding script...");
     console.log(this.vm.run(this.encodeScript));
     let operationJson: any = JSON.parse(operation);

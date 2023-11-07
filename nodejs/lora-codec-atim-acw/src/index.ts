@@ -45,7 +45,7 @@ class AtimAcwCodec extends DeviceCodec {
   }
   protected _decode(
     client: Client,
-    device: IManagedObject,
+    device: Partial<IManagedObject>,
     model: string,
     fport: number,
     time: Date,
@@ -99,7 +99,7 @@ class AtimAcwCodec extends DeviceCodec {
     payload,
     time,
     c8yData: C8YData,
-    device: IManagedObject
+    device: Partial<IManagedObject>
   ) {
     // Init result
     let result: {
@@ -242,7 +242,7 @@ class AtimAcwCodec extends DeviceCodec {
     payload,
     time,
     c8yData: C8YData,
-    device: IManagedObject
+    device: Partial<IManagedObject>
   ) {
     // Init result
     let result: {
@@ -373,7 +373,7 @@ class AtimAcwCodec extends DeviceCodec {
     number_voie,
     date: Date,
     c8yData: C8YData,
-    device: IManagedObject
+    device: Partial<IManagedObject>
   ) {
     switch (mesureType) {
       case 1:

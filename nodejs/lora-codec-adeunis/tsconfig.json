@@ -6,6 +6,7 @@
             "dom"
         ],
         "types": [
+            "jest",
             "reflect-metadata",
             "node"
         ],
