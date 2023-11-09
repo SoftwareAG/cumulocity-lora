@@ -97,7 +97,7 @@ export class AdeunisCodec extends DeviceCodec {
       (result.type?.includes("0x5a") || result.type?.includes("0x5b")) &&
       result.counterValues
     ) {
-      if (!mo.c8y_RequiredAvailability?.responseInterval) {
+      if (!mo.samplingPeriod) {
         console.error("Device must first retrieve its configuration.");
       }
       let channel = "Channel A";
@@ -111,15 +111,15 @@ export class AdeunisCodec extends DeviceCodec {
           channel,
           "",
           c,
-          new Date(
-            time.getTime() -
-              mo["c8y_RequiredAvailability"]["responseInterval"] * i * 60000
-          )
+          new Date(time.getTime() - mo.samplingPeriod * i * 60000)
         );
       });
     }
     if (result.type?.includes("configuration")) {
       mo["c8y_Configuration"] = { config: JSON.stringify(result) };
+      if (result.samplingPeriod) {
+        mo.samplingPeriod = result.samplingPeriod;
+      }
       if (result.calculatedSendingPeriod) {
         let requiredAvailability: number = result.calculatedSendingPeriod.value;
         if (result.calculatedSendingPeriod.unit === "s") {
