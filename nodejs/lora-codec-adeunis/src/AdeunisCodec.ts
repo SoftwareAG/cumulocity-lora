@@ -93,15 +93,30 @@ export class AdeunisCodec extends DeviceCodec {
         time
       );
     }
-    if (result.counterValues) {
-      c8yData.addMeasurements(
-        mo,
-        "Pulse",
-        ["Channel A", "Channel B"],
-        ["", ""],
-        [result.counterValues[0], result.counterValues[1]],
-        time
-      );
+    if (
+      (result.type?.includes("0x5a") || result.type?.includes("0x5b")) &&
+      result.counterValues
+    ) {
+      if (!mo.c8y_RequiredAvailability?.responseInterval) {
+        console.error("Device must first retrieve its configuration.");
+      }
+      let channel = "Channel A";
+      if (result.type?.includes("0x5b")) {
+        channel = "Channel B";
+      }
+      result.counterValues.forEach((c, i) => {
+        c8yData.addMeasurement(
+          mo,
+          "Pulse",
+          channel,
+          "",
+          c,
+          new Date(
+            time.getTime() -
+              mo["c8y_RequiredAvailability"]["responseInterval"] * i * 60000
+          )
+        );
+      });
     }
     if (result.type?.includes("configuration")) {
       mo["c8y_Configuration"] = { config: JSON.stringify(result) };
@@ -139,8 +154,7 @@ export class AdeunisCodec extends DeviceCodec {
     }
     if (result.type?.includes("0x48") && result.channels) {
       result.channels.forEach((channel) => {
-        let i = 1;
-        channel.deltaValues.forEach((value) => {
+        channel.deltaValues.forEach((value, i) => {
           c8yData.addMeasurement(
             mo,
             channel.name,
@@ -149,7 +163,6 @@ export class AdeunisCodec extends DeviceCodec {
             channel.index + value,
             new Date(time.getTime() + result.baseTime * i * 60000)
           );
-          i++;
         });
       });
     }

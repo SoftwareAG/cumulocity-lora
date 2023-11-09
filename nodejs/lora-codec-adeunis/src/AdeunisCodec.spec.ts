@@ -4,7 +4,10 @@ import { IManagedObject } from "@c8y/client";
 
 class TestCodec extends AdeunisCodec {
   testDecode(model: string, payload: string): C8YData {
-    let mo: Partial<IManagedObject> = { id: "test" };
+    let mo: Partial<IManagedObject> = {
+      id: "test",
+      c8y_RequiredAvailability: { responseInterval: 10 },
+    };
     return this._decode(null, mo, model, 1, new Date(), payload);
   }
 }
@@ -33,5 +36,14 @@ describe("Test Adeunis Codec", () => {
     let c8yData: C8YData = codec.testDecode("analog", "42500110000002100000");
     console.log(c8yData);
     expect(c8yData.measurements.length).toBe(2);
+  });
+  test("Test Pulse 4 with historic data", () => {
+    let codec: TestCodec = new TestCodec(null);
+    let c8yData: C8YData = codec.testDecode(
+      "pulse4",
+      "5A8400000127000100020003000414ABA3E9"
+    );
+    console.log(c8yData);
+    expect(c8yData.measurements.length).toBe(5);
   });
 });
