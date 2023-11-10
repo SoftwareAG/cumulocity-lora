@@ -1,18 +1,18 @@
 # LoRa connectivity for Cumulocity
 
-## Installation
+## Installing Cumulocity LoRa plugin
 
-Download the python script python/install.py.
-Script usage is:
+You can install the Cumulocity LoRa plugin from the administration app, it should be available in the Ecosystem -> Applications -> Packages menu.
 
-```
-install.py [-u <username>] [-p <password>] [-h <cumulocity tenant URL>]
-```
+If not, download the zip file from the latest release and install it in the application packages (available from the menu pointed above): https://github.com/SoftwareAG/cumulocity-lora/releases/latest/download/sag-ps-iot-pkg-lora-package.zip
 
-If a parameter is not provided a prompt will ask you to enter it.
-The script might take a while to execute as it will download locally the UI zip and the github-proxy microservice and then install them on your tenant.
+It is intended to be installed in devicemanagement application only.
 
-Once the script is executed just go to devicemanagement-lora application, then to lora/config menu.
+This plugin requires the microservice feature enabled on your tenant to work. If you're on a trial tenant please contact your sales representative to do so, or contact support on Empower.
+
+Once microservice feature is enabled, please install the github-proxy microservice that can be downloaded from this URL: https://github.com/SoftwareAG/cumulocity-lora/releases/latest/download/github-proxy.zip
+
+When the github-proxy microservice is installed, just go to devicemanagement application, then to lora/config menu.
 From there just select the microservices you want to install on your tenant.
 
 You'll see 2 kinds of microservices: LNS connectors, usually named lora-ns-, and codecs, usually named lora-codec-

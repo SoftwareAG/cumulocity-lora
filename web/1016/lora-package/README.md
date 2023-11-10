@@ -4,9 +4,9 @@ This is the Cumulocity LoRa plugin.
 
 It is intended to be installed in devicemanagement application only.
 
-This plugin requires the microservice feature enabled on your tenant to work. If you're on a trial tenant please contact your sales contact to do so, or contact support on Empower.
+This plugin requires the microservice feature enabled on your tenant to work. If you're on a trial tenant please contact your sales representative to do so, or contact support on Empower.
 
-Once microservice feature is enabled, please install the github-proxy microservice that can be downloaded from this URL: https://github.com/SoftwareAG/cumulocity-lora/releases/download/v0.30/github-proxy.zip
+Once microservice feature is enabled, please install the github-proxy microservice that can be downloaded from this URL: https://github.com/SoftwareAG/cumulocity-lora/releases/latest/download/github-proxy.zip
 
 When the github-proxy microservice is installed, just go to devicemanagement application, then to lora/config menu.
 From there just select the microservices you want to install on your tenant.
