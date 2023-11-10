@@ -6,7 +6,7 @@ class TestCodec extends AdeunisCodec {
   testDecode(model: string, payload: string): C8YData {
     let mo: Partial<IManagedObject> = {
       id: "test",
-      samplingPeriod: 10,
+      samplingPeriod: { value: 10, unit: "s" },
     };
     return this._decode(null, mo, model, 1, new Date(), payload);
   }

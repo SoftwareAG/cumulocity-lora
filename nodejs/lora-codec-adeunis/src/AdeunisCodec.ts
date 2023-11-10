@@ -100,18 +100,25 @@ export class AdeunisCodec extends DeviceCodec {
       if (!mo.samplingPeriod) {
         console.error("Device must first retrieve its configuration.");
       }
+      let samplingPeriod = mo.samplingPeriod.value;
+      if (mo.samplingPeriod.unit === "m") {
+        samplingPeriod = samplingPeriod * 60;
+      }
+      console.log("Sampling period: " + samplingPeriod);
       let channel = "Channel A";
       if (result.type?.includes("0x5b")) {
         channel = "Channel B";
       }
       result.counterValues.forEach((c, i) => {
+        let datetime = new Date(time.getTime() - samplingPeriod * i * 1000);
+        console.log("Time: " + datetime);
         c8yData.addMeasurement(
           mo,
           "Pulse",
           channel,
           "",
           c,
-          new Date(time.getTime() - mo.samplingPeriod * i * 60000)
+          new Date(time.getTime() - samplingPeriod * i * 1000)
         );
       });
     }
