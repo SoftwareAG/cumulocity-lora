@@ -71,26 +71,17 @@ export class LoraCodecsComponent {
     console.log(codec);
     console.log(this.codecs.get(codec));
     this.currentCodec = codec;
-    if (
-      this.codecs.get(this.currentCodec) &&
-      this.codecs.get(this.currentCodec).decodeString
-    ) {
+    if (this.codecs.get(this.currentCodec)?.decodeString) {
       this.decodingScript = this.codecs.get(this.currentCodec).decodeString;
     } else {
       this.decodingScript = this.defaultDecodingScript;
     }
-    if (
-      this.codecs.get(this.currentCodec) &&
-      this.codecs.get(this.currentCodec).encodeString
-    ) {
+    if (this.codecs.get(this.currentCodec)?.encodeString) {
       this.encodingScript = this.codecs.get(this.currentCodec).encodeString;
     } else {
       this.encodingScript = this.defaultEncodingScript;
     }
-    if (
-      this.codecs.get(this.currentCodec) &&
-      this.codecs.get(this.currentCodec).operations
-    ) {
+    if (this.codecs.get(this.currentCodec)?.operations) {
       this.operations = this.codecs.get(this.currentCodec).operations;
       if (!this.operations || !(this.operations instanceof Array)) {
         this.operations = [];
@@ -109,10 +100,12 @@ export class LoraCodecsComponent {
   }
 
   async removeCodec() {
+    console.log(this.currentCodec);
     console.log("Will delete codec " + this.codecs.get(this.currentCodec).name);
     await this.fetchClient.fetch(
       "service/lora-codec-custom/model/" +
-        this.codecs.get(this.currentCodec).name,
+        // deprecated - this.codecs.get(this.currentCodec).name,
+        this.codecs.get(this.currentCodec).id,
       {
         method: "DELETE",
       }
@@ -271,5 +264,14 @@ export class LoraCodecsComponent {
       null,
       "\t"
     );
+  }
+
+  codecExists(name: string) {
+    for (let mo of this.codecs.values()) {
+      if (mo.name === name) {
+        return true;
+      }
+    }
+    return false;
   }
 }

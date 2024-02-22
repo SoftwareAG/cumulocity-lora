@@ -80,36 +80,39 @@ class CustomDeviceCodec extends DeviceCodec {
         if (!this.customCodecs.has(client)) {
           this.customCodecs.set(client, new Map<string, CustomCodec>());
         }
-        (await client.inventory.list({ type: "CustomCodec" })).data.forEach(
-          (mo) => {
-            this.customCodecs.get(client).set(mo.name, new CustomCodec(mo));
-            if (!mo.operations) {
-              mo.operations = new Array<DeviceOperation>();
-            }
-            if (mo.operations.size == 0) {
-              mo.operations.push(<DeviceOperation>{
-                id: "test",
-                name: "Sample operation",
-                elements: [
-                  {
-                    id: "param1",
-                    name: "Param 1",
-                    type: ParamType.STRING,
-                    value: null,
-                  },
-                  {
-                    id: "param2",
-                    name: "Param 2",
-                    type: ParamType.INTEGER,
-                    value: null,
-                  },
-                ],
-              });
-            }
-            this.customCodecs.get(client).get(mo.name).operations =
-              mo.operations;
+        (
+          await client.inventory.list({
+            type: "CustomCodec",
+            pageSize: 1000,
+            withTotalPages: true,
+          })
+        ).data.forEach((mo) => {
+          this.customCodecs.get(client).set(mo.name, new CustomCodec(mo));
+          if (!mo.operations) {
+            mo.operations = new Array<DeviceOperation>();
           }
-        );
+          if (mo.operations.size == 0) {
+            mo.operations.push(<DeviceOperation>{
+              id: "test",
+              name: "Sample operation",
+              elements: [
+                {
+                  id: "param1",
+                  name: "Param 1",
+                  type: ParamType.STRING,
+                  value: null,
+                },
+                {
+                  id: "param2",
+                  name: "Param 2",
+                  type: ParamType.INTEGER,
+                  value: null,
+                },
+              ],
+            });
+          }
+          this.customCodecs.get(client).get(mo.name).operations = mo.operations;
+        });
       }
     );
   }
@@ -151,10 +154,16 @@ class CustomCodecApp extends CodecApp {
         subscriptionService
           .getClient(req)
           .then(async (client) => {
-            await client.inventory.delete(
-              codec.customCodecs.get(client).get(req.params.name).id
-            );
-            codec.customCodecs.get(client).delete(req.params.name);
+            // deleting by name will be deprecated
+            if (codec.customCodecs.get(client).get(req.params.name)) {
+              await client.inventory.delete(
+                codec.customCodecs.get(client).get(req.params.name).id
+              );
+              codec.customCodecs.get(client).delete(req.params.name);
+            } else {
+              // Let's assume it's an mo id then
+              await client.inventory.delete(req.params.name);
+            }
             res.json({ message: "deteted" });
             res.status(204);
           })
