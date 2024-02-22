@@ -155,14 +155,23 @@ class CustomCodecApp extends CodecApp {
           .getClient(req)
           .then(async (client) => {
             // deleting by name will be deprecated
+            console.log("Will delete codec identified by " + req.params.name);
             if (codec.customCodecs.get(client).get(req.params.name)) {
+              console.log("Deleting by name");
               await client.inventory.delete(
                 codec.customCodecs.get(client).get(req.params.name).id
               );
               codec.customCodecs.get(client).delete(req.params.name);
             } else {
               // Let's assume it's an mo id then
+              console.log("Deleting by id");
               await client.inventory.delete(req.params.name);
+              Array.from(codec.customCodecs.get(client).values())
+                .filter((codec) => codec.id === req.params.name)
+                .forEach((c) => {
+                  console.log("Deleting " + c.name + " " + c.id);
+                  codec.customCodecs.get(client).delete(c.name);
+                });
             }
             res.json({ message: "deteted" });
             res.status(204);
