@@ -1,0 +1,306 @@
+<c8y-title translate>All devices</c8y-title>
+<div class="card">
+  <div class="card-header separator">
+    <h4 class="card-title">{{ "Register devices" | translate }}</h4>
+  </div>
+  <div class="card-block">
+    <c8y-form-group class="col-sm-12">
+      <label class="c8y-checkbox"><input class="form-control" type="checkbox" name="provisionInLNS"
+          #provisionInLNS /><span></span>Provision device in LoRa network server</label>
+    </c8y-form-group>
+    <c8y-form-group class="col-sm-12">
+      <label class="c8y-checkbox"><input class="form-control" type="checkbox"
+          [(ngModel)]="provisionDevice.useGatewayPosition" name="useGatewayPosition" #model="ngModel" /><span></span>Use
+        gateway position</label>
+    </c8y-form-group>
+    <c8y-form-group class="col-sm-12" *ngIf="provisionInLNS.checked" [hasError]="
+          provisionInLNS.checked &&
+          instanceSelect.invalid &&
+          (instanceSelect.dirty || instanceSelect.touched)
+        ">
+      <div class="c8y-select-wrapper">
+        <label for="instanceSelect">LoRa network server connectors:</label>
+        <select [required]="provisionInLNS.checked" class="form-control" name="instanceSelect" #instanceSelect="ngModel"
+          [(ngModel)]="provisionDevice.instanceSelect" (change)="loadProperties(instanceSelect.value)">
+          <option [ngValue]="undefined" [disabled]="true">
+            Please select a connector
+          </option>
+          <option *ngFor="let instance of lnsService.lnsInstances" [value]="instance.id">
+            {{ instance.name }} -
+            {{ lnsService.proxyMap[instance.lnsType].name }}
+          </option>
+        </select>
+      </div>
+      <c8y-messages *ngIf="
+            provisionInLNS.checked &&
+            instanceSelect.invalid &&
+            (instanceSelect.dirty || instanceSelect.touched)
+          ">
+        <c8y-message name="required" *ngIf="instanceSelect.errors?.required">The connector is required
+        </c8y-message>
+      </c8y-messages>
+    </c8y-form-group>
+    <table class="table table-striped table-condensed">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>
+            Dev EUI<button class="btn-help" popover="Required 64 bits hex number that uniquely identifies the device."
+              placement="right" type="button">
+              <i class="fa fw dlt-c8y-icon-help-outline text-primary"></i>
+            </button>
+          </th>
+          <th>
+            App EUI<button class="btn-help" popover="64 bits hex number that uniquely identifies the application.
+            Will be randomly generated if not provided." placement="right" type="button">
+              <i class="fa fw dlt-c8y-icon-help-outline text-primary"></i>
+            </button>
+          </th>
+          <th>
+            App Key<button class="btn-help" popover="128 bits hex number used to encrypt communication. Will be
+              randomly generated if not provided." placement="right" type="button">
+              <i class="fa fw dlt-c8y-icon-help-outline text-primary"></i>
+            </button>
+          </th>
+          <th>Codec</th>
+          <th>Model</th>
+          <ng-container *ngIf="properties">
+            <th *ngFor="let property of properties">
+              {{ property.label }}
+            </th>
+          </ng-container>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pdevice of pdevices; let index = index">
+          <td>
+            <c8y-form-group class="form-group-sm" [hasError]="
+                deviceName.invalid && (deviceName.dirty || deviceName.touched)
+              ">
+              <input class="form-control" required #deviceName="ngModel" name="deviceName"
+                [(ngModel)]="pdevice.deviceName" (paste)="onPaste($event, index)"
+                (statusChanges)="alert(deviceName.control.status)" />
+              <c8y-messages *ngIf="
+                  deviceName.invalid && (deviceName.dirty || deviceName.touched)
+                ">
+                <c8y-message name="required" *ngIf="deviceName.errors?.required">The device name is required
+                </c8y-message>
+              </c8y-messages>
+            </c8y-form-group>
+          </td>
+          <td>
+            <c8y-form-group class="form-group-sm" [hasError]="devEUI.invalid && (devEUI.dirty || devEUI.touched)">
+              <input required pattern="[a-fA-F0-9]{16}" #devEUI="ngModel" name="devEUI" [(ngModel)]="pdevice.devEUI"
+                class="form-control" maxlength="16" aria-describedby="devEUI-help" placeholder="0011223344556677"
+                (paste)="onPaste($event, index)" />
+              <c8y-messages *ngIf=" devEUI.invalid && (devEUI.dirty || devEUI.touched)">
+                <c8y-message name="required" *ngIf="devEUI.errors?.required">The device EUI is required
+                </c8y-message>
+                <c8y-message name="pattern" *ngIf="devEUI.errors?.pattern">The device EUI should contain exactly 8
+                  bytes
+                  in hex
+                  format</c8y-message>
+              </c8y-messages>
+            </c8y-form-group>
+          </td>
+          <td>
+            <c8y-form-group class="form-group-sm">
+              <input class="form-control" #appEUI="ngModel" name="appEUI" [(ngModel)]="pdevice.appEUI" maxlength="16"
+                (paste)="onPaste($event, index)" />
+            </c8y-form-group>
+          </td>
+          <td>
+            <c8y-form-group class="form-group-sm">
+              <input class="form-control" #appKey="ngModel" name="appKey" [(ngModel)]="pdevice.appKey"
+                aria-describedby="appKey" maxlength="32" (paste)="onPaste($event, index)" />
+            </c8y-form-group>
+          </td>
+          <td>
+            <c8y-form-group class="form-group-sm" [hasError]="codec.invalid && (codec.dirty || codec.touched)">
+              <select class="form-control" #codec="ngModel" name="codec" [(ngModel)]="pdevice.codec"
+                (change)="loadModels(codec.value)" required>
+                <option [ngValue]="undefined" [disabled]="true">
+                  Please select a codec
+                </option>
+                <option *ngFor="let codec of codecService.codecs"
+                  [value]="codec.lora_codec_DeviceCodecRepresentation.id">
+                  {{ codec.lora_codec_DeviceCodecRepresentation.name }}
+                </option>
+              </select>
+              <c8y-messages *ngIf="codec.invalid && (codec.dirty || codec.touched)">
+                <c8y-message name="required" *ngIf="codec.errors?.required">The device codec is required
+                </c8y-message>
+              </c8y-messages>
+            </c8y-form-group>
+          </td>
+          <td>
+            <c8y-form-group class="form-group-sm">
+              <select class="form-control" #model="ngModel" name="model" [(ngModel)]="pdevice.model">
+                <option [ngValue]="undefined" [disabled]="true">
+                  Please select a model
+                </option>
+                <option *ngFor="let model of models[pdevice.codec] | keyvalue" [value]="model.key">
+                  {{ model.value }}
+                </option>
+              </select>
+            </c8y-form-group>
+          </td>
+          <ng-container *ngIf="properties">
+            <td *ngFor="let property of properties">
+              <c8y-form-group class="form-group-sm">
+                <property-editor [(inputValue)]="pdevice[property.name]" [property]="property"
+                  [displayLabel]="false"></property-editor>
+              </c8y-form-group>
+            </td>
+          </ng-container>
+          <td class="text-right">
+            <button class="btn-dot text-primary" type="button" [attr.aria-label]="'Add'" [adaptivePosition]="false"
+              tooltip="Add" [delay]="350" (click)="insertLine(index)">
+              <i class="dlt-c8y-icon-plus-circle"></i>
+            </button>
+            <button *ngIf="index > 0" type="button" class="btn btn-dot btn-dot--danger" tooltip="Remove"
+              [attr.aria-label]="'Remove'" [delay]="350" (click)="pdevices.splice(index, 1)">
+              <i c8yIcon="minus-circle"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer">
+    <div class="form-group">
+      <button type="button" (click)="provisionDevices()" [disabled]="!validateProvisioning()" class="btn btn-primary">
+        Add device(s)
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="split-scroll">
+  <c8y-data-grid [title]="'Devices' | translate" class="scroll-column" [columns]="columns" [pagination]="pagination"
+    [selectable]="true" [actionControls]="actionControls" [bulkActionControls]="bulkActionControls"
+    [serverSideDataCallback]="serverSideDataCallback">
+    <c8y-column name="deveui">
+      <ng-container *c8yCellRendererDef="let context">
+        <a [routerLink]="['/device', context.value]">{{
+          devEUIs[context.value]
+          }}</a>
+      </ng-container>
+    </c8y-column>
+    <c8y-column name="codec">
+      <ng-container *c8yCellRendererDef="let context">
+        {{
+        codecService.codecMap[context.value] &&
+        codecService.codecMap[context.value].name
+        }}
+      </ng-container>
+    </c8y-column>
+    <c8y-column name="lnstype">
+      <ng-container *c8yCellRendererDef="let context">
+        {{
+        lnsService.instanceMap[context.value] &&
+        lnsService.proxyMap[
+        lnsService.instanceMap[context.value].lnsType
+        ] &&
+        lnsService.proxyMap[lnsService.instanceMap[context.value].lnsType]
+        .name
+        }}
+      </ng-container>
+    </c8y-column>
+    <c8y-column name="lnsname">
+      <ng-container *c8yCellRendererDef="let context">
+        {{
+        lnsService.instanceMap[context.value] &&
+        lnsService.instanceMap[context.value].name
+        }}
+      </ng-container>
+    </c8y-column>
+  </c8y-data-grid>
+</div>
+
+<ng-template #deleteDeviceModal>
+  <div class="modal-header">
+    <h4 id="dialog-name" class="modal-title pull-left">
+      Confirm device deletion
+    </h4>
+  </div>
+  <div class="modal-body">
+    Device will be removed from inventory<br />
+    <div class="form-group">
+      <label class="c8y-checkbox"><input type="checkbox" #deprovision /><span></span>Deprovision device
+        from LoRa network server</label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" (click)="endDelete(deprovision.checked)">
+      Confirm
+    </button>
+    <button class="btn btn-primary" (click)="deleteDeviceModalRef.hide()">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #deleteDevicesModal>
+  <div class="modal-header">
+    <h4 id="dialog-name" class="modal-title pull-left">
+      Confirm devices deletion
+    </h4>
+  </div>
+  <div class="modal-body">
+    Devices will be removed from inventory<br />
+    <div class="form-group">
+      <label class="c8y-checkbox"><input type="checkbox" #deprovision /><span></span>Deprovision devices
+        from LoRa network server</label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" (click)="endDeleteAll(deprovision.checked)">
+      Confirm
+    </button>
+    <button class="btn btn-primary" (click)="deleteDevicesModalRef.hide()">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #changeDeviceTypeModal>
+  <div class="modal-header">
+    <h4 id="dialog-name" class="modal-title pull-left">Change device type</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label class="form-control">Type new device type</label>
+      <input #changeType required />
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" (click)="endChangeDeviceType(changeType.value)">
+      Confirm
+    </button>
+    <button class="btn btn-primary" (click)="changeDeviceTypeModalRef.hide()">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #changeDevicesTypeModal>
+  <div class="modal-header">
+    <h4 id="dialog-name" class="modal-title pull-left">Change devices type</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label class="form-control">Type new devices type</label>
+      <input #changeType required />
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" (click)="endChangeDevicesType(changeType.value)">
+      Confirm
+    </button>
+    <button class="btn btn-primary" (click)="changeDevicesTypeModalRef.hide()">
+      Cancel
+    </button>
+  </div>
+</ng-template>

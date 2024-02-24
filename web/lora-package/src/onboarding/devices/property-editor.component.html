@@ -1,0 +1,37 @@
+<c8y-form-group *ngIf="property.type === 'STRING' || property.type === 'TEXT'">
+  <label *ngIf="displayLabel" for="{{ property.name }}">{{ property.label }}:</label>
+  <input class="form-control" [(ngModel)]="inputValue" name="{{ property.name }}" #{{property.name}}="ngModel" ngModel
+    [required]="property.required" (change)="change()" />
+</c8y-form-group>
+<c8y-form-group *ngIf="property.type === 'PASSWORD'">
+  <label *ngIf="displayLabel" for="{{ property.name }}">{{ property.label }}:</label>
+  <input class="form-control" type="password" [(ngModel)]="inputValue" name="{{ property.name }}"
+    #{{property.name}}="ngModel" ngModel [required]="property.required" (change)="change()" />
+</c8y-form-group>
+<c8y-form-group *ngIf="property.type === 'NUMBER'">
+  <label *ngIf="displayLabel" for="{{ property.name }}">{{ property.label }}:</label>
+  <input class="form-control" type="number" step="0.1" [(ngModel)]="inputValue" name="{{ property.name }}"
+    #{{property.name}}="ngModel" ngModel [required]="property.required" (change)="change()" />
+</c8y-form-group>
+<c8y-form-group *ngIf="property.type === 'INTEGER'">
+  <label *ngIf="displayLabel" for="{{ property.name }}">{{ property.label }}:</label>
+  <input class="form-control" type="number" [(ngModel)]="inputValue" name="{{ property.name }}"
+    #{{property.name}}="ngModel" ngModel [required]="property.required" (change)="change()" />
+</c8y-form-group>
+<c8y-form-group *ngIf="property.type === 'BOOLEAN'">
+  <label *ngIf="displayLabel" class="c8y-checkbox"><input type="checkbox" [(ngModel)]="inputValue"
+      name="{{ property.name }}" #{{property.name}}="ngModel" ngModel (change)="change()" /><span></span>{{
+    property.label }}</label>
+</c8y-form-group>
+<c8y-form-group *ngIf="property.type === 'LIST'">
+  <label *ngIf="displayLabel" for="{{ property.name }}">{{ property.label }}:</label>
+  <select [(ngModel)]="inputValue" class="form-control" name="{{ property.name }}" #{{property.name}}="ngModel" ngModel
+    [required]="property.required" (change)="change()">
+    <option [ngValue]="undefined" [disabled]="true">
+      Please select {{ property.name }}
+    </option>
+    <option *ngFor="let v of property.values" [value]="v.id">
+      {{ v.name }}
+    </option>
+  </select>
+</c8y-form-group>
