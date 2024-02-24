@@ -154,7 +154,7 @@ jobs:
               owner, repo,
               release_id: process.env.RELEASE_ID,
               name: 'sag-ps-iot-pkg-lora-package.zip',
-              data: await fs.readFile('web/1016/lora-package/dist/apps/sag-ps-iot-pkg-lora-package/sag-ps-iot-pkg-lora-package.zip')
+              data: await fs.readFile('web/lora-package/dist/apps/sag-ps-iot-pkg-lora-package/sag-ps-iot-pkg-lora-package.zip')
             });
   clean_up_if_failure:
     runs-on: ubuntu-latest
