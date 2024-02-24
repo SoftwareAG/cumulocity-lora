@@ -322,22 +322,6 @@ export class LoraDevicesComponent {
     return result;
   }
 
-  addDeviceFromForm() {
-    this.addDevice(
-      this.provisionDevice.deviceName,
-      this.provisionDevice.devEUI,
-      this.provisionDevice.appEUI,
-      this.provisionDevice.appKey,
-      this.provisionDevice.type,
-      this.provisionDevice.codec,
-      this.provisionDevice.model,
-      this.provisionDevice.instanceSelect,
-      this.provisionDevice.useGatewayPosition,
-      this.deviceProvisioningAdditionalProperties
-    );
-  }
-
-  // Add a managedObject (as device) to the database.
   async addDevice(
     name: string,
     devEUI: string,

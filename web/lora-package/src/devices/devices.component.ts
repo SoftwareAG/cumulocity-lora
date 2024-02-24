@@ -362,6 +362,7 @@ export class DevicesComponent implements OnInit {
           model: this.device.c8y_Hardware.model,
           name: this.device.name,
           type: this.device.type,
+          useGatewayPosition: this.device.useGatewayPosition,
         },
         this.selectedLnsConnectorId,
         this.deviceProvisioningAdditionalProperties
