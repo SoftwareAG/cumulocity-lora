@@ -1,19 +1,13 @@
 import { Injectable } from "@angular/core";
 import {
-  IManagedObject,
-  InventoryService,
-  IdentityService,
   FetchClient,
+  IManagedObject,
+  IdentityService,
+  InventoryService,
 } from "@c8y/client";
 import { AlertService } from "@c8y/ngx-components";
-import { DeviceProvisioning } from "./DeviceProvisioning";
 import { DeviceAdditionalProperty } from "./DeviceAdditionalProperty";
-
-export class LNSResponse {
-  ok: boolean;
-  result: any;
-  message: string;
-}
+import { DeviceProvisioning } from "./DeviceProvisioning";
 
 @Injectable({
   providedIn: "root",
@@ -89,48 +83,43 @@ export class LnsService {
       additionalProperties: additionalProperties,
     });
     let lnsInstance: IManagedObject = this.instanceMap[instance];
-    let response: LNSResponse = await (
-      await this.client.fetch(
-        "service/lora-ns-" + lnsInstance.lnsType + "/" + instance + "/devices",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...deviceProvisioning,
-            provisioningMode: "OTAA",
-            additionalProperties: additionalProperties,
-          }),
-        }
-      )
-    ).json();
+    let response = await this.client.fetch(
+      "service/lora-ns-" + lnsInstance.lnsType + "/" + instance + "/devices",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...deviceProvisioning,
+          provisioningMode: "OTAA",
+          additionalProperties: additionalProperties,
+        }),
+      }
+    );
     console.log(response);
     if (!response.ok) {
-      this.alertService.danger(
-        "Can't provision device " + deviceProvisioning.name,
-        response.message
-      );
+      let error = await response.json();
+      this.alertService.danger(error.message, error.detailedMessage);
     }
   }
 
   async deprovisionDevice(device: Partial<IManagedObject>) {
-    let response: LNSResponse = await (
-      await this.client.fetch(
-        "service/lora-ns-" +
-          this.instanceMap[device.lnsConnectorId].lnsType +
-          "/" +
-          device.lnsConnectorId +
-          "/devices/" +
-          (await this.getDevEUI(device)),
-        {
-          method: "DELETE",
-        }
-      )
-    ).json();
+    let response = await this.client.fetch(
+      "service/lora-ns-" +
+        this.instanceMap[device.lnsConnectorId].lnsType +
+        "/" +
+        device.lnsConnectorId +
+        "/devices/" +
+        (await this.getDevEUI(device)),
+      {
+        method: "DELETE",
+      }
+    );
     console.log(response);
     if (!response.ok) {
-      this.alertService.danger("Can't deprovision device " + device.id);
+      let error = await response.json();
+      this.alertService.danger(error.message, error.detailedMessage);
     }
   }
 
@@ -199,46 +188,41 @@ export class LnsService {
       additionalProperties: additionalProperties,
     });
     let lnsInstance: IManagedObject = this.instanceMap[instance];
-    let response: LNSResponse = await (
-      await this.client.fetch(
-        "service/lora-ns-" + lnsInstance.lnsType + "/" + instance + "/gateways",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...gatewayProvisioning,
-            additionalProperties: additionalProperties,
-          }),
-        }
-      )
-    ).json();
+    let response = await this.client.fetch(
+      "service/lora-ns-" + lnsInstance.lnsType + "/" + instance + "/gateways",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...gatewayProvisioning,
+          additionalProperties: additionalProperties,
+        }),
+      }
+    );
     console.log(response);
     if (!response.ok) {
-      this.alertService.danger(
-        "Can't provision gateway " + gatewayProvisioning.name,
-        response.message
-      );
+      let error = await response.json();
+      this.alertService.danger(error.message, error.detailedMessage);
     }
   }
 
   async deprovisionGateway(gateway: Partial<IManagedObject>) {
-    let response: LNSResponse = await (
-      await this.client.fetch(
-        "service/lora-ns-" +
-          this.instanceMap[gateway.lnsConnectorId].lnsType +
-          "/" +
-          gateway.lnsConnectorId +
-          "/gateways/" +
-          (await this.getGWId(gateway)),
-        {
-          method: "DELETE",
-        }
-      )
-    ).json();
+    let response = await this.client.fetch(
+      "service/lora-ns-" +
+        this.instanceMap[gateway.lnsConnectorId].lnsType +
+        "/" +
+        gateway.lnsConnectorId +
+        "/gateways/" +
+        (await this.getGWId(gateway)),
+      {
+        method: "DELETE",
+      }
+    );
     if (!response.ok) {
-      this.alertService.danger("Can't deprovision gateway " + gateway.id);
+      let error = await response.json();
+      this.alertService.danger(error.message, error.detailedMessage);
     }
   }
 }

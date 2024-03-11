@@ -18,29 +18,29 @@ public interface LNSConnector {
 
 	boolean hasGatewayManagementCapability();
 
-	LNSResponse<List<EndDevice>> getDevices();
+	List<EndDevice> getDevices();
 
 	void setProperties(Properties properties);
 
 	Properties getProperties();
 
-	LNSResponse<EndDevice> getDevice(String devEui);
+	EndDevice getDevice(String devEui);
 
-	LNSResponse<String> sendDownlink(DownlinkData downlinkData);
+	String sendDownlink(DownlinkData downlinkData);
 
-	LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning);
+	void provisionDevice(DeviceProvisioning deviceProvisioning);
 
-	LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password);
+	void configureRoutings(String url, String tenant, String login, String password);
 
-	LNSResponse<Void> removeRoutings();
+	void removeRoutings();
 
-	LNSResponse<Void> deprovisionDevice(String deveui);
+	void deprovisionDevice(String deveui);
 
-	LNSResponse<List<Gateway>> getGateways();
+	List<Gateway> getGateways();
 
 	Properties mergeProperties(Properties properties);
 
-	LNSResponse<Void> provisionGateway(GatewayProvisioning gatewayProvisioning);
+	void provisionGateway(GatewayProvisioning gatewayProvisioning);
 
-	LNSResponse<Void> deprovisionGateway(String id);
+	void deprovisionGateway(String id);
 }

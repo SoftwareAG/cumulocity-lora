@@ -22,16 +22,16 @@
 			<artifactId>device-capability-model</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>retrofit</artifactId>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>converter-jackson</artifactId>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-jackson</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>logging-interceptor</artifactId>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-slf4j</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
@@ -59,7 +59,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.24</version>
+							<version>RELEASE</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>

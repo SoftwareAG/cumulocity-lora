@@ -2,24 +2,29 @@ package lora.ns.connector;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.google.common.collect.Maps;
 
-@Component
-public class LNSConnectorManager {
+import lombok.RequiredArgsConstructor;
+import lora.ns.exception.ConnectorDoesNotExistException;
+
+@Service
+@RequiredArgsConstructor
+public class LNSConnectorService {
 
 	private Map<String, Map<String, LNSConnector>> connectors = new HashMap<>();
 
-	@Autowired
-	private MicroserviceSubscriptionsService subscriptionsService;
+	private final MicroserviceSubscriptionsService subscriptionsService;
 
-	public Optional<LNSConnector> getConnector(String lnsConnectorId) {
-		return Optional.ofNullable(getConnectors().get(lnsConnectorId));
+	public LNSConnector getConnector(String lnsConnectorId) {
+		var lnsConnector = getConnectors().get(lnsConnectorId);
+		if (lnsConnector == null) {
+			throw new ConnectorDoesNotExistException(lnsConnectorId);
+		}
+		return lnsConnector;
 	}
 
 	public void removeConnector(String lnsConnectorId) {

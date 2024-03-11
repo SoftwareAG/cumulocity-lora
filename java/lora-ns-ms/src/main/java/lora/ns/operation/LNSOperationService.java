@@ -2,13 +2,9 @@ package lora.ns.operation;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.idtype.GId;
@@ -19,46 +15,41 @@ import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 
 import c8y.Command;
+import lombok.RequiredArgsConstructor;
 import lora.codec.downlink.DownlinkData;
 import lora.codec.ms.CodecManager;
-import lora.ns.connector.LNSConnector;
-import lora.ns.connector.LNSConnectorManager;
-import lora.ns.connector.LNSResponse;
-import lora.ns.device.LNSDeviceManager;
+import lora.ns.connector.LNSConnectorService;
+import lora.ns.device.LNSDeviceService;
 import lora.ns.integration.LNSIntegrationService;
+import lora.rest.LoraContextService;
 
-@Component
-public class LNSOperationManager {
-
-	final Logger logger = LoggerFactory.getLogger(getClass());
+@Service
+@RequiredArgsConstructor
+public class LNSOperationService {
 
 	private static final String DOWNLINKS = "downlinks";
 
-	@Autowired
-	private InventoryApi inventoryApi;
+	private final InventoryApi inventoryApi;
 
-	@Autowired
-	protected DeviceControlApi deviceControlApi;
+	private final DeviceControlApi deviceControlApi;
 
-	@Autowired
-	private MicroserviceSubscriptionsService subscriptionsService;
+	private final MicroserviceSubscriptionsService subscriptionsService;
 
-	@Autowired
-	private CodecManager codecManager;
+	private final CodecManager codecManager;
 
-	@Autowired
-	private LNSDeviceManager lnsDeviceManager;
+	private final LNSDeviceService lnsDeviceManager;
 
-	@Autowired
-	private LNSConnectorManager lnsConnectorManager;
+	private final LNSConnectorService lnsConnectorManager;
 
-	private Map<String, Map<String, Map<String, OperationRepresentation>>> operations = new HashMap<>();
+	private final LoraContextService loraContextService;
+
+	private final Map<String, Map<String, Map<String, OperationRepresentation>>> operations = new HashMap<>();
 
 	@Async
 	public void executePending(OperationRepresentation operation) {
-		logger.info("Will execute operation {}", operation.toJSON());
+		loraContextService.log("Will execute operation {}", operation.toJSON());
 		if (lnsDeviceManager.getDeviceEui(operation.getDeviceId()) != null) {
-			logger.info("Processing operation {}", operation);
+			loraContextService.log("Processing operation {}", operation);
 			DownlinkData encodedData = codecManager.encode(lnsDeviceManager.getDeviceEui(operation.getDeviceId()),
 					operation);
 			if (encodedData != null && encodedData.getFport() != null && encodedData.getPayload() != null
@@ -86,48 +77,25 @@ public class LNSOperationManager {
 			}
 			deviceControlApi.update(operation);
 		} else {
-			logger.info("Operation {} will be ignored", operation);
+			loraContextService.log("Operation {} will be ignored", operation);
 		}
 	}
 
 	public void processOperation(String lnsConnectorId, DownlinkData operation, OperationRepresentation c8yOperation) {
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		if (connector.isPresent()) {
-			try {
-				LNSResponse<String> lnsResponse = connector.get().sendDownlink(operation);
-				if (lnsResponse.isOk()) {
-					String commandId = lnsResponse.getResult();
-					if (commandId != null) {
-						storeOperation(lnsConnectorId, c8yOperation, commandId);
-					} else {
-						logger.warn("Operation {} status won't be updated as no correlation Id was sent by LNS.",
-								operation);
-					}
-				} else {
-					logger.error("Unable to send downlink: {}", lnsResponse.getMessage());
-					c8yOperation.setStatus(OperationStatus.FAILED.toString());
-					c8yOperation.setFailureReason(lnsResponse.getMessage());
-					Command command = c8yOperation.get(Command.class);
-					command.setResult("Unable to send downlink: " + lnsResponse.getMessage());
-					c8yOperation.set(command);
-					deviceControlApi.update(c8yOperation);
-				}
-			} catch (Exception e) {
-				logger.error("Unable to send downlink", e);
-				c8yOperation.setStatus(OperationStatus.FAILED.toString());
-				Command command = c8yOperation.get(Command.class);
-				command.setResult("Unable to send downlink: " + e.getMessage());
-				c8yOperation.set(command);
-				deviceControlApi.update(c8yOperation);
+		try {
+			String commandId = lnsConnectorManager.getConnector(lnsConnectorId).sendDownlink(operation);
+			if (commandId != null) {
+				storeOperation(lnsConnectorId, c8yOperation, commandId);
+			} else {
+				loraContextService.log("Operation {} status won't be updated as no correlation Id was sent by LNS.",
+						operation);
 			}
-		} else {
-			logger.warn(
-					"Operation {} will be ignored for now as there is no connector with Id {} so we don't know where to send it. Next uplink should update the connector Id on the device and it will then be possible to succesfully send this operation.",
-					operation, lnsConnectorId);
-			c8yOperation.setStatus(OperationStatus.PENDING.toString());
+		} catch (Exception e) {
+			loraContextService.log("Unable to send downlink", e);
+			c8yOperation.setStatus(OperationStatus.FAILED.toString());
+			c8yOperation.setFailureReason(e.getMessage());
 			Command command = c8yOperation.get(Command.class);
-			command.setResult(
-					"Unable to send downlink as device is not properly configured with an existing connector. Next uplink from device might fix that and operation will be properly processed.");
+			command.setResult("Unable to send downlink: " + e.getMessage());
 			c8yOperation.set(command);
 			deviceControlApi.update(c8yOperation);
 		}
@@ -151,7 +119,7 @@ public class LNSOperationManager {
 						: null;
 
 		if (result == null) {
-			logger.info("Operation {} not in cache, fetching it from DB", commandId);
+			loraContextService.log("Operation {} not in cache, fetching it from DB", commandId);
 			result = retrieveOperationFromMO(lnsConnectorId, commandId);
 		}
 

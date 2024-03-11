@@ -6,6 +6,8 @@ module lora.ns.ms {
     requires transitive spring.security.web;
     requires transitive thymeleaf;
     requires transitive thymeleaf.spring5;
+    requires org.apache.tomcat.embed.core;
+    requires feign.core;
 
     exports lora.codec.ms;
     exports lora.ns.integration;

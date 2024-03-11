@@ -1,5 +1,6 @@
 package lora.ns.integration;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -59,16 +60,19 @@ import lora.common.C8YUtils;
 import lora.ns.DeviceData;
 import lora.ns.agent.AgentService;
 import lora.ns.connector.LNSConnector;
-import lora.ns.connector.LNSConnectorManager;
 import lora.ns.connector.LNSConnectorRepresentation;
+import lora.ns.connector.LNSConnectorService;
 import lora.ns.connector.LNSConnectorWizardStep;
-import lora.ns.connector.LNSResponse;
 import lora.ns.connector.PropertyDescription;
 import lora.ns.device.EndDevice;
-import lora.ns.device.LNSDeviceManager;
-import lora.ns.gateway.LNSGatewayManager;
-import lora.ns.operation.LNSOperationManager;
+import lora.ns.device.LNSDeviceService;
+import lora.ns.exception.CannotCreateRouteException;
+import lora.ns.exception.DownlinkProcessingException;
+import lora.ns.exception.UplinkProcessingException;
+import lora.ns.gateway.LNSGatewayService;
+import lora.ns.operation.LNSOperationService;
 import lora.ns.operation.OperationData;
+import lora.rest.LoraContextService;
 
 @EnableScheduling
 @Slf4j
@@ -104,22 +108,25 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	private TenantOptionApi tenantOptionApi;
 
 	@Autowired
-	private LNSDeviceManager lnsDeviceManager;
+	private LNSDeviceService lnsDeviceManager;
 
 	@Autowired
 	private AgentService agentService;
 
 	@Autowired
-	private LNSOperationManager lnsOperationManager;
+	private LNSOperationService lnsOperationManager;
 
 	@Autowired
-	private LNSConnectorManager lnsConnectorManager;
+	private LNSConnectorService lnsConnectorManager;
 
 	@Autowired
-	private LNSGatewayManager lnsGatewayManager;
+	private LNSGatewayService lnsGatewayManager;
 
 	@Autowired
 	protected SpringTemplateEngine mMessageTemplateEngine;
+
+	@Autowired
+	protected LoraContextService loraContextService;
 
 	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<>();
 
@@ -135,16 +142,16 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 
 	public abstract String getVersion();
 
-	public abstract DeviceData processUplinkEvent(String eventString);
+	public abstract DeviceData processUplinkEvent(String eventString) throws IOException;
 
-	public abstract OperationData processDownlinkEvent(String eventString);
+	public abstract OperationData processDownlinkEvent(String eventString) throws IOException;
 
 	public abstract boolean isOperationUpdate(String eventString);
 
 	public String getSimulatedPayload(Map<String, Object> fields) {
 		final Context context = new Context();
 		context.setVariables(fields);
-		log.info(context.toString());
+		loraContextService.log(context.toString());
 		return mMessageTemplateEngine.process("payload.json", context);
 	}
 
@@ -199,7 +206,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	private EventApi eventApi;
 
 	public void mapEventToC8Y(String eventString, String lnsInstanceId) {
-		log.info("Following message was received from the LNS: {}", eventString);
+		loraContextService.log("Following message was received from the LNS: {}", eventString);
 		EventRepresentation event = new EventRepresentation();
 		ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
 		mor.setId(GId.asGId(lnsInstanceId));
@@ -216,68 +223,68 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		} else {
 			event.setType("raw LNS up event");
 			event.setText("raw LNS up event");
-			DeviceData data = processUplinkEvent(eventString);
-			if (data != null) {
-				Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
-				if (connector.isPresent()) {
+			try {
+				DeviceData data = processUplinkEvent(eventString);
+				if (data != null) {
 					lnsDeviceManager.upsertDevice(lnsInstanceId, data);
 				}
+			} catch (Exception e) {
+				throw new UplinkProcessingException("Could not process uplink " + event, e);
 			}
 		}
 		eventApi.create(event);
 	}
 
 	public void updateOperation(String event, String lnsInstanceId) {
-		log.info("LNS instance {} of type {} is known", lnsInstanceId, getType());
-		OperationData data = processDownlinkEvent(event);
-		if (data.getStatus() != OperationStatus.FAILED) {
-			OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
-					data.getCommandId());
-			if (operation != null) {
-				operation.setStatus(data.getStatus().toString());
-				deviceControlApi.update(operation);
-				if (data.getStatus() == OperationStatus.SUCCESSFUL) {
-					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
-				}
-			} else {
-				log.error("Unknown operation {} from LNS", data.getCommandId());
-			}
-		} else {
-			if (data.getCommandId() != null) {
+		try {
+			OperationData data = processDownlinkEvent(event);
+			if (data.getStatus() != OperationStatus.FAILED) {
 				OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
 						data.getCommandId());
 				if (operation != null) {
-					operation.setStatus(OperationStatus.FAILED.toString());
-					operation.setFailureReason(data.getErrorMessage());
+					operation.setStatus(data.getStatus().toString());
 					deviceControlApi.update(operation);
-					lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
+					if (data.getStatus() == OperationStatus.SUCCESSFUL) {
+						lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
+					}
+				} else {
+					loraContextService.log("Unknown operation {} from LNS", data.getCommandId());
 				}
 			} else {
-				log.error("Unknown operation");
+				if (data.getCommandId() != null) {
+					OperationRepresentation operation = lnsOperationManager.retrieveOperation(lnsInstanceId,
+							data.getCommandId());
+					if (operation != null) {
+						operation.setStatus(OperationStatus.FAILED.toString());
+						operation.setFailureReason(data.getErrorMessage());
+						deviceControlApi.update(operation);
+						lnsOperationManager.removeOperation(lnsInstanceId, data.getCommandId());
+					}
+				} else {
+					loraContextService.log("Unknown operation");
+				}
 			}
+		} catch (Exception e) {
+			throw new DownlinkProcessingException("Could not process downlink update " + event, e);
 		}
 	}
 
-	public LNSResponse<List<EndDevice>> getDevices(String lnsInstanceId) {
-		LNSResponse<List<EndDevice>> result = new LNSResponse<>("No connector found with id " + lnsInstanceId, false,
-				null);
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
-		if (connector.isPresent()) {
-			result = connector.get().getDevices();
-		}
-		return result;
+	public List<EndDevice> getDevices(String lnsInstanceId) {
+		return lnsConnectorManager.getConnector(lnsInstanceId).getDevices();
 	}
 
 	private void configureRoutings(String lnsInstanceId, MicroserviceCredentials credentials) {
 		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getType() + "/"
 				+ lnsInstanceId;
-		log.info("Connector URL is {}", url);
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsInstanceId);
-		if (connector.isPresent()) {
-			connector.get().removeRoutings();
-			connector.get().configureRoutings(url, subscriptionsService.getTenant(),
+		loraContextService.log("Connector URL is {}", url);
+		var connector = lnsConnectorManager.getConnector(lnsInstanceId);
+		try {
+			connector.removeRoutings();
+			connector.configureRoutings(url, subscriptionsService.getTenant(),
 					credentials.getUsername(),
 					credentials.getPassword());
+		} catch (Exception e) {
+			throw new CannotCreateRouteException("Cannot create route for url " + url, e);
 		}
 	}
 
@@ -322,35 +329,27 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	public void removeLnsConnector(String lnsConnectorId) {
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		if (connector.isPresent()) {
-			connector.get().removeRoutings();
-			inventoryApi.delete(new GId(lnsConnectorId));
-			lnsConnectorManager.removeConnector(lnsConnectorId);
-			AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
-			beanFactory.destroyBean(beanFactory.getBean("connector-" + lnsConnectorId));
-		}
+		lnsConnectorManager.getConnector(lnsConnectorId).removeRoutings();
+		inventoryApi.delete(new GId(lnsConnectorId));
+		lnsConnectorManager.removeConnector(lnsConnectorId);
+		AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
+		beanFactory.destroyBean(beanFactory.getBean("connector-" + lnsConnectorId));
 	}
 
 	public void updateLnsConnector(String lnsConnectorId, Properties properties) {
-		Optional<LNSConnector> connector = lnsConnectorManager.getConnector(lnsConnectorId);
-		if (connector.isPresent()) {
-			LNSConnector c = connector.get();
-			c.setProperties(c.mergeProperties(properties));
-			c.getProperties().forEach((k, v) -> {
-				OptionRepresentation option = new OptionRepresentation();
-				option.setCategory(lnsConnectorId);
-				if (isPropertyEncrypted(k.toString())) {
-					option.setKey("credentials." + k.toString());
-				} else {
-					option.setKey(k.toString());
-				}
-				option.setValue(v.toString());
-				tenantOptionApi.save(option);
-			});
-		} else {
-			log.error("No valid LNS Connector Id given: {}", lnsConnectorId);
-		}
+		var c = lnsConnectorManager.getConnector(lnsConnectorId);
+		c.setProperties(c.mergeProperties(properties));
+		c.getProperties().forEach((k, v) -> {
+			OptionRepresentation option = new OptionRepresentation();
+			option.setCategory(lnsConnectorId);
+			if (isPropertyEncrypted(k.toString())) {
+				option.setKey("credentials." + k.toString());
+			} else {
+				option.setKey(k.toString());
+			}
+			option.setValue(v.toString());
+			tenantOptionApi.save(option);
+		});
 	}
 
 	private boolean isPropertyEncrypted(String key) {
@@ -372,7 +371,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			if (connectors != null) {
 				connectors.values().forEach(c -> {
 					if (c.hasGatewayManagementCapability()) {
-						log.info("Scanning gateways in tenant {} with connector {}",
+						loraContextService.log("Scanning gateways in tenant {} with connector {}",
 								subscriptionsService.getTenant(),
 								c.getName());
 						lnsGatewayManager.upsertGateways(c);
@@ -387,7 +386,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		subscriptionsService.runForEachTenant(() -> {
 			String currentTenant = subscriptionsService.getTenant();
 			lnsConnectorManager.getConnectors().values().forEach(connector -> {
-				log.info("Checking pending operations in tenant {} for connector {}", subscriptionsService.getTenant(),
+				log.info("Checking pending operations in tenant {} for connector {}",
+						subscriptionsService.getTenant(),
 						connector.getName());
 				OperationCollection oc = deviceControlApi.getOperationsByFilter(new OperationFilter()
 						.byStatus(OperationStatus.PENDING).byAgent(connector.getId()));
@@ -397,7 +397,7 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 									&& !opCollectionRepresentation.getOperations()
 											.isEmpty(); opCollectionRepresentation = oc
 													.getNextPage(opCollectionRepresentation)) {
-						log.info("Processing pending operations on tenant {} - page {}", currentTenant,
+						loraContextService.log("Processing pending operations on tenant {} - page {}", currentTenant,
 								oc.get().getPageStatistics().getCurrentPage());
 						for (OperationRepresentation op : opCollectionRepresentation.getOperations()) {
 							lnsOperationManager.executePending(op);

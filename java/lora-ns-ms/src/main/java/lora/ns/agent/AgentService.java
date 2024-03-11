@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.Agent;
 import com.cumulocity.model.idtype.GId;
@@ -17,39 +21,32 @@ import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.notification.Subscription;
 import com.cumulocity.sdk.client.notification.SubscriptionListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import c8y.IsDevice;
 import c8y.RequiredAvailability;
+import lombok.RequiredArgsConstructor;
 import lora.common.C8YUtils;
 import lora.ns.connector.LNSConnector;
 import lora.ns.integration.LNSIntegrationService;
-import lora.ns.operation.LNSOperationManager;
+import lora.ns.operation.LNSOperationService;
 
 @Service
+@RequiredArgsConstructor
 public class AgentService {
+	private static final String GATEWAY_SCAN_START_DELAY = "gatewayScanStartDelay";
+	private static final String GATEWAY_SCAN_RATE = "gatewayScanRate";
 	protected Logger logger = LoggerFactory.getLogger(AgentService.class);
-	@Autowired
-	private C8YUtils c8yUtils;
-	@Autowired
-	private InventoryApi inventoryApi;
-	@Autowired
-	private IdentityApi identityApi;
-	@Autowired
-	private DeviceControlApi deviceControlApi;
-	@Autowired
-	private MicroserviceSubscriptionsService subscriptionsService;
-	@Autowired
-	private LNSOperationManager lnsOperationManager;
+	private final C8YUtils c8yUtils;
+	private final InventoryApi inventoryApi;
+	private final IdentityApi identityApi;
+	private final DeviceControlApi deviceControlApi;
+	private final MicroserviceSubscriptionsService subscriptionsService;
+	private final LNSOperationService lnsOperationManager;
 
-	private Map<String, ManagedObjectRepresentation> agents = new HashMap<>();
-
+	private final Map<String, ManagedObjectRepresentation> agents = new HashMap<>();
 
 	public void registerAgent(LNSIntegrationService<? extends LNSConnector> lnsIntegrationService) {
-		Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(lnsIntegrationService.getType(), LNSIntegrationService.LNS_EXT_ID);
+		Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(lnsIntegrationService.getType(),
+				LNSIntegrationService.LNS_EXT_ID);
 		ManagedObjectRepresentation agent = null;
 		if (!extId.isPresent()) {
 			agent = new ManagedObjectRepresentation();
@@ -81,24 +78,27 @@ public class AgentService {
 				agent.set(new IsDevice());
 			}
 			inventoryApi.update(agent);
-			if (agent.hasProperty("gatewayScanRate")) {
-				lnsIntegrationService.setGatewayScanRate(Integer.valueOf(agent.getProperty("gatewayScanRate").toString()));
+			if (agent.hasProperty(GATEWAY_SCAN_RATE)) {
+				lnsIntegrationService
+						.setGatewayScanRate(Integer.valueOf(agent.getProperty(GATEWAY_SCAN_RATE).toString()));
 			}
-			if (agent.hasProperty("gatewayScanStartDelay")) {
-				lnsIntegrationService.setGatewayScanStartDelay(Integer.valueOf(agent.getProperty("gatewayScanStartDelay").toString()));
+			if (agent.hasProperty(GATEWAY_SCAN_START_DELAY)) {
+				lnsIntegrationService.setGatewayScanStartDelay(
+						Integer.valueOf(agent.getProperty(GATEWAY_SCAN_START_DELAY).toString()));
 			}
 		}
 		agents.put(subscriptionsService.getTenant(), agent);
-		// We don't want the event listener to crash just because we can't subscribe to operation
+		// We don't want the event listener to crash just because we can't subscribe to
+		// operation
 		// (we're polling them anyway)
 		try {
 			deviceControlApi.getNotificationsSubscriber().subscribe(agent.getId(),
 					new OperationDispatcherSubscriptionListener(subscriptionsService.getTenant()));
-		} catch(Exception e) {
+		} catch (Exception e) {
 			logger.error("Can't subscribe to operation", e);
 		}
 	}
-	
+
 	public ManagedObjectRepresentation getAgent() {
 		return agents.get(subscriptionsService.getTenant());
 	}
@@ -106,14 +106,14 @@ public class AgentService {
 	public void setGatewayScanRate(Integer gatewayScanRate) {
 		ManagedObjectRepresentation agent = new ManagedObjectRepresentation();
 		agent.setId(getAgent().getId());
-		agent.setProperty("gatewayScanRate", gatewayScanRate);
+		agent.setProperty(GATEWAY_SCAN_RATE, gatewayScanRate);
 		inventoryApi.update(agent);
 	}
 
 	public void setGatewayScanStartDelay(Integer gatewayScanStartDelay) {
 		ManagedObjectRepresentation agent = new ManagedObjectRepresentation();
 		agent.setId(getAgent().getId());
-		agent.setProperty("gatewayScanStartDelay", gatewayScanStartDelay);
+		agent.setProperty(GATEWAY_SCAN_START_DELAY, gatewayScanStartDelay);
 		inventoryApi.update(agent);
 	}
 

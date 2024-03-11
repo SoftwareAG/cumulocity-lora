@@ -1,20 +1,25 @@
 package lora.ns.generic;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import lombok.extern.slf4j.Slf4j;
+import com.cumulocity.model.idtype.GId;
+import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.cumulocity.rest.representation.operation.OperationRepresentation;
+import com.cumulocity.sdk.client.devicecontrol.DeviceControlApi;
+
+import c8y.Command;
 import lora.codec.downlink.DownlinkData;
 import lora.ns.connector.LNSAbstractConnector;
-import lora.ns.connector.LNSResponse;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
 import lora.ns.gateway.GatewayProvisioning;
 
-@Slf4j
 public class GenericConnector extends LNSAbstractConnector {
 
 	public GenericConnector(Properties properties) {
@@ -25,59 +30,70 @@ public class GenericConnector extends LNSAbstractConnector {
 		super(instance);
 	}
 
+	@Autowired
+	private DeviceControlApi deviceControlApi;
+
 	@Override
 	protected void init() {
 		// Configure LNS API access here
 	}
 
 	@Override
-	public LNSResponse<List<EndDevice>> getDevices() {
-		return new LNSResponse<List<EndDevice>>().withOk(false).withMessage("Not implemented.");
+	public List<EndDevice> getDevices() {
+		return new ArrayList<>();
 	}
 
 	@Override
-	public LNSResponse<EndDevice> getDevice(String devEui) {
-		return new LNSResponse<EndDevice>().withOk(false).withMessage("Not implemented.");
+	public EndDevice getDevice(String devEui) {
+		return null;
 	}
 
 	@Override
-	public LNSResponse<String> sendDownlink(DownlinkData operation) {
-		return new LNSResponse<String>().withOk(false).withMessage("Not implemented.");
+	public String sendDownlink(DownlinkData operation) {
+		return null;
 	}
 
 	@Override
-	public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
-		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	public void provisionDevice(DeviceProvisioning deviceProvisioning) {
+		OperationRepresentation op = new OperationRepresentation();
+		op.setDeviceId(GId.asGId(this.getId()));
+		op.set(new Command("{'provision':{'deveui':'" + deviceProvisioning.getDevEUI() + "', 'appeui': '"
+				+ deviceProvisioning.getAppEUI() + "', 'appkey': '" + deviceProvisioning.getAppKey()
+				+ "'}}"));
+		deviceControlApi.create(op);
 	}
 
 	@Override
-	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
-		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	public void configureRoutings(String url, String tenant, String login, String password) {
+		throw new NotImplementedException();
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings() {
-		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	public void removeRoutings() {
+		throw new NotImplementedException();
 	}
 
 	@Override
-	public LNSResponse<Void> deprovisionDevice(String deveui) {
-		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	public void deprovisionDevice(String deveui) {
+		OperationRepresentation op = new OperationRepresentation();
+		op.setDeviceId(GId.asGId(this.getId()));
+		op.set(new Command("{'deprovision':{'deveui':'" + deveui + "'}}"));
+		deviceControlApi.create(op);
 	}
 
 	@Override
-	public LNSResponse<List<Gateway>> getGateways() {
-		return new LNSResponse<List<Gateway>>().withOk(false).withMessage("Not implemented.");
+	public List<Gateway> getGateways() {
+		return new ArrayList<>();
 	}
 
 	@Override
-	public LNSResponse<Void> provisionGateway(GatewayProvisioning gatewayProvisioning) {
-		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	public void provisionGateway(GatewayProvisioning gatewayProvisioning) {
+		throw new NotImplementedException();
 	}
 
 	@Override
-	public LNSResponse<Void> deprovisionGateway(String id) {
-		return new LNSResponse<Void>().withOk(false).withMessage("Not implemented.");
+	public void deprovisionGateway(String id) {
+		throw new NotImplementedException();
 	}
 
 	public boolean hasGatewayManagementCapability() {
