@@ -3,7 +3,6 @@ package lora.codec.ms;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -31,8 +30,7 @@ public class CodecProxy implements Component {
 	 */
 	private static final String SERVICE_LORA_CODEC = "/service/lora-codec-";
 
-	@Value("${C8Y.baseURL}")
-	private String c8yBaseUrl;
+	private static final String C8Y_BASEURL = "C8Y_BASEURL";
 
 	private String id;
 	private String name;
@@ -71,7 +69,7 @@ public class CodecProxy implements Component {
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 			headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
 			ResponseEntity<Result<DownlinkData>> response = restTemplate.exchange(
-					c8yBaseUrl + SERVICE_LORA_CODEC + id + "/encode", HttpMethod.POST,
+					System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/encode", HttpMethod.POST,
 					new HttpEntity<Encode>(data, headers), new ParameterizedTypeReference<Result<DownlinkData>>() {
 					});
 			log.info("Answer of encoder is {} with content {}", response.getStatusCode(), response.getBody());
@@ -103,7 +101,7 @@ public class CodecProxy implements Component {
 			headers.set(HttpHeaders.AUTHORIZATION, authentication);
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 			ResponseEntity<Result<String>> response = restTemplate.exchange(
-					c8yBaseUrl + SERVICE_LORA_CODEC + id + "/decode", HttpMethod.POST,
+					System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/decode", HttpMethod.POST,
 					new HttpEntity<Decode>(data, headers), new ParameterizedTypeReference<Result<String>>() {
 					});
 			result = response.getBody();
@@ -131,14 +129,12 @@ public class CodecProxy implements Component {
 			HttpHeaders headers = new HttpHeaders();
 			headers.set(HttpHeaders.AUTHORIZATION, authentication);
 			headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-			String url = c8yBaseUrl + SERVICE_LORA_CODEC + id + "/operations/" + model;
+			String url = System.getenv(C8Y_BASEURL) + SERVICE_LORA_CODEC + id + "/operations/" + model;
 			log.info("Will get list of operations from URL {}", url);
 			ResponseEntity<Map<String, DeviceOperationElement>> response = restTemplate.exchange(url, HttpMethod.GET,
 					new HttpEntity<String>("", headers),
 					new ParameterizedTypeReference<Map<String, DeviceOperationElement>>() {
 					});
-			// log.info("Answer of decoder is {} with content {}", response.getStatusCode(),
-			// response.getBody());
 			result = response.getBody();
 		} catch (RestClientResponseException e) {
 			e.printStackTrace();
