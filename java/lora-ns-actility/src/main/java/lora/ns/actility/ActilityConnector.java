@@ -1,20 +1,28 @@
 package lora.ns.actility;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 
 import org.joda.time.DateTime;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import c8y.ConnectionState;
+import feign.Feign;
+import feign.Logger.Level;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
+import feign.slf4j.Slf4jLogger;
 import lombok.extern.slf4j.Slf4j;
 import lora.codec.downlink.DownlinkData;
 import lora.codec.uplink.C8YData;
@@ -34,20 +42,12 @@ import lora.ns.actility.rest.model.DownlinkMessage;
 import lora.ns.actility.rest.model.MessageSecurityParams;
 import lora.ns.actility.rest.model.RFRegion;
 import lora.ns.actility.rest.model.Route;
-import lora.ns.actility.rest.model.Token;
 import lora.ns.connector.LNSAbstractConnector;
-import lora.ns.connector.LNSResponse;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.DeviceProvisioning.ProvisioningMode;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
 import lora.ns.gateway.GatewayProvisioning;
-import okhttp3.OkHttpClient;
-import okhttp3.ResponseBody;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 @Slf4j
 public class ActilityConnector extends LNSAbstractConnector {
@@ -58,6 +58,10 @@ public class ActilityConnector extends LNSAbstractConnector {
 	private String downlinkAsKey = "4e0ff46472fa1840f25368c066e94769";
 	private String routeRef;
 
+	private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JodaModule())
+					.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+					.configure(SerializationFeature.INDENT_OUTPUT, true).setSerializationInclusion(Include.NON_NULL);
+
 	class DXAdminJWTInterceptor extends JwtInterceptor {
 
 		public DXAdminJWTInterceptor(String clientId, String clientSecret) {
@@ -66,20 +70,9 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 		@Override
 		protected String getToken() {
-			String token = null;
-			try {
-				Response<Token> response;
-				response = actilityAdminService.getToken("client_credentials", this.clientId, this.clientSecret)
-						.execute();
-				if (response.isSuccessful() && response.body() != null) {
-					token = response.body().getAccessToken();
-					log.info("Successfully received a JWT: {}", token);
-				} else {
-					log.error("Can't obtain a JWT with the following reponse: {}", response.errorBody().string());
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			String token = actilityAdminService.getToken("client_credentials", this.clientId, this.clientSecret)
+							.getAccessToken();
+			log.info("Successfully received a JWT: {}", token);
 			return token;
 		}
 	}
@@ -94,79 +87,57 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	protected void init() {
-		HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-		interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-		OkHttpClient dxClient = new OkHttpClient.Builder().addInterceptor(
-				new DXAdminJWTInterceptor(properties.getProperty("username"), properties.getProperty("password")))
-				.addInterceptor(interceptor)
-				.build();
+		final ch.qos.logback.classic.Logger serviceLogger = (ch.qos.logback.classic.Logger) LoggerFactory
+						.getLogger("lora.ns.actility");
+		serviceLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+		var feignBuilder = Feign.builder().decoder(new JacksonDecoder(objectMapper))
+						.encoder(new JacksonEncoder(objectMapper)).logger(new Slf4jLogger("lora.ns.actility"))
+						.logLevel(Level.FULL)
+						.requestInterceptor(template -> template.header("X-API-KEY", properties.getProperty("apikey")));
 
 		String url = properties.getProperty("url");
-
-		OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-
-		Retrofit core = new Retrofit.Builder().client(dxClient)
-				.baseUrl(url + "/thingpark/dx/core/latest/api/")
-				.addConverterFactory(JacksonConverterFactory.create()).build();
-		Retrofit admin = new Retrofit.Builder().baseUrl(url + "/iot-flow/v1/")
-				.client(client).addConverterFactory(JacksonConverterFactory.create()).build();
-		actilityCoreService = core.create(ActilityCoreService.class);
-		actilityAdminService = admin.create(ActilityAdminService.class);
+		actilityCoreService = feignBuilder
+						.requestInterceptor(new DXAdminJWTInterceptor(properties.getProperty("username"),
+										properties.getProperty("password")))
+						.target(ActilityCoreService.class, url + "/thingpark/dx/core/latest/api/");
+		actilityAdminService = feignBuilder.target(ActilityAdminService.class, url + "/iot-flow/v1/");
 	}
 
 	@Override
-	public LNSResponse<List<EndDevice>> getDevices() {
-		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true)
-				.withResult(new ArrayList<EndDevice>());
-
-		return result;
+	public List<EndDevice> getDevices() {
+		return List.of();
 	}
 
 	@Override
-	public LNSResponse<EndDevice> getDevice(String devEui) {
-		LNSResponse<EndDevice> result = new LNSResponse<>();
-		try {
-			Response<List<DeviceCreate>> devs = actilityCoreService.getDeviceByEUI(devEui).execute();
-			if (devs.isSuccessful() && !devs.body().isEmpty()) {
-				DeviceCreate dev = devs.body().get(0);
-				log.info("Device {} is named {}", devEui, dev.getName());
-				result.withOk(true).withResult(new EndDevice(devEui, dev.getName(), null));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
+	public EndDevice getDevice(String devEui) {
+		var result = new EndDevice(devEui, devEui, "A");
+		var devs = actilityCoreService.getDeviceByEUI(devEui);
+		if (!devs.isEmpty()) {
+			DeviceCreate dev = devs.get(0);
+			log.info("Device {} is named {}", devEui, dev.getName());
+			result = new EndDevice(devEui, dev.getName(), null);
 		}
 		return result;
 	}
 
 	@Override
-	public LNSResponse<String> sendDownlink(DownlinkData operation) {
-		LNSResponse<String> result = new LNSResponse<>();
-		Random r = new Random(DateTime.now().getMillis());
-		int downlinkCounter = r.nextInt();
+	public String sendDownlink(DownlinkData operation) {
 		log.info("Will send {} to Thingpark.", operation.toString());
-		try {
-			DownlinkMessage message = new DownlinkMessage();
-			message.setPayloadHex(operation.getPayload());
-			message.setTargetPorts(operation.getFport().toString());
-			MessageSecurityParams securityParams = new MessageSecurityParams();
-			securityParams.setAsId("cumulocity");
-			securityParams.setAsKey(downlinkAsKey);
-			message.setSecurityParams(securityParams);
-			Response<DownlinkMessage> response = actilityCoreService.sendDownlink(operation.getDevEui(), message)
-					.execute();
-			log.info("Response from Thingpark was {}", response.code());
-			result.withOk(true).withResult(String.valueOf(downlinkCounter));
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
-		}
-		return result;
+		String correlationId = String.valueOf(DateTime.now().getMillis());
+		DownlinkMessage message = new DownlinkMessage();
+		message.setPayloadHex(operation.getPayload());
+		message.setTargetPorts(operation.getFport().toString());
+		MessageSecurityParams securityParams = new MessageSecurityParams();
+		securityParams.setAsId("cumulocity");
+		securityParams.setAsKey(downlinkAsKey);
+		message.setSecurityParams(securityParams);
+		message.setCorrelationID(correlationId);
+		DownlinkMessage response = actilityCoreService.sendDownlink(operation.getDevEui(), message);
+		return response.getCorrelationID();
 	}
 
 	@Override
-	public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
+	public void provisionDevice(DeviceProvisioning deviceProvisioning) {
 		DeviceCreate device = new DeviceCreate();
 		device.setEUI(deviceProvisioning.getDevEUI());
 		device.setName(deviceProvisioning.getName());
@@ -181,314 +152,172 @@ public class ActilityConnector extends LNSAbstractConnector {
 			device.setActivationType("ABP");
 		}
 
-		try {
-			Response<DeviceCreate> response = actilityCoreService.createDevice(device).execute();
-			if (!response.isSuccessful()) {
-				result.withOk(false).withMessage(response.errorBody().string());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
-		}
-		return result;
+		actilityCoreService.createDevice(device);
 	}
 
 	@Override
-	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
+	public void configureRoutings(String url, String tenant, String login, String password) {
 		log.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
 		String connectionId = null;
 
-		try {
-			for (Route route : actilityCoreService.getRoutes().execute().body()) {
-				if (route.getName().equals(tenant + "-" + getId())) {
-					routeRef = route.getRef();
-				}
+		for (Route route : actilityCoreService.getRoutes()) {
+			if (route.getName().equals(tenant + "-" + getId())) {
+				routeRef = route.getRef();
 			}
-			for (Connection c : actilityCoreService.getConnections().execute().body()) {
-				if (c.getName().equals(tenant + "-" + getId())) {
-					connectionId = c.getId();
-				}
+		}
+		for (Connection c : actilityCoreService.getConnections()) {
+			if (c.getName().equals(tenant + "-" + getId())) {
+				connectionId = c.getId();
 			}
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			return result.withOk(false).withMessage(e1.getMessage());
 		}
 		ConnectionRequest connectionRequest = new ConnectionRequest();
 		ConnectionHttpConfig configuration = new ConnectionHttpConfig();
 		configuration.setDestinationURL(url + "/uplink");
-		configuration.getHeaders().put("Authorization",
-				"Basic " + Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
+		configuration.getHeaders().put("Authorization", "Basic "
+						+ Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
 		configuration.setDownlinkAsId("cumulocity");
 		configuration.setDownlinkAsKey(downlinkAsKey);
 		connectionRequest.setConfiguration(configuration);
 		connectionRequest.setName(tenant + "-" + this.getId());
 
 		if (routeRef == null) {
-			try {
-				Response<Connection> response = actilityCoreService.createConnection(connectionRequest).execute();
-				if (response.isSuccessful()) {
-					for (Route route : actilityCoreService.getRoutes().execute().body()) {
-						if (route.getName().equals(tenant + "-" + this.getId())) {
-							routeRef = route.getRef();
-						}
-					}
+			actilityCoreService.createConnection(connectionRequest);
+			for (Route route : actilityCoreService.getRoutes()) {
+				if (route.getName().equals(tenant + "-" + this.getId())) {
+					routeRef = route.getRef();
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				return result.withOk(false).withMessage(e.getMessage());
 			}
 		} else {
-			try {
-				actilityCoreService.updateConnection(connectionId, connectionRequest).execute();
-			} catch (Exception e) {
-				e.printStackTrace();
-				return result.withOk(false).withMessage(e.getMessage());
-			}
+			actilityCoreService.updateConnection(connectionId, connectionRequest);
 		}
-		try {
-			Response<List<DeviceCreate>> response = actilityCoreService.getDevices().execute();
-			if (response.isSuccessful()) {
-				response.body().forEach(d -> {
-					if (!d.getRouteRefs().contains(routeRef)) {
-						d.getRouteRefs().add(routeRef);
-						try {
-							actilityCoreService.updateDevice(d.getRef(), d).execute();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
-			} else {
-				log.error("Error while retrieving the list of devices: {}", response.errorBody().string());
-				result.withOk(false).withMessage(response.errorBody().string());
+		List<DeviceCreate> response = actilityCoreService.getDevices();
+		response.forEach(d -> {
+			if (!d.getRouteRefs().contains(routeRef)) {
+				d.getRouteRefs().add(routeRef);
+				try {
+					actilityCoreService.updateDevice(d.getRef(), d);
+				} catch (Exception e) {
+					log.error("Couldn't update device", e);
+				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
-		}
-
-		return result;
+		});
 	}
 
 	@Autowired
 	private MicroserviceSubscriptionsService subscriptionsService;
 
 	@Override
-	public LNSResponse<Void> removeRoutings() {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
-		try {
-			Response<List<DeviceCreate>> response = actilityCoreService.getDevices().execute();
-			if (response.isSuccessful()) {
-				response.body().forEach(d -> {
-					if (d.getRouteRefs().contains(routeRef)) {
-						d.getRouteRefs().remove(routeRef);
-						try {
-							actilityCoreService.updateDevice(d.getRef(), d).execute();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
+	public void removeRoutings() {
+		var devices = actilityCoreService.getDevices();
+		devices.forEach(d -> {
+			if (d.getRouteRefs().contains(routeRef)) {
+				d.getRouteRefs().remove(routeRef);
+				try {
+					actilityCoreService.updateDevice(d.getRef(), d);
+				} catch (Exception e) {
+					log.error("Couldn't update device {}", d.getRef(), e);
+				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return result.withOk(false).withMessage(e.getMessage());
-		}
-		try {
-			Response<List<Connection>> response = actilityCoreService.getConnections().execute();
-			if (response.isSuccessful()) {
-				response.body().forEach(connection -> {
-					log.info("Found Connection {}", connection.getName());
-					if (connection.getName().equals(subscriptionsService.getTenant() + "-" + this.getId())) {
-						try {
-							actilityCoreService.deleteConnection(connection.getId()).execute();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
+		});
+		var connections = actilityCoreService.getConnections();
+		connections.forEach(connection -> {
+			log.info("Found Connection {}", connection.getName());
+			if (connection.getName().equals(subscriptionsService.getTenant() + "-" + this.getId())) {
+				actilityCoreService.deleteConnection(connection.getId());
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return result.withOk(false).withMessage(e.getMessage());
-		}
-		return result;
+		});
 	}
 
 	@Override
-	public LNSResponse<Void> deprovisionDevice(String deveui) {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
-		try {
-			Response<List<DeviceCreate>> devs = actilityCoreService.getDeviceByEUI(deveui).execute();
-			if (devs.isSuccessful() && !devs.body().isEmpty()) {
-				Response<ResponseBody> r = actilityCoreService.deleteDevice(devs.body().get(0).getRef()).execute();
-				if (!r.isSuccessful()) {
-					result.withOk(false).withMessage(r.message());
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return result.withOk(false).withMessage(e.getMessage());
+	public void deprovisionDevice(String deveui) {
+		var devs = actilityCoreService.getDeviceByEUI(deveui);
+		if (!devs.isEmpty()) {
+			actilityCoreService.deleteDevice(devs.get(0).getRef());
 		}
-		return result;
 	}
 
 	@Override
-	public LNSResponse<List<Gateway>> getGateways() {
-		LNSResponse<List<Gateway>> result = new LNSResponse<List<Gateway>>().withOk(true).withResult(new ArrayList<>());
-
-		try {
-			Response<List<BaseStation>> response = actilityCoreService.getBaseStations().execute();
-			if (response.isSuccessful()) {
-				for (BaseStation baseStation : response.body()) {
-					Response<BaseStation> r = actilityCoreService.getBaseStation(baseStation.getRef()).execute();
-					if (r.isSuccessful()) {
-						baseStation = r.body();
-						Gateway g = new Gateway();
-						g.setGwEUI(baseStation.getUuid());
-						if (baseStation.getSMN() != null) {
-							g.setSerial(baseStation.getSMN());
-						}
-						g.setName(baseStation.getName());
-						if (baseStation.getGeoLatitude() != null) {
-							g.setLat(BigDecimal.valueOf(baseStation.getGeoLatitude()));
-						}
-						if (baseStation.getGeoLongitude() != null) {
-							g.setLng(BigDecimal.valueOf(baseStation.getGeoLongitude()));
-						}
-						if (baseStation.getStatistics() != null) {
-							C8YData data = new C8YData();
-							if (baseStation.getStatistics().getConnectionState() == ConnectionStateEnum.CNX
-									&& baseStation.getStatistics().getHealthState() == HealthStateEnum.ACTIVE) {
-								g.setStatus(ConnectionState.AVAILABLE);
-							} else {
-								g.setStatus(ConnectionState.UNAVAILABLE);
-							}
-							if (baseStation.getStatistics().getTemperature() != null) {
-								data.addMeasurement(null, "Temperature", "T", "°C",
-										BigDecimal.valueOf(baseStation.getStatistics().getTemperature()),
-										new DateTime());
-							}
-							if (baseStation.getStatistics().getCpUUsage() != null) {
-								data.addMeasurement(null, "CPU", "Usage", "%",
-										BigDecimal.valueOf(baseStation.getStatistics().getCpUUsage()), new DateTime());
-							}
-							if (baseStation.getStatistics().getRaMUsage() != null) {
-								data.addMeasurement(null, "RAM", "Usage", "%",
-										BigDecimal.valueOf(baseStation.getStatistics().getRaMUsage()), new DateTime());
-							}
-							if (baseStation.getStatistics().getBatteryLevel() != null) {
-								data.addMeasurement(null, "Battery", "level", "%",
-										BigDecimal.valueOf(baseStation.getStatistics().getBatteryLevel()),
-										new DateTime());
-							}
-							g.setData(data);
-						}
-						result.getResult().add(g);
-					}
-				}
-			} else {
-				log.error("Error while retrieving the list of gateways: {}", response.errorBody().string());
-				result.withOk(false).withMessage(response.errorBody().string());
+	public List<Gateway> getGateways() {
+		List<Gateway> result = new ArrayList<>();
+		var baseStations = actilityCoreService.getBaseStations();
+		for (BaseStation b : baseStations) {
+			var baseStation = actilityCoreService.getBaseStation(b.getRef());
+			Gateway g = new Gateway();
+			g.setGwEUI(baseStation.getUuid());
+			if (baseStation.getSMN() != null) {
+				g.setSerial(baseStation.getSMN());
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
+			g.setName(baseStation.getName());
+			if (baseStation.getGeoLatitude() != null) {
+				g.setLat(BigDecimal.valueOf(baseStation.getGeoLatitude()));
+			}
+			if (baseStation.getGeoLongitude() != null) {
+				g.setLng(BigDecimal.valueOf(baseStation.getGeoLongitude()));
+			}
+			if (baseStation.getStatistics() != null) {
+				C8YData data = new C8YData();
+				if (baseStation.getStatistics().getConnectionState() == ConnectionStateEnum.CNX
+								&& baseStation.getStatistics().getHealthState() == HealthStateEnum.ACTIVE) {
+					g.setStatus(ConnectionState.AVAILABLE);
+				} else {
+					g.setStatus(ConnectionState.UNAVAILABLE);
+				}
+				if (baseStation.getStatistics().getTemperature() != null) {
+					data.addMeasurement(null, "Temperature", "T", "°C",
+									BigDecimal.valueOf(baseStation.getStatistics().getTemperature()), new DateTime());
+				}
+				if (baseStation.getStatistics().getCpUUsage() != null) {
+					data.addMeasurement(null, "CPU", "Usage", "%",
+									BigDecimal.valueOf(baseStation.getStatistics().getCpUUsage()), new DateTime());
+				}
+				if (baseStation.getStatistics().getRaMUsage() != null) {
+					data.addMeasurement(null, "RAM", "Usage", "%",
+									BigDecimal.valueOf(baseStation.getStatistics().getRaMUsage()), new DateTime());
+				}
+				if (baseStation.getStatistics().getBatteryLevel() != null) {
+					data.addMeasurement(null, "Battery", "level", "%",
+									BigDecimal.valueOf(baseStation.getStatistics().getBatteryLevel()), new DateTime());
+				}
+				g.setData(data);
+			}
+			result.add(g);
 		}
 
 		return result;
 	}
 
 	public List<DeviceProfile> getDeviceProfiles() {
-		List<DeviceProfile> result = null;
-		try {
-			Response<List<DeviceProfile>> response = actilityCoreService.getDeviceProfiles().execute();
-			if (response.isSuccessful()) {
-				result = response.body();
-			} else {
-				log.error("Error while retrieving the list of device profiles: {}", response.errorBody().string());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+		return actilityCoreService.getDeviceProfiles();
 	}
 
-	public LNSResponse<Void> provisionGateway(GatewayProvisioning gatewayProvisioning) {
+	public void provisionGateway(GatewayProvisioning gatewayProvisioning) {
 		BaseStation baseStation = new BaseStation();
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
-
-		try {
-			baseStation.setName(gatewayProvisioning.getName());
-			baseStation.setUuid(gatewayProvisioning.getGwEUI());
-			baseStation.setSMN(gatewayProvisioning.getAdditionalProperties().getProperty("SMN"));
-			if (gatewayProvisioning.getLat() != null) {
-				baseStation.setGeoLatitude(gatewayProvisioning.getLat().floatValue());
-			}
-			if (gatewayProvisioning.getLng() != null) {
-				baseStation.setGeoLongitude(gatewayProvisioning.getLng().floatValue());
-			}
-			baseStation.setBaseStationProfileId(
-					gatewayProvisioning.getAdditionalProperties().getProperty("gatewayProfile"));
-			baseStation.setRfRegionId(gatewayProvisioning.getAdditionalProperties().getProperty("rfRegion"));
-			Response<BaseStation> response = actilityCoreService.createBaseStation(baseStation).execute();
-			if (!response.isSuccessful()) {
-				result.withOk(false).withMessage(response.errorBody().string());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
+		baseStation.setName(gatewayProvisioning.getName());
+		baseStation.setUuid(gatewayProvisioning.getGwEUI());
+		baseStation.setSMN(gatewayProvisioning.getAdditionalProperties().getProperty("SMN"));
+		baseStation.setPublicKey(gatewayProvisioning.getAdditionalProperties().getProperty("publicKey"));
+		if (gatewayProvisioning.getLat() != null) {
+			baseStation.setGeoLatitude(gatewayProvisioning.getLat().floatValue());
 		}
-
-		return result;
+		if (gatewayProvisioning.getLng() != null) {
+			baseStation.setGeoLongitude(gatewayProvisioning.getLng().floatValue());
+		}
+		baseStation.setBaseStationProfileId(
+						gatewayProvisioning.getAdditionalProperties().getProperty("gatewayProfile"));
+		baseStation.setRfRegionId(gatewayProvisioning.getAdditionalProperties().getProperty("rfRegion"));
+		actilityCoreService.createBaseStation(baseStation);
 	}
 
-	public LNSResponse<Void> deprovisionGateway(String id) {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
-
-		try {
-			Response<ResponseBody> response = actilityCoreService.deleteBaseStation(id).execute();
-			if (!response.isSuccessful()) {
-				result.withOk(false).withMessage(response.errorBody().string());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
-		}
-
-		return result;
+	public void deprovisionGateway(String id) {
+		actilityCoreService.deleteBaseStation(id);
 	}
 
 	public List<BaseStationProfile> getBaseStationProfiles() {
-		List<BaseStationProfile> result = null;
-		try {
-			Response<List<BaseStationProfile>> response = actilityCoreService.getBaseStationProfiles().execute();
-			if (response.isSuccessful()) {
-				result = response.body();
-			} else {
-				log.error("Error while retrieving the list of base station profiles: {}",
-						response.errorBody().string());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+		return actilityCoreService.getBaseStationProfiles();
 	}
 
 	public List<RFRegion> getRFRegions() {
-		List<RFRegion> result = null;
-		try {
-			Response<List<RFRegion>> response = actilityCoreService.getRFRegions().execute();
-			if (response.isSuccessful()) {
-				result = response.body();
-			} else {
-				log.error("Error while retrieving the list of RF regions: {}", response.errorBody().string());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+		return actilityCoreService.getRFRegions();
 	}
 
 	public boolean hasGatewayManagementCapability() {

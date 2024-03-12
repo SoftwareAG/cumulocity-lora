@@ -1,81 +1,53 @@
 package lora.ns.objenious;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
 
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import c8y.ConnectionState;
+import feign.Feign;
+import feign.Logger.Level;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
+import feign.slf4j.Slf4jLogger;
 import lora.codec.downlink.DownlinkData;
 import lora.codec.uplink.C8YData;
 import lora.ns.connector.LNSAbstractConnector;
-import lora.ns.connector.LNSResponse;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.EndDevice;
 import lora.ns.gateway.Gateway;
-import lora.ns.objenious.rest.Device;
 import lora.ns.objenious.rest.DeviceCreate;
 import lora.ns.objenious.rest.DownlinkCreate;
 import lora.ns.objenious.rest.DownlinkCreate.ValidUntilEnum;
 import lora.ns.objenious.rest.DownlinkCreateProtocolData;
-import lora.ns.objenious.rest.DownlinkResponse;
 import lora.ns.objenious.rest.Group;
 import lora.ns.objenious.rest.Headers;
-import lora.ns.objenious.rest.ObjectDeleted;
 import lora.ns.objenious.rest.ObjeniousService;
 import lora.ns.objenious.rest.Profile;
 import lora.ns.objenious.rest.RoutingHttp;
-import lora.ns.objenious.rest.ScenarioRouting;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate.FormatTypeEnum;
 import lora.ns.objenious.rest.ScenarioRoutingCreateUpdate.MessageTypeEnum;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class ObjeniousConnector extends LNSAbstractConnector {
 
 	private ObjeniousService objeniousService;
 
 	private final Logger logger = LoggerFactory.getLogger(ObjeniousConnector.class);
-
-	class APIKeyInterceptor implements Interceptor {
-
-		@Override
-		public Response intercept(Chain chain) throws IOException {
-			Request request = chain.request();
-
-			request = request.newBuilder().header("apikey", properties.getProperty("apikey"))
-					.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-					.header("Accept", MediaType.APPLICATION_JSON_VALUE).build();
-
-			Response response = chain.proceed(request);
-
-			logger.info("Response code from {} {}: {}", request.method(), request.url(), response.code());
-
-			if (!response.isSuccessful()) {
-				logger.error("Error message from Objenious: {}", response.message());
-				logger.error("Request was: {}", request);
-			}
-
-			return response;
-		}
-
-	}
 
 	public ObjeniousConnector(Properties properties) {
 		super(properties);
@@ -85,86 +57,45 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		super(instance);
 	}
 
+	private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JodaModule())
+					.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+					.configure(SerializationFeature.INDENT_OUTPUT, true).setSerializationInclusion(Include.NON_NULL);
+
 	@Override
 	protected void init() {
-		String host = properties.getProperty("proxy-host");
-		String port = properties.getProperty("proxy-port");
+		final ch.qos.logback.classic.Logger serviceLogger = (ch.qos.logback.classic.Logger) LoggerFactory
+						.getLogger("lora.ns.objenious");
+		serviceLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+		var feignBuilder = Feign.builder().decoder(new JacksonDecoder(objectMapper))
+						.encoder(new JacksonEncoder(objectMapper)).logger(new Slf4jLogger("lora.ns.objenious"))
+						.logLevel(Level.FULL)
+						.requestInterceptor(template -> template.headers(
+										Map.of("apikey", List.of(properties.getProperty("apikey")), "Content-Type",
+														List.of(properties.getProperty("application/json")), "Accept",
+														List.of(properties.getProperty("application/json")))));
 
-		if (host != null && !host.trim().isEmpty() && port != null && !port.trim().isEmpty()) {
-			System.setProperty("http.proxyHost", host);
-			System.setProperty("https.proxyHost", host);
-			System.setProperty("http.proxyPort", port);
-			System.setProperty("https.proxyPort", port);
-			System.setProperty("http.nonProxyHosts", "cumulocity");
-			System.setProperty("https.nonProxyHosts", "cumulocity");
-		}
-
-		OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new APIKeyInterceptor()).build();
-
-		Retrofit retrofit = new Retrofit.Builder().client(okHttpClient).baseUrl("https://api.objenious.com/v1/")
-				.addConverterFactory(JacksonConverterFactory.create()).build();
-		objeniousService = retrofit.create(ObjeniousService.class);
+		objeniousService = feignBuilder.target(ObjeniousService.class, "https://api.objenious.com/v1/");
 	}
 
 	@Override
-	public LNSResponse<List<EndDevice>> getDevices() {
-		LNSResponse<List<EndDevice>> result = new LNSResponse<List<EndDevice>>().withOk(true)
-				.withResult(new ArrayList<>());
-		try {
-			retrofit2.Response<List<Device>> response = objeniousService.getDevices().execute();
-			if (response.isSuccessful()) {
-				List<Device> devices = response.body();
-				if (devices != null) {
-					result.setResult(devices.stream()
-							.map(device -> new EndDevice(device.getProperties().getDeveui(), device.getLabel(), ""))
-							.collect(Collectors.toList()));
-				}
-			} else {
-				result.withOk(false).withMessage(response.errorBody().string());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
-		}
-
-		return result;
+	public List<EndDevice> getDevices() {
+		var devices = objeniousService.getDevices();
+		return devices.stream().map(device -> new EndDevice(device.getProperties().getDeveui(), device.getLabel(), ""))
+						.collect(Collectors.toList());
 	}
 
 	public Profile getProfile(int id) {
-		Profile result = null;
-
-		retrofit2.Response<Profile> response;
-		try {
-			response = objeniousService.getProfile(id).execute();
-			result = response.body();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return result;
+		return objeniousService.getProfile(id);
 	}
 
 	@Override
-	public LNSResponse<EndDevice> getDevice(String devEui) {
-		LNSResponse<EndDevice> result = new LNSResponse<EndDevice>().withOk(true);
-		try {
-			retrofit2.Response<Device> response = objeniousService.getDevice(devEui).execute();
-			if (response.isSuccessful()) {
-				Device device = response.body();
-				result.setResult(new EndDevice(devEui, device.getLabel(), "A"));
-			} else {
-				result.withOk(false).withMessage(response.errorBody().string());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
-		}
-		return result;
+	public EndDevice getDevice(String devEui) {
+		var device = objeniousService.getDevice(devEui);
+		return new EndDevice(devEui, device.getLabel(), "A");
 	}
 
 	@Override
-	public LNSResponse<String> sendDownlink(DownlinkData operation) {
-		LNSResponse<String> result = new LNSResponse<String>().withOk(true);
+	public String sendDownlink(DownlinkData operation) {
 		logger.info("Will send {} to Objenious.", operation.toString());
 		DownlinkCreateProtocolData protocolData = new DownlinkCreateProtocolData();
 		protocolData.setPort(operation.getFport());
@@ -174,92 +105,32 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		downlinkCreate.setValidUntil(ValidUntilEnum.NEXT_JOIN);
 		downlinkCreate.setConfirmed(true);
 
-		try {
-			retrofit2.Response<DownlinkResponse> response = objeniousService
-					.sendCommand(operation.getDevEui(), downlinkCreate).execute();
-			if (response.isSuccessful()) {
-				result.setResult(response.body().getCommandId().toString());
-			} else {
-				result.withOk(false).withMessage(response.errorBody().string());
-			}
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			result.withOk(false).withMessage(e1.getMessage());
-		}
-
-		return result;
+		return objeniousService.sendCommand(operation.getDevEui(), downlinkCreate).getCommandId().toString();
 	}
 
 	@Override
-	public LNSResponse<Void> provisionDevice(DeviceProvisioning deviceProvisioning) {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
-		Device device = null;
-		try {
-			device = objeniousService.getDevice(deviceProvisioning.getDevEUI()).execute().body();
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-		if (device == null) {
-			try {
-				DeviceCreate deviceCreate = new DeviceCreate();
-				deviceCreate.setLabel(deviceProvisioning.getName());
-				deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
-				deviceCreate.setAppeui(deviceProvisioning.getAppEUI());
-				deviceCreate.setAppkey(deviceProvisioning.getAppKey());
-				deviceCreate.setLat(deviceProvisioning.getLat());
-				deviceCreate.setLng(deviceProvisioning.getLng());
-				deviceCreate.setGroupId(Integer.parseInt(properties.getProperty("groupId")));
-				deviceCreate.setProfileId(
+	public void provisionDevice(DeviceProvisioning deviceProvisioning) {
+		DeviceCreate deviceCreate = new DeviceCreate();
+		deviceCreate.setLabel(deviceProvisioning.getName());
+		deviceCreate.setDeveui(deviceProvisioning.getDevEUI());
+		deviceCreate.setAppeui(deviceProvisioning.getAppEUI());
+		deviceCreate.setAppkey(deviceProvisioning.getAppKey());
+		deviceCreate.setLat(deviceProvisioning.getLat());
+		deviceCreate.setLng(deviceProvisioning.getLng());
+		deviceCreate.setGroupId(Integer.parseInt(properties.getProperty("groupId")));
+		deviceCreate.setProfileId(
 						Integer.valueOf(deviceProvisioning.getAdditionalProperties().getProperty("deviceProfile")));
-				retrofit2.Response<Device> response = objeniousService.createDevice(deviceCreate).execute();
-				if (!response.isSuccessful()) {
-					logger.error(response.errorBody().string());
-					result.withOk(false).withMessage(response.errorBody().string());
-				}
-			} catch (Exception e1) {
-				e1.printStackTrace();
-				result.withOk(false).withMessage(e1.getMessage());
-			}
-		} else {
-			if (!device.isEnabled()) {
-				try {
-					retrofit2.Response<Device> response = objeniousService
-							.reactivateDevice(deviceProvisioning.getDevEUI()).execute();
-					if (!response.isSuccessful()) {
-						logger.error(response.errorBody().string());
-						result.withOk(false).withMessage(response.errorBody().string());
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					result.withOk(false).withMessage(e.getMessage());
-				}
-			}
-		}
-		return result;
+		objeniousService.createDevice(deviceCreate);
 	}
 
-	public LNSResponse<Void> configureRouting(String url, String tenant, String login, String password, String name,
-			MessageTypeEnum messageType) {
-		assert objeniousService != null : "objeniousService is not initialized";
-
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(false);
-
-		/*
-		 * if (name.endsWith("downlink")) {
-		 * this.getProperty("downlinkRouteId")
-		 * .ifPresent(downlinkRoutingId -> removeRouting(downlinkRoutingId.toString()));
-		 * } else {
-		 * this.getProperty("uplinkRouteId").ifPresent(uplinkRoutingId ->
-		 * removeRouting(uplinkRoutingId.toString()));
-		 * }
-		 */
-
+	public void configureRouting(String url, String tenant, String login, String password, String name,
+					MessageTypeEnum messageType) {
 		RoutingHttp routingHttp = new RoutingHttp();
 		routingHttp.setUrl(url);
 		routingHttp.setMethod(RoutingHttp.MethodEnum.POST);
 		Headers headers = new Headers();
-		headers.put("Authorization",
-				"Basic " + Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
+		headers.put("Authorization", "Basic "
+						+ Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
 		routingHttp.setHeaders(headers);
 		ScenarioRoutingCreateUpdate scenarioRoutingCreateUpdate = new ScenarioRoutingCreateUpdate();
 		scenarioRoutingCreateUpdate.setHttp(routingHttp);
@@ -269,196 +140,99 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		scenarioRoutingCreateUpdate.setEnabled(true);
 		scenarioRoutingCreateUpdate.setGroupId(Integer.parseInt(properties.getProperty("groupId")));
 
-		try {
-			retrofit2.Response<ScenarioRouting> response = objeniousService
-					.createHttpRouting(scenarioRoutingCreateUpdate).execute();
-			if (!response.isSuccessful()) {
-				logger.error("Error from Objenious: {}", response.errorBody().string());
-				result.withOk(false).withMessage(response.errorBody().string());
-			} else {
-				if (name.endsWith("downlink")) {
-					this.setProperty("downlinkRouteId", response.body().getId());
-				} else {
-					this.setProperty("uplinkRouteId", response.body().getId());
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
+		var route = objeniousService.createHttpRouting(scenarioRoutingCreateUpdate);
+		if (name.endsWith("downlink")) {
+			this.setProperty("downlinkRouteId", route.getId());
+		} else {
+			this.setProperty("uplinkRouteId", route.getId());
 		}
-
-		return result;
 	}
 
 	@Override
-	public LNSResponse<Void> configureRoutings(String url, String tenant, String login, String password) {
+	public void configureRoutings(String url, String tenant, String login, String password) {
 		logger.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
 
-		try {
-			this.objeniousService.getRouting().execute().body().forEach(routing -> {
-				if (routing.getName().contains(tenant)) {
-					try {
-						this.objeniousService.deleteRouting(routing.getId()).execute();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+		this.objeniousService.getRouting().forEach(routing -> {
+			if (routing.getName().contains(tenant)) {
+				try {
+					this.objeniousService.deleteRouting(routing.getId());
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		LNSResponse<Void> result = new LNSResponse<>();
-		LNSResponse<Void> resultDownlink = configureRouting(url + "/downlink", tenant, login, password,
-				tenant + "-" + this.getId() + "-downlink",
-				MessageTypeEnum.DOWNLINK);
-		LNSResponse<Void> resultUplink = configureRouting(url + "/uplink", tenant, login, password,
-				tenant + "-" + this.getId() + "-uplink",
-				MessageTypeEnum.UPLINK);
-
-		result.setOk(resultDownlink.isOk() && resultUplink.isOk());
-		if (!result.isOk()) {
-			result.setMessage("");
-			if (!resultDownlink.isOk()) {
-				result.setMessage(resultDownlink.getMessage());
 			}
-			if (!resultUplink.isOk()) {
-				result.setMessage(result.getMessage() + "\n" + resultUplink.getMessage());
-			}
-		}
+		});
 
-		return result;
+		configureRouting(url + "/downlink", tenant, login, password, tenant + "-" + this.getId() + "-downlink",
+						MessageTypeEnum.DOWNLINK);
+		configureRouting(url + "/uplink", tenant, login, password, tenant + "-" + this.getId() + "-uplink",
+						MessageTypeEnum.UPLINK);
 	}
 
-	private LNSResponse<Void> removeRouting(String id) {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
-		try {
-			retrofit2.Response<ResponseBody> response = objeniousService.deleteRouting(Integer.parseInt(id)).execute();
-			if (!response.isSuccessful()) {
-				logger.error("Error from Objenious: {}", response.errorBody().string());
-				result.withOk(false).withMessage(response.errorBody().string());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
-		}
-		return result;
+	private void removeRouting(String id) {
+		objeniousService.deleteRouting(Integer.parseInt(id));
 	}
 
 	@Override
-	public LNSResponse<Void> removeRoutings() {
-		final LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
+	public void removeRoutings() {
 		Optional<Object> uplinkRouteId = getProperty("uplinkRouteId");
 		Optional<Object> downlinkRouteId = getProperty("downlinkRouteId");
 		uplinkRouteId.ifPresent(id -> {
-			var resultUplink = removeRouting(id.toString());
-			result.setOk(resultUplink.isOk());
-			result.setMessage(resultUplink.getMessage());
+			removeRouting(id.toString());
 		});
 		downlinkRouteId.ifPresent(id -> {
-			var resultDownlink = removeRouting(id.toString());
-			result.setOk(result.isOk() && resultDownlink.isOk());
-			if (!resultDownlink.isOk()) {
-				if (!result.isOk()) {
-					result.setMessage(result.getMessage() + "\n" + resultDownlink.getMessage());
-				} else {
-					result.setMessage(resultDownlink.getMessage());
-				}
-			}
+			removeRouting(id.toString());
 		});
-		return result;
 	}
 
 	public List<Group> getGroups() {
-		List<Group> result = new ArrayList<>();
-
-		try {
-			result = objeniousService.getGroups().execute().body();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return result;
+		return objeniousService.getGroups();
 	}
 
 	@Override
-	public LNSResponse<Void> deprovisionDevice(String deveui) {
-		LNSResponse<Void> result = new LNSResponse<Void>().withOk(true);
-		try {
-			retrofit2.Response<ObjectDeleted> response = objeniousService.deprovisionDevice(deveui).execute();
-			if (!response.isSuccessful()) {
-				result.withOk(false).withMessage(response.errorBody().string());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
-		}
-		return result;
+	public void deprovisionDevice(String deveui) {
+		objeniousService.deprovisionDevice(deveui);
 	}
 
 	@Override
-	public LNSResponse<List<Gateway>> getGateways() {
+	public List<Gateway> getGateways() {
 		logger.info("Getting list of gateways with connector {}...", this.getName());
-		LNSResponse<List<Gateway>> result = new LNSResponse<List<Gateway>>().withOk(true).withResult(new ArrayList<>());
-		try {
-			retrofit2.Response<List<lora.ns.objenious.rest.Gateway>> response = objeniousService.getGateways()
-					.execute();
-			if (response.isSuccessful()) {
-				if (response.body() != null) {
-					response.body().forEach(g -> {
-						logger.info("Got gateway {}", g.getGatewayName());
-						C8YData data = new C8YData();
-						ConnectionState state = ConnectionState.AVAILABLE;
-						switch (g.getStatus()) {
-							case ACTIVE:
-								state = ConnectionState.AVAILABLE;
-								break;
-							case ALERT:
-								state = ConnectionState.AVAILABLE;
-								break;
-							case INACTIVE:
-								state = ConnectionState.UNAVAILABLE;
-								break;
-							default:
-								break;
-						}
-						Gateway gateway = new Gateway(g.getGatewayId(), g.getSerialNumber(), g.getGatewayName(),
-								BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(),
-								state,
-								data);
-						result.getResult().add(gateway);
-					});
-				}
-			} else {
-				logger.error("Couldn't retrieve gateways with connector {}", this.getName());
-				result.withOk(false).withMessage(response.errorBody().string());
+		List<Gateway> result = new ArrayList<>();
+		var gateways = objeniousService.getGateways();
+		gateways.forEach(g -> {
+			logger.info("Got gateway {}", g.getGatewayName());
+			C8YData data = new C8YData();
+			ConnectionState state = ConnectionState.AVAILABLE;
+			switch (g.getStatus()) {
+			case ACTIVE:
+				state = ConnectionState.AVAILABLE;
+				break;
+			case ALERT:
+				state = ConnectionState.AVAILABLE;
+				break;
+			case INACTIVE:
+				state = ConnectionState.UNAVAILABLE;
+				break;
+			default:
+				break;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.withOk(false).withMessage(e.getMessage());
-		}
+			Gateway gateway = new Gateway(g.getGatewayId(), g.getSerialNumber(), g.getGatewayName(),
+							BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(), state,
+							data);
+			result.add(gateway);
+		});
 		return result;
 	}
 
 	public List<Profile> getDeviceProfiles() {
-		List<Profile> result = null;
-		try {
-			retrofit2.Response<List<Profile>> response = objeniousService.getProfiles().execute();
-			if (response.isSuccessful()) {
-				result = response.body();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+		return objeniousService.getProfiles();
 	}
 
-	public LNSResponse<Void> provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
-		return new LNSResponse<Void>().withOk(false).withMessage("Not supported");
+	public void provisionGateway(lora.ns.gateway.GatewayProvisioning gatewayProvisioning) {
+		// Not implemented;
 	}
 
-	public LNSResponse<Void> deprovisionGateway(String id) {
-		return new LNSResponse<Void>().withOk(false).withMessage("Not supported");
+	public void deprovisionGateway(String id) {
+		// Not implemented
 	}
 
 	public boolean hasGatewayManagementCapability() {

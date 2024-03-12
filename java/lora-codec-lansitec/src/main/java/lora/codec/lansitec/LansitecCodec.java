@@ -144,7 +144,8 @@ public class LansitecCodec extends DeviceCodec {
 	enum TYPE {
 		REGISTER((byte) 0x10) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData,
+					DateTime updateTime, Algo algo) {
 				String adr = (type & 8) != 0 ? "ON" : "OFF";
 				MODE mode = MODE.BY_MODE.get((byte) (type & 0x7));
 				byte smode = buffer.get();
@@ -171,7 +172,8 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		HEARTBEAT((byte) 0x20) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData,
+					DateTime updateTime, Algo algo) {
 				long vol = buffer.get();
 				long rssi = -buffer.get();
 				long snr = 0;
@@ -179,12 +181,13 @@ public class LansitecCodec extends DeviceCodec {
 					snr = buffer.getShort();
 				}
 				byte gpsstat = buffer.get();
-				GPSSTATE gpsState = GPSSTATE.BY_VALUE.get((byte) ((gpsstat&0xff) >> 4));
+				GPSSTATE gpsState = GPSSTATE.BY_VALUE.get((byte) ((gpsstat & 0xff) >> 4));
 				int vibState = gpsstat & 0xf;
 				byte chgstat = buffer.get();
-				CHGSTATE chgState = CHGSTATE.BY_VALUE.get((byte) ((chgstat&0xff) >> 4));
+				CHGSTATE chgState = CHGSTATE.BY_VALUE.get((byte) ((chgstat & 0xff) >> 4));
 				c8yData.addEvent(mor, "Tracker status", String.format("GPSSTATE: %s\nVIBSTATE: %d\nCHGSTATE: %s",
-						gpsState != null ? gpsState.name() : "UNKNOWN(" + gpsstat + ")", vibState, chgState != null ? chgState.name() : "UNKNOWN(" + chgstat + ")"), null, new DateTime());
+						gpsState != null ? gpsState.name() : "UNKNOWN(" + gpsstat + ")", vibState,
+						chgState != null ? chgState.name() : "UNKNOWN(" + chgstat + ")"), null, new DateTime());
 				c8yData.addMeasurement(mor, "c8y_Battery", "level", "%", BigDecimal.valueOf(vol), new DateTime());
 				c8yData.addMeasurement(mor, "Tracker Signal Strength", "rssi", "dBm", BigDecimal.valueOf(rssi),
 						updateTime);
@@ -194,7 +197,8 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		PERIODICAL_POSITION((byte) 0x30) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData,
+					DateTime updateTime, Algo algo) {
 				float lng = buffer.getFloat();
 				float lat = buffer.getFloat();
 				long time = buffer.getInt() * 1000L;
@@ -214,7 +218,8 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		ON_DEMAND_POSITION((byte) 0x40) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData,
+					DateTime updateTime, Algo algo) {
 				buffer.get();
 				float lng = buffer.getFloat();
 				float lat = buffer.getFloat();
@@ -235,65 +240,80 @@ public class LansitecCodec extends DeviceCodec {
 		},
 		HISTORY_POSITION((byte) 0x50) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData,
+					DateTime updateTime, Algo algo) {
 				// TODO Auto-generated method stub
 
 			}
 		},
 		ALARM((byte) 0x60) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData,
+					DateTime updateTime, Algo algo) {
 				// TODO Auto-generated method stub
 
 			}
 		},
 		BLE_COORDINATE((byte) 0x70) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData,
+					DateTime updateTime, Algo algo) {
 				Beacon beacon = null;
 				byte move = buffer.get();
 				buffer.getInt();
-				//boolean beaconChanged = false;
+				// boolean beaconChanged = false;
 				List<Beacon> beacons = new ArrayList<>();
 				while (buffer.hasRemaining()) {
 					short major = buffer.getShort();
 					short minor = buffer.getShort();
 					byte rssi = buffer.get();
-					c8yData.addEvent(mor, "BLE coordinate", String.format("MOVE: %d\nMAJOR: %04X\nMINOR: %04X\nRSSI: %d", move, major, minor, rssi), null, updateTime);
+					c8yData.addEvent(mor, "BLE coordinate",
+							String.format("MOVE: %d\nMAJOR: %04X\nMINOR: %04X\nRSSI: %d", move, major, minor, rssi),
+							null, updateTime);
 					beacon = new Beacon(String.format("%04X", major), String.format("%04X", minor), rssi);
 					beacons.add(beacon);
-					c8yData.addMeasurement(mor, "Max rssi", "rssi", "dBm", BigDecimal.valueOf(beacon.getRssi()), updateTime);
-					c8yData.addMeasurement(mor, String.format("%04X", major) + "-" + String.format("%04X", minor), "rssi", "dBm", BigDecimal.valueOf(rssi), updateTime);
+					c8yData.addMeasurement(mor, "Max rssi", "rssi", "dBm", BigDecimal.valueOf(beacon.getRssi()),
+							updateTime);
+					c8yData.addMeasurement(mor, String.format("%04X", major) + "-" + String.format("%04X", minor),
+							"rssi", "dBm", BigDecimal.valueOf(rssi), updateTime);
 				}
 
 				mor.set(algo.getPosition(mor, beacons));
 				c8yData.updateRootDevice(mor);
-				/*if (beacon != null) {
-					if (beacon.getMajor().equals(newBeacon.getMajor()) && beacon.getMinor().equals(newBeacon.getMinor()) || newBeacon.getRssi() > beacon.getRssi()) {
-						mor.set(newBeacon);
-						c8yData.setMorToUpdate(mor);
-						beaconChanged = true;
-						beacon = newBeacon;
-					}
-				} else {
-					mor.set(newBeacon);
-					c8yData.setMorToUpdate(mor);
-					beaconChanged = true;
-					beacon = newBeacon;
-				}
-				if (beaconChanged) {
-					c8yData.addEvent(mor, "Nearest beacon changed", String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", beacon.getMajor(), beacon.getMinor(), beacon.getRssi()), null, updateTime);
-				}*/
+				/*
+				 * if (beacon != null) {
+				 * if (beacon.getMajor().equals(newBeacon.getMajor()) &&
+				 * beacon.getMinor().equals(newBeacon.getMinor()) || newBeacon.getRssi() >
+				 * beacon.getRssi()) {
+				 * mor.set(newBeacon);
+				 * c8yData.setMorToUpdate(mor);
+				 * beaconChanged = true;
+				 * beacon = newBeacon;
+				 * }
+				 * } else {
+				 * mor.set(newBeacon);
+				 * c8yData.setMorToUpdate(mor);
+				 * beaconChanged = true;
+				 * beacon = newBeacon;
+				 * }
+				 * if (beaconChanged) {
+				 * c8yData.addEvent(mor, "Nearest beacon changed",
+				 * String.format("MAJOR: %s\nMINOR: %s\nRSSI: %d", beacon.getMajor(),
+				 * beacon.getMinor(), beacon.getRssi()), null, updateTime);
+				 * }
+				 */
 
 			}
 		},
 		ACKNOWLEDGE((byte) 0xF0) {
 			@Override
-			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo) {
+			public void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData,
+					DateTime updateTime, Algo algo) {
 				mor.set(new Configuration("Configuration requested..."));
 				c8yData.updateRootDevice(mor);
 			}
 		};
+
 		/**
 		 *
 		 */
@@ -316,7 +336,8 @@ public class LansitecCodec extends DeviceCodec {
 			}
 		}
 
-		public abstract void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData, DateTime updateTime, Algo algo);
+		public abstract void process(ManagedObjectRepresentation mor, byte type, ByteBuffer buffer, C8YData c8yData,
+				DateTime updateTime, Algo algo);
 
 	}
 
@@ -348,9 +369,8 @@ public class LansitecCodec extends DeviceCodec {
 			logger.info("Frame type: {}", t.name());
 			try {
 				t.process(mor, type, buffer, c8yData, new DateTime(decode.getUpdateTime()), currentAlgo);
-			} catch(Exception e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
+			} catch (Exception e) {
+				logger.error("Couldn't process uplink: {}", decode.getPayload(), e.getMessage());
 			}
 		}
 
@@ -380,13 +400,14 @@ public class LansitecCodec extends DeviceCodec {
 				byte selfadapt = params.get("selfadapt").asBoolean() ? (byte) 4 : 0;
 				byte oneoff = params.get("oneoff").asBoolean() ? (byte) 2 : 0;
 				byte alreport = params.get("alreport").asBoolean() ? (byte) 1 : 0;
-				buffer.put((byte) ((byte) 0x90 | (byte)breakpoint | (byte)selfadapt | (byte)oneoff | (byte)alreport));
+				buffer.put(
+						(byte) ((byte) 0x90 | (byte) breakpoint | (byte) selfadapt | (byte) oneoff | (byte) alreport));
 				buffer.putShort((short) params.get("pos").asInt());
 				buffer.put((byte) params.get("hb").asInt());
 				payload = BaseEncoding.base16().encode(buffer.array());
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Couldn't process operation {}", encode.getOperation(), e);
 		}
 		return new DownlinkData(null, 1, payload);
 	}
@@ -422,8 +443,8 @@ public class LansitecCodec extends DeviceCodec {
 		return null;
 	}
 
-	//UGLY!!!!!! not scalable!!!!!
-	//Need to store that in a managed object!!!
+	// UGLY!!!!!! not scalable!!!!!
+	// Need to store that in a managed object!!!
 	private Algo currentAlgo;
 
 	@Autowired

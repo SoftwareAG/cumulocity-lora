@@ -28,7 +28,8 @@ import lora.ns.operation.OperationData;
 @Service
 @Slf4j
 public class ChirpstackIntegrationService extends LNSIntegrationService<ChirpstackConnector> {
-	{
+
+	public ChirpstackIntegrationService() {
 		wizard.add(new LNSConnectorWizardStep() {
 			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 			{
@@ -106,7 +107,6 @@ public class ChirpstackIntegrationService extends LNSIntegrationService<Chirpsta
 
 			data = new DeviceData(devEUI, devEUI, null, null, fPort, payload, updateTime, measurements, null, null);
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error("Error on Mapping LoRa payload to Cumulocity", e);
 		}
 		return data;

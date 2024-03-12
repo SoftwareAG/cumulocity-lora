@@ -42,7 +42,9 @@
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spring-boot-dependencies.version>2.5.14</spring-boot-dependencies.version>
+    <spring-boot-dependencies.version>2.7.18</spring-boot-dependencies.version>
+    <retrofit2.version>2.9.0</retrofit2.version>
+    <feign.version>13.2.1</feign.version>
   </properties>
   <repositories>
     <repository>
@@ -76,19 +78,24 @@
         <version>${c8y.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.squareup.retrofit2</groupId>
-        <artifactId>retrofit</artifactId>
-        <version>2.9.0</version>
+        <groupId>io.github.openfeign</groupId>
+        <artifactId>feign-core</artifactId>
+        <version>${feign.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.squareup.retrofit2</groupId>
-        <artifactId>converter-jackson</artifactId>
-        <version>2.9.0</version>
+        <groupId>io.github.openfeign</groupId>
+        <artifactId>feign-jackson</artifactId>
+        <version>${feign.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>logging-interceptor</artifactId>
-        <version>3.14.9</version>
+        <groupId>io.github.openfeign</groupId>
+        <artifactId>feign-slf4j</artifactId>
+        <version>${feign.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.openfeign.form</groupId>
+        <artifactId>feign-form</artifactId>
+        <version>3.8.0</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -98,7 +105,7 @@
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-engine</artifactId>
-        <version>5.6.2</version>
+        <version>5.9.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -111,7 +118,7 @@
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.24</version>
+        <version>1.18.30</version>
         <scope>provided</scope>
       </dependency>
     </dependencies>

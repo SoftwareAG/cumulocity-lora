@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package lora.ns.actility.rest.model;
 
 import java.util.Objects;
@@ -21,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Resource representing a base station created by a ThingPark supplier or subscriber.
+ * Resource representing a base station created by a ThingPark supplier or
+ * subscriber.
  */
 public class BaseStation {
   private String ref = null;
@@ -42,15 +42,19 @@ public class BaseStation {
   private String publicKey = null;
 
   /**
-   * Administration state of the base stations. Possible values are: &#39;INIT&#39; (Initial configuration), &#39;VALIDATING&#39; (Waiting for validation), &#39;ACTIVE&#39; (Validated and activated), &#39;SUSPENDED&#39; (Validated and deactivated). Default value is &#39;INIT&#39;. Note that (in current version) this attribute is READ-ONLY.
+   * Administration state of the base stations. Possible values are:
+   * &#39;INIT&#39; (Initial configuration), &#39;VALIDATING&#39; (Waiting for
+   * validation), &#39;ACTIVE&#39; (Validated and activated), &#39;SUSPENDED&#39;
+   * (Validated and deactivated). Default value is &#39;INIT&#39;. Note that (in
+   * current version) this attribute is READ-ONLY.
    */
   public enum AdministrationStateEnum {
     INIT("INIT"),
-    
+
     VALIDATING("VALIDATING"),
-    
+
     ACTIVE("ACTIVE"),
-    
+
     SUSPENDED("SUSPENDED");
 
     private String value;
@@ -108,10 +112,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * Ref of the base station.
+   * 
    * @return ref
-  **/
+   **/
   public String getRef() {
     return ref;
   }
@@ -125,10 +130,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * Id of the base station (LRR id).
+   * 
    * @return id
-  **/
+   **/
   public String getId() {
     return id;
   }
@@ -142,10 +148,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * Uuid of the base station (LRR uuid).
+   * 
    * @return uuid
-  **/
+   **/
   public String getUuid() {
     return uuid;
   }
@@ -159,10 +166,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * Id of the base station profile (model id).
+   * 
    * @return baseStationProfileId
-  **/
+   **/
   public String getBaseStationProfileId() {
     return baseStationProfileId;
   }
@@ -176,10 +184,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * Name of the base station. If not specified, the name is generated.
+   * 
    * @return name
-  **/
+   **/
   public String getName() {
     return name;
   }
@@ -193,10 +202,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * Serial marketing number of the base station.
+   * 
    * @return SMN
-  **/
+   **/
   public String getSMN() {
     return SMN;
   }
@@ -210,10 +220,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * Optional administrative information.
+   * 
    * @return administrativeInfo
-  **/
+   **/
   public String getAdministrativeInfo() {
     return administrativeInfo;
   }
@@ -227,10 +238,12 @@ public class BaseStation {
     return this;
   }
 
-   /**
-   * SSH public key used by the base station to authenticate to the Key installer. The public key must be provided in PEM PKCS8 format.
+  /**
+   * SSH public key used by the base station to authenticate to the Key installer.
+   * The public key must be provided in PEM PKCS8 format.
+   * 
    * @return publicKey
-  **/
+   **/
   public String getPublicKey() {
     return publicKey;
   }
@@ -244,10 +257,15 @@ public class BaseStation {
     return this;
   }
 
-   /**
-   * Administration state of the base stations. Possible values are: &#39;INIT&#39; (Initial configuration), &#39;VALIDATING&#39; (Waiting for validation), &#39;ACTIVE&#39; (Validated and activated), &#39;SUSPENDED&#39; (Validated and deactivated). Default value is &#39;INIT&#39;. Note that (in current version) this attribute is READ-ONLY.
+  /**
+   * Administration state of the base stations. Possible values are:
+   * &#39;INIT&#39; (Initial configuration), &#39;VALIDATING&#39; (Waiting for
+   * validation), &#39;ACTIVE&#39; (Validated and activated), &#39;SUSPENDED&#39;
+   * (Validated and deactivated). Default value is &#39;INIT&#39;. Note that (in
+   * current version) this attribute is READ-ONLY.
+   * 
    * @return administrationState
-  **/
+   **/
   public AdministrationStateEnum getAdministrationState() {
     return administrationState;
   }
@@ -261,10 +279,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * RX2 optimization
+   * 
    * @return rx2Optimization
-  **/
+   **/
   public Boolean isRx2Optimization() {
     return rx2Optimization;
   }
@@ -278,10 +297,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * Indicates if the base station is ready to manage class B devices.
+   * 
    * @return classBReady
-  **/
+   **/
   public Boolean isClassBReady() {
     return classBReady;
   }
@@ -295,10 +315,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * Allow Beacon Transmission
+   * 
    * @return activateBeaconTransmission
-  **/
+   **/
   public Boolean isActivateBeaconTransmission() {
     return activateBeaconTransmission;
   }
@@ -312,10 +333,12 @@ public class BaseStation {
     return this;
   }
 
-   /**
-   * Owner is a string that identifies the owner of the gateway. The scope and the ref of the owner are concatened.
+  /**
+   * Owner is a string that identifies the owner of the gateway. The scope and the
+   * ref of the owner are concatened.
+   * 
    * @return owner
-  **/
+   **/
   public String getOwner() {
     return owner;
   }
@@ -329,10 +352,13 @@ public class BaseStation {
     return this;
   }
 
-   /**
-   * Latitude of the base station. Can only be updated for base stations with &#39;locationType&#39; attribute set to &#39;ADMINISTRATIVELY&#39; and with the proper administration rights.
+  /**
+   * Latitude of the base station. Can only be updated for base stations with
+   * &#39;locationType&#39; attribute set to &#39;ADMINISTRATIVELY&#39; and with
+   * the proper administration rights.
+   * 
    * @return geoLatitude
-  **/
+   **/
   public Float getGeoLatitude() {
     return geoLatitude;
   }
@@ -346,10 +372,13 @@ public class BaseStation {
     return this;
   }
 
-   /**
-   * Longitude of the base station. Can only be updated for base stations with &#39;locationType&#39; attribute set to &#39;ADMINISTRATIVELY&#39; and with the proper administration rights.
+  /**
+   * Longitude of the base station. Can only be updated for base stations with
+   * &#39;locationType&#39; attribute set to &#39;ADMINISTRATIVELY&#39; and with
+   * the proper administration rights.
+   * 
    * @return geoLongitude
-  **/
+   **/
   public Float getGeoLongitude() {
     return geoLongitude;
   }
@@ -363,10 +392,13 @@ public class BaseStation {
     return this;
   }
 
-   /**
-   * Altitude of the base station. Can only be updated for base stations with &#39;locationType&#39; attribute set to &#39;ADMINISTRATIVELY&#39; and with the proper administration rights.
+  /**
+   * Altitude of the base station. Can only be updated for base stations with
+   * &#39;locationType&#39; attribute set to &#39;ADMINISTRATIVELY&#39; and with
+   * the proper administration rights.
+   * 
    * @return geoAltitude
-  **/
+   **/
   public Integer getGeoAltitude() {
     return geoAltitude;
   }
@@ -380,10 +412,11 @@ public class BaseStation {
     return this;
   }
 
-   /**
+  /**
    * ID of the RF Region of the gateway.
+   * 
    * @return rfRegionId
-  **/
+   **/
   public String getRfRegionId() {
     return rfRegionId;
   }
@@ -397,10 +430,12 @@ public class BaseStation {
     return this;
   }
 
-   /**
-   * Statistics of the base station. Note that this attribute and all enclosing attributes are read-only.
+  /**
+   * Statistics of the base station. Note that this attribute and all enclosing
+   * attributes are read-only.
+   * 
    * @return statistics
-  **/
+   **/
   public BaseStationStatistics getStatistics() {
     return statistics;
   }
@@ -414,10 +449,12 @@ public class BaseStation {
     return this;
   }
 
-   /**
-   * Commercial details of the base station, if available. Note that this attribute and all enclosing attributes are read-only.
+  /**
+   * Commercial details of the base station, if available. Note that this
+   * attribute and all enclosing attributes are read-only.
+   * 
    * @return commercialDetails
-  **/
+   **/
   public CommercialDetails getCommercialDetails() {
     return commercialDetails;
   }
@@ -433,16 +470,17 @@ public class BaseStation {
 
   public BaseStation addTagsItem(BaseStationTag tagsItem) {
     if (this.tags == null) {
-      this.tags = new ArrayList<BaseStationTag>();
+      this.tags = new ArrayList<>();
     }
     this.tags.add(tagsItem);
     return this;
   }
 
-   /**
+  /**
    * Tags of the base station.
+   * 
    * @return tags
-  **/
+   **/
   public List<BaseStationTag> getTags() {
     return tags;
   }
@@ -450,7 +488,6 @@ public class BaseStation {
   public void setTags(List<BaseStationTag> tags) {
     this.tags = tags;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -485,15 +522,16 @@ public class BaseStation {
 
   @Override
   public int hashCode() {
-    return Objects.hash(ref, id, uuid, baseStationProfileId, name, SMN, administrativeInfo, publicKey, administrationState, rx2Optimization, classBReady, activateBeaconTransmission, owner, geoLatitude, geoLongitude, geoAltitude, rfRegionId, statistics, commercialDetails, tags);
+    return Objects.hash(ref, id, uuid, baseStationProfileId, name, SMN, administrativeInfo, publicKey,
+        administrationState, rx2Optimization, classBReady, activateBeaconTransmission, owner, geoLatitude, geoLongitude,
+        geoAltitude, rfRegionId, statistics, commercialDetails, tags);
   }
-
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class BaseStation {\n");
-    
+
     sb.append("    ref: ").append(toIndentedString(ref)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
@@ -530,4 +568,3 @@ public class BaseStation {
   }
 
 }
-

@@ -67,7 +67,7 @@ public class GithubRestController {
                 result.forEach(r -> r.getAssets().removeIf(a -> !a.getName().startsWith("lora")));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Couldn't retrieve github releases", e);
         }
         return result;
     }
@@ -108,7 +108,7 @@ public class GithubRestController {
             @Override
             public void writeTo(BufferedSink sink) throws IOException {
                 URL url = new URL(asset.getBrowserDownloadUrl());
-                try(InputStream is = url.openStream()) {
+                try (InputStream is = url.openStream()) {
                     is.transferTo(sink.outputStream());
                 }
             }
@@ -122,20 +122,23 @@ public class GithubRestController {
                     .uploadApplicationAttachment(application.getId(), file).execute();
             if (response.isSuccessful()) {
                 logger.info("New microservice upload was successful, now subscribing to it...");
-                response = tenantService.subscribeToApplication(subscriptionsService.getTenant(), new Subscription().application(new Application().self(application.getSelf()))).execute();
+                response = tenantService
+                        .subscribeToApplication(subscriptionsService.getTenant(),
+                                new Subscription().application(new Application().self(application.getSelf())))
+                        .execute();
                 if (response.isSuccessful()) {
                     logger.info("Subscription was successful");
                     result = "{result: 'OK'}";
                 } else {
                     logger.error("An error occurred while subscribing to the microservice: {} {} {}", response.code(),
-                    response.message(), response.errorBody().string());
+                            response.message(), response.errorBody().string());
                 }
             } else {
                 logger.error("An error occurred while uploading the microservice: {} {} {}", response.code(),
                         response.message(), response.errorBody().string());
             }
         } catch (IOException e1) {
-            e1.printStackTrace();
+            logger.error("Couldn't upload application file", e1);
         }
 
         return result;

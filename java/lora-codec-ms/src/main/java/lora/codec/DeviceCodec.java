@@ -35,7 +35,6 @@ import com.cumulocity.sdk.client.alarm.AlarmFilter;
 import com.cumulocity.sdk.client.event.EventApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -71,7 +70,7 @@ public abstract class DeviceCodec implements Component {
 	@Autowired
 	protected MicroserviceSubscriptionsService subscriptionsService;
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(DeviceCodec.class);
 
 	protected Map<String, String> models = new HashMap<>();
 	protected Map<String, String> childrenNames = new HashMap<>();
@@ -239,6 +238,7 @@ public abstract class DeviceCodec implements Component {
 					logger.info("Storing last measurements on device...");
 					ObjectMapper mapper = new ObjectMapper();
 					JsonNode root = mapper.readTree(mor.toJSON());
+					@SuppressWarnings("unchecked")
 					Map<String, Map<String, Map<String, Object>>> measurements = root.has("measurements")
 							? mapper.convertValue(root.at("/measurements"), Map.class)
 							: new HashMap<>();
@@ -246,17 +246,18 @@ public abstract class DeviceCodec implements Component {
 						if (!measurements.containsKey(m.getType())) {
 							measurements.put(m.getType(), new HashMap<>());
 						}
+						@SuppressWarnings("unchecked")
 						Map<String, MeasurementValue> measurementValues = (Map<String, MeasurementValue>) m
 								.getProperty(m.getType());
-						for (String series : measurementValues.keySet()) {
-							if (!measurements.get(m.getType()).containsKey(series)) {
-								measurements.get(m.getType()).put(series, new HashMap<>());
+						for (var series : measurementValues.entrySet()) {
+							if (!measurements.get(m.getType()).containsKey(series.getKey())) {
+								measurements.get(m.getType()).put(series.getKey(), new HashMap<>());
 							}
-							measurements.get(m.getType()).get(series).put("time", m.getDateTime());
-							measurements.get(m.getType()).get(series)
-									.put("value", measurementValues.get(series).getValue());
-							measurements.get(m.getType()).get(series)
-									.put("unit", measurementValues.get(series).getUnit());
+							measurements.get(m.getType()).get(series.getKey()).put("time", m.getDateTime());
+							measurements.get(m.getType()).get(series.getKey())
+									.put("value", series.getValue().getValue());
+							measurements.get(m.getType()).get(series.getKey())
+									.put("unit", series.getValue().getUnit());
 						}
 					});
 					mor.setProperty("measurements", measurements);
@@ -271,7 +272,7 @@ public abstract class DeviceCodec implements Component {
 				result = new Result<>(false, "Couldn't find device " + decode.getDeveui(), "NOK");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Couldn't decode {}", decode, e);
 			result = new Result<>(false, e.getMessage(), "Couldn't process " + decode.toString());
 		}
 		return result;
@@ -303,7 +304,7 @@ public abstract class DeviceCodec implements Component {
 				result = new Result<>(true, "Couldn't find device " + encode.getDevEui(), data);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Couldn't encode {}", encode, e);
 			result = new Result<>(false, "Couldn't process " + encode.toString(), null);
 		}
 
@@ -315,9 +316,8 @@ public abstract class DeviceCodec implements Component {
 		try {
 			data = new DownlinkData(encode.getDevEui(), Integer.parseInt(tokens[1]), tokens[2]);
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("Can't process {}. Expected syntax is \"raw <port number> <hex payload>\"",
-					encode.getOperation());
+					encode.getOperation(), e);
 		}
 		return data;
 	}
@@ -337,12 +337,13 @@ public abstract class DeviceCodec implements Component {
 				deviceOperation.addElement(convertJsonNodeToDeviceOperationElement(field.getValue(), field.getKey()));
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Couldn't convert JSON String to operation {}", operation, e);
 		}
 
 		return deviceOperation;
 	}
 
+	@SuppressWarnings("unchecked")
 	private DeviceOperationElement convertJsonNodeToDeviceOperationElement(JsonNode node, String nodeName) {
 		DeviceOperationElement element = new DeviceOperationElement().id(nodeName);
 		switch (node.getNodeType()) {

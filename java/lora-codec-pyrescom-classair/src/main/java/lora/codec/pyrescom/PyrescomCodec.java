@@ -33,9 +33,9 @@ import lora.codec.uplink.Decode;
 public class PyrescomCodec extends DeviceCodec {
 
 	private final Logger logger = LoggerFactory.getLogger(PyrescomCodec.class);
-	
+
 	private static final String CLASS_AIR = "Class'Air";
-	
+
 	{
 		models.put(CLASS_AIR, CLASS_AIR);
 	}
@@ -58,9 +58,10 @@ public class PyrescomCodec extends DeviceCodec {
 	@Override
 	protected C8YData decode(ManagedObjectRepresentation mor, Decode decode) {
 		C8YData c8yData = new C8YData();
-		
-		ByteBuffer buffer = ByteBuffer.wrap(BaseEncoding.base16().decode(decode.getPayload().toUpperCase())).order(ByteOrder.LITTLE_ENDIAN);
-		
+
+		ByteBuffer buffer = ByteBuffer.wrap(BaseEncoding.base16().decode(decode.getPayload().toUpperCase()))
+				.order(ByteOrder.LITTLE_ENDIAN);
+
 		if (decode.getModel().equals(CLASS_AIR)) {
 			byte header = buffer.get();
 			if (header == 0x56) {
@@ -71,17 +72,23 @@ public class PyrescomCodec extends DeviceCodec {
 				c8yData.updateRootDevice(mor);
 				buffer.get();
 				c8yData.addMeasurement(mor, "Humidity", "H", "%RH", BigDecimal.valueOf(buffer.get()), new DateTime());
-				c8yData.addMeasurement(mor, "Pressure", "P", "hPa", BigDecimal.valueOf(buffer.getShort()), new DateTime());
-				c8yData.addMeasurement(mor, "Mean CO2 Moyen", "C", "ppm", BigDecimal.valueOf(buffer.getShort()), new DateTime());
-				c8yData.addMeasurement(mor, "Mean Temperature", "T", "°C", BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(10)), new DateTime());
-				c8yData.addMeasurement(mor, "Max CO2 Moyen", "C", "ppm", BigDecimal.valueOf(buffer.getShort()), new DateTime());
-				c8yData.addMeasurement(mor, "Max Temperature", "T", "°C", BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(10)), new DateTime());
-				c8yData.addMeasurement(mor, "Signal Quality", "SQ", "dB", BigDecimal.valueOf(buffer.getShort()), new DateTime());
+				c8yData.addMeasurement(mor, "Pressure", "P", "hPa", BigDecimal.valueOf(buffer.getShort()),
+						new DateTime());
+				c8yData.addMeasurement(mor, "Mean CO2 Moyen", "C", "ppm", BigDecimal.valueOf(buffer.getShort()),
+						new DateTime());
+				c8yData.addMeasurement(mor, "Mean Temperature", "T", "°C",
+						BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(10)), new DateTime());
+				c8yData.addMeasurement(mor, "Max CO2 Moyen", "C", "ppm", BigDecimal.valueOf(buffer.getShort()),
+						new DateTime());
+				c8yData.addMeasurement(mor, "Max Temperature", "T", "°C",
+						BigDecimal.valueOf(buffer.getShort()).divide(BigDecimal.valueOf(10)), new DateTime());
+				c8yData.addMeasurement(mor, "Signal Quality", "SQ", "dB", BigDecimal.valueOf(buffer.getShort()),
+						new DateTime());
 				mor.set(new RequiredAvailability(60));
 				c8yData.updateRootDevice(mor);
 			}
 		}
-		
+
 		return c8yData;
 	}
 
@@ -105,19 +112,19 @@ public class PyrescomCodec extends DeviceCodec {
 			int hour_diff = root.get("hour_diff").asInt();
 			byte[] bytes = new byte[11];
 			bytes[0] = 0x43;
-			bytes[1] = (byte)((leds_enabled ? (byte)(1<<6) : 0) & (back_light_enabled ? (byte)(1<<5) : 0));
-			bytes[2] = (byte)(orange_threshold & 0xff);
-			bytes[3] = (byte)((orange_threshold >> 8) & 0xff);
-			bytes[4] = (byte)(red_threshold & 0xff);
-			bytes[5] = (byte)((red_threshold >> 8) & 0xff);
-			bytes[6] = (byte)(day_hour & 0xff);
-			bytes[7] = (byte)(night_hour & 0xff);
-			bytes[8] = (byte)(hour_diff & 0xff);
-			bytes[9] = (byte)((hour_diff >> 8) & 0xff);
-			bytes[10] = (byte)((hour_diff >> 16) & 0xff);
+			bytes[1] = (byte) ((leds_enabled ? (byte) (1 << 6) : 0) & (back_light_enabled ? (byte) (1 << 5) : 0));
+			bytes[2] = (byte) (orange_threshold & 0xff);
+			bytes[3] = (byte) ((orange_threshold >> 8) & 0xff);
+			bytes[4] = (byte) (red_threshold & 0xff);
+			bytes[5] = (byte) ((red_threshold >> 8) & 0xff);
+			bytes[6] = (byte) (day_hour & 0xff);
+			bytes[7] = (byte) (night_hour & 0xff);
+			bytes[8] = (byte) (hour_diff & 0xff);
+			bytes[9] = (byte) ((hour_diff >> 8) & 0xff);
+			bytes[10] = (byte) ((hour_diff >> 16) & 0xff);
 			payload = BaseEncoding.base16().encode(bytes);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Couldn't encode {}", encode, e);
 		}
 		return new DownlinkData(null, 3, payload);
 	}
@@ -128,11 +135,10 @@ public class PyrescomCodec extends DeviceCodec {
 		return null;
 	}
 
-
 	@Override
 	public Map<String, DeviceOperation> getAvailableOperations(String model) {
 		Map<String, DeviceOperation> result = new HashMap<>();
-		
+
 		List<DeviceOperationElement> params = new ArrayList<>();
 		params.add(new DeviceOperationElement("leds_enabled", "Leds enabled", ParamType.BOOL));
 		params.add(new DeviceOperationElement("back_light_enabled", "Back light enabled", ParamType.BOOL));
@@ -143,7 +149,7 @@ public class PyrescomCodec extends DeviceCodec {
 		params.add(new DeviceOperationElement("hour_diff", "Hour diff in seconds", ParamType.INTEGER));
 		result.put("config", new DeviceOperation("config", "Config"));
 		result.get("config").getElements().addAll(params);
-		
+
 		return result;
 	}
 

@@ -283,6 +283,22 @@ public class ACSSwitchCodec extends DeviceCodec {
 			case TOF_CONFIGURED_IN_DISTANCE_MODE:
 				c8yData.addMeasurement(mor, "c8y_DistanceMeasurement", "distance", "mm", BigDecimal.valueOf(x), time);
 				break;
+			case BUTTON_PRESSED_OR_REED_CLOSED:
+				break;
+			case BUTTON_RELEASED_OR_REED_OPENED:
+				break;
+			case PIR_IN_MOVE_PROFILE_MOTION_ALGORITHM_ACTIVATED:
+				break;
+			case PIR_IN_MOVE_PROFILE_MOTION_ALGORITHM_ACTIVATED_AND_INACTIVE_STATE_MANAGED:
+				break;
+			case PIR_IN_MOVE_PROFILE_MOTION_ALGORITHM_DEACTIVATED:
+				break;
+			case REED_CLOSED:
+				break;
+			case REED_OPENED:
+				break;
+			default:
+				break;
 		}
 		int activeStatePercentage = buffer.get();
 		c8yData.addMeasurement(mor, "Active state percentage", "level", "%", BigDecimal.valueOf(activeStatePercentage),
@@ -378,7 +394,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 				try {
 					mor.set(new Configuration(new ObjectMapper().writeValueAsString(map)));
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("Error while seriliazing device configuration", e);
 				}
 				if (ra.getResponseInterval() > 0) {
 					mor.set(ra);
@@ -467,7 +483,7 @@ public class ACSSwitchCodec extends DeviceCodec {
 				data.setPayload("0301" + param.buildPayload());
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Coudln't read operation content: {}", encode.getOperation(), e);
 		}
 		data.setFport(1);
 		return data;

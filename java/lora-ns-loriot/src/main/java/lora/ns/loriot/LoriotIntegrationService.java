@@ -7,17 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import lora.ns.DeviceData;
 import lora.ns.integration.LNSIntegrationService;
@@ -28,7 +28,7 @@ public class LoriotIntegrationService extends LNSIntegrationService<LoriotConnec
 
 	private final Logger logger = LoggerFactory.getLogger(LoriotIntegrationService.class);
 
-	{
+	public LoriotIntegrationService() {
 		wizard.add(new ConnectorWizardStep1());
 		wizard.add(new ConnectorWizardStep2());
 	}
@@ -48,7 +48,7 @@ public class LoriotIntegrationService extends LNSIntegrationService<LoriotConnec
 				logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
 				byte[] payload = BaseEncoding.base16().decode(rootNode.get("data").asText().toUpperCase());
 				Long updateTime = rootNode.get("ts").asLong();
-				logger.info("Update time is: " + updateTime);
+				logger.info("Update time is: {}", updateTime);
 
 				List<MeasurementRepresentation> measurements = new ArrayList<>();
 				MeasurementRepresentation m = new MeasurementRepresentation();

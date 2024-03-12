@@ -30,12 +30,16 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 
 	private final Logger logger = LoggerFactory.getLogger(ActilityIntegrationService.class);
 
-	{
+	public ActilityIntegrationService() {
 		wizard.add(new ConnectorWizardStep1());
 		deviceProvisioningAdditionalProperties.add(new PropertyDescription("deviceProfile", "Device profile", true,
 				null, "/deviceProfiles", null, null, null, null, null, PropertyType.LIST, false));
-		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("SMN", "SMN", false, null, null, null, null,
-				null, null, null, PropertyType.TEXT, false));
+		gatewayProvisioningAdditionalProperties
+				.add(new PropertyDescription("SMN", "Serial Markting Number", false, null, null, null, null,
+						null, null, null, PropertyType.TEXT, false));
+		gatewayProvisioningAdditionalProperties
+				.add(new PropertyDescription("publicKey", "Public key", false, null, null, null, null,
+						null, null, null, PropertyType.TEXT, false));
 		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("gatewayProfile", "Gateway profile", true,
 				null, "/baseStationProfiles", null, null, null, null, null, PropertyType.LIST, false));
 		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("rfRegion", "RF Region", true, null,
@@ -59,8 +63,7 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 			byte[] payload = BaseEncoding.base16()
 					.decode(rootNode.at("/DevEUI_uplink/payload_hex").asText().toUpperCase());
 			Long updateTime = new DateTime(rootNode.at("/DevEUI_uplink/Time").asText()).getMillis();
-			// String model = null;
-			logger.info("Update time is: " + updateTime);
+			logger.info("Update time is: {}", updateTime);
 
 			List<MeasurementRepresentation> measurements = new ArrayList<>();
 			MeasurementRepresentation m = new MeasurementRepresentation();
@@ -89,7 +92,6 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 			data = new DeviceData(deviceEui, deviceEui, null, null, fPort, payload, updateTime, measurements,
 					lat != null ? BigDecimal.valueOf(lat) : null, lng != null ? BigDecimal.valueOf(lng) : null);
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("Error on Mapping LoRa payload to Cumulocity", e);
 		}
 		return data;
@@ -125,7 +127,7 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 			JsonNode rootNode = mapper.readTree(eventString);
 			result = rootNode.has("DevEUI_downlink_Sent");
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			logger.error("Couldn't map ThingPark event {}", eventString, e);
 		}
 		return result;
 	}

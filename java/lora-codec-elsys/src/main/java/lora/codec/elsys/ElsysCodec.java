@@ -33,7 +33,8 @@ import lora.codec.uplink.Decode;
 public class ElsysCodec extends DeviceCodec {
 
 	Map<String, DeviceOperation> ops = new HashMap<>();
-	{
+
+	public ElsysCodec() {
 		models.put("default", "default");
 		models.put("desk", "ERS Desk");
 		models.put("eye", "ERS Eye");
@@ -537,7 +538,7 @@ public class ElsysCodec extends DeviceCodec {
 					DateTime time,
 					int offsetSize) {
 				Map<String, Object> map = new HashMap<>();
-				int size = buffer.get();
+				buffer.get(); // size, we should check the remaining bytes match
 				while (buffer.hasRemaining()) {
 					parseCurrentSetting(buffer, map);
 				}
@@ -548,7 +549,7 @@ public class ElsysCodec extends DeviceCodec {
 					mor.set(config);
 					c8yData.updateRootDevice(mor);
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.error("Couldn't write deserialize device config {}", map, e);
 				}
 				c8yData.addEvent(mor, "settings", "Settings", map, getTime(buffer, time, offsetSize));
 			}
@@ -595,8 +596,7 @@ public class ElsysCodec extends DeviceCodec {
 					eventType.process(mor, decode.getModel(), buffer, c8yData,
 							new DateTime(decode.getUpdateTime()), offsetSize);
 				} catch (Exception e) {
-					e.printStackTrace();
-					log.error("Couldn't handle event {}", eventType);
+					log.error("Couldn't handle event {}", eventType, e);
 					c8yData.addAlarm(mor, "Event decoding error", "Error while decoding event: " + eventType,
 							CumulocitySeverities.WARNING,
 							new DateTime(decode.getUpdateTime()));

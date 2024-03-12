@@ -2,54 +2,49 @@ package lora.ns.objenious.rest;
 
 import java.util.List;
 
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.DELETE;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Path;
+import feign.Param;
+import feign.RequestLine;
 
 public interface ObjeniousService {
-	@GET("devices")
-	Call<List<Device>> getDevices();
+	@RequestLine("GET devices")
+	List<Device> getDevices();
 
-	@GET("devices/lora:{devEui}")
-	Call<Device> getDevice(@Path("devEui") String devEui);
+	@RequestLine("GET devices/lora:{devEui}")
+	Device getDevice(@Param("devEui") String devEui);
 
-	@POST("devices/lora:{devEui}/deprovision")
-	Call<ObjectDeleted> deprovisionDevice(@Path("devEui") String devEui);
+	@RequestLine("POST devices/lora:{devEui}/deprovision")
+	ObjectDeleted deprovisionDevice(@Param("devEui") String devEui);
 
-	@POST("devices/lora:{devEui}/reactivate")
-	Call<Device> reactivateDevice(@Path("devEui") String devEui);
-	
-	@POST("devices/lora:{devEui}/downlinks")
-	Call<DownlinkResponse> sendCommand(@Path("devEui") String devEui, @Body DownlinkCreate command);
-	
-	@POST("scenarios/routing")
-	Call<ScenarioRouting> createHttpRouting(@Body ScenarioRoutingCreateUpdate routing);
-	
-	@GET("scenarios/routing")
-	Call<List<ScenarioRoutingReader>> getRouting();
-	
-	@DELETE("scenarios/routing/{id}")
-	Call<ResponseBody> deleteRouting(@Path("id") Integer id);
-	
-	@POST("devices")
-	Call<Device> createDevice(@Body DeviceCreate device);
-	
-	@GET("profiles")
-	Call<List<Profile>> getProfiles();
-	
-	@GET("profiles/{id}")
-	Call<Profile> getProfile(@Path("id") Integer id);
-	
-	@GET("groups")
-	Call<List<Group>> getGroups();
+	@RequestLine("POST devices/lora:{devEui}/reactivate")
+	Device reactivateDevice(@Param("devEui") String devEui);
 
-	@GET("gateways")
-	Call<List<Gateway>> getGateways();
+	@RequestLine("POST devices/lora:{devEui}/downlinks")
+	DownlinkResponse sendCommand(@Param("devEui") String devEui, DownlinkCreate command);
 
-	@GET("gateways/{id}")
-	Call<List<Gateway>> getGateway(@Path("id") String id);
+	@RequestLine("POST scenarios/routing")
+	ScenarioRouting createHttpRouting(ScenarioRoutingCreateUpdate routing);
+
+	@RequestLine("GET scenarios/routing")
+	List<ScenarioRoutingReader> getRouting();
+
+	@RequestLine("DELETE scenarios/routing/{id}")
+	String deleteRouting(@Param("id") Integer id);
+
+	@RequestLine("POST devices")
+	Device createDevice(@Param DeviceCreate device);
+
+	@RequestLine("GET profiles")
+	List<Profile> getProfiles();
+
+	@RequestLine("GET profiles/{id}")
+	Profile getProfile(@Param("id") Integer id);
+
+	@RequestLine("GET groups")
+	List<Group> getGroups();
+
+	@RequestLine("GET gateways")
+	List<Gateway> getGateways();
+
+	@RequestLine("GET gateways/{id}")
+	List<Gateway> getGateway(@Param("id") String id);
 }

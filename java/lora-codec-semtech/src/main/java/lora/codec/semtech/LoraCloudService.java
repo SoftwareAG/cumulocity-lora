@@ -1,6 +1,5 @@
 package lora.codec.semtech;
 
-
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
