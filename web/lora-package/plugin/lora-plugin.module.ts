@@ -17,7 +17,6 @@ import { ModalModule } from "ngx-bootstrap/modal";
 import { PopoverModule } from "ngx-bootstrap/popover";
 import { TimepickerModule } from "ngx-bootstrap/timepicker";
 import { MonacoEditorModule } from "ngx-monaco-editor-v2";
-import { LoraNavigationFactory } from "../factories/Navigation";
 import { LoRaConfigComponent } from "../src/config/config.component";
 import { DevicesComponent } from "../src/devices/devices.component";
 import { LoraGuard } from "../src/devices/lora.guard";
@@ -34,6 +33,7 @@ import { LNSEditComponent } from "../src/onboarding/lns/lns-edit.component";
 import { LNSComponent } from "../src/onboarding/lns/lns.component";
 import { SimulatorComponent } from "../src/simulator/simulator.component";
 
+import { LoraNavigationFactory } from "../factories/Navigation";
 import { SelectTypeComponent } from "../src/onboarding/codecs/select.type";
 import { PropertyEditorComponent } from "../src/onboarding/devices/property-editor.component";
 import { monacoConfig } from "./monacoConfig";
@@ -108,7 +108,7 @@ import { monacoConfig } from "./monacoConfig";
   ],
   exports: [],
   providers: [
-    hookNavigator({ useClass: LoraNavigationFactory, multi: true }),
+    hookNavigator(new LoraNavigationFactory().get()),
     hookRoute([
       {
         context: ViewContext.Group,
@@ -118,8 +118,6 @@ import { monacoConfig } from "./monacoConfig";
         priority: 100,
         icon: "heart",
       },
-    ]),
-    hookRoute([
       {
         context: ViewContext.Device,
         path: "lora_command",
