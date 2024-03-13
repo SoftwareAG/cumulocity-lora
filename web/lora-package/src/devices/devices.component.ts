@@ -1,18 +1,18 @@
-import { _ } from "@c8y/ngx-components";
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { FormGroup } from "@angular/forms";
+import { ActivatedRoute } from "@angular/router";
 import {
-  InventoryService,
+  EventService,
+  IEvent,
   IManagedObject,
   IOperation,
   IdentityService,
+  InventoryService,
   OperationService,
-  IEvent,
-  EventService,
 } from "@c8y/client";
-import { ActivatedRoute } from "@angular/router";
-import { BsModalService, BsModalRef } from "ngx-bootstrap/modal";
-import { FormGroup } from "@angular/forms";
-import { FormlyFormOptions, FormlyFieldConfig } from "@ngx-formly/core";
+import { FormlyFieldConfig, FormlyFormOptions } from "@ngx-formly/core";
+import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
+import { DeviceAdditionalProperty } from "src/service/DeviceAdditionalProperty";
 import { DeviceOperation } from "../../src/onboarding/codecs/DeviceOperation";
 import {
   DeviceOperationElement,
@@ -20,7 +20,6 @@ import {
 } from "../../src/onboarding/codecs/DeviceOperationElement";
 import { CodecService } from "../../src/service/CodecService";
 import { LnsService } from "../../src/service/LnsService";
-import { DeviceAdditionalProperty } from "src/service/DeviceAdditionalProperty";
 
 @Component({
   selector: "devices",
@@ -156,6 +155,7 @@ export class DevicesComponent implements OnInit {
         field.templateOptions.options = element.value.map((e) => {
           return { label: e, value: e };
         });
+        field.defaultValue = null;
         break;
       case ParamType.GROUP:
         if (element.dependsOnParam) {

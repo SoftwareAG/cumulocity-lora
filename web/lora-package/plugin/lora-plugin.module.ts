@@ -1,12 +1,12 @@
-import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { NgModule } from "@angular/core";
 import { RouterModule as NgRouterModule } from "@angular/router";
 import {
   CoreModule,
-  HOOK_NAVIGATOR_NODES,
-  HOOK_ROUTE,
-  ViewContext,
   FormsModule,
+  ViewContext,
+  hookNavigator,
+  hookRoute,
 } from "@c8y/ngx-components";
 
 import { UPGRADE_ROUTES } from "@c8y/ngx-components/upgrade";
@@ -34,9 +34,9 @@ import { LNSEditComponent } from "../src/onboarding/lns/lns-edit.component";
 import { LNSComponent } from "../src/onboarding/lns/lns.component";
 import { SimulatorComponent } from "../src/simulator/simulator.component";
 
-import { monacoConfig } from "./monacoConfig";
 import { SelectTypeComponent } from "../src/onboarding/codecs/select.type";
 import { PropertyEditorComponent } from "../src/onboarding/devices/property-editor.component";
+import { monacoConfig } from "./monacoConfig";
 
 @NgModule({
   declarations: [
@@ -108,40 +108,28 @@ import { PropertyEditorComponent } from "../src/onboarding/devices/property-edit
   ],
   exports: [],
   providers: [
-    {
-      provide: HOOK_NAVIGATOR_NODES,
-      useClass: LoraNavigationFactory,
-      multi: true,
-    },
-    {
-      provide: HOOK_ROUTE,
-      useValue: [
-        {
-          context: ViewContext.Group,
-          path: "health",
-          component: GroupsComponent,
-          label: "Health",
-          priority: 100,
-          icon: "heart",
-        },
-      ],
-      multi: true,
-    },
-    {
-      provide: HOOK_ROUTE,
-      useValue: [
-        {
-          context: ViewContext.Device,
-          path: "lora_command",
-          component: DevicesComponent,
-          label: "LoRa",
-          priority: 100,
-          icon: "c8y-energy",
-          canActivate: [LoraGuard],
-        },
-      ],
-      multi: true,
-    },
+    hookNavigator({ useClass: LoraNavigationFactory, multi: true }),
+    hookRoute([
+      {
+        context: ViewContext.Group,
+        path: "health",
+        component: GroupsComponent,
+        label: "Health",
+        priority: 100,
+        icon: "heart",
+      },
+    ]),
+    hookRoute([
+      {
+        context: ViewContext.Device,
+        path: "lora_command",
+        component: DevicesComponent,
+        label: "LoRa",
+        priority: 100,
+        icon: "c8y-energy",
+        canActivate: [LoraGuard],
+      },
+    ]),
   ],
 })
 export class LoraPluginModule {}
