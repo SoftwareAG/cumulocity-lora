@@ -86,6 +86,7 @@ public class LNSDeviceService {
 	public void addDeviceProperty(ManagedObjectRepresentation mor, String key, Object value) {
 		mor.setProperty(key, value);
 		ManagedObjectRepresentation update = new ManagedObjectRepresentation();
+		update.setId(mor.getId());
 		update.setProperty(key, value);
 		inventoryApi.update(update);
 	}
@@ -93,13 +94,14 @@ public class LNSDeviceService {
 	public void addDeviceProperty(ManagedObjectRepresentation mor, Object value) {
 		mor.set(value);
 		ManagedObjectRepresentation update = new ManagedObjectRepresentation();
+		update.setId(mor.getId());
 		update.set(value);
 		inventoryApi.update(update);
 	}
 
 	public void upsertDevice(String lnsConnectorId, DeviceData event) {
 		loraContextService.log("Upsert device with devEui {} with Payload {} from fPort {}", event.getDevEui(),
-				event.getPayload(), event.getfPort());
+						event.getPayload(), event.getfPort());
 		ManagedObjectRepresentation mor = getOrCreateDevice(lnsConnectorId, event.getDevEui());
 		boolean useGatewayPosition = !mor.hasProperty("useGatewayPosition") || (Boolean) mor.get("useGatewayPosition");
 		if (event.getModel() == null && mor.get(Hardware.class) != null) {
@@ -113,8 +115,8 @@ public class LNSDeviceService {
 			loraContextService.log("Using gateway position to locate device: {}, {}", event.getLat(), event.getLng());
 			updateLocation(event, mor);
 		}
-		if (!mor.hasProperty(LNSIntegrationService.LNS_CONNECTOR_REF)
-				|| !mor.getProperty(LNSIntegrationService.LNS_CONNECTOR_REF).toString().equals(lnsConnectorId)) {
+		if (!mor.hasProperty(LNSIntegrationService.LNS_CONNECTOR_REF) || !mor
+						.getProperty(LNSIntegrationService.LNS_CONNECTOR_REF).toString().equals(lnsConnectorId)) {
 			addDeviceProperty(mor, LNSIntegrationService.LNS_CONNECTOR_REF, lnsConnectorId);
 		}
 		updateCodec(mor);
@@ -132,7 +134,7 @@ public class LNSDeviceService {
 	private void updateCodec(ManagedObjectRepresentation mor) {
 		DeviceCodecRepresentation codec = mor.get(DeviceCodecRepresentation.class);
 		if (mor.getProperty(CODEC_PROPERTY) != null
-				&& (codec == null || !codec.getId().equals(mor.getProperty(CODEC_PROPERTY)))) {
+						&& (codec == null || !codec.getId().equals(mor.getProperty(CODEC_PROPERTY)))) {
 			CodecProxy codecProxy = codecManager.getCodec(mor.getProperty(CODEC_PROPERTY).toString());
 			if (codecProxy != null) {
 				addDeviceProperty(mor, codecProxy);
@@ -214,32 +216,32 @@ public class LNSDeviceService {
 			}
 			if (result == null) {
 				loraContextService.log("Device {} has no external Ids or does not exist in tenant {}.", id,
-						subscriptionsService.getTenant());
+								subscriptionsService.getTenant());
 			}
 		} else {
 			loraContextService.log("Device {} has no external Ids or does not exist in tenant {}.", id,
-					subscriptionsService.getTenant());
+							subscriptionsService.getTenant());
 		}
 		return result;
 	}
 
 	public Optional<ManagedObjectRepresentation> getDevice(String devEui) {
 		return c8yUtils.findExternalId(devEui, C8YUtils.DEVEUI_TYPE)
-				.map(extId -> Optional.of(inventoryApi.get(extId.getManagedObject().getId())))
-				.orElse(Optional.empty());
+						.map(extId -> Optional.of(inventoryApi.get(extId.getManagedObject().getId())))
+						.orElse(Optional.empty());
 	}
 
 	public ManagedObjectRepresentation mustGetDevice(String devEui) {
 		return c8yUtils.findExternalId(devEui, C8YUtils.DEVEUI_TYPE)
-				.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
-				.orElseThrow(() -> new DeviceNotFoundException(devEui));
+						.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
+						.orElseThrow(() -> new DeviceNotFoundException(devEui));
 	}
 
 	public void getDeviceConfig(ManagedObjectRepresentation mor) {
 		if (codecManager.getAvailableOperations(mor) != null
-				&& codecManager.getAvailableOperations(mor).containsKey(GET_CONFIG_COMMAND)) {
+						&& codecManager.getAvailableOperations(mor).containsKey(GET_CONFIG_COMMAND)) {
 			OperationCollection oc = deviceControlApi.getOperationsByFilter(
-					new OperationFilter().byDevice(mor.getId().getValue()).byStatus(OperationStatus.EXECUTING));
+							new OperationFilter().byDevice(mor.getId().getValue()).byStatus(OperationStatus.EXECUTING));
 			for (OperationRepresentation o : oc.get(2000).allPages()) {
 				if (o.get(Command.class) != null && o.get(Command.class).getText().contains(GET_CONFIG_COMMAND)) {
 					return;
@@ -254,7 +256,7 @@ public class LNSDeviceService {
 	}
 
 	private ManagedObjectRepresentation initDevice(ManagedObjectRepresentation device,
-			DeviceProvisioning deviceProvisioning) {
+					DeviceProvisioning deviceProvisioning) {
 		var update = new ManagedObjectRepresentation();
 		update.setId(device.getId());
 		if (deviceProvisioning.getCodec() != null) {
@@ -272,8 +274,7 @@ public class LNSDeviceService {
 		return inventoryApi.update(update);
 	}
 
-	public ManagedObjectRepresentation provisionDevice(String lnsConnectorId,
-			DeviceProvisioning deviceProvisioning) {
+	public ManagedObjectRepresentation provisionDevice(String lnsConnectorId, DeviceProvisioning deviceProvisioning) {
 		loraContextService.log("Will provision device on LNS connector {}: {}", lnsConnectorId, deviceProvisioning);
 		ManagedObjectRepresentation mor = null;
 		LNSConnector connector = lnsConnectorManager.getConnector(lnsConnectorId);
