@@ -10,14 +10,16 @@
  * Do not edit the class manually.
  */
 
-
 package lora.ns.actility.rest.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Resource representing a set of statistics related to alarms.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AlarmStatistics {
   private Integer nonAckedClearedCount = null;
 
@@ -31,15 +33,18 @@ public class AlarmStatistics {
 
   private Integer nonAckedCriticalCount = null;
 
+  private Integer nonAckedIndeterminateCount = null;
+
   public AlarmStatistics nonAckedClearedCount(Integer nonAckedClearedCount) {
     this.nonAckedClearedCount = nonAckedClearedCount;
     return this;
   }
 
-   /**
+  /**
    * Number of non-acked alarms with the CLEARED state.
+   * 
    * @return nonAckedClearedCount
-  **/
+   **/
   public Integer getNonAckedClearedCount() {
     return nonAckedClearedCount;
   }
@@ -53,10 +58,11 @@ public class AlarmStatistics {
     return this;
   }
 
-   /**
+  /**
    * Number of non-acked alarms with the UNCLEARED state.
+   * 
    * @return nonAckedUnclearedCount
-  **/
+   **/
   public Integer getNonAckedUnclearedCount() {
     return nonAckedUnclearedCount;
   }
@@ -70,10 +76,11 @@ public class AlarmStatistics {
     return this;
   }
 
-   /**
+  /**
    * Number of non-acked alarms with the WARNING state.
+   * 
    * @return nonAckedWarningCount
-  **/
+   **/
   public Integer getNonAckedWarningCount() {
     return nonAckedWarningCount;
   }
@@ -87,10 +94,11 @@ public class AlarmStatistics {
     return this;
   }
 
-   /**
+  /**
    * Number of non-acked alarms with the MINOR state.
+   * 
    * @return nonAckedMinorCount
-  **/
+   **/
   public Integer getNonAckedMinorCount() {
     return nonAckedMinorCount;
   }
@@ -104,10 +112,11 @@ public class AlarmStatistics {
     return this;
   }
 
-   /**
+  /**
    * Number of non-acked alarms with the MAJOR state.
+   * 
    * @return nonAckedMajorCount
-  **/
+   **/
   public Integer getNonAckedMajorCount() {
     return nonAckedMajorCount;
   }
@@ -121,10 +130,11 @@ public class AlarmStatistics {
     return this;
   }
 
-   /**
+  /**
    * Number of non-acked alarms with the CRITICAL state.
+   * 
    * @return nonAckedCriticalCount
-  **/
+   **/
   public Integer getNonAckedCriticalCount() {
     return nonAckedCriticalCount;
   }
@@ -132,7 +142,6 @@ public class AlarmStatistics {
   public void setNonAckedCriticalCount(Integer nonAckedCriticalCount) {
     this.nonAckedCriticalCount = nonAckedCriticalCount;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -143,25 +152,25 @@ public class AlarmStatistics {
       return false;
     }
     AlarmStatistics alarmStatistics = (AlarmStatistics) o;
-    return Objects.equals(this.nonAckedClearedCount, alarmStatistics.nonAckedClearedCount) &&
-        Objects.equals(this.nonAckedUnclearedCount, alarmStatistics.nonAckedUnclearedCount) &&
-        Objects.equals(this.nonAckedWarningCount, alarmStatistics.nonAckedWarningCount) &&
-        Objects.equals(this.nonAckedMinorCount, alarmStatistics.nonAckedMinorCount) &&
-        Objects.equals(this.nonAckedMajorCount, alarmStatistics.nonAckedMajorCount) &&
-        Objects.equals(this.nonAckedCriticalCount, alarmStatistics.nonAckedCriticalCount);
+    return Objects.equals(this.nonAckedClearedCount, alarmStatistics.nonAckedClearedCount)
+            && Objects.equals(this.nonAckedUnclearedCount, alarmStatistics.nonAckedUnclearedCount)
+            && Objects.equals(this.nonAckedWarningCount, alarmStatistics.nonAckedWarningCount)
+            && Objects.equals(this.nonAckedMinorCount, alarmStatistics.nonAckedMinorCount)
+            && Objects.equals(this.nonAckedMajorCount, alarmStatistics.nonAckedMajorCount)
+            && Objects.equals(this.nonAckedCriticalCount, alarmStatistics.nonAckedCriticalCount);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(nonAckedClearedCount, nonAckedUnclearedCount, nonAckedWarningCount, nonAckedMinorCount, nonAckedMajorCount, nonAckedCriticalCount);
+    return Objects.hash(nonAckedClearedCount, nonAckedUnclearedCount, nonAckedWarningCount, nonAckedMinorCount,
+            nonAckedMajorCount, nonAckedCriticalCount);
   }
-
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class AlarmStatistics {\n");
-    
+
     sb.append("    nonAckedClearedCount: ").append(toIndentedString(nonAckedClearedCount)).append("\n");
     sb.append("    nonAckedUnclearedCount: ").append(toIndentedString(nonAckedUnclearedCount)).append("\n");
     sb.append("    nonAckedWarningCount: ").append(toIndentedString(nonAckedWarningCount)).append("\n");
@@ -183,5 +192,12 @@ public class AlarmStatistics {
     return o.toString().replace("\n", "\n    ");
   }
 
-}
+  public Integer getNonAckedIndeterminateCount() {
+    return nonAckedIndeterminateCount;
+  }
 
+  public void setNonAckedIndeterminateCount(Integer nonAckedIndeterminateCount) {
+    this.nonAckedIndeterminateCount = nonAckedIndeterminateCount;
+  }
+
+}

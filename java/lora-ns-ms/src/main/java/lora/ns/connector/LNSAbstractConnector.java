@@ -1,20 +1,7 @@
 package lora.ns.connector;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.cumulocity.model.idtype.GId;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.cumulocity.rest.representation.tenant.OptionRepresentation;
-import com.cumulocity.sdk.client.inventory.BinariesApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.option.TenantOptionApi;
 
@@ -42,9 +28,6 @@ public abstract class LNSAbstractConnector implements LNSConnector, Initializing
 
 	@Autowired
 	private TenantOptionApi tenantOptionApi;
-
-	@Autowired
-	private BinariesApi binariesApi;
 
 	protected LNSAbstractConnector(Properties properties) {
 		this.setProperties(properties);
@@ -135,31 +118,5 @@ public abstract class LNSAbstractConnector implements LNSConnector, Initializing
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	public void trustCertificates() throws KeyManagementException, CertificateException, KeyStoreException,
-			NoSuchAlgorithmException, IOException {
-		var certificates = inventoryApi.get(GId.asGId(this.getId())).get("certificates");
-		if (certificates != null && certificates instanceof List<?> certificateList) {
-			for (var certificate : certificateList) {
-				trustCertificate(GId.asGId(certificate));
-			}
-		}
-	}
-
-	public void trustCertificate(GId fileId) throws CertificateException, KeyStoreException, NoSuchAlgorithmException,
-			IOException, KeyManagementException {
-		binariesApi.downloadFile(fileId);
-		X509Certificate ca = (X509Certificate) CertificateFactory.getInstance("X.509")
-				.generateCertificate(new BufferedInputStream(binariesApi.downloadFile(fileId)));
-		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-		ks.load(null, null);
-		ks.setCertificateEntry(Integer.toString(1), ca);
-
-		TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		tmf.init(ks);
-
-		SSLContext context = SSLContext.getInstance("TLS");
-		context.init(null, tmf.getTrustManagers(), null);
 	}
 }

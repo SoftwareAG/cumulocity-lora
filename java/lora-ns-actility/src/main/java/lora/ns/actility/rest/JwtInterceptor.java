@@ -29,6 +29,7 @@ public abstract class JwtInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
+        logger.info("Trying to call {}", template.url());
         DecodedJWT decodedJwt = null;
         if (jwt != null) {
             try {
@@ -40,6 +41,7 @@ public abstract class JwtInterceptor implements RequestInterceptor {
         }
 
         if (decodedJwt == null || decodedJwt.getExpiresAt().before(Calendar.getInstance().getTime())) {
+            logger.info("Need to get a new JWT...");
             jwt = getToken();
         }
 

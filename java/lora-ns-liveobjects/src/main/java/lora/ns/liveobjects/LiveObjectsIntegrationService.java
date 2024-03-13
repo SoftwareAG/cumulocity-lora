@@ -30,7 +30,7 @@ public class LiveObjectsIntegrationService extends LNSIntegrationService<LiveObj
 	public LiveObjectsIntegrationService() {
 		wizard.add(new LNSConnectorWizardStep() {
 			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>(
-					List.of(PropertyDescription.text("apikey", "API Key", true)));
+							List.of(PropertyDescription.text("apikey", "API Key", true).withEncrypted(true)));
 
 			public String getName() {
 				return "step1";
@@ -42,7 +42,7 @@ public class LiveObjectsIntegrationService extends LNSIntegrationService<LiveObj
 		});
 		wizard.add(new LNSConnectorWizardStep() {
 			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>(
-					List.of(PropertyDescription.list("groupId", "Group", "/groups", true)));
+							List.of(PropertyDescription.list("groupId", "Group", "/groups", true)));
 
 			public String getName() {
 				return "step2";
@@ -52,10 +52,9 @@ public class LiveObjectsIntegrationService extends LNSIntegrationService<LiveObj
 				return propertyDescriptions;
 			}
 		});
-		deviceProvisioningAdditionalProperties
-				.add(PropertyDescription.list("connectivityPlan", "Connectivity Plan", "/connectivityPlans", true));
-		deviceProvisioningAdditionalProperties
-				.add(PropertyDescription.list("profile", "Profile", "/profiles", true));
+		deviceProvisioningAdditionalProperties.add(
+						PropertyDescription.list("connectivityPlan", "Connectivity Plan", "/connectivityPlans", true));
+		deviceProvisioningAdditionalProperties.add(PropertyDescription.list("profile", "Profile", "/profiles", true));
 	}
 
 	@Override

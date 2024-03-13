@@ -66,11 +66,10 @@ public class LNSRestController {
 
 	@PostMapping(value = "/{lnsInstanceId}/devices", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ManagedObjectRepresentation> provisionDevice(
-			@RequestBody DeviceProvisioning deviceProvisioning,
-			@PathVariable String lnsInstanceId) {
+					@RequestBody DeviceProvisioning deviceProvisioning, @PathVariable String lnsInstanceId) {
 		loraContext.setConnector(lnsConnectorManager.getConnector(lnsInstanceId));
 		return new ResponseEntity<>(lnsDeviceManager.provisionDevice(lnsInstanceId, deviceProvisioning),
-				HttpStatus.CREATED);
+						HttpStatus.CREATED);
 	}
 
 	@DeleteMapping(value = "/{lnsInstanceId}/devices/{deveui}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -82,10 +81,10 @@ public class LNSRestController {
 
 	@PostMapping(value = "/{lnsInstanceId}/gateways", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ManagedObjectRepresentation> provisionGateway(
-			@RequestBody GatewayProvisioning gatewayProvisioning, @PathVariable String lnsInstanceId) {
+					@RequestBody GatewayProvisioning gatewayProvisioning, @PathVariable String lnsInstanceId) {
 		loraContext.setConnector(lnsConnectorManager.getConnector(lnsInstanceId));
 		return new ResponseEntity<>(lnsGatewayManager.provisionGateway(lnsInstanceId, gatewayProvisioning),
-				HttpStatus.CREATED);
+						HttpStatus.CREATED);
 	}
 
 	@DeleteMapping(value = "/{lnsInstanceId}/gateways/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,13 +101,13 @@ public class LNSRestController {
 
 	@PostMapping(value = "/lnsinstances", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ManagedObjectRepresentation> addLnsConnector(
-			@RequestBody LNSConnectorRepresentation connector) {
+					@RequestBody LNSConnectorRepresentation connector) {
 		return new ResponseEntity<>(lnsIntegrationService.addLnsConnector(connector), HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/lnsinstances/{lnsConnectorId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Void> updateLnsConnector(@PathVariable String lnsConnectorId,
-			@RequestBody Properties properties) {
+					@RequestBody Properties properties) {
 		loraContext.setConnector(lnsConnectorManager.getConnector(lnsConnectorId));
 		lnsIntegrationService.updateLnsConnector(lnsConnectorId, properties);
 		return ResponseEntity.ok().build();

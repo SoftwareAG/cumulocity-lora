@@ -10,33 +10,39 @@
  * Do not edit the class manually.
  */
 
-
 package lora.ns.actility.rest.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
- * Resource representing read-only statistics about the connection interface for a base station.
+ * Resource representing read-only statistics about the connection interface for
+ * a base station.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConnectionInterfaceStatistics {
   private String name = null;
 
   /**
-   * State of the interface. The following value are supported: &#39;DOWN&#39;, &#39;UP_LINKDOWN&#39; (only for ETHERNET), &#39;UP_NOSIGNAL&#39; (only for GPRS), &#39;UP_NOIP&#39;, &#39;UP_NETWORKDOWN&#39;, &#39;UP_RUNNING&#39; and &#39;UP_RUNNING_USED&#39;.
+   * State of the interface. The following value are supported: &#39;DOWN&#39;,
+   * &#39;UP_LINKDOWN&#39; (only for ETHERNET), &#39;UP_NOSIGNAL&#39; (only for
+   * GPRS), &#39;UP_NOIP&#39;, &#39;UP_NETWORKDOWN&#39;, &#39;UP_RUNNING&#39; and
+   * &#39;UP_RUNNING_USED&#39;.
    */
   public enum StateEnum {
     DOWN("DOWN"),
-    
+
     UP_LINKDOWN("UP_LINKDOWN"),
-    
+
     UP_NOSIGNAL("UP_NOSIGNAL"),
-    
+
     UP_NOIP("UP_NOIP"),
-    
+
     UP_NETWORKDOWN("UP_NETWORKDOWN"),
-    
+
     UP_RUNNING("UP_RUNNING"),
-    
+
     UP_RUNNING_USED("UP_RUNNING_USED");
 
     private String value;
@@ -71,7 +77,7 @@ public class ConnectionInterfaceStatistics {
    */
   public enum TypeEnum {
     ETHERNET("ETHERNET"),
-    
+
     GPRS("GPRS");
 
     private String value;
@@ -111,15 +117,18 @@ public class ConnectionInterfaceStatistics {
 
   private String ip = null;
 
+  private String iccid = null;
+
   public ConnectionInterfaceStatistics name(String name) {
     this.name = name;
     return this;
   }
 
-   /**
+  /**
    * Name of the interface.
+   * 
    * @return name
-  **/
+   **/
   public String getName() {
     return name;
   }
@@ -133,10 +142,14 @@ public class ConnectionInterfaceStatistics {
     return this;
   }
 
-   /**
-   * State of the interface. The following value are supported: &#39;DOWN&#39;, &#39;UP_LINKDOWN&#39; (only for ETHERNET), &#39;UP_NOSIGNAL&#39; (only for GPRS), &#39;UP_NOIP&#39;, &#39;UP_NETWORKDOWN&#39;, &#39;UP_RUNNING&#39; and &#39;UP_RUNNING_USED&#39;.
+  /**
+   * State of the interface. The following value are supported: &#39;DOWN&#39;,
+   * &#39;UP_LINKDOWN&#39; (only for ETHERNET), &#39;UP_NOSIGNAL&#39; (only for
+   * GPRS), &#39;UP_NOIP&#39;, &#39;UP_NETWORKDOWN&#39;, &#39;UP_RUNNING&#39; and
+   * &#39;UP_RUNNING_USED&#39;.
+   * 
    * @return state
-  **/
+   **/
   public StateEnum getState() {
     return state;
   }
@@ -150,10 +163,11 @@ public class ConnectionInterfaceStatistics {
     return this;
   }
 
-   /**
+  /**
    * Type of connection for the base station.
+   * 
    * @return type
-  **/
+   **/
   public TypeEnum getType() {
     return type;
   }
@@ -167,10 +181,11 @@ public class ConnectionInterfaceStatistics {
     return this;
   }
 
-   /**
+  /**
    * Interface average round trip for the base station.
+   * 
    * @return averageRoundTrip
-  **/
+   **/
   public Integer getAverageRoundTrip() {
     return averageRoundTrip;
   }
@@ -184,10 +199,11 @@ public class ConnectionInterfaceStatistics {
     return this;
   }
 
-   /**
+  /**
    * Interface deviation round trip for the base station.
+   * 
    * @return deviationRoundTrip
-  **/
+   **/
   public Integer getDeviationRoundTrip() {
     return deviationRoundTrip;
   }
@@ -201,10 +217,11 @@ public class ConnectionInterfaceStatistics {
     return this;
   }
 
-   /**
+  /**
    * Total traffic (data and mac commands) in kB sent by the base station.
+   * 
    * @return totalTrafficSent
-  **/
+   **/
   public Float getTotalTrafficSent() {
     return totalTrafficSent;
   }
@@ -218,10 +235,11 @@ public class ConnectionInterfaceStatistics {
     return this;
   }
 
-   /**
+  /**
    * Total traffic (data and mac commands) in kB received by the base station.
+   * 
    * @return totalTrafficReceived
-  **/
+   **/
   public Float getTotalTrafficReceived() {
     return totalTrafficReceived;
   }
@@ -235,10 +253,11 @@ public class ConnectionInterfaceStatistics {
     return this;
   }
 
-   /**
+  /**
    * IP address of the base station.
+   * 
    * @return ip
-  **/
+   **/
   public String getIp() {
     return ip;
   }
@@ -247,6 +266,13 @@ public class ConnectionInterfaceStatistics {
     this.ip = ip;
   }
 
+  public String getIccid() {
+    return iccid;
+  }
+
+  public void setIccid(String iccid) {
+    this.iccid = iccid;
+  }
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -257,27 +283,27 @@ public class ConnectionInterfaceStatistics {
       return false;
     }
     ConnectionInterfaceStatistics connectionInterfaceStatistics = (ConnectionInterfaceStatistics) o;
-    return Objects.equals(this.name, connectionInterfaceStatistics.name) &&
-        Objects.equals(this.state, connectionInterfaceStatistics.state) &&
-        Objects.equals(this.type, connectionInterfaceStatistics.type) &&
-        Objects.equals(this.averageRoundTrip, connectionInterfaceStatistics.averageRoundTrip) &&
-        Objects.equals(this.deviationRoundTrip, connectionInterfaceStatistics.deviationRoundTrip) &&
-        Objects.equals(this.totalTrafficSent, connectionInterfaceStatistics.totalTrafficSent) &&
-        Objects.equals(this.totalTrafficReceived, connectionInterfaceStatistics.totalTrafficReceived) &&
-        Objects.equals(this.ip, connectionInterfaceStatistics.ip);
+    return Objects.equals(this.name, connectionInterfaceStatistics.name)
+            && Objects.equals(this.state, connectionInterfaceStatistics.state)
+            && Objects.equals(this.type, connectionInterfaceStatistics.type)
+            && Objects.equals(this.averageRoundTrip, connectionInterfaceStatistics.averageRoundTrip)
+            && Objects.equals(this.deviationRoundTrip, connectionInterfaceStatistics.deviationRoundTrip)
+            && Objects.equals(this.totalTrafficSent, connectionInterfaceStatistics.totalTrafficSent)
+            && Objects.equals(this.totalTrafficReceived, connectionInterfaceStatistics.totalTrafficReceived)
+            && Objects.equals(this.ip, connectionInterfaceStatistics.ip);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, state, type, averageRoundTrip, deviationRoundTrip, totalTrafficSent, totalTrafficReceived, ip);
+    return Objects.hash(name, state, type, averageRoundTrip, deviationRoundTrip, totalTrafficSent, totalTrafficReceived,
+            ip);
   }
-
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConnectionInterfaceStatistics {\n");
-    
+
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    state: ").append(toIndentedString(state)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
@@ -302,4 +328,3 @@ public class ConnectionInterfaceStatistics {
   }
 
 }
-

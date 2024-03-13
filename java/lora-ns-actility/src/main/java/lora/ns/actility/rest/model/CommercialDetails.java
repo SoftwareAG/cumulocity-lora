@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package lora.ns.actility.rest.model;
 
 import java.util.Objects;
@@ -22,19 +21,26 @@ import java.util.Objects;
 public class CommercialDetails {
   private String image = null;
 
+  private String vendorId = null;
+
   private String manufacturerName = null;
 
   private String manufacturerLogo = null;
+
+  private String manufacturerDescription = null;
+
+  private String softwareType = null;
 
   public CommercialDetails image(String image) {
     this.image = image;
     return this;
   }
 
-   /**
+  /**
    * Image of the device.
+   * 
    * @return image
-  **/
+   **/
   public String getImage() {
     return image;
   }
@@ -48,10 +54,11 @@ public class CommercialDetails {
     return this;
   }
 
-   /**
+  /**
    * Name of the device manufacturer.
+   * 
    * @return manufacturerName
-  **/
+   **/
   public String getManufacturerName() {
     return manufacturerName;
   }
@@ -65,10 +72,11 @@ public class CommercialDetails {
     return this;
   }
 
-   /**
+  /**
    * Commercial logo of the device manufacturer.
+   * 
    * @return manufacturerLogo
-  **/
+   **/
   public String getManufacturerLogo() {
     return manufacturerLogo;
   }
@@ -76,7 +84,6 @@ public class CommercialDetails {
   public void setManufacturerLogo(String manufacturerLogo) {
     this.manufacturerLogo = manufacturerLogo;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -87,9 +94,9 @@ public class CommercialDetails {
       return false;
     }
     CommercialDetails commercialDetails = (CommercialDetails) o;
-    return Objects.equals(this.image, commercialDetails.image) &&
-        Objects.equals(this.manufacturerName, commercialDetails.manufacturerName) &&
-        Objects.equals(this.manufacturerLogo, commercialDetails.manufacturerLogo);
+    return Objects.equals(this.image, commercialDetails.image)
+            && Objects.equals(this.manufacturerName, commercialDetails.manufacturerName)
+            && Objects.equals(this.manufacturerLogo, commercialDetails.manufacturerLogo);
   }
 
   @Override
@@ -97,12 +104,11 @@ public class CommercialDetails {
     return Objects.hash(image, manufacturerName, manufacturerLogo);
   }
 
-
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class CommercialDetails {\n");
-    
+
     sb.append("    image: ").append(toIndentedString(image)).append("\n");
     sb.append("    manufacturerName: ").append(toIndentedString(manufacturerName)).append("\n");
     sb.append("    manufacturerLogo: ").append(toIndentedString(manufacturerLogo)).append("\n");
@@ -121,5 +127,28 @@ public class CommercialDetails {
     return o.toString().replace("\n", "\n    ");
   }
 
-}
+  public String getManufacturerDescription() {
+    return manufacturerDescription;
+  }
 
+  public void setManufacturerDescription(String manufacturerDescription) {
+    this.manufacturerDescription = manufacturerDescription;
+  }
+
+  public String getSoftwareType() {
+    return softwareType;
+  }
+
+  public void setSoftwareType(String softwareType) {
+    this.softwareType = softwareType;
+  }
+
+  public String getVendorId() {
+    return vendorId;
+  }
+
+  public void setVendorId(String vendorId) {
+    this.vendorId = vendorId;
+  }
+
+}

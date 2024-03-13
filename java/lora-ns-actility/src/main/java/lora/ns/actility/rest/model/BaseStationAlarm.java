@@ -10,14 +10,16 @@
  * Do not edit the class manually.
  */
 
-
 package lora.ns.actility.rest.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Resource representing a base station alarm.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseStationAlarm extends Alarm {
   private String baseStationRef = null;
 
@@ -30,10 +32,11 @@ public class BaseStationAlarm extends Alarm {
     return this;
   }
 
-   /**
+  /**
    * Ref of the base station related to the alarm.
+   * 
    * @return baseStationRef
-  **/
+   **/
   public String getBaseStationRef() {
     return baseStationRef;
   }
@@ -47,10 +50,12 @@ public class BaseStationAlarm extends Alarm {
     return this;
   }
 
-   /**
-   * Id of the base station alarm type. Refer to the list of ThingPark base station alarm types to get the corresponding label.
+  /**
+   * Id of the base station alarm type. Refer to the list of ThingPark base
+   * station alarm types to get the corresponding label.
+   * 
    * @return baseStationAlarmTypeId
-  **/
+   **/
   public Integer getBaseStationAlarmTypeId() {
     return baseStationAlarmTypeId;
   }
@@ -64,10 +69,12 @@ public class BaseStationAlarm extends Alarm {
     return this;
   }
 
-   /**
-   * Id of the base station alarm object. Refer to the list of ThingPark base station alarm objects to get the corresponding label.
+  /**
+   * Id of the base station alarm object. Refer to the list of ThingPark base
+   * station alarm objects to get the corresponding label.
+   * 
    * @return baseStationAlarmObjectId
-  **/
+   **/
   public String getBaseStationAlarmObjectId() {
     return baseStationAlarmObjectId;
   }
@@ -75,7 +82,6 @@ public class BaseStationAlarm extends Alarm {
   public void setBaseStationAlarmObjectId(String baseStationAlarmObjectId) {
     this.baseStationAlarmObjectId = baseStationAlarmObjectId;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -86,17 +92,16 @@ public class BaseStationAlarm extends Alarm {
       return false;
     }
     BaseStationAlarm baseStationAlarm = (BaseStationAlarm) o;
-    return Objects.equals(this.baseStationRef, baseStationAlarm.baseStationRef) &&
-        Objects.equals(this.baseStationAlarmTypeId, baseStationAlarm.baseStationAlarmTypeId) &&
-        Objects.equals(this.baseStationAlarmObjectId, baseStationAlarm.baseStationAlarmObjectId) &&
-        super.equals(o);
+    return Objects.equals(this.baseStationRef, baseStationAlarm.baseStationRef)
+            && Objects.equals(this.baseStationAlarmTypeId, baseStationAlarm.baseStationAlarmTypeId)
+            && Objects.equals(this.baseStationAlarmObjectId, baseStationAlarm.baseStationAlarmObjectId)
+            && super.equals(o);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(baseStationRef, baseStationAlarmTypeId, baseStationAlarmObjectId, super.hashCode());
   }
-
 
   @Override
   public String toString() {
@@ -110,4 +115,3 @@ public class BaseStationAlarm extends Alarm {
     return sb.toString();
   }
 }
-

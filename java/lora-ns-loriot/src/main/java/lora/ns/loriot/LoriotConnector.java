@@ -93,10 +93,9 @@ public class LoriotConnector extends LNSAbstractConnector {
 		var feignBuilder = Feign.builder().decoder(new JacksonDecoder(objectMapper))
 						.encoder(new JacksonEncoder(objectMapper)).logger(new Slf4jLogger("lora.ns.loriot"))
 						.logLevel(Level.FULL)
-						.requestInterceptor(template -> template.headers(
-										Map.of("Authorization", List.of("Session " + sessionId), "Content-Type",
-														List.of(properties.getProperty("application/json")), "Accept",
-														List.of(properties.getProperty("application/json")))))
+						.requestInterceptor(template -> template.headers(Map.of("Authorization",
+										List.of("Session " + sessionId), "Content-Type", List.of("application/json"),
+										"Accept", List.of("application/json"))))
 						.errorDecoder((String methodKey, Response response) -> {
 							FeignException exception = feign.FeignException.errorStatus(methodKey, response);
 							int status = response.status();

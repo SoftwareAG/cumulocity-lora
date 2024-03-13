@@ -12,17 +12,18 @@
 
 package lora.ns.actility.rest.model;
 
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Resource representing a base station created by a ThingPark supplier or
  * subscriber.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseStation {
   private String ref = null;
 
@@ -498,33 +499,31 @@ public class BaseStation {
       return false;
     }
     BaseStation baseStation = (BaseStation) o;
-    return Objects.equals(this.ref, baseStation.ref) &&
-        Objects.equals(this.id, baseStation.id) &&
-        Objects.equals(this.uuid, baseStation.uuid) &&
-        Objects.equals(this.baseStationProfileId, baseStation.baseStationProfileId) &&
-        Objects.equals(this.name, baseStation.name) &&
-        Objects.equals(this.SMN, baseStation.SMN) &&
-        Objects.equals(this.administrativeInfo, baseStation.administrativeInfo) &&
-        Objects.equals(this.publicKey, baseStation.publicKey) &&
-        Objects.equals(this.administrationState, baseStation.administrationState) &&
-        Objects.equals(this.rx2Optimization, baseStation.rx2Optimization) &&
-        Objects.equals(this.classBReady, baseStation.classBReady) &&
-        Objects.equals(this.activateBeaconTransmission, baseStation.activateBeaconTransmission) &&
-        Objects.equals(this.owner, baseStation.owner) &&
-        Objects.equals(this.geoLatitude, baseStation.geoLatitude) &&
-        Objects.equals(this.geoLongitude, baseStation.geoLongitude) &&
-        Objects.equals(this.geoAltitude, baseStation.geoAltitude) &&
-        Objects.equals(this.rfRegionId, baseStation.rfRegionId) &&
-        Objects.equals(this.statistics, baseStation.statistics) &&
-        Objects.equals(this.commercialDetails, baseStation.commercialDetails) &&
-        Objects.equals(this.tags, baseStation.tags);
+    return Objects.equals(this.ref, baseStation.ref) && Objects.equals(this.id, baseStation.id)
+            && Objects.equals(this.uuid, baseStation.uuid)
+            && Objects.equals(this.baseStationProfileId, baseStation.baseStationProfileId)
+            && Objects.equals(this.name, baseStation.name) && Objects.equals(this.SMN, baseStation.SMN)
+            && Objects.equals(this.administrativeInfo, baseStation.administrativeInfo)
+            && Objects.equals(this.publicKey, baseStation.publicKey)
+            && Objects.equals(this.administrationState, baseStation.administrationState)
+            && Objects.equals(this.rx2Optimization, baseStation.rx2Optimization)
+            && Objects.equals(this.classBReady, baseStation.classBReady)
+            && Objects.equals(this.activateBeaconTransmission, baseStation.activateBeaconTransmission)
+            && Objects.equals(this.owner, baseStation.owner)
+            && Objects.equals(this.geoLatitude, baseStation.geoLatitude)
+            && Objects.equals(this.geoLongitude, baseStation.geoLongitude)
+            && Objects.equals(this.geoAltitude, baseStation.geoAltitude)
+            && Objects.equals(this.rfRegionId, baseStation.rfRegionId)
+            && Objects.equals(this.statistics, baseStation.statistics)
+            && Objects.equals(this.commercialDetails, baseStation.commercialDetails)
+            && Objects.equals(this.tags, baseStation.tags);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(ref, id, uuid, baseStationProfileId, name, SMN, administrativeInfo, publicKey,
-        administrationState, rx2Optimization, classBReady, activateBeaconTransmission, owner, geoLatitude, geoLongitude,
-        geoAltitude, rfRegionId, statistics, commercialDetails, tags);
+            administrationState, rx2Optimization, classBReady, activateBeaconTransmission, owner, geoLatitude,
+            geoLongitude, geoAltitude, rfRegionId, statistics, commercialDetails, tags);
   }
 
   @Override

@@ -6,6 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import com.cumulocity.model.measurement.MeasurementValue;
 import com.cumulocity.model.operation.OperationStatus;
 import com.cumulocity.rest.representation.measurement.MeasurementRepresentation;
@@ -13,11 +18,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import lora.ns.DeviceData;
 import lora.ns.connector.PropertyDescription;
@@ -33,17 +33,15 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 	public ActilityIntegrationService() {
 		wizard.add(new ConnectorWizardStep1());
 		deviceProvisioningAdditionalProperties.add(new PropertyDescription("deviceProfile", "Device profile", true,
-				null, "/deviceProfiles", null, null, null, null, null, PropertyType.LIST, false));
-		gatewayProvisioningAdditionalProperties
-				.add(new PropertyDescription("SMN", "Serial Markting Number", false, null, null, null, null,
-						null, null, null, PropertyType.TEXT, false));
-		gatewayProvisioningAdditionalProperties
-				.add(new PropertyDescription("publicKey", "Public key", false, null, null, null, null,
-						null, null, null, PropertyType.TEXT, false));
+						null, "/deviceProfiles", null, null, null, null, null, PropertyType.LIST, false));
+		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("SMN", "Serial Marketing Number", false,
+						null, null, null, null, null, null, null, PropertyType.TEXT, false));
+		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("publicKey", "Public key", false, null,
+						null, null, null, null, null, null, PropertyType.TEXT, true));
 		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("gatewayProfile", "Gateway profile", true,
-				null, "/baseStationProfiles", null, null, null, null, null, PropertyType.LIST, false));
+						null, "/baseStationProfiles", null, null, null, null, null, PropertyType.LIST, false));
 		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("rfRegion", "RF Region", true, null,
-				"/rfRegions", null, null, null, null, null, PropertyType.LIST, false));
+						"/rfRegions", null, null, null, null, null, PropertyType.LIST, false));
 	}
 
 	@Override
@@ -61,7 +59,7 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 			Double lng = rootNode.at("/DevEUI_uplink/DevLON").asDouble();
 			logger.info("Signal strength: rssi = {} dBm, snr = {} dB", rssi, snr);
 			byte[] payload = BaseEncoding.base16()
-					.decode(rootNode.at("/DevEUI_uplink/payload_hex").asText().toUpperCase());
+							.decode(rootNode.at("/DevEUI_uplink/payload_hex").asText().toUpperCase());
 			Long updateTime = new DateTime(rootNode.at("/DevEUI_uplink/Time").asText()).getMillis();
 			logger.info("Update time is: {}", updateTime);
 
@@ -90,7 +88,7 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 			measurements.add(m);
 
 			data = new DeviceData(deviceEui, deviceEui, null, null, fPort, payload, updateTime, measurements,
-					lat != null ? BigDecimal.valueOf(lat) : null, lng != null ? BigDecimal.valueOf(lng) : null);
+							lat != null ? BigDecimal.valueOf(lat) : null, lng != null ? BigDecimal.valueOf(lng) : null);
 		} catch (Exception e) {
 			logger.error("Error on Mapping LoRa payload to Cumulocity", e);
 		}

@@ -1,10 +1,20 @@
 package lora.ns.actility;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
@@ -18,8 +28,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import c8y.ConnectionState;
+import feign.Client;
 import feign.Feign;
 import feign.Logger.Level;
+import feign.form.FormEncoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
@@ -42,10 +54,12 @@ import lora.ns.actility.rest.model.DownlinkMessage;
 import lora.ns.actility.rest.model.MessageSecurityParams;
 import lora.ns.actility.rest.model.RFRegion;
 import lora.ns.actility.rest.model.Route;
+import lora.ns.actility.rest.model.Token;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.device.DeviceProvisioning;
 import lora.ns.device.DeviceProvisioning.ProvisioningMode;
 import lora.ns.device.EndDevice;
+import lora.ns.exception.LoraException;
 import lora.ns.gateway.Gateway;
 import lora.ns.gateway.GatewayProvisioning;
 
@@ -70,10 +84,17 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 		@Override
 		protected String getToken() {
-			String token = actilityAdminService.getToken("client_credentials", this.clientId, this.clientSecret)
-							.getAccessToken();
+			Token token = null;
+			try {
+				token = actilityAdminService.getToken("client_credentials", this.clientId, this.clientSecret);
+			} catch (Exception e) {
+				throw new LoraException("Couldn't get JWT", e);
+			}
+			if (token == null) {
+				throw new LoraException("Couldn't get JWT");
+			}
 			log.info("Successfully received a JWT: {}", token);
-			return token;
+			return token.getAccessToken();
 		}
 	}
 
@@ -85,22 +106,65 @@ public class ActilityConnector extends LNSAbstractConnector {
 		super(instance);
 	}
 
+	// SSLSocketFactory
+	// Install the all-trusting trust manager
+	private static SSLSocketFactory getSSLSocketFactory() {
+		try {
+			SSLContext sslContext = SSLContext.getInstance("SSL");
+			sslContext.init(null, getTrustManager(), new SecureRandom());
+			return sslContext.getSocketFactory();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	// TrustManager
+	// trust manager that does not validate certificate chains
+	private static TrustManager[] getTrustManager() {
+		return new TrustManager[] { new X509TrustManager() {
+			@Override
+			public void checkClientTrusted(X509Certificate[] chain, String authType) {
+				// Do nothing, we trust everything
+			}
+
+			@Override
+			public void checkServerTrusted(X509Certificate[] chain, String authType) {
+				// Do nothing, we trust everything
+			}
+
+			@Override
+			public X509Certificate[] getAcceptedIssuers() {
+				return new X509Certificate[] {};
+			}
+		} };
+	}
+
+	// HostnameVerifier
+	private static HostnameVerifier getHostnameVerifier() {
+		return (String s, SSLSession sslSession) -> true;
+	}
+
 	@Override
 	protected void init() {
 		final ch.qos.logback.classic.Logger serviceLogger = (ch.qos.logback.classic.Logger) LoggerFactory
 						.getLogger("lora.ns.actility");
 		serviceLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
-		var feignBuilder = Feign.builder().decoder(new JacksonDecoder(objectMapper))
-						.encoder(new JacksonEncoder(objectMapper)).logger(new Slf4jLogger("lora.ns.actility"))
-						.logLevel(Level.FULL)
-						.requestInterceptor(template -> template.header("X-API-KEY", properties.getProperty("apikey")));
-
+		var feignBuilder = Feign.builder().client(new Client.Default(getSSLSocketFactory(), getHostnameVerifier()))
+						.decoder(new JacksonDecoder(objectMapper)).encoder(new FormEncoder())
+						.logger(new Slf4jLogger("lora.ns.actility")).logLevel(Level.FULL)
+						.requestInterceptor(template -> template.header("Content-Type",
+										"application/x-www-form-urlencoded"));
 		String url = properties.getProperty("url");
+		actilityAdminService = feignBuilder.target(ActilityAdminService.class, url + "/iot-flow/v1/");
+		feignBuilder = Feign.builder().client(new Client.Default(getSSLSocketFactory(), getHostnameVerifier()))
+						.decoder(new JacksonDecoder(objectMapper)).encoder(new JacksonEncoder(objectMapper))
+						.logger(new Slf4jLogger("lora.ns.actility")).logLevel(Level.FULL)
+						.requestInterceptor(template -> template.headers(Map.of("Content-Type",
+										List.of("application/json"), "Accept", List.of("application/json"))));
 		actilityCoreService = feignBuilder
 						.requestInterceptor(new DXAdminJWTInterceptor(properties.getProperty("username"),
 										properties.getProperty("password")))
 						.target(ActilityCoreService.class, url + "/thingpark/dx/core/latest/api/");
-		actilityAdminService = feignBuilder.target(ActilityAdminService.class, url + "/iot-flow/v1/");
 	}
 
 	@Override
@@ -208,24 +272,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	public void removeRoutings() {
-		var devices = actilityCoreService.getDevices();
-		devices.forEach(d -> {
-			if (d.getRouteRefs().contains(routeRef)) {
-				d.getRouteRefs().remove(routeRef);
-				try {
-					actilityCoreService.updateDevice(d.getRef(), d);
-				} catch (Exception e) {
-					log.error("Couldn't update device {}", d.getRef(), e);
-				}
-			}
-		});
-		var connections = actilityCoreService.getConnections();
-		connections.forEach(connection -> {
-			log.info("Found Connection {}", connection.getName());
-			if (connection.getName().equals(subscriptionsService.getTenant() + "-" + this.getId())) {
-				actilityCoreService.deleteConnection(connection.getId());
-			}
-		});
+		// Don't remove the connections, update them
 	}
 
 	@Override

@@ -10,34 +10,38 @@
  * Do not edit the class manually.
  */
 
-
 package lora.ns.actility.rest.model;
-
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Resource representing read-only statistics for base stations.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseStationStatistics {
   private String creationTime = null;
 
   /**
-   * Connection state of the base station. Possible values are: &#39;NEVERCNX&#39; (the base station has never been connected), &#39;CNX&#39; (the base station has an IEC link started with at least a LRC), &#39;DISC&#39; (the base station is disconnected from all LRCs), &#39;UNKNOWN&#39; (the base station&#39;s connection state is currently undefined).
+   * Connection state of the base station. Possible values are: &#39;NEVERCNX&#39;
+   * (the base station has never been connected), &#39;CNX&#39; (the base station
+   * has an IEC link started with at least a LRC), &#39;DISC&#39; (the base
+   * station is disconnected from all LRCs), &#39;UNKNOWN&#39; (the base
+   * station&#39;s connection state is currently undefined).
    */
   public enum ConnectionStateEnum {
     NEVERCNX("NEVERCNX"),
-    
+
     CNX("CNX"),
-    
+
     DISC("DISC"),
-    
+
     UNKNOWN("UNKNOWN");
 
     private String value;
@@ -70,15 +74,16 @@ public class BaseStationStatistics {
   private ConnectionStateEnum connectionState = null;
 
   /**
-   * Health state of the base station. Possible values are: &#39;INIT&#39;, &#39;ACTIVE&#39;, &#39;BACKHAUL_CNX_ERROR&#39; and &#39;RF_ERROR&#39;.
+   * Health state of the base station. Possible values are: &#39;INIT&#39;,
+   * &#39;ACTIVE&#39;, &#39;BACKHAUL_CNX_ERROR&#39; and &#39;RF_ERROR&#39;.
    */
   public enum HealthStateEnum {
     INIT("INIT"),
-    
+
     ACTIVE("ACTIVE"),
-    
+
     BACKHAUL_CNX_ERROR("BACKHAUL_CNX_ERROR"),
-    
+
     RF_ERROR("RF_ERROR");
 
     private String value;
@@ -111,11 +116,12 @@ public class BaseStationStatistics {
   private HealthStateEnum healthState = null;
 
   /**
-   * GPS receiver synchronization status. Possible values are &#39;LOCKING_OR_NO_SIGNAL&#39; or &#39;LOCKED&#39;.
+   * GPS receiver synchronization status. Possible values are
+   * &#39;LOCKING_OR_NO_SIGNAL&#39; or &#39;LOCKED&#39;.
    */
   public enum GpsSyncStatusEnum {
     LOCKING_OR_NO_SIGNAL("LOCKING_OR_NO_SIGNAL"),
-    
+
     LOCKED("LOCKED");
 
     private String value;
@@ -148,13 +154,14 @@ public class BaseStationStatistics {
   private GpsSyncStatusEnum gpsSyncStatus = null;
 
   /**
-   * Time synchronization status. Possible values &#39;LOCAL&#39;, &#39;NTP&#39; or &#39;GPS&#39;.
+   * Time synchronization status. Possible values &#39;LOCAL&#39;, &#39;NTP&#39;
+   * or &#39;GPS&#39;.
    */
   public enum TimeSyncStatusEnum {
     LOCAL("LOCAL"),
-    
+
     NTP("NTP"),
-    
+
     GPS("GPS");
 
     private String value;
@@ -193,13 +200,15 @@ public class BaseStationStatistics {
   private String lastDownlinkTime = null;
 
   /**
-   * Indicates how the network location of the base station is currently defined. Possible values are &#39;UNKNOWN&#39;, &#39;ADMINISTRATIVELY&#39; or &#39;GPS&#39;.
+   * Indicates how the network location of the base station is currently defined.
+   * Possible values are &#39;UNKNOWN&#39;, &#39;ADMINISTRATIVELY&#39; or
+   * &#39;GPS&#39;.
    */
   public enum LocationTypeEnum {
     UNKNOWN("UNKNOWN"),
-    
+
     ADMINISTRATIVELY("ADMINISTRATIVELY"),
-    
+
     GPS("GPS");
 
     private String value;
@@ -238,27 +247,30 @@ public class BaseStationStatistics {
   private Boolean isRX2Activated = null;
 
   /**
-   * ISM band associated with the base station. The following value are supported: &#39;eu868&#39;, &#39;eu433&#39;, &#39;cn779&#39;, &#39;as923&#39;, &#39;kr920&#39;, &#39;sg920&#39;, &#39;tw920&#39;, &#39;us915&#39;, &#39;au915&#39;, &#39;cn470&#39;.
+   * ISM band associated with the base station. The following value are supported:
+   * &#39;eu868&#39;, &#39;eu433&#39;, &#39;cn779&#39;, &#39;as923&#39;,
+   * &#39;kr920&#39;, &#39;sg920&#39;, &#39;tw920&#39;, &#39;us915&#39;,
+   * &#39;au915&#39;, &#39;cn470&#39;.
    */
   public enum IsmBandEnum {
     EU868("eu868"),
-    
+
     EU433("eu433"),
-    
+
     CN779("cn779"),
-    
+
     AS923("as923"),
-    
+
     KR920("kr920"),
-    
+
     SG920("sg920"),
-    
+
     TW920("tw920"),
-    
+
     US915("us915"),
-    
+
     AU915("au915"),
-    
+
     CN470("cn470");
 
     private String value;
@@ -296,7 +308,7 @@ public class BaseStationStatistics {
 
   private Integer lastGeoAltitude = null;
 
-  private Float fileSystemUsage = null;
+  private List<FileSystemUsage> fileSystemUsage = new ArrayList<>();
 
   private String softwareVersion = null;
 
@@ -321,13 +333,13 @@ public class BaseStationStatistics {
    */
   public enum PowerSourceEnum {
     WIND("WIND"),
-    
+
     SOLAR("SOLAR"),
-    
+
     BATTERY("BATTERY"),
-    
+
     POE("POE"),
-    
+
     MAINS("MAINS");
 
     private String value;
@@ -378,10 +390,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * ISO 8601 time of the base station creation.
+   * 
    * @return creationTime
-  **/
+   **/
   public String getCreationTime() {
     return creationTime;
   }
@@ -395,10 +408,15 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
-   * Connection state of the base station. Possible values are: &#39;NEVERCNX&#39; (the base station has never been connected), &#39;CNX&#39; (the base station has an IEC link started with at least a LRC), &#39;DISC&#39; (the base station is disconnected from all LRCs), &#39;UNKNOWN&#39; (the base station&#39;s connection state is currently undefined).
+  /**
+   * Connection state of the base station. Possible values are: &#39;NEVERCNX&#39;
+   * (the base station has never been connected), &#39;CNX&#39; (the base station
+   * has an IEC link started with at least a LRC), &#39;DISC&#39; (the base
+   * station is disconnected from all LRCs), &#39;UNKNOWN&#39; (the base
+   * station&#39;s connection state is currently undefined).
+   * 
    * @return connectionState
-  **/
+   **/
   public ConnectionStateEnum getConnectionState() {
     return connectionState;
   }
@@ -412,10 +430,12 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
-   * Health state of the base station. Possible values are: &#39;INIT&#39;, &#39;ACTIVE&#39;, &#39;BACKHAUL_CNX_ERROR&#39; and &#39;RF_ERROR&#39;.
+  /**
+   * Health state of the base station. Possible values are: &#39;INIT&#39;,
+   * &#39;ACTIVE&#39;, &#39;BACKHAUL_CNX_ERROR&#39; and &#39;RF_ERROR&#39;.
+   * 
    * @return healthState
-  **/
+   **/
   public HealthStateEnum getHealthState() {
     return healthState;
   }
@@ -429,10 +449,12 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
-   * GPS receiver synchronization status. Possible values are &#39;LOCKING_OR_NO_SIGNAL&#39; or &#39;LOCKED&#39;.
+  /**
+   * GPS receiver synchronization status. Possible values are
+   * &#39;LOCKING_OR_NO_SIGNAL&#39; or &#39;LOCKED&#39;.
+   * 
    * @return gpsSyncStatus
-  **/
+   **/
   public GpsSyncStatusEnum getGpsSyncStatus() {
     return gpsSyncStatus;
   }
@@ -446,10 +468,12 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
-   * Time synchronization status. Possible values &#39;LOCAL&#39;, &#39;NTP&#39; or &#39;GPS&#39;.
+  /**
+   * Time synchronization status. Possible values &#39;LOCAL&#39;, &#39;NTP&#39;
+   * or &#39;GPS&#39;.
+   * 
    * @return timeSyncStatus
-  **/
+   **/
   public TimeSyncStatusEnum getTimeSyncStatus() {
     return timeSyncStatus;
   }
@@ -463,10 +487,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * ISO 8601 time of the last reporting frame.
+   * 
    * @return lastReportingTime
-  **/
+   **/
   public String getLastReportingTime() {
     return lastReportingTime;
   }
@@ -480,10 +505,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * ISO 8601 time of the last uplink.
+   * 
    * @return lastUplinkTime
-  **/
+   **/
   public String getLastUplinkTime() {
     return lastUplinkTime;
   }
@@ -497,10 +523,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * ISO 8601 time of the last downlink.
+   * 
    * @return lastDownlinkTime
-  **/
+   **/
   public String getLastDownlinkTime() {
     return lastDownlinkTime;
   }
@@ -514,10 +541,13 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
-   * Indicates how the network location of the base station is currently defined. Possible values are &#39;UNKNOWN&#39;, &#39;ADMINISTRATIVELY&#39; or &#39;GPS&#39;.
+  /**
+   * Indicates how the network location of the base station is currently defined.
+   * Possible values are &#39;UNKNOWN&#39;, &#39;ADMINISTRATIVELY&#39; or
+   * &#39;GPS&#39;.
+   * 
    * @return locationType
-  **/
+   **/
   public LocationTypeEnum getLocationType() {
     return locationType;
   }
@@ -531,10 +561,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * RF region identifier.
+   * 
    * @return rfRegionId
-  **/
+   **/
   public String getRfRegionId() {
     return rfRegionId;
   }
@@ -556,10 +587,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Statistics about the base station connection interfaces.
+   * 
    * @return interfaceStatistics
-  **/
+   **/
   public List<ConnectionInterfaceStatistics> getInterfaceStatistics() {
     return interfaceStatistics;
   }
@@ -573,10 +605,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Indicates if RX2 optimization is activated.
+   * 
    * @return isRX2Activated
-  **/
+   **/
   public Boolean isIsRX2Activated() {
     return isRX2Activated;
   }
@@ -590,10 +623,14 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
-   * ISM band associated with the base station. The following value are supported: &#39;eu868&#39;, &#39;eu433&#39;, &#39;cn779&#39;, &#39;as923&#39;, &#39;kr920&#39;, &#39;sg920&#39;, &#39;tw920&#39;, &#39;us915&#39;, &#39;au915&#39;, &#39;cn470&#39;.
+  /**
+   * ISM band associated with the base station. The following value are supported:
+   * &#39;eu868&#39;, &#39;eu433&#39;, &#39;cn779&#39;, &#39;as923&#39;,
+   * &#39;kr920&#39;, &#39;sg920&#39;, &#39;tw920&#39;, &#39;us915&#39;,
+   * &#39;au915&#39;, &#39;cn470&#39;.
+   * 
    * @return ismBand
-  **/
+   **/
   public IsmBandEnum getIsmBand() {
     return ismBand;
   }
@@ -607,10 +644,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Last known latitude of the base station if network location is available.
+   * 
    * @return lastGeoLatitude
-  **/
+   **/
   public Float getLastGeoLatitude() {
     return lastGeoLatitude;
   }
@@ -624,10 +662,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Last known longitude of the base station if network location is available.
+   * 
    * @return lastGeoLongitude
-  **/
+   **/
   public Float getLastGeoLongitude() {
     return lastGeoLongitude;
   }
@@ -641,10 +680,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Last known altitude of the base station if network location is available.
+   * 
    * @return lastGeoAltitude
-  **/
+   **/
   public Integer getLastGeoAltitude() {
     return lastGeoAltitude;
   }
@@ -653,20 +693,21 @@ public class BaseStationStatistics {
     this.lastGeoAltitude = lastGeoAltitude;
   }
 
-  public BaseStationStatistics fileSystemUsage(Float fileSystemUsage) {
+  public BaseStationStatistics fileSystemUsage(List<FileSystemUsage> fileSystemUsage) {
     this.fileSystemUsage = fileSystemUsage;
     return this;
   }
 
-   /**
+  /**
    * File system current usage (occupation percentage).
+   * 
    * @return fileSystemUsage
-  **/
-  public Float getFileSystemUsage() {
+   **/
+  public List<FileSystemUsage> getFileSystemUsage() {
     return fileSystemUsage;
   }
 
-  public void setFileSystemUsage(Float fileSystemUsage) {
+  public void setFileSystemUsage(List<FileSystemUsage> fileSystemUsage) {
     this.fileSystemUsage = fileSystemUsage;
   }
 
@@ -675,10 +716,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Software version of the base station.
+   * 
    * @return softwareVersion
-  **/
+   **/
   public String getSoftwareVersion() {
     return softwareVersion;
   }
@@ -692,10 +734,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Software version of the last backup of the base station.
+   * 
    * @return backupSoftwareVersion
-  **/
+   **/
   public String getBackupSoftwareVersion() {
     return backupSoftwareVersion;
   }
@@ -709,10 +752,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Statistics about alarms, in case the base station has raised any alarm.
+   * 
    * @return alarmStatistics
-  **/
+   **/
   public AlarmStatistics getAlarmStatistics() {
     return alarmStatistics;
   }
@@ -726,10 +770,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Statistics about available logical channels for the base station.
+   * 
    * @return logicalChannelStatistics
-  **/
+   **/
   public LogicalChannelDetails getLogicalChannelStatistics() {
     return logicalChannelStatistics;
   }
@@ -743,10 +788,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Average uplink packets received per hour for the base station.
+   * 
    * @return uplinkPacketPerHour
-  **/
+   **/
   public Integer getUplinkPacketPerHour() {
     return uplinkPacketPerHour;
   }
@@ -760,10 +806,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Average downlink packets sent per hour for the base station.
+   * 
    * @return downlinkPacketPerHour
-  **/
+   **/
   public Integer getDownlinkPacketPerHour() {
     return downlinkPacketPerHour;
   }
@@ -777,10 +824,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * ISO 8601 time of the last system reboot of the base station.
+   * 
    * @return lastSystemReboot
-  **/
+   **/
   public String getLastSystemReboot() {
     return lastSystemReboot;
   }
@@ -794,10 +842,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Name of the user who performed the last update of the base station.
+   * 
    * @return lastUpdateUser
-  **/
+   **/
   public String getLastUpdateUser() {
     return lastUpdateUser;
   }
@@ -811,10 +860,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * ISO 8601 time of the last update of the base station.
+   * 
    * @return lastUpdateTime
-  **/
+   **/
   public String getLastUpdateTime() {
     return lastUpdateTime;
   }
@@ -828,10 +878,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Indicates the power source used by the base station.
+   * 
    * @return powerSource
-  **/
+   **/
   public PowerSourceEnum getPowerSource() {
     return powerSource;
   }
@@ -845,10 +896,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Remaining battery level (%) when the activated power source is WIND or SOLAR.
+   * 
    * @return batteryLevel
-  **/
+   **/
   public Integer getBatteryLevel() {
     return batteryLevel;
   }
@@ -862,10 +914,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Indicates the last known base station temperature.
+   * 
    * @return temperature
-  **/
+   **/
   public Integer getTemperature() {
     return temperature;
   }
@@ -879,10 +932,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Indicates the last known CPU usage (%) for the base station.
+   * 
    * @return cpUUsage
-  **/
+   **/
   public Integer getCpUUsage() {
     return cpUUsage;
   }
@@ -896,10 +950,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Indicates the last known RAM usage (%) for the base station.
+   * 
    * @return raMUsage
-  **/
+   **/
   public Integer getRaMUsage() {
     return raMUsage;
   }
@@ -913,10 +968,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * ISO 8601 time of the last base station software reboot.
+   * 
    * @return lastSoftwareReboot
-  **/
+   **/
   public String getLastSoftwareReboot() {
     return lastSoftwareReboot;
   }
@@ -930,10 +986,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * Indicates the last known status of the classBReady data for the base station.
+   * 
    * @return lastClassBReady
-  **/
+   **/
   public Boolean isLastClassBReady() {
     return lastClassBReady;
   }
@@ -947,10 +1004,11 @@ public class BaseStationStatistics {
     return this;
   }
 
-   /**
+  /**
    * ISO 8601 time of the last generated certificate.
+   * 
    * @return certificateGenerationTime
-  **/
+   **/
   public String getCertificateGenerationTime() {
     return certificateGenerationTime;
   }
@@ -958,7 +1016,6 @@ public class BaseStationStatistics {
   public void setCertificateGenerationTime(String certificateGenerationTime) {
     this.certificateGenerationTime = certificateGenerationTime;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -969,53 +1026,57 @@ public class BaseStationStatistics {
       return false;
     }
     BaseStationStatistics baseStationStatistics = (BaseStationStatistics) o;
-    return Objects.equals(this.creationTime, baseStationStatistics.creationTime) &&
-        Objects.equals(this.connectionState, baseStationStatistics.connectionState) &&
-        Objects.equals(this.healthState, baseStationStatistics.healthState) &&
-        Objects.equals(this.gpsSyncStatus, baseStationStatistics.gpsSyncStatus) &&
-        Objects.equals(this.timeSyncStatus, baseStationStatistics.timeSyncStatus) &&
-        Objects.equals(this.lastReportingTime, baseStationStatistics.lastReportingTime) &&
-        Objects.equals(this.lastUplinkTime, baseStationStatistics.lastUplinkTime) &&
-        Objects.equals(this.lastDownlinkTime, baseStationStatistics.lastDownlinkTime) &&
-        Objects.equals(this.locationType, baseStationStatistics.locationType) &&
-        Objects.equals(this.rfRegionId, baseStationStatistics.rfRegionId) &&
-        Objects.equals(this.interfaceStatistics, baseStationStatistics.interfaceStatistics) &&
-        Objects.equals(this.isRX2Activated, baseStationStatistics.isRX2Activated) &&
-        Objects.equals(this.ismBand, baseStationStatistics.ismBand) &&
-        Objects.equals(this.lastGeoLatitude, baseStationStatistics.lastGeoLatitude) &&
-        Objects.equals(this.lastGeoLongitude, baseStationStatistics.lastGeoLongitude) &&
-        Objects.equals(this.lastGeoAltitude, baseStationStatistics.lastGeoAltitude) &&
-        Objects.equals(this.fileSystemUsage, baseStationStatistics.fileSystemUsage) &&
-        Objects.equals(this.softwareVersion, baseStationStatistics.softwareVersion) &&
-        Objects.equals(this.backupSoftwareVersion, baseStationStatistics.backupSoftwareVersion) &&
-        Objects.equals(this.alarmStatistics, baseStationStatistics.alarmStatistics) &&
-        Objects.equals(this.logicalChannelStatistics, baseStationStatistics.logicalChannelStatistics) &&
-        Objects.equals(this.uplinkPacketPerHour, baseStationStatistics.uplinkPacketPerHour) &&
-        Objects.equals(this.downlinkPacketPerHour, baseStationStatistics.downlinkPacketPerHour) &&
-        Objects.equals(this.lastSystemReboot, baseStationStatistics.lastSystemReboot) &&
-        Objects.equals(this.lastUpdateUser, baseStationStatistics.lastUpdateUser) &&
-        Objects.equals(this.lastUpdateTime, baseStationStatistics.lastUpdateTime) &&
-        Objects.equals(this.powerSource, baseStationStatistics.powerSource) &&
-        Objects.equals(this.batteryLevel, baseStationStatistics.batteryLevel) &&
-        Objects.equals(this.temperature, baseStationStatistics.temperature) &&
-        Objects.equals(this.cpUUsage, baseStationStatistics.cpUUsage) &&
-        Objects.equals(this.raMUsage, baseStationStatistics.raMUsage) &&
-        Objects.equals(this.lastSoftwareReboot, baseStationStatistics.lastSoftwareReboot) &&
-        Objects.equals(this.lastClassBReady, baseStationStatistics.lastClassBReady) &&
-        Objects.equals(this.certificateGenerationTime, baseStationStatistics.certificateGenerationTime);
+    return Objects.equals(this.creationTime, baseStationStatistics.creationTime)
+            && Objects.equals(this.connectionState, baseStationStatistics.connectionState)
+            && Objects.equals(this.healthState, baseStationStatistics.healthState)
+            && Objects.equals(this.gpsSyncStatus, baseStationStatistics.gpsSyncStatus)
+            && Objects.equals(this.timeSyncStatus, baseStationStatistics.timeSyncStatus)
+            && Objects.equals(this.lastReportingTime, baseStationStatistics.lastReportingTime)
+            && Objects.equals(this.lastUplinkTime, baseStationStatistics.lastUplinkTime)
+            && Objects.equals(this.lastDownlinkTime, baseStationStatistics.lastDownlinkTime)
+            && Objects.equals(this.locationType, baseStationStatistics.locationType)
+            && Objects.equals(this.rfRegionId, baseStationStatistics.rfRegionId)
+            && Objects.equals(this.interfaceStatistics, baseStationStatistics.interfaceStatistics)
+            && Objects.equals(this.isRX2Activated, baseStationStatistics.isRX2Activated)
+            && Objects.equals(this.ismBand, baseStationStatistics.ismBand)
+            && Objects.equals(this.lastGeoLatitude, baseStationStatistics.lastGeoLatitude)
+            && Objects.equals(this.lastGeoLongitude, baseStationStatistics.lastGeoLongitude)
+            && Objects.equals(this.lastGeoAltitude, baseStationStatistics.lastGeoAltitude)
+            && Objects.equals(this.fileSystemUsage, baseStationStatistics.fileSystemUsage)
+            && Objects.equals(this.softwareVersion, baseStationStatistics.softwareVersion)
+            && Objects.equals(this.backupSoftwareVersion, baseStationStatistics.backupSoftwareVersion)
+            && Objects.equals(this.alarmStatistics, baseStationStatistics.alarmStatistics)
+            && Objects.equals(this.logicalChannelStatistics, baseStationStatistics.logicalChannelStatistics)
+            && Objects.equals(this.uplinkPacketPerHour, baseStationStatistics.uplinkPacketPerHour)
+            && Objects.equals(this.downlinkPacketPerHour, baseStationStatistics.downlinkPacketPerHour)
+            && Objects.equals(this.lastSystemReboot, baseStationStatistics.lastSystemReboot)
+            && Objects.equals(this.lastUpdateUser, baseStationStatistics.lastUpdateUser)
+            && Objects.equals(this.lastUpdateTime, baseStationStatistics.lastUpdateTime)
+            && Objects.equals(this.powerSource, baseStationStatistics.powerSource)
+            && Objects.equals(this.batteryLevel, baseStationStatistics.batteryLevel)
+            && Objects.equals(this.temperature, baseStationStatistics.temperature)
+            && Objects.equals(this.cpUUsage, baseStationStatistics.cpUUsage)
+            && Objects.equals(this.raMUsage, baseStationStatistics.raMUsage)
+            && Objects.equals(this.lastSoftwareReboot, baseStationStatistics.lastSoftwareReboot)
+            && Objects.equals(this.lastClassBReady, baseStationStatistics.lastClassBReady)
+            && Objects.equals(this.certificateGenerationTime, baseStationStatistics.certificateGenerationTime);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(creationTime, connectionState, healthState, gpsSyncStatus, timeSyncStatus, lastReportingTime, lastUplinkTime, lastDownlinkTime, locationType, rfRegionId, interfaceStatistics, isRX2Activated, ismBand, lastGeoLatitude, lastGeoLongitude, lastGeoAltitude, fileSystemUsage, softwareVersion, backupSoftwareVersion, alarmStatistics, logicalChannelStatistics, uplinkPacketPerHour, downlinkPacketPerHour, lastSystemReboot, lastUpdateUser, lastUpdateTime, powerSource, batteryLevel, temperature, cpUUsage, raMUsage, lastSoftwareReboot, lastClassBReady, certificateGenerationTime);
+    return Objects.hash(creationTime, connectionState, healthState, gpsSyncStatus, timeSyncStatus, lastReportingTime,
+            lastUplinkTime, lastDownlinkTime, locationType, rfRegionId, interfaceStatistics, isRX2Activated, ismBand,
+            lastGeoLatitude, lastGeoLongitude, lastGeoAltitude, fileSystemUsage, softwareVersion, backupSoftwareVersion,
+            alarmStatistics, logicalChannelStatistics, uplinkPacketPerHour, downlinkPacketPerHour, lastSystemReboot,
+            lastUpdateUser, lastUpdateTime, powerSource, batteryLevel, temperature, cpUUsage, raMUsage,
+            lastSoftwareReboot, lastClassBReady, certificateGenerationTime);
   }
-
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class BaseStationStatistics {\n");
-    
+
     sb.append("    creationTime: ").append(toIndentedString(creationTime)).append("\n");
     sb.append("    connectionState: ").append(toIndentedString(connectionState)).append("\n");
     sb.append("    healthState: ").append(toIndentedString(healthState)).append("\n");
@@ -1066,4 +1127,3 @@ public class BaseStationStatistics {
   }
 
 }
-

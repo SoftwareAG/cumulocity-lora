@@ -10,14 +10,17 @@
  * Do not edit the class manually.
  */
 
-
 package lora.ns.actility.rest.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
- * Resource representing read-only statistics about health states for base stations.
+ * Resource representing read-only statistics about health states for base
+ * stations.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseStationHealthStatistics {
   private Integer initCount = null;
 
@@ -34,10 +37,12 @@ public class BaseStationHealthStatistics {
     return this;
   }
 
-   /**
-   * Number of base stations with the &#39;healthState&#39; attribute set to &#39;INIT&#39;.
+  /**
+   * Number of base stations with the &#39;healthState&#39; attribute set to
+   * &#39;INIT&#39;.
+   * 
    * @return initCount
-  **/
+   **/
   public Integer getInitCount() {
     return initCount;
   }
@@ -51,10 +56,12 @@ public class BaseStationHealthStatistics {
     return this;
   }
 
-   /**
-   * Number of base stations with the &#39;healthState&#39; attribute set to &#39;ACTIVE&#39;.
+  /**
+   * Number of base stations with the &#39;healthState&#39; attribute set to
+   * &#39;ACTIVE&#39;.
+   * 
    * @return activeCount
-  **/
+   **/
   public Integer getActiveCount() {
     return activeCount;
   }
@@ -68,10 +75,12 @@ public class BaseStationHealthStatistics {
     return this;
   }
 
-   /**
-   * Number of base stations with the &#39;healthState&#39; attribute set to &#39;BACKHAUL_CNX_ERROR&#39;.
+  /**
+   * Number of base stations with the &#39;healthState&#39; attribute set to
+   * &#39;BACKHAUL_CNX_ERROR&#39;.
+   * 
    * @return backhaulConnectionErrorCount
-  **/
+   **/
   public Integer getBackhaulConnectionErrorCount() {
     return backhaulConnectionErrorCount;
   }
@@ -85,10 +94,12 @@ public class BaseStationHealthStatistics {
     return this;
   }
 
-   /**
-   * Number of base stations with the &#39;healthState&#39; attribute set to &#39;RF_ERROR&#39;.
+  /**
+   * Number of base stations with the &#39;healthState&#39; attribute set to
+   * &#39;RF_ERROR&#39;.
+   * 
    * @return rfErrorCount
-  **/
+   **/
   public Integer getRfErrorCount() {
     return rfErrorCount;
   }
@@ -102,10 +113,11 @@ public class BaseStationHealthStatistics {
     return this;
   }
 
-   /**
+  /**
    * Total number of base stations in authorized scopes.
+   * 
    * @return totalCount
-  **/
+   **/
   public Integer getTotalCount() {
     return totalCount;
   }
@@ -113,7 +125,6 @@ public class BaseStationHealthStatistics {
   public void setTotalCount(Integer totalCount) {
     this.totalCount = totalCount;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -124,11 +135,12 @@ public class BaseStationHealthStatistics {
       return false;
     }
     BaseStationHealthStatistics baseStationHealthStatistics = (BaseStationHealthStatistics) o;
-    return Objects.equals(this.initCount, baseStationHealthStatistics.initCount) &&
-        Objects.equals(this.activeCount, baseStationHealthStatistics.activeCount) &&
-        Objects.equals(this.backhaulConnectionErrorCount, baseStationHealthStatistics.backhaulConnectionErrorCount) &&
-        Objects.equals(this.rfErrorCount, baseStationHealthStatistics.rfErrorCount) &&
-        Objects.equals(this.totalCount, baseStationHealthStatistics.totalCount);
+    return Objects.equals(this.initCount, baseStationHealthStatistics.initCount)
+            && Objects.equals(this.activeCount, baseStationHealthStatistics.activeCount)
+            && Objects.equals(this.backhaulConnectionErrorCount,
+                    baseStationHealthStatistics.backhaulConnectionErrorCount)
+            && Objects.equals(this.rfErrorCount, baseStationHealthStatistics.rfErrorCount)
+            && Objects.equals(this.totalCount, baseStationHealthStatistics.totalCount);
   }
 
   @Override
@@ -136,12 +148,11 @@ public class BaseStationHealthStatistics {
     return Objects.hash(initCount, activeCount, backhaulConnectionErrorCount, rfErrorCount, totalCount);
   }
 
-
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class BaseStationHealthStatistics {\n");
-    
+
     sb.append("    initCount: ").append(toIndentedString(initCount)).append("\n");
     sb.append("    activeCount: ").append(toIndentedString(activeCount)).append("\n");
     sb.append("    backhaulConnectionErrorCount: ").append(toIndentedString(backhaulConnectionErrorCount)).append("\n");
@@ -163,4 +174,3 @@ public class BaseStationHealthStatistics {
   }
 
 }
-

@@ -10,14 +10,16 @@
  * Do not edit the class manually.
  */
 
-
 package lora.ns.actility.rest.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Resource representing a ThingPark base station profile.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseStationProfile {
   private String id = null;
 
@@ -28,10 +30,11 @@ public class BaseStationProfile {
     return this;
   }
 
-   /**
+  /**
    * Id of the base station profile.
+   * 
    * @return id
-  **/
+   **/
   public String getId() {
     return id;
   }
@@ -45,10 +48,11 @@ public class BaseStationProfile {
     return this;
   }
 
-   /**
+  /**
    * B2C name of the base station profile.
+   * 
    * @return commercialName
-  **/
+   **/
   public String getCommercialName() {
     return commercialName;
   }
@@ -56,7 +60,6 @@ public class BaseStationProfile {
   public void setCommercialName(String commercialName) {
     this.commercialName = commercialName;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -67,8 +70,8 @@ public class BaseStationProfile {
       return false;
     }
     BaseStationProfile baseStationProfile = (BaseStationProfile) o;
-    return Objects.equals(this.id, baseStationProfile.id) &&
-        Objects.equals(this.commercialName, baseStationProfile.commercialName);
+    return Objects.equals(this.id, baseStationProfile.id)
+            && Objects.equals(this.commercialName, baseStationProfile.commercialName);
   }
 
   @Override
@@ -76,12 +79,11 @@ public class BaseStationProfile {
     return Objects.hash(id, commercialName);
   }
 
-
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class BaseStationProfile {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    commercialName: ").append(toIndentedString(commercialName)).append("\n");
     sb.append("}");
@@ -100,4 +102,3 @@ public class BaseStationProfile {
   }
 
 }
-

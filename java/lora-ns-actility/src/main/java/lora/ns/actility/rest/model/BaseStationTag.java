@@ -10,14 +10,16 @@
  * Do not edit the class manually.
  */
 
-
 package lora.ns.actility.rest.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * BaseStationTag
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseStationTag {
   private String id = null;
 
@@ -32,10 +34,11 @@ public class BaseStationTag {
     return this;
   }
 
-   /**
+  /**
    * Id of the base station tag.
+   * 
    * @return id
-  **/
+   **/
   public String getId() {
     return id;
   }
@@ -49,10 +52,11 @@ public class BaseStationTag {
     return this;
   }
 
-   /**
+  /**
    * Name of the tag
+   * 
    * @return name
-  **/
+   **/
   public String getName() {
     return name;
   }
@@ -66,10 +70,12 @@ public class BaseStationTag {
     return this;
   }
 
-   /**
-   * TRUE if the tag is visible for multicast. Mandatory if the tag is a new one. Ignored otherwise.
+  /**
+   * TRUE if the tag is visible for multicast. Mandatory if the tag is a new one.
+   * Ignored otherwise.
+   * 
    * @return multicastVisibility
-  **/
+   **/
   public Boolean isMulticastVisibility() {
     return multicastVisibility;
   }
@@ -83,10 +89,12 @@ public class BaseStationTag {
     return this;
   }
 
-   /**
-   * TRUE if the tag is visible for managed customer network. Mandatory if the tag is a new one. Ignored otherwise.
+  /**
+   * TRUE if the tag is visible for managed customer network. Mandatory if the tag
+   * is a new one. Ignored otherwise.
+   * 
    * @return managedNetworkVisibility
-  **/
+   **/
   public Boolean isManagedNetworkVisibility() {
     return managedNetworkVisibility;
   }
@@ -94,7 +102,6 @@ public class BaseStationTag {
   public void setManagedNetworkVisibility(Boolean managedNetworkVisibility) {
     this.managedNetworkVisibility = managedNetworkVisibility;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -105,10 +112,9 @@ public class BaseStationTag {
       return false;
     }
     BaseStationTag baseStationTag = (BaseStationTag) o;
-    return Objects.equals(this.id, baseStationTag.id) &&
-        Objects.equals(this.name, baseStationTag.name) &&
-        Objects.equals(this.multicastVisibility, baseStationTag.multicastVisibility) &&
-        Objects.equals(this.managedNetworkVisibility, baseStationTag.managedNetworkVisibility);
+    return Objects.equals(this.id, baseStationTag.id) && Objects.equals(this.name, baseStationTag.name)
+            && Objects.equals(this.multicastVisibility, baseStationTag.multicastVisibility)
+            && Objects.equals(this.managedNetworkVisibility, baseStationTag.managedNetworkVisibility);
   }
 
   @Override
@@ -116,12 +122,11 @@ public class BaseStationTag {
     return Objects.hash(id, name, multicastVisibility, managedNetworkVisibility);
   }
 
-
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class BaseStationTag {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    multicastVisibility: ").append(toIndentedString(multicastVisibility)).append("\n");
@@ -142,4 +147,3 @@ public class BaseStationTag {
   }
 
 }
-
