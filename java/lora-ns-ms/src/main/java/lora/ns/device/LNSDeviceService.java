@@ -137,7 +137,7 @@ public class LNSDeviceService {
 						&& (codec == null || !codec.getId().equals(mor.getProperty(CODEC_PROPERTY)))) {
 			CodecProxy codecProxy = codecManager.getCodec(mor.getProperty(CODEC_PROPERTY).toString());
 			if (codecProxy != null) {
-				addDeviceProperty(mor, codecProxy);
+				addDeviceProperty(mor, new DeviceCodecRepresentation(codecProxy));
 			}
 		}
 	}
