@@ -1,38 +1,38 @@
 import {
+  Component,
+  EventEmitter,
+  Output,
+  Pipe,
+  PipeTransform,
+  TemplateRef,
+  ViewChild,
+} from "@angular/core";
+import {
+  FetchClient,
+  IManagedObject,
+  IdentityService,
+  InventoryService,
+  QueriesUtil,
+} from "@c8y/client";
+import {
   ActionControl,
   BuiltInActionType,
   BulkActionControl,
   Column,
   ColumnDataRecordClassName,
-  Pagination,
   DataGridComponent,
   DataSourceModifier,
   FilteringActionType,
+  Pagination,
   ServerSideDataResult,
   _,
 } from "@c8y/ngx-components";
-import {
-  Component,
-  EventEmitter,
-  Output,
-  TemplateRef,
-  ViewChild,
-  Pipe,
-  PipeTransform,
-} from "@angular/core";
-import {
-  FetchClient,
-  InventoryService,
-  IdentityService,
-  IManagedObject,
-  QueriesUtil,
-} from "@c8y/client";
-import { BsModalService, BsModalRef } from "ngx-bootstrap/modal";
 import { FilteringModifier } from "@c8y/ngx-components/core/data-grid/column/filtering-form-renderer";
 import { assign, transform } from "lodash-es";
-import { LnsService } from "../../../src/service/LnsService";
+import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { CodecService } from "../../../src/service/CodecService";
 import { DeviceAdditionalProperty } from "../../../src/service/DeviceAdditionalProperty";
+import { LnsService } from "../../../src/service/LnsService";
 
 @Pipe({ name: "property" })
 export class PropertyPipe implements PipeTransform {
@@ -556,13 +556,31 @@ export class LoraDevicesComponent {
     }
   }
 
+  modelsSize(pdevice) {
+    return pdevice.codec && this.models[pdevice.codec]
+      ? Object.keys(this.models[pdevice.codec]).length
+      : 0;
+  }
+
   validateProvisioning() {
     let result = true;
     this.pdevices.forEach((pdevice) => {
       if (!pdevice.deviceName || pdevice.deviceName.length == 0) {
         result = false;
       }
-      if (!pdevice.devEUI || !pdevice.devEUI.match("[a-fA-F0-9]{16}")) {
+      if (!pdevice.devEUI?.match("[a-fA-F0-9]{16}")) {
+        result = false;
+      }
+      if (!pdevice.appEUI?.match("[a-fA-F0-9]{16}")) {
+        result = false;
+      }
+      if (!pdevice.appKey?.match("[a-fA-F0-9]{32}")) {
+        result = false;
+      }
+      if (!pdevice.codec) {
+        result = false;
+      }
+      if (!pdevice.model && this.modelsSize(pdevice) > 0) {
         result = false;
       }
     });

@@ -12,7 +12,7 @@
     "Cumulocity",
     "Plugin"
   ],
-  "author": "",
+  "author": "Cyril PODER",
   "license": "Apache",
   "dependencies": {
     "@angular/animations": "14.0.6",

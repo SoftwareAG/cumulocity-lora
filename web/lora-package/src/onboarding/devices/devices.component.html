@@ -51,14 +51,14 @@
             </button>
           </th>
           <th>
-            App EUI<button class="btn-help" popover="64 bits hex number that uniquely identifies the application.
-            Will be randomly generated if not provided." placement="right" type="button">
+            App EUI<button class="btn-help" popover="64 bits hex number that uniquely identifies the application."
+              placement="right" type="button">
               <i class="fa fw dlt-c8y-icon-help-outline text-primary"></i>
             </button>
           </th>
           <th>
-            App Key<button class="btn-help" popover="128 bits hex number used to encrypt communication. Will be
-              randomly generated if not provided." placement="right" type="button">
+            App Key<button class="btn-help" popover="128 bits hex number used to encrypt communication."
+              placement="right" type="button">
               <i class="fa fw dlt-c8y-icon-help-outline text-primary"></i>
             </button>
           </th>
@@ -106,20 +106,36 @@
           </td>
           <td>
             <c8y-form-group class="form-group-sm">
-              <input class="form-control" #appEUI="ngModel" name="appEUI" [(ngModel)]="pdevice.appEUI" maxlength="16"
-                (paste)="onPaste($event, index)" />
+              <input required class="form-control" #appEUI="ngModel" name="appEUI" [(ngModel)]="pdevice.appEUI"
+                maxlength="16" pattern="[a-fA-F0-9]{16}" (paste)="onPaste($event, index)" />
+              <c8y-messages *ngIf=" appEUI.invalid && (appEUI.dirty || appEUI.touched)">
+                <c8y-message name="required" *ngIf="appEUI.errors?.required">The app EUI is required
+                </c8y-message>
+                <c8y-message name="pattern" *ngIf="appEUI.errors?.pattern">The app EUI should contain exactly 8
+                  bytes
+                  in hex
+                  format</c8y-message>
+              </c8y-messages>
             </c8y-form-group>
           </td>
           <td>
             <c8y-form-group class="form-group-sm">
-              <input class="form-control" #appKey="ngModel" name="appKey" [(ngModel)]="pdevice.appKey"
-                aria-describedby="appKey" maxlength="32" (paste)="onPaste($event, index)" />
+              <input required class="form-control" #appKey="ngModel" name="appKey" [(ngModel)]="pdevice.appKey"
+                aria-describedby="appKey" pattern="[a-fA-F0-9]{32}" maxlength="32" (paste)="onPaste($event, index)" />
+              <c8y-messages *ngIf=" appKey.invalid && (appKey.dirty || appKey.touched)">
+                <c8y-message name="required" *ngIf="appKey.errors?.required">The app Key is required
+                </c8y-message>
+                <c8y-message name="pattern" *ngIf="appKey.errors?.pattern">The app Key should contain exactly 16
+                  bytes
+                  in hex
+                  format</c8y-message>
+              </c8y-messages>
             </c8y-form-group>
           </td>
           <td>
             <c8y-form-group class="form-group-sm" [hasError]="codec.invalid && (codec.dirty || codec.touched)">
               <select class="form-control" #codec="ngModel" name="codec" [(ngModel)]="pdevice.codec"
-                (change)="loadModels(codec.value)" required>
+                (change)="pdevice.model=undefined;loadModels(codec.value)" required>
                 <option [ngValue]="undefined" [disabled]="true">
                   Please select a codec
                 </option>
@@ -136,14 +152,19 @@
           </td>
           <td>
             <c8y-form-group class="form-group-sm">
-              <select class="form-control" #model="ngModel" name="model" [(ngModel)]="pdevice.model">
+              <select [required]="modelsSize(pdevice) > 0" class="form-control" #model="ngModel" name="model"
+                [(ngModel)]="pdevice.model">
                 <option [ngValue]="undefined" [disabled]="true">
                   Please select a model
                 </option>
-                <option *ngFor="let model of models[pdevice.codec] | keyvalue" [value]="model.key">
-                  {{ model.value }}
+                <option *ngFor="let omodel of models[pdevice.codec] | keyvalue" [value]="omodel.key">
+                  {{ omodel.value }}
                 </option>
               </select>
+              <c8y-messages *ngIf="model.invalid && (model.dirty || model.touched) && modelsSize(pdevice) > 0">
+                <c8y-message name="required" *ngIf="model.errors?.required">The codec model is required
+                </c8y-message>
+              </c8y-messages>
             </c8y-form-group>
           </td>
           <ng-container *ngIf="properties">
@@ -159,7 +180,7 @@
               tooltip="Add" [delay]="350" (click)="insertLine(index)">
               <i class="dlt-c8y-icon-plus-circle"></i>
             </button>
-            <button *ngIf="index > 0" type="button" class="btn btn-dot btn-dot--danger" tooltip="Remove"
+            <button *ngIf="pdevices.length > 1" type="button" class="btn btn-dot btn-dot--danger" tooltip="Remove"
               [attr.aria-label]="'Remove'" [delay]="350" (click)="pdevices.splice(index, 1)">
               <i c8yIcon="minus-circle"></i>
             </button>
