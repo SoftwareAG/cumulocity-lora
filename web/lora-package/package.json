@@ -8,7 +8,10 @@
     "deploy": "c8ycli deploy",
     "postinstall": "ngcc"
   },
-  "keywords": [],
+  "keywords": [
+    "Cumulocity",
+    "Plugin"
+  ],
   "author": "",
   "license": "Apache",
   "dependencies": {

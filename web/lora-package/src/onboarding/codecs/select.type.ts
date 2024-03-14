@@ -7,7 +7,6 @@ import { FieldType, FormlyFieldConfig } from "@ngx-formly/core";
     <c8y-wrapper-form-field>
       <div class="form-group">
         <div class="c8y-select-wrapper">
-          <label [for]="field.key">{{ field.templateOptions?.label }}</label>
           <select
             class="form-control"
             [formControl]="formControl"

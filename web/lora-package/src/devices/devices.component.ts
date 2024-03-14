@@ -155,7 +155,7 @@ export class DevicesComponent implements OnInit {
         field.templateOptions.options = element.value.map((e) => {
           return { label: e, value: e };
         });
-        field.defaultValue = null;
+        field.defaultValue = undefined;
         break;
       case ParamType.GROUP:
         if (element.dependsOnParam) {
