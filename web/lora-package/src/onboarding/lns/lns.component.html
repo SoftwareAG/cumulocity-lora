@@ -15,11 +15,7 @@
       <div class="col-sm-12">
         <div class="c8y-select-wrapper">
           <label for="model">LoRa network server:</label>
-          <select
-            class="form-control"
-            #model
-            (change)="loadWizard(model.value)"
-          >
+          <select class="form-control" #model (change)="loadWizard(model.value)">
             <option value="">Please select a provider</option>
             <option *ngFor="let proxy of lnsProxies" [value]="proxy.lnsType">
               {{ proxy.name }}
@@ -30,75 +26,35 @@
       <form #instanceProperties="ngForm">
         <div *ngIf="properties !== undefined">
           <div *ngFor="let property of properties" class="col-sm-6">
-            <div
-              class="form-group"
-              *ngIf="property.type === 'STRING' || property.type === 'TEXT'"
-            >
+            <div class="form-group" *ngIf="property.type === 'STRING' || property.type === 'TEXT'">
               <label for="{{ property.name }}">{{ property.label }}:</label>
-              <input
-                [ngModel]="allProperties[property.name]"
-                name="{{ property.name }}"
-                #{{property.name}}="ngModel"
-                ngModel
-                required
-              />
+              <input [ngModel]="allProperties[property.name]" name="{{ property.name }}" #{{property.name}}="ngModel"
+                ngModel required />
             </div>
             <div class="form-group" *ngIf="property.type === 'PASSWORD'">
               <label for="{{ property.name }}">{{ property.label }}:</label>
-              <input
-                type="password"
-                [ngModel]="allProperties[property.name]"
-                name="{{ property.name }}"
-                #{{property.name}}="ngModel"
-                ngModel
-                required
-              />
+              <input type="password" [ngModel]="allProperties[property.name]" name="{{ property.name }}"
+                #{{property.name}}="ngModel" ngModel required />
             </div>
             <div class="form-group" *ngIf="property.type === 'NUMBER'">
               <label for="{{ property.name }}">{{ property.label }}:</label>
-              <input
-                type="number"
-                step="0.1"
-                [ngModel]="allProperties[property.name]"
-                name="{{ property.name }}"
-                #{{property.name}}="ngModel"
-                ngModel
-                required
-              />
+              <input type="number" step="0.1" [ngModel]="allProperties[property.name]" name="{{ property.name }}"
+                #{{property.name}}="ngModel" ngModel required />
             </div>
             <div class="form-group" *ngIf="property.type === 'INTEGER'">
               <label for="{{ property.name }}">{{ property.label }}:</label>
-              <input
-                type="number"
-                [ngModel]="allProperties[property.name]"
-                name="{{ property.name }}"
-                #{{property.name}}="ngModel"
-                ngModel
-                required
-              />
+              <input type="number" [ngModel]="allProperties[property.name]" name="{{ property.name }}"
+                #{{property.name}}="ngModel" ngModel required />
             </div>
             <div class="form-group" *ngIf="property.type === 'BOOLEAN'">
-              <label class="c8y-checkbox"
-                ><input
-                  type="checkbox"
-                  [ngModel]="allProperties[property.name]"
-                  name="{{ property.name }}"
-                  #{{property.name}}="ngModel"
-                  ngModel
-                  required
-                /><span></span>{{ property.label }}</label
-              >
+              <label class="c8y-checkbox"><input type="checkbox" [ngModel]="allProperties[property.name]"
+                  name="{{ property.name }}" #{{property.name}}="ngModel" ngModel required /><span></span>{{
+                property.label }}</label>
             </div>
             <div class="form-group" *ngIf="property.type === 'LIST'">
               <label for="{{ property.name }}">{{ property.label }}:</label>
-              <select
-                [ngModel]="allProperties[property.name]"
-                class="form-control"
-                name="{{ property.name }}"
-                #{{property.name}}="ngModel"
-                ngModel
-                required
-              >
+              <select [ngModel]="allProperties[property.name]" class="form-control" name="{{ property.name }}"
+                #{{property.name}}="ngModel" ngModel required>
                 <option value="">Please select {{ property.name }}</option>
                 <option *ngFor="let v of property.values" [value]="v.id">
                   {{ v.name }}
@@ -111,34 +67,21 @@
     </div>
     <div class="card-footer">
       <div class="form-group" *ngIf="wizard !== undefined">
-        <button
-          *ngIf="currentStep < wizard.length - 1"
-          type="button"
-          (click)="nextStep(model.value, instanceProperties.value)"
-          class="btn btn-primary"
-        >
+        <button *ngIf="currentStep < wizard.length - 1" type="button"
+          (click)="nextStep(model.value, instanceProperties.value)" class="btn btn-primary">
           Next step
         </button>
-        <button
-          *ngIf="currentStep > 0"
-          type="button"
-          (click)="previousStep(model.value, instanceProperties.value)"
-          class="btn btn-primary"
-        >
+        <button *ngIf="currentStep > 0" type="button" (click)="previousStep(model.value, instanceProperties.value)"
+          class="btn btn-primary">
           Previous step
         </button>
-        <button
-          *ngIf="wizard.length === currentStep + 1"
-          type="button"
-          (click)="
+        <button *ngIf="wizard.length === currentStep + 1" type="button" [disabled]="!instanceName.value" (click)="
             addInstance(
               model.value,
               instanceName.value,
               instanceProperties.value
             )
-          "
-          class="btn btn-primary"
-        >
+          " class="btn btn-primary">
           Add connector
         </button>
       </div>
@@ -150,10 +93,7 @@
   {{ informationText | translate }}
 </div>
 
-<table
-  class="table table-striped table-hover"
-  *ngIf="lnsInstances !== undefined && lnsInstances.length > 0"
->
+<table class="table table-striped table-hover" *ngIf="lnsInstances !== undefined && lnsInstances.length > 0">
   <thead>
     <tr>
       <th scope="col" translate>Name</th>
@@ -162,11 +102,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr
-      *ngFor="let instance of lnsInstances"
-      (click)="edit(instance)"
-      class="interact"
-    >
+    <tr *ngFor="let instance of lnsInstances" (click)="edit(instance)" class="interact">
       <td>
         <a href="#/lns/{{ instance.id }}">{{ instance.name }}</a>
       </td>
@@ -175,17 +111,9 @@
       </td>
       <td class="text-center">
         <div style="max-width: 240px" class="text-truncate">
-          <button
-            class="btn-dot showOnHover"
-            uib-tooltip="Delete LNS connector"
-            tooltip-append-to-body="true"
-            tooltip-placement="left"
-            (click)="delete(instance)"
-          >
-            <i
-              c8y-icon="minus-circle"
-              class="text-danger dlt-c8y-icon-minus-circle"
-            ></i>
+          <button class="btn-dot showOnHover" uib-tooltip="Delete LNS connector" tooltip-append-to-body="true"
+            tooltip-placement="left" (click)="delete(instance)">
+            <i c8y-icon="minus-circle" class="text-danger dlt-c8y-icon-minus-circle"></i>
           </button>
         </div>
       </td>
@@ -201,20 +129,10 @@
   </div>
   <div class="modal-body">LNS connector will be removed</div>
   <div class="modal-footer">
-    <button
-      class="btn btn-default"
-      (click)="endDelete()"
-      translate=""
-      ng-reflect-translate=""
-    >
+    <button class="btn btn-default" (click)="endDelete()" translate="" ng-reflect-translate="">
       Confirm
     </button>
-    <button
-      class="btn btn-primary"
-      (click)="deleteLNSModalRef.hide()"
-      translate=""
-      ng-reflect-translate=""
-    >
+    <button class="btn btn-primary" (click)="deleteLNSModalRef.hide()" translate="" ng-reflect-translate="">
       Cancel
     </button>
   </div>

@@ -172,7 +172,15 @@ export class LNSComponent {
             body: JSON.stringify(this.allProperties),
           }
         );
-        p.values = await values.json();
+        console.log(values);
+        if (values.ok) {
+          p.values = await values.json();
+          console.log(p.values);
+        } else {
+          let error = await values.json();
+          console.log(error);
+          this.alertService.danger(error.message, error.detailedMessage);
+        }
       }
     });
   }

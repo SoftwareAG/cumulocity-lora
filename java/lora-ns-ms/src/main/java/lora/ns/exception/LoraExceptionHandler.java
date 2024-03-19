@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.cumulocity.model.event.CumulocitySeverities;
 
+import feign.FeignException;
 import feign.FeignException.FeignClientException;
 import lombok.RequiredArgsConstructor;
 import lora.rest.LoraContextService;
@@ -30,16 +31,26 @@ public class LoraExceptionHandler {
         StringWriter detailedMessage = new StringWriter();
         e.printStackTrace(new PrintWriter(detailedMessage));
         return new ResponseEntity<>(new LoraError(e.getMessage(), detailedMessage.toString()),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+                        HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(FeignClientException.class)
-    ResponseEntity<LoraError> processFeignException(FeignClientException e) {
+    ResponseEntity<LoraError> processFeignClientException(FeignClientException e) {
         loraContextService.error(e.getMessage(), e);
         loraContextService.sendAlarm(e.getClass().getSimpleName(), e.getMessage(), CumulocitySeverities.CRITICAL);
         StringWriter detailedMessage = new StringWriter();
         e.printStackTrace(new PrintWriter(detailedMessage));
         return new ResponseEntity<>(new LoraError(e.getMessage(), detailedMessage.toString()),
-                HttpStatus.resolve(e.status()));
+                        HttpStatus.resolve(e.status()));
+    }
+
+    @ExceptionHandler(FeignException.class)
+    ResponseEntity<LoraError> processFeignException(FeignException e) {
+        loraContextService.error(e.getMessage(), e);
+        loraContextService.sendAlarm(e.getClass().getSimpleName(), e.getMessage(), CumulocitySeverities.CRITICAL);
+        StringWriter detailedMessage = new StringWriter();
+        e.printStackTrace(new PrintWriter(detailedMessage));
+        return new ResponseEntity<>(new LoraError(e.getMessage(), detailedMessage.toString()),
+                        HttpStatus.resolve(e.status()));
     }
 }

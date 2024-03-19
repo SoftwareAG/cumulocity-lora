@@ -35,6 +35,9 @@ public class LoraContextService {
         if (source == null && loraContext.getConnector() != null) {
             source = inventoryApi.get(GId.asGId(loraContext.getConnector().getId()));
         }
+        if (source == null) {
+            return;
+        }
         var alarm = new AlarmRepresentation();
         alarm.setType(type);
         alarm.setText(text);
@@ -45,38 +48,29 @@ public class LoraContextService {
     }
 
     public void log(String message) {
-        if (RequestContextHolder.getRequestAttributes() != null) {
+        if (RequestContextHolder.getRequestAttributes() != null && loraContext.getConnector() != null) {
             log.info(REQUEST_SCOPE_MESSAGE_FORMAT, subscriptionsService.getTenant(),
-                    loraContext.getConnector().getName(),
-                    loraContext.getConnector().getId(),
-                    message);
+                            loraContext.getConnector().getName(), loraContext.getConnector().getId(), message);
         } else {
-            log.info(NO_REQUEST_SCOPE_MESSAGE_FORMAT, subscriptionsService.getTenant(),
-                    message);
+            log.info(NO_REQUEST_SCOPE_MESSAGE_FORMAT, subscriptionsService.getTenant(), message);
         }
     }
 
     public void error(String message) {
-        if (RequestContextHolder.getRequestAttributes() != null) {
+        if (RequestContextHolder.getRequestAttributes() != null && loraContext.getConnector() != null) {
             log.error(REQUEST_SCOPE_MESSAGE_FORMAT, subscriptionsService.getTenant(),
-                    loraContext.getConnector().getName(),
-                    loraContext.getConnector().getId(),
-                    message);
+                            loraContext.getConnector().getName(), loraContext.getConnector().getId(), message);
         } else {
-            log.error(NO_REQUEST_SCOPE_MESSAGE_FORMAT, subscriptionsService.getTenant(),
-                    message);
+            log.error(NO_REQUEST_SCOPE_MESSAGE_FORMAT, subscriptionsService.getTenant(), message);
         }
     }
 
     public void error(String message, Throwable t) {
-        if (RequestContextHolder.getRequestAttributes() != null) {
+        if (RequestContextHolder.getRequestAttributes() != null && loraContext.getConnector() != null) {
             log.error(REQUEST_SCOPE_MESSAGE_FORMAT, subscriptionsService.getTenant(),
-                    loraContext.getConnector().getName(),
-                    loraContext.getConnector().getId(), message,
-                    t);
+                            loraContext.getConnector().getName(), loraContext.getConnector().getId(), message, t);
         } else {
-            log.error(NO_REQUEST_SCOPE_MESSAGE_FORMAT, subscriptionsService.getTenant(), message,
-                    t);
+            log.error(NO_REQUEST_SCOPE_MESSAGE_FORMAT, subscriptionsService.getTenant(), message, t);
         }
     }
 
