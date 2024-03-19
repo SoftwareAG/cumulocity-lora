@@ -69,10 +69,9 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 		var feignBuilder = Feign.builder().decoder(new JacksonDecoder(objectMapper))
 						.encoder(new JacksonEncoder(objectMapper)).logger(new Slf4jLogger("lora.ns.objenious"))
 						.logLevel(Level.FULL)
-						.requestInterceptor(template -> template.headers(
-										Map.of("apikey", List.of(properties.getProperty("apikey")), "Content-Type",
-														List.of(properties.getProperty("application/json")), "Accept",
-														List.of(properties.getProperty("application/json")))));
+						.requestInterceptor(template -> template.headers(Map.of("apikey",
+										List.of(properties.getProperty("apikey")), "Content-Type",
+										List.of("application/json"), "Accept", List.of("application/json"))));
 
 		objeniousService = feignBuilder.target(ObjeniousService.class, "https://api.objenious.com/v1/");
 	}
