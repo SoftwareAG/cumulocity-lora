@@ -20,6 +20,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import c8y.ConnectionState;
 import feign.Feign;
+import feign.FeignException.FeignClientException;
 import feign.Logger.Level;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
@@ -196,29 +197,37 @@ public class ObjeniousConnector extends LNSAbstractConnector {
 	public List<Gateway> getGateways() {
 		logger.info("Getting list of gateways with connector {}...", this.getName());
 		List<Gateway> result = new ArrayList<>();
-		var gateways = objeniousService.getGateways();
-		gateways.forEach(g -> {
-			logger.info("Got gateway {}", g.getGatewayName());
-			C8YData data = new C8YData();
-			ConnectionState state = ConnectionState.AVAILABLE;
-			switch (g.getStatus()) {
-			case ACTIVE:
-				state = ConnectionState.AVAILABLE;
-				break;
-			case ALERT:
-				state = ConnectionState.AVAILABLE;
-				break;
-			case INACTIVE:
-				state = ConnectionState.UNAVAILABLE;
-				break;
-			default:
-				break;
+		try {
+			var gateways = objeniousService.getGateways();
+			gateways.forEach(g -> {
+				logger.info("Got gateway {}", g.getGatewayName());
+				C8YData data = new C8YData();
+				ConnectionState state = ConnectionState.AVAILABLE;
+				switch (g.getStatus()) {
+				case ACTIVE:
+					state = ConnectionState.AVAILABLE;
+					break;
+				case ALERT:
+					state = ConnectionState.AVAILABLE;
+					break;
+				case INACTIVE:
+					state = ConnectionState.UNAVAILABLE;
+					break;
+				default:
+					break;
+				}
+				Gateway gateway = new Gateway(g.getGatewayId(), g.getSerialNumber(), g.getGatewayName(),
+								BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(),
+								state, data);
+				result.add(gateway);
+			});
+		} catch (FeignClientException e) {
+			if (e.status() == 403) {
+				logger.error("Gateway access is forbidden with this account.", e);
+			} else {
+				throw e;
 			}
-			Gateway gateway = new Gateway(g.getGatewayId(), g.getSerialNumber(), g.getGatewayName(),
-							BigDecimal.valueOf(g.getLat()), BigDecimal.valueOf(g.getLng()), g.getGatewayType(), state,
-							data);
-			result.add(gateway);
-		});
+		}
 		return result;
 	}
 
