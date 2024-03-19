@@ -31,7 +31,7 @@ public interface ObjeniousService {
 	String deleteRouting(@Param("id") Integer id);
 
 	@RequestLine("POST devices")
-	Device createDevice(@Param DeviceCreate device);
+	Device createDevice(DeviceCreate device);
 
 	@RequestLine("GET profiles")
 	List<Profile> getProfiles();
