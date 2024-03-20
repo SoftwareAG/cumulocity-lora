@@ -146,7 +146,7 @@ public class LNSDeviceService {
 
 	private ManagedObjectRepresentation getOrCreateDevice(String lnsInstanceId, String devEui) {
 		var mor = getDevice(devEui.toLowerCase());
-		ManagedObjectRepresentation result = mor.get();
+		ManagedObjectRepresentation result = null;
 		if (mor.isEmpty()) {
 			synchronized (lock) {
 				mor = getDevice(devEui.toLowerCase());
@@ -155,6 +155,7 @@ public class LNSDeviceService {
 				}
 			}
 		} else {
+			result = mor.get();
 			addDeviceToLNSConnector(lnsInstanceId, result);
 		}
 		loraContext.setDevice(result);
