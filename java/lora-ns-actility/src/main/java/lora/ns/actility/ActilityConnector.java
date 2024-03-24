@@ -155,7 +155,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 						.requestInterceptor(template -> template.header("Content-Type",
 										"application/x-www-form-urlencoded"));
 		String url = properties.getProperty("url");
-		actilityAdminService = feignBuilder.target(ActilityAdminService.class, url + "/iot-flow/v1/");
+		actilityAdminService = feignBuilder.target(ActilityAdminService.class, url + "/thingpark/dx/admin/latest/api/");
 		feignBuilder = Feign.builder().client(new Client.Default(getSSLSocketFactory(), getHostnameVerifier()))
 						.decoder(new JacksonDecoder(objectMapper)).encoder(new JacksonEncoder(objectMapper))
 						.logger(new Slf4jLogger("lora.ns.actility")).logLevel(Level.FULL)
