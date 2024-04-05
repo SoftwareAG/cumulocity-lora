@@ -48,14 +48,17 @@ public class LNSGatewayService {
     public void upsertGateways(LNSConnector connector) {
         List<Gateway> gateways = connector.getGateways();
         for (Gateway gateway : gateways) {
-            ManagedObjectRepresentation mor = getGateway(gateway.getGwEUI());
-            if (mor == null) {
-                mor = createGateway(connector.getId(), gateway);
+            var gw = getGateway(gateway.getGwEUI());
+            var mor = new ManagedObjectRepresentation();
+            if (gw == null) {
+                mor.setId(createGateway(connector.getId(), gateway).getId());
+            } else {
+                mor.setId(gw.getId());
             }
             mor.setProperty("gatewayAvailability", gateway.getStatus());
             if (gateway.getLat() != null && gateway.getLng() != null) {
                 loraContextService.log("Updating position of gateway {}: {}, {}", gateway.getName(), gateway.getLat(),
-                        gateway.getLng());
+                                gateway.getLng());
                 Position p = new Position();
                 p.setLat(gateway.getLat());
                 p.setLng(gateway.getLng());
@@ -90,13 +93,11 @@ public class LNSGatewayService {
     }
 
     public ManagedObjectRepresentation createGateway(String lnsConnectorId, GatewayProvisioning gatewayProvisioning) {
-        return createGateway(lnsConnectorId, new Gateway(gatewayProvisioning.getGwEUI(),
-                gatewayProvisioning.getSerial(),
-                gatewayProvisioning.getName(),
-                gatewayProvisioning.getLat(),
-                gatewayProvisioning.getLng(),
-                gatewayProvisioning.getType(),
-                gatewayProvisioning.getStatus(), null));
+        return createGateway(lnsConnectorId,
+                        new Gateway(gatewayProvisioning.getGwEUI(), gatewayProvisioning.getSerial(),
+                                        gatewayProvisioning.getName(), gatewayProvisioning.getLat(),
+                                        gatewayProvisioning.getLng(), gatewayProvisioning.getType(),
+                                        gatewayProvisioning.getStatus(), null));
     }
 
     public ManagedObjectRepresentation getGateway(String id) {
@@ -139,7 +140,7 @@ public class LNSGatewayService {
     }
 
     public ManagedObjectRepresentation provisionGateway(String lnsConnectorId,
-            GatewayProvisioning gatewayProvisioning) {
+                    GatewayProvisioning gatewayProvisioning) {
         ManagedObjectRepresentation mor;
         try {
             lnsConnectorManager.getConnector(lnsConnectorId).provisionGateway(gatewayProvisioning);
