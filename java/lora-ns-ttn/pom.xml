@@ -12,7 +12,7 @@
 	<artifactId>lora-ns-ttn</artifactId>
 
 	<properties>
-		<io.grpc.version>1.51.0</io.grpc.version>
+		<io.grpc.version>1.62.2</io.grpc.version>
 		<os-maven-plugin.version>1.6.1</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 	</properties>
@@ -77,7 +77,7 @@
 				<version>${protobuf-maven-plugin.version}</version>
 				<configuration>
 					<protocArtifact>
-						com.google.protobuf:protoc:3.21.11:exe:${os.detected.classifier}
+						com.google.protobuf:protoc:3.25.3:exe:${os.detected.classifier}
 					</protocArtifact>
 					<pluginId>grpc-java</pluginId>
 					<pluginArtifact>
