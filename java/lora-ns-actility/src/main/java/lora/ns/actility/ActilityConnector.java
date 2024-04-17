@@ -40,6 +40,7 @@ import lora.codec.downlink.DownlinkData;
 import lora.codec.uplink.C8YData;
 import lora.ns.actility.rest.ActilityAdminService;
 import lora.ns.actility.rest.ActilityCoreService;
+import lora.ns.actility.rest.ActilityServiceAccountService;
 import lora.ns.actility.rest.JwtInterceptor;
 import lora.ns.actility.rest.model.BaseStation;
 import lora.ns.actility.rest.model.BaseStationProfile;
@@ -68,6 +69,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	private ActilityCoreService actilityCoreService;
 	private ActilityAdminService actilityAdminService;
+	private ActilityServiceAccountService actilityServiceAccountService;
 
 	private String downlinkAsKey = "4e0ff46472fa1840f25368c066e94769";
 	private String routeRef;
@@ -86,7 +88,12 @@ public class ActilityConnector extends LNSAbstractConnector {
 		protected String getToken() {
 			Token token = null;
 			try {
-				token = actilityAdminService.getToken("client_credentials", this.clientId, this.clientSecret);
+				if (this.clientId.contains("/")) {
+					token = actilityServiceAccountService.getToken("client_credentials", this.clientId,
+									this.clientSecret);
+				} else {
+					token = actilityAdminService.getToken("client_credentials", this.clientId, this.clientSecret);
+				}
 			} catch (Exception e) {
 				throw new LoraException("Couldn't get JWT", e);
 			}
@@ -155,7 +162,14 @@ public class ActilityConnector extends LNSAbstractConnector {
 						.requestInterceptor(template -> template.header("Content-Type",
 										"application/x-www-form-urlencoded"));
 		String url = properties.getProperty("url");
-		actilityAdminService = feignBuilder.target(ActilityAdminService.class, url + "/users-auth/protocol/");
+		actilityAdminService = feignBuilder.target(ActilityAdminService.class, url + "/thingpark/dx/admin/latest/api/");
+		feignBuilder = Feign.builder().client(new Client.Default(getSSLSocketFactory(), getHostnameVerifier()))
+						.decoder(new JacksonDecoder(objectMapper)).encoder(new FormEncoder())
+						.logger(new Slf4jLogger("lora.ns.actility")).logLevel(Level.FULL)
+						.requestInterceptor(template -> template.header("Content-Type",
+										"application/x-www-form-urlencoded"));
+		actilityServiceAccountService = feignBuilder.target(ActilityServiceAccountService.class,
+						url + "/users-auth/protocol/");
 		feignBuilder = Feign.builder().client(new Client.Default(getSSLSocketFactory(), getHostnameVerifier()))
 						.decoder(new JacksonDecoder(objectMapper)).encoder(new JacksonEncoder(objectMapper))
 						.logger(new Slf4jLogger("lora.ns.actility")).logLevel(Level.FULL)
