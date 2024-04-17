@@ -7,7 +7,7 @@ import lora.ns.actility.rest.model.Token;
 
 public interface ActilityAdminService {
 	@Headers("Content-Type: application/x-www-form-urlencoded")
-	@RequestLine("POST oauth/token")
+	@RequestLine("POST openid-connect/token")
 	Token getToken(@Param("grant_type") String grantType, @Param("client_id") String clientId,
 					@Param("client_secret") String clientSecret);
 }

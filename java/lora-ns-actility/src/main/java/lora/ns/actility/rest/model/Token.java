@@ -17,21 +17,6 @@ public class Token {
     @JsonProperty("scope")
     private String scope;
 
-    @JsonProperty("jti")
-    private String jti;
-
-    @JsonProperty("operator_id")
-    private String operatorId;
-
-    @JsonProperty("client_id")
-    private String clientId;
-
-    @JsonProperty("provider_id")
-    private String providerId;
-
-    @JsonProperty("customer_id")
-    private String customerId;
-
     public String getAccessToken() {
         return accessToken;
     }
@@ -62,37 +47,5 @@ public class Token {
 
     public void setScope(String scope) {
         this.scope = scope;
-    }
-
-    public String getJti() {
-        return jti;
-    }
-
-    public void setJti(String jti) {
-        this.jti = jti;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public String getProviderId() {
-        return providerId;
-    }
-
-    public void setProviderId(String providerId) {
-        this.providerId = providerId;
-    }
-
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
     }
 }
