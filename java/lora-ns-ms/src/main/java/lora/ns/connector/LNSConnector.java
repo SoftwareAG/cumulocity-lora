@@ -43,4 +43,8 @@ public interface LNSConnector {
 	void provisionGateway(GatewayProvisioning gatewayProvisioning);
 
 	void deprovisionGateway(String id);
+
+	default Properties getInitProperties() {
+		return new Properties();
+	}
 }
