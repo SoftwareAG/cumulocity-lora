@@ -5,3 +5,5 @@
 web/lora-package/dist
 web/lora-package/node_modules
 c8y_credentials
+
+**/.idea/
