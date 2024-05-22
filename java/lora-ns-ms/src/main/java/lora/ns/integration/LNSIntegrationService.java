@@ -288,6 +288,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	public ManagedObjectRepresentation addLnsConnector(LNSConnectorRepresentation connectorRepresentation) {
+		loraContextService.log("Adding LNS connector {} with properties {}", connectorRepresentation.getName(),
+				connectorRepresentation.getProperties());
 		ManagedObjectRepresentation mor = new ManagedObjectRepresentation();
 		mor.setType(LNS_CONNECTOR_TYPE);
 		mor.setName(connectorRepresentation.getName());
@@ -299,8 +301,15 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		ManagedObject agentApi = inventoryApi.getManagedObjectApi(agentService.getAgent().getId());
 		agentApi.addChildDevice(mor.getId());
 
+		LNSConnector instance = getInstance(mor);
+
+        Properties allProperties = new Properties();
+		allProperties.putAll(instance.getInitProperties());
+		allProperties.putAll(connectorRepresentation.getProperties());
+		instance.setProperties(allProperties);
+
 		String category = mor.getId().getValue();
-		connectorRepresentation.getProperties().forEach((k, v) -> {
+		allProperties.forEach((k, v) -> {
 			OptionRepresentation option = new OptionRepresentation();
 			option.setCategory(category);
 			if (isPropertyEncrypted(k.toString())) {
@@ -312,17 +321,16 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 			tenantOptionApi.save(option);
 		});
 
-		LNSConnector instance = getInstance(mor);
-		instance.setProperties(connectorRepresentation.getProperties());
-
 		lnsConnectorManager.addConnector(instance);
 		Optional<MicroserviceCredentials> credentials = subscriptionsService
 						.getCredentials(subscriptionsService.getTenant());
-		if (credentials.isPresent()) {
-			configureRoutings(instance.getId(), credentials.get());
-		}
+        credentials.ifPresent(microserviceCredentials ->
+				configureRoutings(instance.getId(), microserviceCredentials));
 
 		lnsGatewayManager.upsertGateways(instance);
+
+		loraContextService.log("Added connector [id={}, name={}, type={}, properties={}]",
+				instance.getId(), instance.getName(), instance.getType(), instance.getProperties());
 
 		return mor;
 	}

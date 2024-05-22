@@ -16,6 +16,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import lora.ns.actility.common.RandomUtils;
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,11 +68,16 @@ import lora.ns.gateway.GatewayProvisioning;
 @Slf4j
 public class ActilityConnector extends LNSAbstractConnector {
 
+	private static final String AS_ID_PROPERTY = "asId";
+	private static final String AS_KEY_PROPERTY = "asKey";
+	private static final String AS_ID_PREFIX = "cumulocity-";
+	private static final String DEFAULT_AS_ID = "cumulocity";
+	private static final String DEFAULT_AS_KEY = "4e0ff46472fa1840f25368c066e94769";
+
 	private ActilityCoreService actilityCoreService;
 	private ActilityAdminService actilityAdminService;
 	private ActilityServiceAccountService actilityServiceAccountService;
 
-	private String downlinkAsKey = "4e0ff46472fa1840f25368c066e94769";
 	private String routeRef;
 
 	private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JodaModule())
@@ -206,8 +212,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 		message.setPayloadHex(operation.getPayload());
 		message.setTargetPorts(operation.getFport().toString());
 		MessageSecurityParams securityParams = new MessageSecurityParams();
-		securityParams.setAsId("cumulocity");
-		securityParams.setAsKey(downlinkAsKey);
+		securityParams.setAsId(getAsId());
+		securityParams.setAsKey(getAsKey());
 		message.setSecurityParams(securityParams);
 		message.setCorrelationID(correlationId);
 		DownlinkMessage response = actilityCoreService.sendDownlink(operation.getDevEui(), message);
@@ -253,8 +259,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 		configuration.setDestinationURL(url + "/uplink");
 		configuration.getHeaders().put("Authorization", "Basic "
 						+ Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
-		configuration.setDownlinkAsId("cumulocity");
-		configuration.setDownlinkAsKey(downlinkAsKey);
+		configuration.setDownlinkAsId(getAsId());
+		configuration.setDownlinkAsKey(getAsKey());
 		connectionRequest.setConfiguration(configuration);
 		connectionRequest.setName(tenant + "-" + this.getId());
 
@@ -373,6 +379,14 @@ public class ActilityConnector extends LNSAbstractConnector {
 		actilityCoreService.deleteBaseStation(id);
 	}
 
+	@Override
+	public Properties getInitProperties() {
+		Properties initProperties = super.getInitProperties();
+		initProperties.put(AS_ID_PROPERTY, AS_ID_PREFIX + RandomUtils.generateRandomHexString(16));
+		initProperties.put(AS_KEY_PROPERTY, RandomUtils.generateRandomHexString(32));
+		return initProperties;
+	}
+
 	public List<BaseStationProfile> getBaseStationProfiles() {
 		return actilityCoreService.getBaseStationProfiles();
 	}
@@ -383,5 +397,17 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	public boolean hasGatewayManagementCapability() {
 		return true;
+	}
+
+	private String getAsId() {
+		return getProperty(AS_ID_PROPERTY)
+				.map(Object::toString)
+				.orElse(DEFAULT_AS_ID);
+	}
+
+	private String getAsKey() {
+		return getProperty(AS_KEY_PROPERTY)
+				.map(Object::toString)
+				.orElse(DEFAULT_AS_KEY);
 	}
 }
