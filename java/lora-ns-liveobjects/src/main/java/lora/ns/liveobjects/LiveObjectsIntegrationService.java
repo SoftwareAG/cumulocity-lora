@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
 import lora.ns.DeviceData;
-import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.connector.PropertyDescription;
 import lora.ns.integration.LNSIntegrationService;
 import lora.ns.operation.OperationData;
@@ -28,30 +26,8 @@ import lora.ns.operation.OperationData;
 @Service
 public class LiveObjectsIntegrationService extends LNSIntegrationService<LiveObjectsConnector> {
 	public LiveObjectsIntegrationService() {
-		wizard.add(new LNSConnectorWizardStep() {
-			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>(
-							List.of(PropertyDescription.text("apikey", "API Key", true).withEncrypted(true)));
-
-			public String getName() {
-				return "step1";
-			}
-
-			public java.util.LinkedList<PropertyDescription> getPropertyDescriptions() {
-				return propertyDescriptions;
-			}
-		});
-		wizard.add(new LNSConnectorWizardStep() {
-			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>(
-							List.of(PropertyDescription.list("groupId", "Group", "/groups", true)));
-
-			public String getName() {
-				return "step2";
-			}
-
-			public java.util.LinkedList<PropertyDescription> getPropertyDescriptions() {
-				return propertyDescriptions;
-			}
-		});
+		wizard.add(new ConnectorWizardStep1());
+		wizard.add(new ConnectorWizardStep2());
 		deviceProvisioningAdditionalProperties.add(
 						PropertyDescription.list("connectivityPlan", "Connectivity Plan", "/connectivityPlans", true));
 		deviceProvisioningAdditionalProperties.add(PropertyDescription.list("profile", "Profile", "/profiles", true));
