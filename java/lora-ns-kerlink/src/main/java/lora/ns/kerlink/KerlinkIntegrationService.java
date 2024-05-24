@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,12 +33,10 @@ public class KerlinkIntegrationService extends LNSIntegrationService<KerlinkConn
 	
 	{
 		wizard.add(new LNSConnectorWizardStep() {
-			final private LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
-			{
-				propertyDescriptions.add(new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.TEXT, true));
-				propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.TEXT, true));
-				propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD, true));
-			}
+			final private List<PropertyDescription> propertyDescriptions = List.of(
+					new PropertyDescription("baseUrl", "URL", true, "https://<your wanesy instance>.wanesy.com/gms/application", null, null, null, null, null, null, PropertyType.TEXT, true),
+					new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.TEXT, true),
+					new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD, true));
 
 			@Override
 			public String getName() {
@@ -47,15 +44,13 @@ public class KerlinkIntegrationService extends LNSIntegrationService<KerlinkConn
 			}
 
 			@Override
-			public LinkedList<PropertyDescription> getPropertyDescriptions() {
+			public List<PropertyDescription> getPropertyDescriptions() {
 				return propertyDescriptions;
 			}
 		});
 		wizard.add(new LNSConnectorWizardStep() {
-			final private LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
-			{
-				propertyDescriptions.add(new PropertyDescription("clusterId", "Cluster", true, null, "/clusters", null, null, null, null, null, PropertyType.LIST, false));
-			}
+			final private List<PropertyDescription> propertyDescriptions = List.of(
+					new PropertyDescription("clusterId", "Cluster", true, null, "/clusters", null, null, null, null, null, PropertyType.LIST, false));
 
 			@Override
 			public String getName() {
@@ -63,13 +58,12 @@ public class KerlinkIntegrationService extends LNSIntegrationService<KerlinkConn
 			}
 
 			@Override
-			public LinkedList<PropertyDescription> getPropertyDescriptions() {
+			public List<PropertyDescription> getPropertyDescriptions() {
 				return propertyDescriptions;
 			}
 		});
 	}
-	
-	
+
 	private Map<String, OperationStatus> statusMap = new HashMap<>();
 	{
 		statusMap.put("OK", OperationStatus.SUCCESSFUL);

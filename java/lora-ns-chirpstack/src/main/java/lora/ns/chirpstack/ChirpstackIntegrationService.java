@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,34 +30,30 @@ public class ChirpstackIntegrationService extends LNSIntegrationService<Chirpsta
 
 	public ChirpstackIntegrationService() {
 		wizard.add(new LNSConnectorWizardStep() {
-			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
-			{
-				propertyDescriptions.add(PropertyDescription.text("address", "Address (IP or server address)", true));
-				propertyDescriptions.add(PropertyDescription.integer("port", "Port", true));
-				propertyDescriptions.add(PropertyDescription.bool("ssl", "Use SSL"));
-				propertyDescriptions.add(PropertyDescription.text("apikey", "Tenant API Key", true));
-				propertyDescriptions.add(PropertyDescription.text("tenantid", "Tenant Id", true));
-			}
+			private final List<PropertyDescription> propertyDescriptions = List.of(
+					PropertyDescription.text("address", "Address (IP or server address)", true),
+					PropertyDescription.integer("port", "Port", true),
+					PropertyDescription.bool("ssl", "Use SSL"),
+					PropertyDescription.text("apikey", "Tenant API Key", true),
+					PropertyDescription.text("tenantid", "Tenant Id", true));
 
 			public String getName() {
 				return "step1";
 			}
 
-			public java.util.LinkedList<PropertyDescription> getPropertyDescriptions() {
+			public List<PropertyDescription> getPropertyDescriptions() {
 				return propertyDescriptions;
 			}
 		});
 		wizard.add(new LNSConnectorWizardStep() {
-			protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
-			{
-				propertyDescriptions.add(PropertyDescription.list("application", "Application", "/applications", true));
-			}
+			private final List<PropertyDescription> propertyDescriptions = List.of(
+					PropertyDescription.list("application", "Application", "/applications", true));
 
 			public String getName() {
 				return "step2";
 			}
 
-			public java.util.LinkedList<PropertyDescription> getPropertyDescriptions() {
+			public List<PropertyDescription> getPropertyDescriptions() {
 				return propertyDescriptions;
 			}
 		});
