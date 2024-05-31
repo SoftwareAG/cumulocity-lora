@@ -52,6 +52,8 @@ import lora.ns.actility.api.model.basestation.BsModel;
 import lora.ns.actility.api.model.basestation.BsProfiles;
 import lora.ns.actility.api.model.basestation.BsProfilesBriefsInner;
 import lora.ns.actility.api.model.basestation.Bss;
+import lora.ns.actility.api.model.common.Domain;
+import lora.ns.actility.api.model.common.DomainGroup;
 import lora.ns.actility.api.model.common.Token;
 import lora.ns.actility.api.model.device.Device;
 import lora.ns.actility.api.model.device.Device.ActivationEnum;
@@ -190,12 +192,6 @@ public class ActilityConnector extends LNSAbstractConnector {
 						.logger(new Slf4jLogger("lora.ns.actility")).logLevel(Level.FULL)
 						.requestInterceptor(template -> template.headers(Map.of("Content-Type",
 										List.of("application/json"), "Accept", List.of("application/json"))));
-		/*
-		 * actilityCoreService = feignBuilder .requestInterceptor(new
-		 * DXAdminJWTInterceptor(properties.getProperty("username"),
-		 * properties.getProperty("password"))) .target(ActilityCoreService.class, url +
-		 * "/thingpark/dx/core/latest/api/");
-		 */
 
 		feignBuilder = feignBuilder.requestInterceptor(new DXAdminJWTInterceptor(properties.getProperty("username"),
 						properties.getProperty("password")));
@@ -231,6 +227,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 	public void provisionDevice(DeviceProvisioning deviceProvisioning) {
 		var device = new Device();
 		device.EUI(deviceProvisioning.getDevEUI()).name(deviceProvisioning.getName()).activation(ActivationEnum.OTAA)
+						.addDomainsItem(new Domain().name(properties.getProperty("domain"))
+										.group(new DomainGroup().name(properties.getProperty("group"))))
 						.appKey(deviceProvisioning.getAppKey()).appEUI(deviceProvisioning.getAppEUI())
 						.addAppServersItem(new DeviceLorawanAppServer().ID(this.appServerId)).model(new DeviceModel()
 										.ID(deviceProvisioning.getAdditionalProperties().getProperty("deviceProfile")));
@@ -257,6 +255,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 		} else {
 			// Create appserver
 			var appServer = new AppServer()
+							.addDomainsItem(new Domain().name(properties.getProperty("domain"))
+											.group(new DomainGroup().name(properties.getProperty("group"))))
 							.addCustomHttpHeadersItem(new AppServerCustomHttpHeadersInner().name("Authentication")
 											.value("Basic " + Base64.getEncoder().encodeToString(
 															(tenant + "/" + login + ":" + password).getBytes())))
@@ -339,6 +339,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 	public void provisionGateway(GatewayProvisioning gatewayProvisioning) {
 		var baseStation = new Bs();
 		baseStation.setName(gatewayProvisioning.getName());
+		baseStation.addDomainsItem(new Domain().name(properties.getProperty("domain"))
+						.group(new DomainGroup().name(properties.getProperty("group"))));
 		baseStation.setLrrUUID(gatewayProvisioning.getGwEUI());
 		baseStation.setSmn(gatewayProvisioning.getAdditionalProperties().getProperty("SMN"));
 		baseStation.setPublicKey(gatewayProvisioning.getAdditionalProperties().getProperty("publicKey"));
