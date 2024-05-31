@@ -3,7 +3,7 @@ package lora.ns.actility.rest;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import lora.ns.actility.rest.model.Token;
+import lora.ns.actility.api.model.common.Token;
 
 public interface ActilityAdminService {
 	@Headers("Content-Type: application/x-www-form-urlencoded")

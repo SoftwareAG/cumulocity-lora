@@ -78,6 +78,11 @@
         <version>${c8y.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.openapitools</groupId>
+        <artifactId>jackson-databind-nullable</artifactId>
+        <version>0.2.6</version>
+      </dependency>
+      <dependency>
         <groupId>io.github.openfeign</groupId>
         <artifactId>feign-core</artifactId>
         <version>${feign.version}</version>
@@ -90,6 +95,11 @@
       <dependency>
         <groupId>io.github.openfeign</groupId>
         <artifactId>feign-slf4j</artifactId>
+        <version>${feign.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.openfeign</groupId>
+        <artifactId>feign-okhttp</artifactId>
         <version>${feign.version}</version>
       </dependency>
       <dependency>

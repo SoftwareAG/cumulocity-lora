@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lora.common.IdNameEntry;
 import lora.ns.connector.LNSConnectorService;
 import lora.ns.ttn.TTNConnector;
-import ttn.lorawan.v3.ApplicationOuterClass.Application;
 import ttn.lorawan.v3.Lorawan.MACVersion;
 import ttn.lorawan.v3.Lorawan.PHYVersion;
 
@@ -28,20 +27,20 @@ public class TTNRestController {
 	@GetMapping(value = "/{lnsConnectorId}/macversion", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<IdNameEntry> getMACVersions(@PathVariable String lnsConnectorId) {
 		return Arrays.stream(MACVersion.values()).map(m -> new IdNameEntry(m.toString(), m.toString()))
-				.collect(Collectors.toList());
+						.collect(Collectors.toList());
 	}
 
 	@GetMapping(value = "/{lnsConnectorId}/phyversion", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<IdNameEntry> getPHYVersions(@PathVariable String lnsConnectorId) {
 		return Arrays.stream(PHYVersion.values()).map(m -> new IdNameEntry(m.toString(), m.toString()))
-				.collect(Collectors.toList());
+						.collect(Collectors.toList());
 	}
 
 	@GetMapping(value = "/{lnsConnectorId}/frequencyplan", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<IdNameEntry> getFequencyPlans(@PathVariable String lnsConnectorId) {
 		var connector = lnsConnectorManager.getConnector(lnsConnectorId);
 		return ((TTNConnector) connector).getFrequencyPlans().stream()
-				.map(fp -> new IdNameEntry(fp.getId(), fp.getName())).collect(Collectors.toList());
+						.map(fp -> new IdNameEntry(fp.getId(), fp.getName())).collect(Collectors.toList());
 	}
 
 	/***
@@ -57,13 +56,12 @@ public class TTNRestController {
 		var connector = lnsConnectorManager.getConnector(lnsConnectorId);
 		properties = connector.mergeProperties(properties);
 		return new TTNConnector(properties).getApplications().stream()
-				.map(a -> new IdNameEntry(a.getIds().getApplicationId(), a.getName())).collect(Collectors.toList());
+						.map(a -> new IdNameEntry(a.getIds().getApplicationId(), a.getName()))
+						.collect(Collectors.toList());
 	}
 
 	/***
-	 * Retrieves the list of application in TTN when
-	 * creating
-	 * a new TTN connector.
+	 * Retrieves the list of application in TTN when creating a new TTN connector.
 	 * 
 	 * @param properties
 	 * @return
@@ -71,6 +69,7 @@ public class TTNRestController {
 	@PostMapping(value = "/apps", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public List<IdNameEntry> getApps(@RequestBody Properties properties) {
 		return new TTNConnector(properties).getApplications().stream()
-				.map(a -> new IdNameEntry(a.getIds().getApplicationId(), a.getName())).collect(Collectors.toList());
+						.map(a -> new IdNameEntry(a.getIds().getApplicationId(), a.getName()))
+						.collect(Collectors.toList());
 	}
 }

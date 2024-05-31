@@ -1,0 +1,461 @@
+openapi: 3.1.0
+info:
+  title: ThingPark AS to LRC Tunnel API for LoRaWAN®
+  description: >
+    REST interface implemented by ThingPark for AS to LRC communication. This
+    interface applies to LoRaWAN® devices and multicast groups.
+  version: '7.3'
+servers:
+  - url: 'https://community.thingpark.io/thingpark/lrc/rest'
+    description: Community
+  - url: 'https://thingparkenterprise.eu.actility.com/thingpark/lrc/rest'
+    description: Europe
+  - url: 'https://thingparkenterprise.us.actility.com/thingpark/lrc/rest'
+    description: United-States
+  - url: 'https://thingparkenterprise.au.actility.com/thingpark/lrc/rest'
+    description: Australia
+  - url: 'https://{hostname}/thingpark/lrc/rest'
+    description: Self-hosted TPE
+    variables:
+      hostname:
+        default: enterprise.actility.local
+        description: Hostname of the self-hosted TPE deployment
+paths:
+  /downlink:
+    post:
+      deprecated: true
+      tags:
+        - downlink-v1
+      summary: Send a downlink payload to a LoRaWAN® device or multicast group
+      description: |
+        This endpoint must no longer be used: the endpoint `POST /v2/downlink` must be used in replacement.
+
+        ---
+
+        Send a downlink payload to a LoRaWAN® device or multicast group
+      x-rateLimit:
+        category: HIGH_IMPACT
+      parameters:
+        - $ref: '#/components/parameters/DevEUI'
+        - $ref: '#/components/parameters/FPort'
+        - $ref: '#/components/parameters/Payload'
+        - $ref: '#/components/parameters/FCntDn'
+        - $ref: '#/components/parameters/AFCntDn'
+        - $ref: '#/components/parameters/Confirmed'
+        - $ref: '#/components/parameters/FlushDownlinkQueue'
+        - $ref: '#/components/parameters/ValidityTime'
+        - $ref: '#/components/parameters/AS_ID'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Token'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/RetryIneligibleGateways'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessV1'
+        '350':
+          $ref: '#/components/responses/ErrorOtherV1'
+        '404':
+          $ref: '#/components/responses/ErrorNoBaseStationV1'
+  /v2/downlink:
+    post:
+      security: []
+      tags:
+        - downlink-v2
+      summary: Send a downlink payload to a LoRaWAN® device or a multicast group
+      description: Send a downlink payload to a LoRaWAN® device or a multicast group
+      x-rateLimit:
+        category: HIGH_IMPACT
+      parameters:
+        - $ref: '#/components/parameters/DevEUI'
+        - $ref: '#/components/parameters/FPort'
+        - $ref: '#/components/parameters/Payload'
+        - $ref: '#/components/parameters/FCntDn'
+        - $ref: '#/components/parameters/AFCntDn'
+        - $ref: '#/components/parameters/Confirmed'
+        - $ref: '#/components/parameters/FlushDownlinkQueue'
+        - $ref: '#/components/parameters/ValidityTime'
+        - $ref: '#/components/parameters/AS_ID'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Token'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/RetryIneligibleGateways'
+      responses:
+        '202':
+          description: The downlink request is accepted
+        '409':
+          $ref: '#/components/responses/ErrorV2'
+components:
+  schemas:
+    Error:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/ErrorDefault'
+        - $ref: '#/components/schemas/ErrorWrongDownlinkCounter'
+        - $ref: '#/components/schemas/ErrorInvalidPayloadSize'
+        - $ref: '#/components/schemas/ErrorPayloadTooBig'
+      example:
+        code: 100
+        message: Invalid DevEUI
+    ErrorDefault:
+      title: Default error
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          allOf:
+            - $ref: '#/components/schemas/ErrorCode'
+            - type: integer
+              enum:
+                [
+                  100,
+                  103,
+                  104,
+                  105,
+                  106,
+                  107,
+                  108,
+                  109,
+                  110,
+                  111,
+                  112,
+                  114,
+                  115,
+                  117,
+                  118,
+                  119,
+                  121
+                ]
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+    ErrorWrongDownlinkCounter:
+      title: Wrong downlink counter error
+      type: object
+      required:
+        - code
+        - message
+        - expected
+      properties:
+        code:
+          type: integer
+          allOf:
+            - $ref: '#/components/schemas/ErrorCode'
+            - type: integer
+              enum: [ 101, 102 ]
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+        expected:
+          type: integer
+          format: int32
+          description: Expected FCnt
+    ErrorInvalidPayloadSize:
+      title: Invalid payload size error
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          allOf:
+            - $ref: '#/components/schemas/ErrorCode'
+            - type: integer
+              enum: [ 113 ]
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+        maxSize:
+          type: integer
+          format: int32
+          description: When set this means that the max payload size was reached. When not
+            set this means that the payload size is invalid (must be a multiple
+            of 2).
+    ErrorPayloadTooBig:
+      title: Payload too big error
+      type: object
+      required:
+        - code
+        - message
+        - maxSize
+      properties:
+        code:
+          type: integer
+          allOf:
+            - $ref: '#/components/schemas/ErrorCode'
+            - type: integer
+              enum: [ 116 ]
+        message:
+          $ref: '#/components/schemas/ErrorMessage'
+        rx2DR:
+          type: integer
+          format: int32
+          description: MAX Data Rate associated to RX2 (class A/C).
+        pingSlotDR:
+          type: integer
+          format: int32
+          description: MAX Data Rate associated to PingSlot (class B).
+        maxSize:
+          type: integer
+          format: int32
+          description: Max payload size according to RX2 (class A/C) or PingSlot (class
+            B). The current RX1 DR is not checked.
+    ErrorCode:
+      type: integer
+      format: int32
+      description: Error code
+    ErrorMessage:
+      type: string
+      description: Error message
+  responses:
+    SuccessV1:
+      description: The downlink request is accepted
+      content:
+        text/html:
+          schema:
+            type: string
+            example: <html><body>Request queued by LRC</body></html>
+    ErrorOtherV1:
+      description: |
+        The downlink request is rejected.
+
+        The HTML document in response body contains the error message:
+
+        <html><table>
+          <thead><tr><th><strong>Message</strong></th><th><strong>Description</strong></th></tr></thead>
+          <tbody>
+            <tr><td>Invalid DevEUI</td><td>The provided DevEUI does not match an existing Device or Multicast Group.</td></tr>
+            <tr><td>Downlink counter value already used. Expected=1238</td><td>The downlink counter value was already used, for instance due to a race condition with another Application server. The expected downlink counter value is provided in the message.</td></tr>
+            <tr><td>Downlink counter value increment too large. Expected=1001</td><td>The AS supplied downlink counter value is much larger than the expected downlink counter value and was rejected by the LRC. The expected downlink counter value is provided in the message.</td></tr>
+            <tr><td>Confirmed downlink is not authorized for this device</td><td>The request for transmission of a confirmed downlink packet was rejected by the LRC due to the absence of the ackedDownlinkFrame feature flag in the Connectivity plan associated to the device.</td></tr>
+            <tr><td>Invalid LoRa port</td><td>Sending on port non included in 1..224 range is unauthorized from the tunneling interface.</td></tr>
+            <tr><td>Security Check. AS_ID is mandatory</td><td>Speaking to this device needs AS_ID. The Application Server authorization has been activated for this device and the application must be identified.</td></tr>
+            <tr><td>Security Check. missing timestamp/token</td><td>Time and Token query parameters are mandatory when the application server authentication is activated.</td></tr>
+            <tr><td>Security Check. bad AS_ID</td><td>AS_ID is not declared in the database or is not authorized for the targeted device</td></tr>
+            <tr><td>Security Check. Server Decrypt Error</td><td>Missing or badly formatted security token.</td></tr>
+            <tr><td>Security Check. malformed ISO8601 time</td><td>An ISO 8601 date/time must be used (YYYY-MM-DDThh:mm:ss.s+|-hh:mm) representing a local time with a time zone offset in hours and minutes.</td></tr>
+            <tr><td>Security Check. Invalid downlink frame timestamp</td><td>The time deviation between the frame generation by the application server and the reception by the LRC exceeds the MAX deviation configured in the AS profile.</td></tr>
+            <tr><td>Security Check. bad token</td><td>Token was not accepted by the LRC.</td></tr>
+            <tr><td>ValidityTime expired or invalid</td><td>The date or duration in the ValidityTime attribute is wrongly formatted or is invalid (for instance, date in the past).</td></tr>
+            <tr><td>Payload too big or invalid size</td><td>The payload size is greater than 5000 characters or is not a multiple of 2.</td></tr>
+            <tr><td>Downlink transmission disabled</td><td>The request for transmission of the downlink packet was rejected by the LRC due to the absence of the downlinkTransmission feature flag in the Connectivity plan associated to the device.</td></tr>
+            <tr><td>Invalid payload size according to currents DR</td><td>The payload is too big to be transmitted according to the data rate currently used by the device.</td></tr>
+            <tr><td>Invalid CorrelationID. Must be a 64 bits hexadecimal value encoded as string</td><td>The format of the correlation ID is not valid: it must be a 64 bits hexadecimal string.</td></tr>
+            <tr><td>Invalid payload. Must not be empty</td><td>The payload is empty.</td></tr>
+            <tr><td>Payload must be provided encrypted with the downlink counter value</td><td>The payload is provided unencrypted but the LRC is not able to encrypt it (AppSKey is not available).</td></tr>
+            <tr><td>Token bucket limit reached</td><td>The downlink packet cannot be sent because the downlink token bucket limit is reached and the DROP strategy is used.</td></tr>
+          </tbody>
+        <br/></html>
+      content:
+        text/html:
+          schema:
+            type: string
+            example: <html><body>Invalid DevEUI</body></html>
+    ErrorNoBaseStationV1:
+      description: The request for transmission of the downlink packet was rejected by
+        the LRC because no base station near to the device is connected.
+      content:
+        text/html:
+          schema:
+            type: string
+            example: <html><body>No Base Station Available</body></html>
+    ErrorV2:
+      description: |
+        The downlink request is rejected.
+
+        The JSON document in response body contains the error code, the error message and optionally additional information:
+
+        <html><table>
+          <thead><tr><th><strong>Code</strong></th><th><strong>Message</strong></th></tr></thead>
+          <tbody>
+            <tr><td>100</td><td>Invalid DevEUI</td></tr>
+            <tr><td>101</td><td>Downlink counter value already used</td></tr>
+            <tr><td>102</td><td>Downlink counter value increment too large</td></tr>
+            <tr><td>103</td><td>Confirmed downlink is not authorized for this device</td></tr>
+            <tr><td>104</td><td>Invalid LoRa port</td></tr>
+            <tr><td>105</td><td>Security Check: AS_ID is mandatory</td></tr>
+            <tr><td>106</td><td>Security Check: Missing timestamp</td></tr>
+            <tr><td>107</td><td>Security Check: Bad AS_ID</td></tr>
+            <tr><td>108</td><td>Security Check: Server Decrypt Error</td></tr>
+            <tr><td>109</td><td>Security Check: Malformed ISO 8601 time</td></tr>
+            <tr><td>110</td><td>Security Check: Invalid downlink frame timestamp</td></tr>
+            <tr><td>111</td><td>Security Check: Bad token</td></tr>
+            <tr><td>112</td><td>Validity time expired or invalid</td></tr>
+            <tr><td>113</td><td>Payload too big or invalid size</td></tr>
+            <tr><td>114</td><td>Downlink transmission disabled</td></tr>
+            <tr><td>115</td><td>No Base Station Available</td></tr>
+            <tr><td>116</td><td>Invalid payload size according to currents DR</td></tr>
+            <tr><td>117</td><td>Invalid Correlation ID. Must be a 64 bits hexadecimal value encoded as string</td></tr>
+            <tr><td>118</td><td>Invalid payload. Must not be empty</td></tr>
+            <tr><td>119</td><td>Payload must be provided encrypted with the downlink counter value</td></tr>
+            <tr><td>121</td><td>Token bucket limit reached</td></tr>
+          </tbody>
+        <br/></html>
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    DevEUI:
+      name: DevEUI
+      in: query
+      description: Target device IEEE EUI64 in hexadecimal format (representing 8 octets)
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{16}$
+        example: '000000000F1D8693'
+    FPort:
+      name: FPort
+      in: query
+      description: Target port (in decimal format). This query parameter is needed
+        only if the Application Server provides a payload.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 225
+        example: 1
+    Payload:
+      name: Payload
+      in: query
+      description: |
+        Hexadecimal payload. The hexadecimal payload will be encrypted by the LRC cluster if the FCntDn parameter is absent, and if the LRC has been configured with an AppSKey for the specified LoRaWAN® port. Otherwise the payload must be encrypted by the Application Server according to the LoRaWAN® specification, and the FCntDn parameter must be present. The Application Server encryption uses the downlink counter, which is why the FCntDn query parameter is required in this case.
+
+        The payload can be omitted when FlushDownlinkQueue=1: in this case no downlink payload is inserted in the AS downlink queue of the device after the purge.
+      schema:
+        type: string
+        pattern: ^([0-9A-F][0-9A-F]){1,250}$
+        example: '00'
+    FCntDn:
+      name: FCntDn
+      in: query
+      description: |
+        The LoRaWAN® Downlink Counter value is used to encrypt the payload. This query parameter is needed only if the Application Server provides an encrypted payload. If present, FCntDn will be copied in the LoRaWAN® header field FCnt, and the encrypted payload will be copied as-is to the LoRaWAN® downlink frame by the LRC.
+
+        Only applicable to LoRaWAN® 1.0.
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        example: 0
+    AFCntDn:
+      name: AFCntDn
+      in: query
+      description: |
+        The LoRaWAN® Applicative Downlink Counter value is used to encrypt the payload. This query parameter is needed only if the Application Server provides an encrypted payload. If present, AFCntDn will be copied in the LoRaWAN® header field FCnt, and the encrypted payload will be copied as-is to the LoRaWAN® downlink frame by the LRC.
+
+        Only applicable to LoRaWAN® 1.1.
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        example: 0
+    Confirmed:
+      name: Confirmed
+      in: query
+      description: |
+        A value of Confirmed=0 requests transmission of an UNCONFIRMED downlink frame. A value of Confirmed=1 requests transmission of a CONFIRMED downlink frame. Default value is Confirmed=0 (UNCONFIRMED).
+        Support of CONFIRMED downlink frame transmission is subject to Connectivity plan feature flag ackedDownlinkFrame. If the Confirmed flag is set on the HTTP POST and the device is associated with a Connectivity plan where the ackedDownlinkFrame feature flag is set, the downlink packet is processed. Otherwise the processing is aborted, and a specific error code is returned to the AS in the HTTP response.
+        The Network Server never tries to re-send a CONFIRMED downlink if the device acknowledgment is not received. This is up to the Application Server to decide what to do when a DL acknowledgment has not been successfully received, e.g. either resend the same frame, send another follow-up frame with updated payload, or don't send anything.  
+        When targeting a multicast device, only UNCONFIRMED downlink frame is supported.
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1
+        default: 0
+        example: 0
+    FlushDownlinkQueue:
+      name: FlushDownlinkQueue
+      in: query
+      description: |
+        Empties the device AS downlink queue of the device (Boolean).
+
+        When this parameter is set to FlushDownlinkQueue=1, the AS requests the LRC to purge the AS downlink queue of the device. If a payload is provided, it is inserted in the AS downlink queue of the device after the purge.
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1
+        default: 0
+        example: 0
+    ValidityTime:
+      name: ValidityTime
+      in: query
+      description: |
+        Associates the AS downlink payload with an expiration date (ISO 8601 timestamp or Duration in seconds) in the device AS downlink queue.
+
+        If the AS downlink payload has not yet been sent to the device, the AS downlink payload will be discarded by the LRC when the expiration date is reached.
+      schema:
+        type: string
+        oneOf:
+          - title: ISO 8601 timestamp
+            type: string
+            format: date-time
+            example: '2016-01-11T14:28:00+02:00'
+          - title: Duration in seconds
+            type: integer
+            format: int32
+            example: 3600
+    AS_ID:
+      name: AS_ID
+      in: query
+      description: |
+        Application Server ID, as provisioned in the AS Profile. AS_ID is mandatory if the Application server authentication has been activated in the AS Profile. In this case, the LRC will check that the Application Server is authorized to send downlink command to the device.
+      schema:
+        type: string
+        pattern: ^[0-9A-Za-z\-._]+$
+        example: app1.sample.com
+    Time:
+      name: Time
+      in: query
+      description: |
+        ISO 8601 time of the request. Time is mandatory when the Application server authentication has been activated in the AS Profile. In this case the LRC will verify the time deviation between the generation and the reception of the request. The deviation must be lower than Max Time Deviation defined in the AS Profile.
+
+        Note: In the URL of the HTTP request, use %2B ASCII code for the + character and the %3A ASCII code for the : character.
+      schema:
+        type: string
+        format: date-time
+        example: '2016-01-11T14:28:00.333+02:00'
+    Token:
+      name: Token
+      in: query
+      description: |
+        Security token to sign the downlink frame. Token is mandatory when the Application server authentication has been activated in the AS Profile.
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{64}$
+        example: 'ea8f31d2299cbece8e180a3012766c4df15fe3cf2e142d9fdf4035b5894ec886'
+    CorrelationID:
+      name: CorrelationID
+      in: query
+      description: |
+        64 bits ID used to correlate the downlink frame with the associated downlink frame sent report or multicast summary reports.
+
+        When this parameter is provided, it is sent back in the associated downlink frame sent report for unicast downlink frame or in the associated multicast summary reports for multicast downlink frame.
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{16}$
+        example: '4434704901C7450B'
+    RetryIneligibleGateways:
+      name: RetryIneligibleGateways
+      in: query
+      description: |
+        When set to 1 or not provided, non eligible gateways (GPS out of sync for Class B, gateway down for Class B/C…) are retried during each retransmission attempt.
+
+        When set to 0, non eligible gateways are excluded at the beginning of the multicast campaign and not retried during each retransmission attempt.
+
+        This parameter is only applicable to multicast downlink transmission.
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1
+        default: 1
+        example: 1
+tags:
+  - name: downlink-v1
+    description: Downlink API v1
+  - name: downlink-v2
+    description: Downlink API v2

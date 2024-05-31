@@ -21,8 +21,8 @@ public class ActilityRestController {
     public List<IdNameEntry> getDeviceProfiles(@PathVariable String lnsConnectorId) {
         var connector = lnsConnectorManager.getConnector(lnsConnectorId);
         ActilityConnector actilityConnector = (ActilityConnector) connector;
-        return actilityConnector.getDeviceProfiles().stream().map(dp -> new IdNameEntry(dp.getId(), dp.getName()))
-                        .collect(Collectors.toList());
+        return actilityConnector.getDeviceProfiles().stream()
+                        .map(dp -> new IdNameEntry(dp.getID(), dp.getCommercialName())).collect(Collectors.toList());
     }
 
     @GetMapping(value = "/{lnsConnectorId}/baseStationProfiles", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -30,14 +30,6 @@ public class ActilityRestController {
         var connector = lnsConnectorManager.getConnector(lnsConnectorId);
         ActilityConnector actilityConnector = (ActilityConnector) connector;
         return actilityConnector.getBaseStationProfiles().stream()
-                        .map(bsp -> new IdNameEntry(bsp.getId(), bsp.getCommercialName())).collect(Collectors.toList());
-    }
-
-    @GetMapping(value = "/{lnsConnectorId}/rfRegions", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<IdNameEntry> getRfRegions(@PathVariable String lnsConnectorId) {
-        var connector = lnsConnectorManager.getConnector(lnsConnectorId);
-        ActilityConnector actilityConnector = (ActilityConnector) connector;
-        return actilityConnector.getRFRegions().stream().map(bsp -> new IdNameEntry(bsp.getId(), bsp.getName()))
-                        .collect(Collectors.toList());
+                        .map(bsp -> new IdNameEntry(bsp.getID(), bsp.getCommercialName())).collect(Collectors.toList());
     }
 }
