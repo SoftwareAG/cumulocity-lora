@@ -1,8 +1,17 @@
 package lora.ns.liveobjects;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNumeric;
+
+import feign.Client.Proxied;
+import feign.Feign.Builder;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Proxy.Type;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -68,10 +77,13 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 		final ch.qos.logback.classic.Logger serviceLogger = (ch.qos.logback.classic.Logger) LoggerFactory
 				.getLogger("lora.ns.liveobjects");
 		serviceLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
-		var feignBuilder = Feign.builder().decoder(new JacksonDecoder(objectMapper))
-				.encoder(new JacksonEncoder(objectMapper)).logger(new Slf4jLogger("lora.ns.liveobjects"))
+		var feignBuilder = Feign.builder()
+				.decoder(new JacksonDecoder(objectMapper))
+				.encoder(new JacksonEncoder(objectMapper))
+				.logger(new Slf4jLogger("lora.ns.liveobjects"))
 				.logLevel(Level.FULL)
 				.requestInterceptor(template -> template.header("X-API-KEY", properties.getProperty("apikey")));
+		addProxyConfigIfPresent(feignBuilder);
 		service = feignBuilder.target(LiveObjectsService.class, "https://liveobjects.orange-business.com/");
 	}
 
@@ -184,5 +196,25 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 
 	public List<Group> getGroups() {
 		return service.getGroups();
+	}
+
+	private void addProxyConfigIfPresent(Builder feignBuilder) {
+		Optional<String> proxyHost = getProxyHost();
+		Optional<Integer> proxyPost = getProxyPost();
+		proxyHost.map(host -> new InetSocketAddress(host, proxyPost.orElse(80)))
+				.map(address -> new Proxy(Type.HTTP, address))
+				.ifPresent(proxy -> feignBuilder.client(new Proxied(null, null, proxy)));
+	}
+
+	private Optional<String> getProxyHost() {
+		return isNotBlank(properties.getProperty("proxy-host")) ?
+				Optional.of(properties.getProperty("proxy-host")) :
+				Optional.empty();
+	}
+
+	private Optional<Integer> getProxyPost() {
+		return isNumeric(properties.getProperty("proxy-port")) ?
+				Optional.of(Integer.parseInt(properties.getProperty("proxy-port"))) :
+				Optional.empty();
 	}
 }

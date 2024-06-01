@@ -1,8 +1,8 @@
 package lora.ns.connector;
 
-import java.util.LinkedList;
+import java.util.List;
 
 public interface LNSConnectorWizardStep {
 	String getName();
-	LinkedList<PropertyDescription> getPropertyDescriptions();
+	List<PropertyDescription> getPropertyDescriptions();
 }

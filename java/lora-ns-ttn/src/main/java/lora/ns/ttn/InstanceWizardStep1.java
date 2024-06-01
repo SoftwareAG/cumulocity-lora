@@ -1,19 +1,15 @@
 package lora.ns.ttn;
 
-import java.util.LinkedList;
-
+import java.util.List;
 import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.connector.PropertyDescription;
 import lora.ns.connector.PropertyDescription.PropertyType;
 
 public class InstanceWizardStep1 implements LNSConnectorWizardStep {
-	protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
-	{
-		propertyDescriptions.add(new PropertyDescription("address", "Address", true, null, null, null, null, null, null,
-				null, PropertyType.TEXT, false));
-		propertyDescriptions.add(new PropertyDescription("apikey", "API Key", true, null, null, null, null, null, null,
-				null, PropertyType.TEXT, true));
-	}
+
+	private final List<PropertyDescription> propertyDescriptions = List.of(
+			new PropertyDescription("address", "Address", true, null, null, null, null, null, null, null, PropertyType.TEXT, false),
+			new PropertyDescription("apikey", "API Key", true, null, null, null, null, null, null, null, PropertyType.TEXT, true));
 
 	@Override
 	public String getName() {
@@ -21,8 +17,7 @@ public class InstanceWizardStep1 implements LNSConnectorWizardStep {
 	}
 
 	@Override
-	public LinkedList<PropertyDescription> getPropertyDescriptions() {
+	public List<PropertyDescription> getPropertyDescriptions() {
 		return propertyDescriptions;
 	}
-
 }

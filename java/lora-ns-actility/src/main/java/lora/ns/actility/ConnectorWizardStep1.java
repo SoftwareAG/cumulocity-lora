@@ -1,12 +1,12 @@
 package lora.ns.actility;
 
-import java.util.LinkedList;
-
+import java.util.List;
 import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.connector.PropertyDescription;
 import lora.ns.connector.PropertyDescription.PropertyType;
 
 public class ConnectorWizardStep1 implements LNSConnectorWizardStep {
+
 	protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
 	{
 		propertyDescriptions.add(new PropertyDescription("url", "URL", true, null, null, null, null, null, null, null,
@@ -27,8 +27,7 @@ public class ConnectorWizardStep1 implements LNSConnectorWizardStep {
 	}
 
 	@Override
-	public LinkedList<PropertyDescription> getPropertyDescriptions() {
+	public List<PropertyDescription> getPropertyDescriptions() {
 		return propertyDescriptions;
 	}
-
 }
