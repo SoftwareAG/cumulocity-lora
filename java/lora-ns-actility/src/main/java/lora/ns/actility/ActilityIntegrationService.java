@@ -40,8 +40,6 @@ public class ActilityIntegrationService extends LNSIntegrationService<ActilityCo
 						null, null, null, null, null, null, PropertyType.TEXT, true));
 		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("gatewayProfile", "Gateway profile", true,
 						null, "/baseStationProfiles", null, null, null, null, null, PropertyType.LIST, false));
-		gatewayProvisioningAdditionalProperties.add(new PropertyDescription("rfRegion", "RF Region", true, null,
-						"/rfRegions", null, null, null, null, null, PropertyType.LIST, false));
 	}
 
 	@Override

@@ -7,10 +7,19 @@ import lora.ns.connector.PropertyDescription.PropertyType;
 
 public class ConnectorWizardStep1 implements LNSConnectorWizardStep {
 
-	private final List<PropertyDescription> propertyDescriptions = List.of(
-			new PropertyDescription("url", "URL", true, null, null, null, null, null, null, null, PropertyType.TEXT, false),
-			new PropertyDescription("username", "Username", true, null, null, null, null, null, null, null, PropertyType.TEXT, false),
-			new PropertyDescription("password", "Password", true, null, null, null, null, null, null, null, PropertyType.PASSWORD, true));
+	protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
+	{
+		propertyDescriptions.add(new PropertyDescription("url", "URL", true, null, null, null, null, null, null, null,
+						PropertyType.TEXT, false));
+		propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null,
+						null, null, PropertyType.TEXT, false));
+		propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null,
+						null, null, PropertyType.PASSWORD, true));
+		propertyDescriptions.add(new PropertyDescription("domain", "Domain", false, null, null, null, null, null, null,
+						null, PropertyType.TEXT, false));
+		propertyDescriptions.add(new PropertyDescription("group", "Group", false, null, null, null, null, null, null,
+						null, PropertyType.TEXT, false));
+	}
 
 	@Override
 	public String getName() {

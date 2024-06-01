@@ -16,12 +16,9 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import lora.ns.actility.common.RandomUtils;
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.rest.representation.inventory.ManagedObjectRepresentation;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +28,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 import c8y.ConnectionState;
 import feign.Client;
 import feign.Feign;
+import feign.FeignException.FeignClientException;
 import feign.Logger.Level;
 import feign.form.FormEncoder;
 import feign.jackson.JacksonDecoder;
@@ -39,27 +37,39 @@ import feign.slf4j.Slf4jLogger;
 import lombok.extern.slf4j.Slf4j;
 import lora.codec.downlink.DownlinkData;
 import lora.codec.uplink.C8YData;
+import lora.ns.actility.api.AppServerApi;
+import lora.ns.actility.api.BaseStationApi;
+import lora.ns.actility.api.DeviceApi;
+import lora.ns.actility.api.DownlinkApi;
+import lora.ns.actility.api.model.appserver.AppServer;
+import lora.ns.actility.api.model.appserver.AppServer.ContentTypeEnum;
+import lora.ns.actility.api.model.appserver.AppServerCustomHttpHeadersInner;
+import lora.ns.actility.api.model.appserver.AppServerHttpLorawanDestination;
+import lora.ns.actility.api.model.appserver.AppServerStrategy;
+import lora.ns.actility.api.model.appserver.DownlinkSecurity;
+import lora.ns.actility.api.model.basestation.Bs;
+import lora.ns.actility.api.model.basestation.BsAppServersInner;
+import lora.ns.actility.api.model.basestation.BsBrief;
+import lora.ns.actility.api.model.basestation.BsHealthState;
+import lora.ns.actility.api.model.basestation.BsModel;
+import lora.ns.actility.api.model.basestation.BsProfiles;
+import lora.ns.actility.api.model.basestation.BsProfilesBriefsInner;
+import lora.ns.actility.api.model.basestation.Bss;
+import lora.ns.actility.api.model.common.Domain;
+import lora.ns.actility.api.model.common.DomainGroup;
+import lora.ns.actility.api.model.common.Token;
+import lora.ns.actility.api.model.device.Device;
+import lora.ns.actility.api.model.device.Device.ActivationEnum;
+import lora.ns.actility.api.model.device.DeviceLorawanAppServer;
+import lora.ns.actility.api.model.device.DeviceModel;
+import lora.ns.actility.api.model.device.DeviceProfiles;
+import lora.ns.actility.api.model.device.DeviceProfilesBriefsInner;
+import lora.ns.actility.common.RandomUtils;
 import lora.ns.actility.rest.ActilityAdminService;
-import lora.ns.actility.rest.ActilityCoreService;
 import lora.ns.actility.rest.ActilityServiceAccountService;
 import lora.ns.actility.rest.JwtInterceptor;
-import lora.ns.actility.rest.model.BaseStation;
-import lora.ns.actility.rest.model.BaseStationProfile;
-import lora.ns.actility.rest.model.BaseStationStatistics.ConnectionStateEnum;
-import lora.ns.actility.rest.model.BaseStationStatistics.HealthStateEnum;
-import lora.ns.actility.rest.model.Connection;
-import lora.ns.actility.rest.model.ConnectionHttpConfig;
-import lora.ns.actility.rest.model.ConnectionRequest;
-import lora.ns.actility.rest.model.DeviceCreate;
-import lora.ns.actility.rest.model.DeviceProfile;
-import lora.ns.actility.rest.model.DownlinkMessage;
-import lora.ns.actility.rest.model.MessageSecurityParams;
-import lora.ns.actility.rest.model.RFRegion;
-import lora.ns.actility.rest.model.Route;
-import lora.ns.actility.rest.model.Token;
 import lora.ns.connector.LNSAbstractConnector;
 import lora.ns.device.DeviceProvisioning;
-import lora.ns.device.DeviceProvisioning.ProvisioningMode;
 import lora.ns.device.EndDevice;
 import lora.ns.exception.LoraException;
 import lora.ns.gateway.Gateway;
@@ -74,11 +84,15 @@ public class ActilityConnector extends LNSAbstractConnector {
 	private static final String DEFAULT_AS_ID = "cumulocity";
 	private static final String DEFAULT_AS_KEY = "4e0ff46472fa1840f25368c066e94769";
 
-	private ActilityCoreService actilityCoreService;
 	private ActilityAdminService actilityAdminService;
 	private ActilityServiceAccountService actilityServiceAccountService;
 
-	private String routeRef;
+	private DeviceApi deviceApi;
+	private AppServerApi appServerApi;
+	private BaseStationApi baseStationApi;
+	private DownlinkApi downlinkV2Api;
+
+	private String appServerId;
 
 	private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JodaModule())
 					.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
@@ -181,10 +195,14 @@ public class ActilityConnector extends LNSAbstractConnector {
 						.logger(new Slf4jLogger("lora.ns.actility")).logLevel(Level.FULL)
 						.requestInterceptor(template -> template.headers(Map.of("Content-Type",
 										List.of("application/json"), "Accept", List.of("application/json"))));
-		actilityCoreService = feignBuilder
-						.requestInterceptor(new DXAdminJWTInterceptor(properties.getProperty("username"),
-										properties.getProperty("password")))
-						.target(ActilityCoreService.class, url + "/thingpark/dx/core/latest/api/");
+
+		feignBuilder = feignBuilder.requestInterceptor(new DXAdminJWTInterceptor(properties.getProperty("username"),
+						properties.getProperty("password")));
+
+		deviceApi = feignBuilder.target(DeviceApi.class, url + "/thingpark/wireless/rest");
+		appServerApi = feignBuilder.target(AppServerApi.class, url + "/thingpark/wireless/rest");
+		baseStationApi = feignBuilder.target(BaseStationApi.class, url + "/thingpark/wireless/rest");
+		downlinkV2Api = feignBuilder.target(DownlinkApi.class, url + "/thingpark/lrc/rest");
 	}
 
 	@Override
@@ -194,101 +212,73 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	public EndDevice getDevice(String devEui) {
-		var result = new EndDevice(devEui, devEui, "A");
-		var devs = actilityCoreService.getDeviceByEUI(devEui);
-		if (!devs.isEmpty()) {
-			DeviceCreate dev = devs.get(0);
-			log.info("Device {} is named {}", devEui, dev.getName());
-			result = new EndDevice(devEui, dev.getName(), null);
-		}
-		return result;
+		var dev = deviceApi.getDevice("e" + devEui);
+		log.info("Device {} is named {}", devEui, dev.getName());
+		return new EndDevice(devEui, dev.getName(), dev.getCurrentClass().getValue());
 	}
 
 	@Override
 	public String sendDownlink(DownlinkData operation) {
 		log.info("Will send {} to Thingpark.", operation.toString());
 		String correlationId = String.valueOf(DateTime.now().getMillis());
-		DownlinkMessage message = new DownlinkMessage();
-		message.setPayloadHex(operation.getPayload());
-		message.setTargetPorts(operation.getFport().toString());
-		MessageSecurityParams securityParams = new MessageSecurityParams();
-		securityParams.setAsId(getAsId());
-		securityParams.setAsKey(getAsKey());
-		message.setSecurityParams(securityParams);
-		message.setCorrelationID(correlationId);
-		DownlinkMessage response = actilityCoreService.sendDownlink(operation.getDevEui(), message);
-		return response.getCorrelationID();
+		downlinkV2Api.v2DownlinkPost(operation.getDevEui(), operation.getFport(), operation.getPayload(), null, null, 1,
+						null, null, getAsId(), null, null, correlationId, null);
+		return correlationId;
 	}
 
 	@Override
 	public void provisionDevice(DeviceProvisioning deviceProvisioning) {
-		DeviceCreate device = new DeviceCreate();
-		device.setEUI(deviceProvisioning.getDevEUI());
-		device.setName(deviceProvisioning.getName());
-		device.setProcessingStrategyId("ROUTE");
-		device.getRouteRefs().add(routeRef);
-		device.setDeviceProfileId(deviceProvisioning.getAdditionalProperties().getProperty("deviceProfile"));
-		if (deviceProvisioning.getProvisioningMode() == ProvisioningMode.OTAA) {
-			device.setActivationType("OTAA");
-			device.setApplicationEUI(deviceProvisioning.getAppEUI());
-			device.setApplicationKey(deviceProvisioning.getAppKey());
+		var device = new Device();
+		device.EUI(deviceProvisioning.getDevEUI()).name(deviceProvisioning.getName()).activation(ActivationEnum.OTAA)
+						.appKey(deviceProvisioning.getAppKey()).appEUI(deviceProvisioning.getAppEUI())
+						.addAppServersItem(new DeviceLorawanAppServer().ID(this.appServerId)).model(new DeviceModel()
+										.ID(deviceProvisioning.getAdditionalProperties().getProperty("deviceProfile")));
+		if (properties.containsKey("domain")) {
+			device.addDomainsItem(new Domain().name(properties.getProperty("domain"))
+							.group(new DomainGroup().name(properties.getProperty("group"))));
 		} else {
-			device.setActivationType("ABP");
+			device.setDomains(null);
 		}
-
-		actilityCoreService.createDevice(device);
+		deviceApi.createDevice(device);
 	}
 
 	@Override
 	public void configureRoutings(String url, String tenant, String login, String password) {
 		log.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
-		String connectionId = null;
 
-		for (Route route : actilityCoreService.getRoutes()) {
-			if (route.getName().equals(tenant + "-" + getId())) {
-				routeRef = route.getRef();
-			}
-		}
-		for (Connection c : actilityCoreService.getConnections()) {
-			if (c.getName().equals(tenant + "-" + getId())) {
-				connectionId = c.getId();
-			}
-		}
-		ConnectionRequest connectionRequest = new ConnectionRequest();
-		ConnectionHttpConfig configuration = new ConnectionHttpConfig();
-		configuration.setDestinationURL(url + "/uplink");
-		configuration.getHeaders().put("Authorization", "Basic "
-						+ Base64.getEncoder().encodeToString((tenant + "/" + login + ":" + password).getBytes()));
-		configuration.setDownlinkAsId(getAsId());
-		configuration.setDownlinkAsKey(getAsKey());
-		connectionRequest.setConfiguration(configuration);
-		connectionRequest.setName(tenant + "-" + this.getId());
-
-		if (routeRef == null) {
-			actilityCoreService.createConnection(connectionRequest);
-			for (Route route : actilityCoreService.getRoutes()) {
-				if (route.getName().equals(tenant + "-" + this.getId())) {
-					routeRef = route.getRef();
-				}
-			}
+		var appServers = appServerApi.getAppServersByName(tenant + "-" + getId());
+		if (!appServers.getBriefs().isEmpty()) {
+			// Update appserver
+			this.appServerId = appServers.getBriefs().iterator().next().getID();
+			String uid = appServers.getBriefs().iterator().next().getID().split("\\.")[1];
+			var appServer = new AppServer();
+			appServer.setType(null);
+			appServer.setContentType(ContentTypeEnum.JSON);
+			appServer.setCustomHttpHeaders(new ArrayList<>());
+			appServer.addCustomHttpHeadersItem(new AppServerCustomHttpHeadersInner().name("Authentication")
+							.value("Basic " + Base64.getEncoder()
+											.encodeToString((tenant + "/" + login + ":" + password).getBytes())));
+			appServer.setDestinations(new ArrayList<>());
+			appServer.addDestinationsItem(new AppServerHttpLorawanDestination().addAddressesItem(url + "/uplink")
+							.strategy(AppServerStrategy.SEQUENTIAL).ports("*"));
+			appServer.downlinkSecurity(new DownlinkSecurity(getAsId(), getAsKey()));
+			// appServerApi.updateAppServer(uid, appServer); <- doesn't work, 403
 		} else {
-			actilityCoreService.updateConnection(connectionId, connectionRequest);
-		}
-		List<DeviceCreate> response = actilityCoreService.getDevices();
-		response.forEach(d -> {
-			if (!d.getRouteRefs().contains(routeRef)) {
-				d.getRouteRefs().add(routeRef);
-				try {
-					actilityCoreService.updateDevice(d.getRef(), d);
-				} catch (Exception e) {
-					log.error("Couldn't update device", e);
-				}
+			// Create appserver
+			var appServer = new AppServer().contentType(ContentTypeEnum.JSON)
+							.addCustomHttpHeadersItem(new AppServerCustomHttpHeadersInner().name("Authentication")
+											.value("Basic " + Base64.getEncoder().encodeToString(
+															(tenant + "/" + login + ":" + password).getBytes())))
+							.addDestinationsItem(new AppServerHttpLorawanDestination().addAddressesItem(url + "/uplink")
+											.strategy(AppServerStrategy.SEQUENTIAL).ports("*"))
+							.name(tenant + "-" + getId()).downlinkSecurity(new DownlinkSecurity(getAsId(), getAsKey()));
+			if (properties.containsKey("domain")) {
+				appServer.addDomainsItem(new Domain().name(properties.getProperty("domain"))
+								.group(new DomainGroup().name(properties.getProperty("group"))));
 			}
-		});
+			this.appServerId = appServerApi.createAppServer(appServer).getID();
+		}
 	}
-
-	@Autowired
-	private MicroserviceSubscriptionsService subscriptionsService;
 
 	@Override
 	public void removeRoutings() {
@@ -297,86 +287,98 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	public void deprovisionDevice(String deveui) {
-		var devs = actilityCoreService.getDeviceByEUI(deveui);
-		if (!devs.isEmpty()) {
-			actilityCoreService.deleteDevice(devs.get(0).getRef());
-		}
+		deviceApi.deleteDevice("e" + deveui);
 	}
 
 	@Override
 	public List<Gateway> getGateways() {
-		List<Gateway> result = new ArrayList<>();
-		var baseStations = actilityCoreService.getBaseStations();
-		for (BaseStation b : baseStations) {
-			var baseStation = actilityCoreService.getBaseStation(b.getRef());
-			Gateway g = new Gateway();
-			g.setGwEUI(baseStation.getUuid());
-			if (baseStation.getSMN() != null) {
-				g.setSerial(baseStation.getSMN());
+		final List<Gateway> result = new ArrayList<>();
+		try {
+
+			int i = 1;
+			Bss baseStations;
+			do {
+				baseStations = baseStationApi.getBaseStations(i++);
+				for (BsBrief b : baseStations.getBriefs()) {
+					var baseStation = baseStationApi.getBaseStation(b.getHref());
+					Gateway g = new Gateway();
+					g.setGwEUI(baseStation.getLrrUUID());
+					if (baseStation.getSmn() != null) {
+						g.setSerial(baseStation.getSmn());
+					}
+					g.setName(baseStation.getName());
+					if (baseStation.getLastGeoLat() != null) {
+						g.setLat(BigDecimal.valueOf(baseStation.getLastGeoLat()));
+					}
+					if (baseStation.getLastGeoLon() != null) {
+						g.setLng(BigDecimal.valueOf(baseStation.getLastGeoLon()));
+					}
+					if (baseStation.getHealthState() != null) {
+						C8YData data = new C8YData();
+						if (baseStation.getHealthState() == BsHealthState.ACTIVE) {
+							g.setStatus(ConnectionState.AVAILABLE);
+						} else {
+							g.setStatus(ConnectionState.UNAVAILABLE);
+						}
+						if (baseStation.getTemp() != null) {
+							data.addMeasurement(null, "Temperature", "T", "°C",
+											BigDecimal.valueOf(baseStation.getTemp()), new DateTime());
+						}
+						if (baseStation.getCpu() != null) {
+							data.addMeasurement(null, "CPU", "Usage", "%", BigDecimal.valueOf(baseStation.getCpu()),
+											new DateTime());
+						}
+						if (baseStation.getRam() != null) {
+							data.addMeasurement(null, "RAM", "Usage", "%", BigDecimal.valueOf(baseStation.getRam()),
+											new DateTime());
+						}
+						g.setData(data);
+					}
+					result.add(g);
+				}
+			} while (baseStations.getMore());
+		} catch (FeignClientException e) {
+			if (e.status() == 401) {
+				log.error("User can't access base stations API");
+			} else {
+				throw e;
 			}
-			g.setName(baseStation.getName());
-			if (baseStation.getGeoLatitude() != null) {
-				g.setLat(BigDecimal.valueOf(baseStation.getGeoLatitude()));
-			}
-			if (baseStation.getGeoLongitude() != null) {
-				g.setLng(BigDecimal.valueOf(baseStation.getGeoLongitude()));
-			}
-			if (baseStation.getStatistics() != null) {
-				C8YData data = new C8YData();
-				if (baseStation.getStatistics().getConnectionState() == ConnectionStateEnum.CNX
-								&& baseStation.getStatistics().getHealthState() == HealthStateEnum.ACTIVE) {
-					g.setStatus(ConnectionState.AVAILABLE);
-				} else {
-					g.setStatus(ConnectionState.UNAVAILABLE);
-				}
-				if (baseStation.getStatistics().getTemperature() != null) {
-					data.addMeasurement(null, "Temperature", "T", "°C",
-									BigDecimal.valueOf(baseStation.getStatistics().getTemperature()), new DateTime());
-				}
-				if (baseStation.getStatistics().getCpUUsage() != null) {
-					data.addMeasurement(null, "CPU", "Usage", "%",
-									BigDecimal.valueOf(baseStation.getStatistics().getCpUUsage()), new DateTime());
-				}
-				if (baseStation.getStatistics().getRaMUsage() != null) {
-					data.addMeasurement(null, "RAM", "Usage", "%",
-									BigDecimal.valueOf(baseStation.getStatistics().getRaMUsage()), new DateTime());
-				}
-				if (baseStation.getStatistics().getBatteryLevel() != null) {
-					data.addMeasurement(null, "Battery", "level", "%",
-									BigDecimal.valueOf(baseStation.getStatistics().getBatteryLevel()), new DateTime());
-				}
-				g.setData(data);
-			}
-			result.add(g);
 		}
 
 		return result;
 	}
 
-	public List<DeviceProfile> getDeviceProfiles() {
-		return actilityCoreService.getDeviceProfiles();
+	public List<DeviceProfilesBriefsInner> getDeviceProfiles() {
+		List<DeviceProfilesBriefsInner> result = new ArrayList<>();
+		DeviceProfiles deviceProfiles;
+		int i = 1;
+		do {
+			deviceProfiles = deviceApi.getDeviceProfiles(i++);
+			result.addAll(deviceProfiles.getBriefs());
+		} while (deviceProfiles.getMore());
+		return result;
 	}
 
 	public void provisionGateway(GatewayProvisioning gatewayProvisioning) {
-		BaseStation baseStation = new BaseStation();
+		var baseStation = new Bs();
 		baseStation.setName(gatewayProvisioning.getName());
-		baseStation.setUuid(gatewayProvisioning.getGwEUI());
-		baseStation.setSMN(gatewayProvisioning.getAdditionalProperties().getProperty("SMN"));
+		if (properties.containsKey("domain")) {
+			baseStation.addDomainsItem(new Domain().name(properties.getProperty("domain"))
+							.group(new DomainGroup().name(properties.getProperty("group"))));
+		} else {
+			baseStation.setDomains(null);
+		}
+		baseStation.setLrrUUID(gatewayProvisioning.getGwEUI());
+		baseStation.setSmn(gatewayProvisioning.getAdditionalProperties().getProperty("SMN"));
 		baseStation.setPublicKey(gatewayProvisioning.getAdditionalProperties().getProperty("publicKey"));
-		if (gatewayProvisioning.getLat() != null) {
-			baseStation.setGeoLatitude(gatewayProvisioning.getLat().floatValue());
-		}
-		if (gatewayProvisioning.getLng() != null) {
-			baseStation.setGeoLongitude(gatewayProvisioning.getLng().floatValue());
-		}
-		baseStation.setBaseStationProfileId(
-						gatewayProvisioning.getAdditionalProperties().getProperty("gatewayProfile"));
-		baseStation.setRfRegionId(gatewayProvisioning.getAdditionalProperties().getProperty("rfRegion"));
-		actilityCoreService.createBaseStation(baseStation);
+		baseStation.setModel(
+						new BsModel().ID(gatewayProvisioning.getAdditionalProperties().getProperty("gatewayProfile")));
+		baseStation.addAppServersItem(new BsAppServersInner().ID(this.appServerId));
+		baseStationApi.createBaseStation(baseStation);
 	}
 
 	public void deprovisionGateway(String id) {
-		actilityCoreService.deleteBaseStation(id);
+		baseStationApi.deleteBaseStation("u" + id);
 	}
 
 	@Override
@@ -387,12 +389,15 @@ public class ActilityConnector extends LNSAbstractConnector {
 		return initProperties;
 	}
 
-	public List<BaseStationProfile> getBaseStationProfiles() {
-		return actilityCoreService.getBaseStationProfiles();
-	}
-
-	public List<RFRegion> getRFRegions() {
-		return actilityCoreService.getRFRegions();
+	public List<BsProfilesBriefsInner> getBaseStationProfiles() {
+		List<BsProfilesBriefsInner> result = new ArrayList<>();
+		BsProfiles bsProfiles;
+		int i = 1;
+		do {
+			bsProfiles = baseStationApi.getBaseStationProfiles(i++);
+			result.addAll(bsProfiles.getBriefs());
+		} while (bsProfiles.getMore());
+		return result;
 	}
 
 	public boolean hasGatewayManagementCapability() {
@@ -400,14 +405,10 @@ public class ActilityConnector extends LNSAbstractConnector {
 	}
 
 	private String getAsId() {
-		return getProperty(AS_ID_PROPERTY)
-				.map(Object::toString)
-				.orElse(DEFAULT_AS_ID);
+		return getProperty(AS_ID_PROPERTY).map(Object::toString).orElse(DEFAULT_AS_ID);
 	}
 
 	private String getAsKey() {
-		return getProperty(AS_KEY_PROPERTY)
-				.map(Object::toString)
-				.orElse(DEFAULT_AS_KEY);
+		return getProperty(AS_KEY_PROPERTY).map(Object::toString).orElse(DEFAULT_AS_KEY);
 	}
 }
