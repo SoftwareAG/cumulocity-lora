@@ -1,6 +1,8 @@
 package lora.ns.actility;
 
+import java.util.LinkedList;
 import java.util.List;
+
 import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.connector.PropertyDescription;
 import lora.ns.connector.PropertyDescription.PropertyType;
