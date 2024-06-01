@@ -14,6 +14,7 @@ package lora.ns.actility.api.model.device;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 /**
  * DeviceProfilesBriefsInnerVendor
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({ DeviceProfilesBriefsInnerVendor.JSON_PROPERTY_I_D,
     DeviceProfilesBriefsInnerVendor.JSON_PROPERTY_NAME, DeviceProfilesBriefsInnerVendor.JSON_PROPERTY_COMMERCIAL_NAME,
     DeviceProfilesBriefsInnerVendor.JSON_PROPERTY_COMMERCIAL_DESCRIPTION })

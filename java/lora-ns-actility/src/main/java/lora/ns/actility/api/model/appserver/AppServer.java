@@ -254,7 +254,6 @@ public class AppServer {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_BASE_STATION_COUNT)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Integer getBaseStationCount() {
     return baseStationCount;
@@ -321,7 +320,6 @@ public class AppServer {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_DEVICE_COUNT)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Integer getDeviceCount() {
     return deviceCount;
@@ -396,7 +394,6 @@ public class AppServer {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_HEALTH_STATE)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public HealthStateEnum getHealthState() {
     return healthState;
@@ -413,7 +410,6 @@ public class AppServer {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_MULTICAST_GROUP_COUNT)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Integer getMulticastGroupCount() {
     return multicastGroupCount;
@@ -503,7 +499,6 @@ public class AppServer {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_VALIDATION_STATE)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public AppServerValidationState getValidationState() {
     return validationState;

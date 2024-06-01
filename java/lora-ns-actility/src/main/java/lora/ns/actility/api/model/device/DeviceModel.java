@@ -15,6 +15,7 @@ package lora.ns.actility.api.model.device;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * Device Profile When updated, the MAC type of the new Device Profile must be
  * the same than the current one
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({ DeviceModel.JSON_PROPERTY_I_D, DeviceModel.JSON_PROPERTY_COMMERCIAL_NAME,
     DeviceModel.JSON_PROPERTY_LOGO })
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2024-05-29T01:47:08.521515962+02:00[Europe/Paris]", comments = "Generator version: 7.6.0")
@@ -85,7 +87,6 @@ public class DeviceModel {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_COMMERCIAL_NAME)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public String getCommercialName() {
     return commercialName;
@@ -98,7 +99,6 @@ public class DeviceModel {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_LOGO)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public String getLogo() {
     return logo;

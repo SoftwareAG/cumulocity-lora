@@ -38,7 +38,7 @@ public class BsModel {
   private String commercialName;
 
   public static final String JSON_PROPERTY_ISM_BANDS = "ismBands";
-  private List<BsModelIsmBandsInner> ismBands = new ArrayList<>();
+  private List<BsModelIsmBandsInner> ismBands;
 
   public static final String JSON_PROPERTY_LOGO = "logo";
   private String logo;
@@ -163,14 +163,12 @@ public class BsModel {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_I_D)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public String getID() {
     return ID;
   }
 
   @JsonProperty(JSON_PROPERTY_I_D)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setID(String ID) {
     this.ID = ID;
   }
@@ -182,7 +180,6 @@ public class BsModel {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_COMMERCIAL_NAME)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public String getCommercialName() {
     return commercialName;
@@ -230,7 +227,6 @@ public class BsModel {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_LOGO)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public String getLogo() {
     return logo;
@@ -249,7 +245,6 @@ public class BsModel {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_RF_HARDWARE_CONFIG)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public RfHardwareConfigEnum getRfHardwareConfig() {
     return rfHardwareConfig;
@@ -264,7 +259,6 @@ public class BsModel {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_SOFTWARE_TYPE)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public SoftwareTypeEnum getSoftwareType() {
     return softwareType;

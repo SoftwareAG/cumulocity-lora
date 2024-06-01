@@ -19,7 +19,7 @@ public interface DeviceApi {
   @Headers({ "Accept: application/json", })
   Device deleteDevice(@Param("deviceUid") String deviceUid);
 
-  @RequestLine("GET /subscriptions/mine/devicesProfiles?pageIndex={pageIndex}")
+  @RequestLine("GET /subscriptions/mine/deviceProfiles?pageIndex={pageIndex}")
   @Headers({ "Accept: application/json", })
   DeviceProfiles getDeviceProfiles(@Param("pageIndex") Integer pageIndex);
 }

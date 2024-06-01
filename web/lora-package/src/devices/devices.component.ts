@@ -128,52 +128,54 @@ export class DevicesComponent implements OnInit {
     switch (element.type) {
       case ParamType.STRING:
         field.type = "input";
-        field.templateOptions.type = "text";
-        field.templateOptions.required = element.required;
+        field.props.type = "text";
+        field.props.required = element.required;
         break;
       case ParamType.INTEGER:
       case ParamType.FLOAT:
         field.type = "input";
-        field.templateOptions.type = "number";
-        field.templateOptions.required = element.required;
-        field.templateOptions.min = element.min;
-        field.templateOptions.max = element.max;
+        field.props.type = "number";
+        field.props.required = element.required;
+        field.props.min = element.min;
+        field.props.max = element.max;
         break;
       case ParamType.BOOL:
         field.type = "checkbox";
         break;
       case ParamType.DATE:
         field.type = "input";
-        field.templateOptions.type = "date";
-        field.templateOptions.required = element.required;
+        field.props.type = "date";
+        field.props.required = element.required;
         break;
       case ParamType.ENUM:
         field.type = "radio";
         if (element.value.length > 3) {
           field.type = "select";
         }
-        field.templateOptions.options = element.value.map((e) => {
+        field.props.options = element.value.map((e) => {
           return { label: e, value: e };
         });
         field.defaultValue = undefined;
         break;
       case ParamType.GROUP:
         if (element.dependsOnParam) {
-          field.hideExpression = () => {
-            return (
-              this.parameterValues[element.dependsOnParamId] !=
-              element.dependsOnParamValue
-            );
+          field.expressions = {
+            hide: () => {
+              return (
+                this.parameterValues[element.dependsOnParamId] !=
+                element.dependsOnParamValue
+              );
+            },
           };
         }
         if (element.repeatable) {
           field.type = "repeat";
-          field.templateOptions.addText = "Add " + element.name;
-          field.templateOptions.removeText = "Remove " + element.name;
-          field.templateOptions.minOccur = element.minOccur;
-          field.templateOptions.maxOccur = element.maxOccur;
+          field.props.addText = "Add " + element.name;
+          field.props.removeText = "Remove " + element.name;
+          field.props.minOccur = element.minOccur;
+          field.props.maxOccur = element.maxOccur;
           field.fieldArray = {
-            templateOptions: { label: element.name },
+            props: { label: element.name },
             wrappers: ["panel"],
             fieldGroup: element.elements.map((e) =>
               this.getFieldFromElement(e)

@@ -28,6 +28,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 import c8y.ConnectionState;
 import feign.Client;
 import feign.Feign;
+import feign.FeignException.FeignClientException;
 import feign.Logger.Level;
 import feign.form.FormEncoder;
 import feign.jackson.JacksonDecoder;
@@ -41,11 +42,13 @@ import lora.ns.actility.api.BaseStationApi;
 import lora.ns.actility.api.DeviceApi;
 import lora.ns.actility.api.DownlinkApi;
 import lora.ns.actility.api.model.appserver.AppServer;
+import lora.ns.actility.api.model.appserver.AppServer.ContentTypeEnum;
 import lora.ns.actility.api.model.appserver.AppServerCustomHttpHeadersInner;
 import lora.ns.actility.api.model.appserver.AppServerHttpLorawanDestination;
 import lora.ns.actility.api.model.appserver.AppServerStrategy;
 import lora.ns.actility.api.model.appserver.DownlinkSecurity;
 import lora.ns.actility.api.model.basestation.Bs;
+import lora.ns.actility.api.model.basestation.BsAppServersInner;
 import lora.ns.actility.api.model.basestation.BsBrief;
 import lora.ns.actility.api.model.basestation.BsHealthState;
 import lora.ns.actility.api.model.basestation.BsModel;
@@ -227,11 +230,15 @@ public class ActilityConnector extends LNSAbstractConnector {
 	public void provisionDevice(DeviceProvisioning deviceProvisioning) {
 		var device = new Device();
 		device.EUI(deviceProvisioning.getDevEUI()).name(deviceProvisioning.getName()).activation(ActivationEnum.OTAA)
-						.addDomainsItem(new Domain().name(properties.getProperty("domain"))
-										.group(new DomainGroup().name(properties.getProperty("group"))))
 						.appKey(deviceProvisioning.getAppKey()).appEUI(deviceProvisioning.getAppEUI())
 						.addAppServersItem(new DeviceLorawanAppServer().ID(this.appServerId)).model(new DeviceModel()
 										.ID(deviceProvisioning.getAdditionalProperties().getProperty("deviceProfile")));
+		if (properties.containsKey("domain")) {
+			device.addDomainsItem(new Domain().name(properties.getProperty("domain"))
+							.group(new DomainGroup().name(properties.getProperty("group"))));
+		} else {
+			device.setDomains(null);
+		}
 		deviceApi.createDevice(device);
 	}
 
@@ -242,28 +249,34 @@ public class ActilityConnector extends LNSAbstractConnector {
 		var appServers = appServerApi.getAppServersByName(tenant + "-" + getId());
 		if (!appServers.getBriefs().isEmpty()) {
 			// Update appserver
-			var appServer = appServerApi.getAppServer(appServers.getBriefs().iterator().next().getID());
+			this.appServerId = appServers.getBriefs().iterator().next().getID();
+			String uid = appServers.getBriefs().iterator().next().getID().split("\\.")[1];
+			var appServer = new AppServer();
+			appServer.setType(null);
+			appServer.setContentType(ContentTypeEnum.JSON);
 			appServer.setCustomHttpHeaders(new ArrayList<>());
 			appServer.addCustomHttpHeadersItem(new AppServerCustomHttpHeadersInner().name("Authentication")
 							.value("Basic " + Base64.getEncoder()
 											.encodeToString((tenant + "/" + login + ":" + password).getBytes())));
 			appServer.setDestinations(new ArrayList<>());
 			appServer.addDestinationsItem(new AppServerHttpLorawanDestination().addAddressesItem(url + "/uplink")
-							.strategy(AppServerStrategy.SEQUENTIAL));
+							.strategy(AppServerStrategy.SEQUENTIAL).ports("*"));
 			appServer.downlinkSecurity(new DownlinkSecurity(getAsId(), getAsKey()));
-			appServerApi.updateAppServer(appServer.getID(), appServer);
+			// appServerApi.updateAppServer(uid, appServer); <- doesn't work, 403
 		} else {
 			// Create appserver
-			var appServer = new AppServer()
-							.addDomainsItem(new Domain().name(properties.getProperty("domain"))
-											.group(new DomainGroup().name(properties.getProperty("group"))))
+			var appServer = new AppServer().contentType(ContentTypeEnum.JSON)
 							.addCustomHttpHeadersItem(new AppServerCustomHttpHeadersInner().name("Authentication")
 											.value("Basic " + Base64.getEncoder().encodeToString(
 															(tenant + "/" + login + ":" + password).getBytes())))
 							.addDestinationsItem(new AppServerHttpLorawanDestination().addAddressesItem(url + "/uplink")
-											.strategy(AppServerStrategy.SEQUENTIAL))
+											.strategy(AppServerStrategy.SEQUENTIAL).ports("*"))
 							.name(tenant + "-" + getId()).downlinkSecurity(new DownlinkSecurity(getAsId(), getAsKey()));
-			appServerApi.createAppServer(appServer);
+			if (properties.containsKey("domain")) {
+				appServer.addDomainsItem(new Domain().name(properties.getProperty("domain"))
+								.group(new DomainGroup().name(properties.getProperty("group"))));
+			}
+			this.appServerId = appServerApi.createAppServer(appServer).getID();
 		}
 	}
 
@@ -280,47 +293,55 @@ public class ActilityConnector extends LNSAbstractConnector {
 	@Override
 	public List<Gateway> getGateways() {
 		final List<Gateway> result = new ArrayList<>();
-		// var baseStations = baseStationApi.getBaseStations();
-		Bss baseStations = null;
-		;
-		for (var i = 1; baseStations == null
-						|| baseStations.getMore(); baseStations = baseStationApi.getBaseStations(i++)) {
-			for (BsBrief b : baseStations.getBriefs()) {
-				var baseStation = baseStationApi.getBaseStation(b.getHref());
-				Gateway g = new Gateway();
-				g.setGwEUI(baseStation.getLrrUUID());
-				if (baseStation.getSmn() != null) {
-					g.setSerial(baseStation.getSmn());
-				}
-				g.setName(baseStation.getName());
-				if (baseStation.getLastGeoLat() != null) {
-					g.setLat(BigDecimal.valueOf(baseStation.getLastGeoLat()));
-				}
-				if (baseStation.getLastGeoLon() != null) {
-					g.setLng(BigDecimal.valueOf(baseStation.getLastGeoLon()));
-				}
-				if (baseStation.getHealthState() != null) {
-					C8YData data = new C8YData();
-					if (baseStation.getHealthState() == BsHealthState.ACTIVE) {
-						g.setStatus(ConnectionState.AVAILABLE);
-					} else {
-						g.setStatus(ConnectionState.UNAVAILABLE);
+		try {
+
+			int i = 1;
+			Bss baseStations;
+			do {
+				baseStations = baseStationApi.getBaseStations(i++);
+				for (BsBrief b : baseStations.getBriefs()) {
+					var baseStation = baseStationApi.getBaseStation(b.getHref());
+					Gateway g = new Gateway();
+					g.setGwEUI(baseStation.getLrrUUID());
+					if (baseStation.getSmn() != null) {
+						g.setSerial(baseStation.getSmn());
 					}
-					if (baseStation.getTemp() != null) {
-						data.addMeasurement(null, "Temperature", "T", "°C", BigDecimal.valueOf(baseStation.getTemp()),
-										new DateTime());
+					g.setName(baseStation.getName());
+					if (baseStation.getLastGeoLat() != null) {
+						g.setLat(BigDecimal.valueOf(baseStation.getLastGeoLat()));
 					}
-					if (baseStation.getCpu() != null) {
-						data.addMeasurement(null, "CPU", "Usage", "%", BigDecimal.valueOf(baseStation.getCpu()),
-										new DateTime());
+					if (baseStation.getLastGeoLon() != null) {
+						g.setLng(BigDecimal.valueOf(baseStation.getLastGeoLon()));
 					}
-					if (baseStation.getRam() != null) {
-						data.addMeasurement(null, "RAM", "Usage", "%", BigDecimal.valueOf(baseStation.getRam()),
-										new DateTime());
+					if (baseStation.getHealthState() != null) {
+						C8YData data = new C8YData();
+						if (baseStation.getHealthState() == BsHealthState.ACTIVE) {
+							g.setStatus(ConnectionState.AVAILABLE);
+						} else {
+							g.setStatus(ConnectionState.UNAVAILABLE);
+						}
+						if (baseStation.getTemp() != null) {
+							data.addMeasurement(null, "Temperature", "T", "°C",
+											BigDecimal.valueOf(baseStation.getTemp()), new DateTime());
+						}
+						if (baseStation.getCpu() != null) {
+							data.addMeasurement(null, "CPU", "Usage", "%", BigDecimal.valueOf(baseStation.getCpu()),
+											new DateTime());
+						}
+						if (baseStation.getRam() != null) {
+							data.addMeasurement(null, "RAM", "Usage", "%", BigDecimal.valueOf(baseStation.getRam()),
+											new DateTime());
+						}
+						g.setData(data);
 					}
-					g.setData(data);
+					result.add(g);
 				}
-				result.add(g);
+			} while (baseStations.getMore());
+		} catch (FeignClientException e) {
+			if (e.status() == 401) {
+				log.error("User can't access base stations API");
+			} else {
+				throw e;
 			}
 		}
 
@@ -329,23 +350,30 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	public List<DeviceProfilesBriefsInner> getDeviceProfiles() {
 		List<DeviceProfilesBriefsInner> result = new ArrayList<>();
-		DeviceProfiles deviceProfiles = null;
-		for (int i = 1; deviceProfiles == null || deviceProfiles.getMore(); deviceApi.getDeviceProfiles(i++)) {
+		DeviceProfiles deviceProfiles;
+		int i = 1;
+		do {
+			deviceProfiles = deviceApi.getDeviceProfiles(i++);
 			result.addAll(deviceProfiles.getBriefs());
-		}
+		} while (deviceProfiles.getMore());
 		return result;
 	}
 
 	public void provisionGateway(GatewayProvisioning gatewayProvisioning) {
 		var baseStation = new Bs();
 		baseStation.setName(gatewayProvisioning.getName());
-		baseStation.addDomainsItem(new Domain().name(properties.getProperty("domain"))
-						.group(new DomainGroup().name(properties.getProperty("group"))));
+		if (properties.containsKey("domain")) {
+			baseStation.addDomainsItem(new Domain().name(properties.getProperty("domain"))
+							.group(new DomainGroup().name(properties.getProperty("group"))));
+		} else {
+			baseStation.setDomains(null);
+		}
 		baseStation.setLrrUUID(gatewayProvisioning.getGwEUI());
 		baseStation.setSmn(gatewayProvisioning.getAdditionalProperties().getProperty("SMN"));
 		baseStation.setPublicKey(gatewayProvisioning.getAdditionalProperties().getProperty("publicKey"));
 		baseStation.setModel(
 						new BsModel().ID(gatewayProvisioning.getAdditionalProperties().getProperty("gatewayProfile")));
+		baseStation.addAppServersItem(new BsAppServersInner().ID(this.appServerId));
 		baseStationApi.createBaseStation(baseStation);
 	}
 
@@ -363,10 +391,12 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	public List<BsProfilesBriefsInner> getBaseStationProfiles() {
 		List<BsProfilesBriefsInner> result = new ArrayList<>();
-		BsProfiles bsProfiles = null;
-		for (int i = 1; bsProfiles == null || bsProfiles.getMore(); baseStationApi.getBaseStationProfiles(i++)) {
+		BsProfiles bsProfiles;
+		int i = 1;
+		do {
+			bsProfiles = baseStationApi.getBaseStationProfiles(i++);
 			result.addAll(bsProfiles.getBriefs());
-		}
+		} while (bsProfiles.getMore());
 		return result;
 	}
 

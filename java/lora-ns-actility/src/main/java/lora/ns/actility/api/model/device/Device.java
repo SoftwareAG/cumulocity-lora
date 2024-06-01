@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -17,6 +18,7 @@ import lora.ns.actility.api.model.common.OccContext;
 /**
  * Device
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({ Device.JSON_PROPERTY_E_U_I, Device.JSON_PROPERTY_ADMIN_LAT, Device.JSON_PROPERTY_ADMIN_LON,
         Device.JSON_PROPERTY_SUSPENSION, Device.JSON_PROPERTY_ALARM004, Device.JSON_PROPERTY_ALARM1,
         Device.JSON_PROPERTY_ALARM2, Device.JSON_PROPERTY_ALARM3, Device.JSON_PROPERTY_ALARM4,
@@ -271,7 +273,7 @@ public class Device {
     private Object vendor;
 
     public static final String JSON_PROPERTY_LR_RS = "LRRs";
-    private List<DeviceLorawanLRR> lrRs = new ArrayList<>();
+    private List<DeviceLorawanLRR> lrRs;
 
     public static final String JSON_PROPERTY_LAST_GEO_RADIUS = "LastGeoRadius";
     private Integer lastGeoRadius;
@@ -749,7 +751,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_ALARM1)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Integer getAlarm1() {
         return alarm1;
@@ -762,7 +763,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_ALARM2)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Integer getAlarm2() {
         return alarm2;
@@ -775,7 +775,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_ALARM3)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Integer getAlarm3() {
         return alarm3;
@@ -788,7 +787,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_ALARM4)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Integer getAlarm4() {
         return alarm4;
@@ -801,7 +799,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_ALARM5)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Integer getAlarm5() {
         return alarm5;
@@ -814,7 +811,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_ALARM6)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Integer getAlarm6() {
         return alarm6;
@@ -855,7 +851,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_CREATION_DATE)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Long getCreationDate() {
         return creationDate;
@@ -1001,14 +996,12 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_HEALTH_STATE)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public DeviceHealthState getHealthState() {
         return healthState;
     }
 
     @JsonProperty(JSON_PROPERTY_HEALTH_STATE)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
     public void setHealthState(DeviceHealthState healthState) {
         this.healthState = healthState;
     }
@@ -1020,7 +1013,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_HISTORY_DW_DAILY)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Object getHistoryDwDaily() {
         return historyDwDaily;
@@ -1033,7 +1025,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_HISTORY_UP_DAILY)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Object getHistoryUpDaily() {
         return historyUpDaily;
@@ -1219,7 +1210,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_NOW)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Long getNow() {
         return now;
@@ -1284,7 +1274,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VENDOR)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Object getVendor() {
         return vendor;
@@ -1542,7 +1531,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_AVG_R_S_S_I)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Float getAvgRSSI() {
         return avgRSSI;
@@ -1555,7 +1543,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_AVG_S_N_R)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Float getAvgSNR() {
         return avgSNR;
@@ -1569,7 +1556,6 @@ public class Device {
      **/
     @javax.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_CLASS_B_STATE)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
     public Integer getClassBState() {
         return classBState;

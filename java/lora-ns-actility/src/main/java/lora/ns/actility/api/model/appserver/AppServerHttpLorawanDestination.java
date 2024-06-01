@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * AppServerHttpLorawanDestination
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({ AppServerHttpLorawanDestination.JSON_PROPERTY_ADDRESSES,
     AppServerHttpLorawanDestination.JSON_PROPERTY_PORTS, AppServerHttpLorawanDestination.JSON_PROPERTY_STRATEGY })
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2024-05-29T11:38:36.048437806+02:00[Europe/Paris]", comments = "Generator version: 7.6.0")

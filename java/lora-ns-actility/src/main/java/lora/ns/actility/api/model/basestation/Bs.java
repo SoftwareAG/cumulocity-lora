@@ -248,7 +248,7 @@ public class Bs {
   private BsDwFrame dwFrame;
 
   public static final String JSON_PROPERTY_FPGA_BOARDS = "fpgaBoards";
-  private List<BsFpgaBoardsInner> fpgaBoards = new ArrayList<>();
+  private List<BsFpgaBoardsInner> fpgaBoards;
 
   public static final String JSON_PROPERTY_GPS_ANTENNA_CONFIG = "gpsAntennaConfig";
   private String gpsAntennaConfig;
@@ -735,7 +735,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_ACTIVATE_BEACON_TRANSMISSION)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Boolean getActivateBeaconTransmission() {
     return activateBeaconTransmission;
@@ -748,7 +747,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_ACTIVATE_R_X2_OPTIMIZATION)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public ActivateRX2OptimizationEnum getActivateRX2Optimization() {
     return activateRX2Optimization;
@@ -761,7 +759,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_ACTIVATE_SUPPORT_FOR802154)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public ActivateSupportFor802154Enum getActivateSupportFor802154() {
     return activateSupportFor802154;
@@ -799,7 +796,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_ALARM1)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Integer getAlarm1() {
     return alarm1;
@@ -851,7 +847,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_ALARM2)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Integer getAlarm2() {
     return alarm2;
@@ -864,7 +859,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_ALARM3)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Integer getAlarm3() {
     return alarm3;
@@ -877,7 +871,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_ALARM4)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Integer getAlarm4() {
     return alarm4;
@@ -890,7 +883,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_ALARM5)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Integer getAlarm5() {
     return alarm5;
@@ -903,7 +895,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_ALARM6)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Integer getAlarm6() {
     return alarm6;
@@ -1069,7 +1060,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_CNX_STATE)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public CnxStateEnum getCnxState() {
     return cnxState;
@@ -1134,7 +1124,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_CREATION_DATE)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Long getCreationDate() {
     return creationDate;
@@ -1300,14 +1289,12 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_FPGA_BOARDS)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public List<BsFpgaBoardsInner> getFpgaBoards() {
     return fpgaBoards;
   }
 
   @JsonProperty(JSON_PROPERTY_FPGA_BOARDS)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setFpgaBoards(List<BsFpgaBoardsInner> fpgaBoards) {
     this.fpgaBoards = fpgaBoards;
   }
@@ -1391,14 +1378,12 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_HEALTH_STATE)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public BsHealthState getHealthState() {
     return healthState;
   }
 
   @JsonProperty(JSON_PROPERTY_HEALTH_STATE)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setHealthState(BsHealthState healthState) {
     this.healthState = healthState;
   }
@@ -1416,14 +1401,12 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_HOST)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public BsHost getHost() {
     return host;
   }
 
   @JsonProperty(JSON_PROPERTY_HOST)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setHost(BsHost host) {
     this.host = host;
   }
@@ -1440,7 +1423,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_IDENTIFICATION_MODE)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public IdentificationModeEnum getIdentificationMode() {
     return identificationMode;
@@ -1459,14 +1441,12 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_INTS)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public BsInts getInts() {
     return ints;
   }
 
   @JsonProperty(JSON_PROPERTY_INTS)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setInts(BsInts ints) {
     this.ints = ints;
   }
@@ -1594,7 +1574,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_LOCATION_TYPE)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Integer getLocationType() {
     return locationType;
@@ -1694,14 +1673,12 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_LRCS)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public BsLrcs getLrcs() {
     return lrcs;
   }
 
   @JsonProperty(JSON_PROPERTY_LRCS)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setLrcs(BsLrcs lrcs) {
     this.lrcs = lrcs;
   }
@@ -1855,7 +1832,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_NOW)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Long getNow() {
     return now;
@@ -1899,14 +1875,12 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_OWNER)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public BsOwner getOwner() {
     return owner;
   }
 
   @JsonProperty(JSON_PROPERTY_OWNER)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setOwner(BsOwner owner) {
     this.owner = owner;
   }
@@ -2217,7 +2191,6 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_STATE_SINCE)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public Long getStateSince() {
     return stateSince;
@@ -2330,14 +2303,12 @@ public class Bs {
    **/
   @javax.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_VENDOR)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public BsVendor getVendor() {
     return vendor;
   }
 
   @JsonProperty(JSON_PROPERTY_VENDOR)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setVendor(BsVendor vendor) {
     this.vendor = vendor;
   }
