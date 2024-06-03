@@ -1,10 +1,10 @@
-import {
-  DeviceCodec,
-  C8YData,
-  DownlinkData,
-  DeviceOperation,
-} from "lora-codec-interface";
 import { Client, IManagedObject, Severity } from "@c8y/client";
+import {
+  C8YData,
+  DeviceCodec,
+  DeviceOperation,
+  DownlinkData,
+} from "lora-codec-interface";
 const codec = require("@adeunis/codecs");
 require("source-map-support").install();
 
@@ -147,6 +147,7 @@ export class AdeunisCodec extends DeviceCodec {
       }
       c8yData.morToUpdate = mo;
     }
+    // Analog
     if (result.type?.includes("0x42") && result.channels) {
       result.channels.forEach((channel) => {
         c8yData.addMeasurement(
@@ -159,6 +160,7 @@ export class AdeunisCodec extends DeviceCodec {
         );
       });
     }
+    // Pulse historic data
     if (result.type?.includes("0x48") && result.channels) {
       result.channels.forEach((channel) => {
         channel.deltaValues.forEach((value, i) => {
@@ -171,6 +173,19 @@ export class AdeunisCodec extends DeviceCodec {
             new Date(time.getTime() + result.baseTime * i * 60000)
           );
         });
+      });
+    }
+    // Pulse data
+    if (result.type?.includes("0x46") && result.counterValues) {
+      result.counterValues.forEach((value, i) => {
+        c8yData.addMeasurement(
+          mo,
+          "Channel " + String.fromCharCode(65 + i),
+          "Channel " + String.fromCharCode(65 + i),
+          "count",
+          value,
+          time
+        );
       });
     }
     return c8yData;
