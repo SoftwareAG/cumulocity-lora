@@ -180,7 +180,7 @@ export class AdeunisCodec extends DeviceCodec {
       result.counterValues.forEach((value, i) => {
         c8yData.addMeasurement(
           mo,
-          "Channel " + String.fromCharCode(65 + i),
+          "Pulse",
           "Channel " + String.fromCharCode(65 + i),
           "count",
           value,
