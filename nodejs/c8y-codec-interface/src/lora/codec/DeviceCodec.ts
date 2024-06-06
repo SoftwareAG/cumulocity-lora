@@ -50,8 +50,12 @@ export abstract class DeviceCodec implements Component {
   async decode(client: Client, decode: Decode): Promise<Result<string>> {
     let result: Result<string> = { success: true, message: "", response: null };
     try {
+      let device: IManagedObject = await this.getDevice(
+        client,
+        decode.deveui.toLowerCase()
+      );
       this.logger.info(
-        `Processing payload ${decode.payload} from port ${decode.fPort} for device ${decode.deveui} with time ${decode.updateTime}`
+        `Processing payload ${decode.payload} from port ${decode.fPort} for device deveui=${decode.deveui} / id=${device.id} with time ${decode.updateTime}`
       );
       let datetime: Date;
       if (!decode.updateTime) {
@@ -83,10 +87,6 @@ export abstract class DeviceCodec implements Component {
         result.success = false;
         result.message += "Payload is not in hexadecimal format!<br>";
       }
-      let device: IManagedObject = await this.getDevice(
-        client,
-        decode.deveui.toLowerCase()
-      );
       if (result.success) {
         if (!device) {
           this.logger.error(`There is no device with DevEUI ${decode.deveui}`);
@@ -287,8 +287,9 @@ export abstract class DeviceCodec implements Component {
     alarmType: string
   ) {
     this.logger.info(
-      "Will clear alarms of type " + alarmType + " on device " + device.name
+      `Will clear alarms of type  ${alarmType} on device deveui=${device.name} / id=${device.id}`
     );
+
     let alarms: IResultList<IAlarm> = await client.alarm.list({
       source: device.id,
       type: alarmType,
@@ -304,12 +305,7 @@ export abstract class DeviceCodec implements Component {
         });
       });
     } else {
-      this.logger.info(
-        "No alarms to update with type " +
-          alarmType +
-          " on device " +
-          device.name
-      );
+      this.logger.info(`No alarms to update with type ${alarmType} on device deveui=${device.name} /id=${device.id}`);
     }
   }
 }
