@@ -13,7 +13,7 @@ export class MicroserviceSubscriptionService extends EventEmitter {
   protected clients: Map<string, Client> = new Map<string, Client>();
   protected logger = Logger.getLogger("MicroserviceSubscriptionService");
 
-  constructor() {
+  constructor(testmode?) {
     super();
     this.client = new FetchClient(
       new BasicAuth({
@@ -23,40 +23,42 @@ export class MicroserviceSubscriptionService extends EventEmitter {
       }),
       this.baseUrl
     );
-    cron.schedule("*/10 * * * * *", () => {
+    if (testmode) {
       this.getUsers();
-    });
+    } else {
+      cron.schedule("*/10 * * * * *", () => {
+        this.getUsers();
+      });
+    }
   }
 
-  protected async getUsers() {
-    this.client
-      .fetch("/application/currentApplication/subscriptions")
-      .then(async (result) => {
-        let allUsers = await result.json();
-        let newClients: Map<string, Client> = new Map<string, Client>();
-        if (allUsers?.users) {
-          allUsers.users.forEach((user) => {
-            if (!Array.from(this.clients.keys()).includes(user.tenant)) {
-              const auth = new BasicAuth({
-                user: user.name,
-                password: user.password,
-                tenant: user.tenant,
-              });
-              let client: Client = new Client(auth, this.baseUrl);
-              newClients.set(user.tenant, client);
-
-              this.emit("newMicroserviceSubscription", client);
-            } else {
-              newClients.set(user.tenant, this.clients.get(user.tenant));
-            }
+  async getUsers() {
+    try {
+      let result = await this.client.fetch(
+        "/application/currentApplication/subscriptions"
+      );
+      let allUsers = await result.json();
+      let newClients: Map<string, Client> = new Map<string, Client>();
+      allUsers?.users?.forEach((user) => {
+        if (!Array.from(this.clients.keys()).includes(user.tenant)) {
+          const auth = new BasicAuth({
+            user: user.name,
+            password: user.password,
+            tenant: user.tenant,
           });
+          let client: Client = new Client(auth, this.baseUrl);
+          newClients.set(user.tenant, client);
+
+          this.emit("newMicroserviceSubscription", client);
+        } else {
+          newClients.set(user.tenant, this.clients.get(user.tenant));
         }
-        this.clients = newClients;
-      })
-      .catch((e) => {
-        console.log(e);
-        this.logger.error(e);
       });
+      this.clients = newClients;
+    } catch (e) {
+      console.log(e);
+      this.logger.error(e);
+    }
   }
 
   getClients(): Map<string, Client> {
