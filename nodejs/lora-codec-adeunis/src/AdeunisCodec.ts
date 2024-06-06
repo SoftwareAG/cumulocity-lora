@@ -116,7 +116,7 @@ export class AdeunisCodec extends DeviceCodec {
           mo,
           "Pulse",
           channel,
-          "",
+          "count",
           c,
           new Date(time.getTime() - samplingPeriod * i * 1000)
         );
@@ -166,9 +166,9 @@ export class AdeunisCodec extends DeviceCodec {
         channel.deltaValues.forEach((value, i) => {
           c8yData.addMeasurement(
             mo,
+            "Pulse",
             channel.name,
-            channel.name,
-            "count",
+            "",
             channel.index + value,
             new Date(time.getTime() + result.baseTime * i * 60000)
           );
@@ -180,9 +180,9 @@ export class AdeunisCodec extends DeviceCodec {
       result.counterValues.forEach((value, i) => {
         c8yData.addMeasurement(
           mo,
+          "Pulse",
           "Channel " + String.fromCharCode(65 + i),
-          "Channel " + String.fromCharCode(65 + i),
-          "count",
+          "",
           value,
           time
         );

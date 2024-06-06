@@ -29,13 +29,13 @@ describe("Test Adeunis Codec", () => {
       "4820000000010000000200000100020003000400050006000700080009000A000B000C000D000E000F00100011001200130014"
     );
     console.dir(c8yData, { depth: null });
-    expect(c8yData.measurements.length).toBe(20);
+    expect(c8yData.measurements).toHaveLength(20);
   });
   test("Test analog", () => {
     let codec: TestCodec = new TestCodec(null);
     let c8yData: C8YData = codec.testDecode("analog", "42500110000002100000");
     console.dir(c8yData, { depth: null });
-    expect(c8yData.measurements.length).toBe(2);
+    expect(c8yData.measurements).toHaveLength(2);
   });
   test("Test Pulse 4 with historic data", () => {
     let codec: TestCodec = new TestCodec(null);
@@ -50,7 +50,7 @@ describe("Test Adeunis Codec", () => {
     let codec: TestCodec = new TestCodec(null);
     let c8yData: C8YData = codec.testDecode("pulse", "46000000000000026C9B");
     console.dir(c8yData, { depth: null });
-    expect(c8yData.measurements.length).toBe(2);
+    expect(c8yData.measurements).toHaveLength(2);
     expect(c8yData.measurements[0].type).toBe("Channel A");
     expect(c8yData.measurements[1].type).toBe("Channel B");
   });
