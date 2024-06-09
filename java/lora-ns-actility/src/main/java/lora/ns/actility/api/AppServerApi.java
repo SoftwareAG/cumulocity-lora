@@ -3,6 +3,7 @@ package lora.ns.actility.api;
 import feign.Param;
 import feign.RequestLine;
 import lora.ns.actility.api.model.appserver.AppServer;
+import lora.ns.actility.api.model.appserver.AppServerUpdate;
 import lora.ns.actility.api.model.appserver.AppServers;
 
 public interface AppServerApi {
@@ -16,5 +17,5 @@ public interface AppServerApi {
     AppServer createAppServer(AppServer appServer);
 
     @RequestLine("PUT /subscriptions/mine/appServers/{appServerUID}")
-    AppServer updateAppServer(@Param("appServerUID") String appServerUID, AppServer appServer);
+    AppServer updateAppServer(@Param("appServerUID") String appServerUID, AppServerUpdate appServer);
 }

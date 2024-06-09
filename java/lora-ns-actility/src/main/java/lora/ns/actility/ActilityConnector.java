@@ -46,6 +46,7 @@ import lora.ns.actility.api.model.appserver.AppServer.ContentTypeEnum;
 import lora.ns.actility.api.model.appserver.AppServerCustomHttpHeadersInner;
 import lora.ns.actility.api.model.appserver.AppServerHttpLorawanDestination;
 import lora.ns.actility.api.model.appserver.AppServerStrategy;
+import lora.ns.actility.api.model.appserver.AppServerUpdate;
 import lora.ns.actility.api.model.appserver.DownlinkSecurity;
 import lora.ns.actility.api.model.basestation.Bs;
 import lora.ns.actility.api.model.basestation.BsAppServersInner;
@@ -65,7 +66,6 @@ import lora.ns.actility.api.model.device.DeviceModel;
 import lora.ns.actility.api.model.device.DeviceProfiles;
 import lora.ns.actility.api.model.device.DeviceProfilesBriefsInner;
 import lora.ns.actility.common.RandomUtils;
-import lora.ns.actility.rest.ActilityAdminService;
 import lora.ns.actility.rest.ActilityServiceAccountService;
 import lora.ns.actility.rest.JwtInterceptor;
 import lora.ns.connector.LNSAbstractConnector;
@@ -78,13 +78,13 @@ import lora.ns.gateway.GatewayProvisioning;
 @Slf4j
 public class ActilityConnector extends LNSAbstractConnector {
 
+	private static final String THINGPARK_WIRELESS_REST = "/thingpark/wireless/rest";
 	private static final String AS_ID_PROPERTY = "asId";
 	private static final String AS_KEY_PROPERTY = "asKey";
 	private static final String AS_ID_PREFIX = "cumulocity-";
 	private static final String DEFAULT_AS_ID = "cumulocity";
 	private static final String DEFAULT_AS_KEY = "4e0ff46472fa1840f25368c066e94769";
 
-	private ActilityAdminService actilityAdminService;
 	private ActilityServiceAccountService actilityServiceAccountService;
 
 	private DeviceApi deviceApi;
@@ -108,12 +108,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 		protected String getToken() {
 			Token token = null;
 			try {
-				if (this.clientId.contains("/")) {
-					token = actilityServiceAccountService.getToken("client_credentials", this.clientId,
-									this.clientSecret);
-				} else {
-					token = actilityAdminService.getToken("client_credentials", this.clientId, this.clientSecret);
-				}
+				token = actilityServiceAccountService.getToken("client_credentials", this.clientId, this.clientSecret);
 			} catch (Exception e) {
 				throw new LoraException("Couldn't get JWT", e);
 			}
@@ -176,14 +171,8 @@ public class ActilityConnector extends LNSAbstractConnector {
 		final ch.qos.logback.classic.Logger serviceLogger = (ch.qos.logback.classic.Logger) LoggerFactory
 						.getLogger("lora.ns.actility");
 		serviceLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
-		var feignBuilder = Feign.builder().client(new Client.Default(getSSLSocketFactory(), getHostnameVerifier()))
-						.decoder(new JacksonDecoder(objectMapper)).encoder(new FormEncoder())
-						.logger(new Slf4jLogger("lora.ns.actility")).logLevel(Level.FULL)
-						.requestInterceptor(template -> template.header("Content-Type",
-										"application/x-www-form-urlencoded"));
 		String url = properties.getProperty("url");
-		actilityAdminService = feignBuilder.target(ActilityAdminService.class, url + "/thingpark/dx/admin/latest/api/");
-		feignBuilder = Feign.builder().client(new Client.Default(getSSLSocketFactory(), getHostnameVerifier()))
+		var feignBuilder = Feign.builder().client(new Client.Default(getSSLSocketFactory(), getHostnameVerifier()))
 						.decoder(new JacksonDecoder(objectMapper)).encoder(new FormEncoder())
 						.logger(new Slf4jLogger("lora.ns.actility")).logLevel(Level.FULL)
 						.requestInterceptor(template -> template.header("Content-Type",
@@ -199,9 +188,9 @@ public class ActilityConnector extends LNSAbstractConnector {
 		feignBuilder = feignBuilder.requestInterceptor(new DXAdminJWTInterceptor(properties.getProperty("username"),
 						properties.getProperty("password")));
 
-		deviceApi = feignBuilder.target(DeviceApi.class, url + "/thingpark/wireless/rest");
-		appServerApi = feignBuilder.target(AppServerApi.class, url + "/thingpark/wireless/rest");
-		baseStationApi = feignBuilder.target(BaseStationApi.class, url + "/thingpark/wireless/rest");
+		deviceApi = feignBuilder.target(DeviceApi.class, url + THINGPARK_WIRELESS_REST);
+		appServerApi = feignBuilder.target(AppServerApi.class, url + THINGPARK_WIRELESS_REST);
+		baseStationApi = feignBuilder.target(BaseStationApi.class, url + THINGPARK_WIRELESS_REST);
 		downlinkV2Api = feignBuilder.target(DownlinkApi.class, url + "/thingpark/lrc/rest");
 	}
 
@@ -244,16 +233,18 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	public void configureRoutings(String url, String tenant, String login, String password) {
-		log.info("Configuring routings to: {} with credentials: {}:{}", url, login, password);
+		String domain = properties.getProperty("domain");
+		String group = properties.getProperty("group");
+		log.info("Configuring routings to: {} with credentials: {}:{} and domain {}:{}", url, login, password, domain,
+						group);
 
 		var appServers = appServerApi.getAppServersByName(tenant + "-" + getId());
 		if (!appServers.getBriefs().isEmpty()) {
 			// Update appserver
-			this.appServerId = appServers.getBriefs().iterator().next().getID();
-			String uid = appServers.getBriefs().iterator().next().getID().split("\\.")[1];
-			var appServer = new AppServer();
-			appServer.setType(null);
-			appServer.setContentType(ContentTypeEnum.JSON);
+			var currentAppServer = appServers.getBriefs().iterator().next();
+			this.appServerId = currentAppServer.getID();
+			String uid = currentAppServer.getID().split("\\.")[1];
+			var appServer = new AppServerUpdate();
 			appServer.setCustomHttpHeaders(new ArrayList<>());
 			appServer.addCustomHttpHeadersItem(new AppServerCustomHttpHeadersInner().name("Authentication")
 							.value("Basic " + Base64.getEncoder()
@@ -261,8 +252,11 @@ public class ActilityConnector extends LNSAbstractConnector {
 			appServer.setDestinations(new ArrayList<>());
 			appServer.addDestinationsItem(new AppServerHttpLorawanDestination().addAddressesItem(url + "/uplink")
 							.strategy(AppServerStrategy.SEQUENTIAL).ports("*"));
-			appServer.downlinkSecurity(new DownlinkSecurity(getAsId(), getAsKey()));
-			// appServerApi.updateAppServer(uid, appServer); <- doesn't work, 403
+			if (properties.containsKey("domain")) {
+				appServer.addDomainsItem(new Domain().name(properties.getProperty("domain"))
+								.group(new DomainGroup().name(properties.getProperty("group"))));
+			}
+			appServerApi.updateAppServer(uid, appServer);
 		} else {
 			// Create appserver
 			var appServer = new AppServer().contentType(ContentTypeEnum.JSON)
@@ -287,7 +281,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 
 	@Override
 	public void deprovisionDevice(String deveui) {
-		deviceApi.deleteDevice("e" + deveui);
+		deviceApi.deleteDevice("e" + deveui.toUpperCase());
 	}
 
 	@Override
