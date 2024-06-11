@@ -246,7 +246,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 			String uid = currentAppServer.getID().split("\\.")[1];
 			var appServer = new AppServerUpdate();
 			appServer.setCustomHttpHeaders(new ArrayList<>());
-			appServer.addCustomHttpHeadersItem(new AppServerCustomHttpHeadersInner().name("Authentication")
+			appServer.addCustomHttpHeadersItem(new AppServerCustomHttpHeadersInner().name("Authorization")
 							.value("Basic " + Base64.getEncoder()
 											.encodeToString((tenant + "/" + login + ":" + password).getBytes())));
 			appServer.setDestinations(new ArrayList<>());
@@ -260,7 +260,7 @@ public class ActilityConnector extends LNSAbstractConnector {
 		} else {
 			// Create appserver
 			var appServer = new AppServer().contentType(ContentTypeEnum.JSON)
-							.addCustomHttpHeadersItem(new AppServerCustomHttpHeadersInner().name("Authentication")
+							.addCustomHttpHeadersItem(new AppServerCustomHttpHeadersInner().name("Authorization")
 											.value("Basic " + Base64.getEncoder().encodeToString(
 															(tenant + "/" + login + ":" + password).getBytes())))
 							.addDestinationsItem(new AppServerHttpLorawanDestination().addAddressesItem(url + "/uplink")
