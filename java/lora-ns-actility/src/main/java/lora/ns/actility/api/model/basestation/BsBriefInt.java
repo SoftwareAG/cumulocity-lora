@@ -41,10 +41,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes({ @JsonSubTypes.Type(value = BsBriefIntEthernet.class, name = "ETHERNET"),
     @JsonSubTypes.Type(value = BsBriefIntCellular.class, name = "GPRS"),
-    @JsonSubTypes.Type(value = BsBriefIntWlan.class, name = "WLAN"),
-    @JsonSubTypes.Type(value = BsBriefIntCellular.class, name = "BsBriefIntCellular"),
-    @JsonSubTypes.Type(value = BsBriefIntEthernet.class, name = "BsBriefIntEthernet"),
-    @JsonSubTypes.Type(value = BsBriefIntWlan.class, name = "BsBriefIntWlan"), })
+    @JsonSubTypes.Type(value = BsBriefIntWlan.class, name = "WLAN") })
 
 public class BsBriefInt {
   public static final String JSON_PROPERTY_AVG_ROUND_TRIP = "avgRoundTrip";
