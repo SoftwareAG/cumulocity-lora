@@ -1,5 +1,7 @@
 package lora.ns.actility;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.net.ssl.HostnameVerifier;
@@ -272,6 +275,13 @@ public class ActilityConnector extends LNSAbstractConnector {
 			}
 			this.appServerId = appServerApi.createAppServer(appServer).getID();
 		}
+	}
+
+	@Override
+	public Optional<String> getCustomRoutingBaseUrl() {
+		return isNotBlank(properties.getProperty("webhook-url")) ?
+				Optional.of(properties.getProperty("webhook-url")) :
+				super.getCustomRoutingBaseUrl();
 	}
 
 	@Override
