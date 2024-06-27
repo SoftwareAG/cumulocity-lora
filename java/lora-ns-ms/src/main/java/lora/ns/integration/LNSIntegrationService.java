@@ -1,11 +1,11 @@
 package lora.ns.integration;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -128,6 +128,12 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	@Autowired
 	protected LoraContextService loraContextService;
 
+	@Autowired
+	private ApplicationContext applicationContext;
+
+	@Autowired
+	private EventApi eventApi;
+
 	protected LinkedList<LNSConnectorWizardStep> wizard = new LinkedList<>();
 
 	protected LinkedList<PropertyDescription> deviceProvisioningAdditionalProperties = new LinkedList<>();
@@ -154,9 +160,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		loraContextService.log(context.toString());
 		return mMessageTemplateEngine.process("payload.json", context);
 	}
-
-	@Autowired
-	private ApplicationContext applicationContext;
 
 	protected I getInstance(ManagedObjectRepresentation instance) {
 		@SuppressWarnings("unchecked")
@@ -185,13 +188,8 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		log.info("Looking for LNS Connectors in tenant {}", subscriptionsService.getTenant());
 		InventoryFilter filter = new InventoryFilter().byType(LNS_CONNECTOR_TYPE);
 		ManagedObjectCollection col = inventoryApi.getManagedObjectsByFilter(filter);
-		QueryParam queryParam = null;
-		try {
-			queryParam = new QueryParam(() -> "query", URLEncoder.encode(
-							LNS_TYPE + " eq " + this.getType() + " and type eq '" + LNS_CONNECTOR_TYPE + "'", "utf8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		QueryParam queryParam = new QueryParam(() -> "query", URLEncoder.encode(
+							LNS_TYPE + " eq " + this.getType() + " and type eq '" + LNS_CONNECTOR_TYPE + "'", StandardCharsets.UTF_8));
 		for (ManagedObjectRepresentation mor : col.get(queryParam).allPages()) {
 			log.info("Retrieved connector: {} of type {}", mor.getName(), mor.getProperty(LNS_TYPE));
 			LNSConnector instance = getInstance(mor);
@@ -201,9 +199,6 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		}
 		agentService.registerAgent(this);
 	}
-
-	@Autowired
-	private EventApi eventApi;
 
 	public void mapEventToC8Y(String eventString, String lnsInstanceId) {
 		loraContextService.log("Following message was received from the LNS: {}", eventString);
@@ -274,10 +269,9 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 	}
 
 	private void configureRoutings(String lnsInstanceId, MicroserviceCredentials credentials) {
-		String url = "https://" + c8yUtils.getTenantDomain() + "/service/lora-ns-" + this.getType() + "/"
-						+ lnsInstanceId;
-		loraContextService.log("Connector URL is {}", url);
 		var connector = lnsConnectorManager.getConnector(lnsInstanceId);
+		String url = getRoutingUrl(connector);
+		loraContextService.log("Connector URL is {}", url);
 		try {
 			connector.removeRoutings();
 			connector.configureRoutings(url, subscriptionsService.getTenant(), credentials.getUsername(),
@@ -285,6 +279,12 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		} catch (Exception e) {
 			throw new CannotCreateRouteException("Cannot create route for url " + url, e);
 		}
+	}
+
+	private String getRoutingUrl(LNSConnector connector) {
+		String routingBaseUrl = connector.getCustomRoutingBaseUrl()
+				.orElse("https://" + c8yUtils.getTenantDomain());
+		return routingBaseUrl + "/service/lora-ns-" + this.getType() + "/" + connector.getId();
 	}
 
 	public ManagedObjectRepresentation addLnsConnector(LNSConnectorRepresentation connectorRepresentation) {
