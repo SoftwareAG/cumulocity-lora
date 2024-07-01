@@ -46,7 +46,7 @@ jobs:
       - name: Build with Maven
         run: |
           cd java
-          mvn -T 4C --batch-mode --update-snapshots verify
+          mvn -T 4C --batch-mode --update-snapshots verify -P ci
       - name: Create Release
         uses: actions/github-script@v6
         env:
