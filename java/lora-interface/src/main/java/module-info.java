@@ -1,5 +1,6 @@
 module lora_interface {
-    // both modules will be replaced in 10.15 by requires transitive java.client.model;
+    // both modules will be replaced in 10.15 by requires transitive
+    // java.client.model;
     requires transitive rest.representation;
     requires transitive core.model;
 
@@ -19,9 +20,9 @@ module lora_interface {
     requires transitive com.google.common;
     requires transitive lombok;
 
+    exports lora.common;
     exports lora.codec;
     exports lora.codec.uplink;
     exports lora.codec.downlink;
-    exports lora.common;
     exports lora.ns;
 }

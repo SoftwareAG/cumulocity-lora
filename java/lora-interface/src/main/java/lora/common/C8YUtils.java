@@ -3,6 +3,16 @@ package lora.common;
 import java.io.IOException;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
 import com.cumulocity.microservice.subscription.service.MicroserviceSubscriptionsService;
 import com.cumulocity.model.ID;
 import com.cumulocity.rest.representation.identity.ExternalIDRepresentation;
@@ -12,30 +22,19 @@ import com.cumulocity.sdk.client.identity.IdentityApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import lombok.RequiredArgsConstructor;
 
 @org.springframework.stereotype.Component
+@RequiredArgsConstructor
 public class C8YUtils {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Autowired
-	private IdentityApi identityApi;
+	private final IdentityApi identityApi;
 
-	@Autowired
-	private InventoryApi inventoryApi;
+	private final InventoryApi inventoryApi;
 
-	@Autowired
-	protected MicroserviceSubscriptionsService subscriptionsService;
+	private final MicroserviceSubscriptionsService subscriptionsService;
 
 	@Value("${C8Y.baseURL}")
 	private String c8yBaseUrl;
@@ -71,39 +70,35 @@ public class C8YUtils {
 
 	public ManagedObjectRepresentation getOrCreateDevice(String externalId, ManagedObjectRepresentation device) {
 		return findExternalId(externalId.toLowerCase(), DEVEUI_TYPE)
-				.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
-				.orElseGet(() -> {
-					ManagedObjectRepresentation result = inventoryApi.create(device);
-					createExternalId(result, externalId, DEVEUI_TYPE);
-					return result;
-				});
+						.map(extId -> inventoryApi.get(extId.getManagedObject().getId())).orElseGet(() -> {
+							ManagedObjectRepresentation result = inventoryApi.create(device);
+							createExternalId(result, externalId, DEVEUI_TYPE);
+							return result;
+						});
 	}
 
 	public Optional<ManagedObjectRepresentation> getDevice(String externalId) {
 		return Optional.ofNullable(findExternalId(externalId.toLowerCase(), DEVEUI_TYPE)
-				.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
-				.orElse(null));
+						.map(extId -> inventoryApi.get(extId.getManagedObject().getId())).orElse(null));
 	}
 
 	public Optional<ManagedObjectRepresentation> getChildDevice(String externalId) {
 		return Optional.ofNullable(findExternalId(externalId.toLowerCase(), CHILD_DEVICE_TYPE)
-				.map(extId -> inventoryApi.get(extId.getManagedObject().getId()))
-				.orElse(null));
+						.map(extId -> inventoryApi.get(extId.getManagedObject().getId())).orElse(null));
 	}
 
 	public ManagedObjectRepresentation createChildDevice(ManagedObjectRepresentation parentDevice,
-			String childExternalId, String name) {
-		return findExternalId(childExternalId, CHILD_DEVICE_TYPE)
-				.map(extId -> extId.getManagedObject())
-				.orElseGet(() -> {
-					ManagedObjectRepresentation childDevice = new ManagedObjectRepresentation();
-					childDevice.setName(name);
-					childDevice.setType("LoRa child device");
-					childDevice = inventoryApi.create(childDevice);
-					createExternalId(childDevice, childExternalId, CHILD_DEVICE_TYPE);
-					inventoryApi.getManagedObjectApi(parentDevice.getId()).addChildDevice(childDevice.getId());
-					return childDevice;
-				});
+					String childExternalId, String name) {
+		return findExternalId(childExternalId, CHILD_DEVICE_TYPE).map(extId -> extId.getManagedObject())
+						.orElseGet(() -> {
+							ManagedObjectRepresentation childDevice = new ManagedObjectRepresentation();
+							childDevice.setName(name);
+							childDevice.setType("LoRa child device");
+							childDevice = inventoryApi.create(childDevice);
+							createExternalId(childDevice, childExternalId, CHILD_DEVICE_TYPE);
+							inventoryApi.getManagedObjectApi(parentDevice.getId()).addChildDevice(childDevice.getId());
+							return childDevice;
+						});
 	}
 
 	public String getTenantDomain() {
@@ -112,10 +107,10 @@ public class C8YUtils {
 		try {
 			HttpHeaders headers = new HttpHeaders();
 			headers.set("Authorization", subscriptionsService.getCredentials(subscriptionsService.getTenant()).get()
-					.toCumulocityCredentials().getAuthenticationString());
+							.toCumulocityCredentials().getAuthenticationString());
 			headers.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
 			result = restTemplate.exchange(c8yBaseUrl + "/tenant/currentTenant", HttpMethod.GET,
-					new HttpEntity<String>("", headers), String.class).getBody();
+							new HttpEntity<String>("", headers), String.class).getBody();
 			ObjectMapper mapper = new ObjectMapper();
 			result = mapper.readTree(result).get("domainName").asText();
 		} catch (IOException | HttpClientErrorException e) {

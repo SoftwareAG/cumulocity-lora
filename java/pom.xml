@@ -7,35 +7,6 @@
   <artifactId>lora</artifactId>
   <version>1.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <modules>
-    <module>github-proxy</module>
-    <module>lora-interface</module>
-    <module>lora-codec-ms</module>
-    <module>lora-ns-ms</module>
-    <module>lora-codec-cayennelpp</module>
-    <module>lora-codec-nke</module>
-    <module>lora-codec-pyrescom-classair</module>
-    <module>lora-codec-senlab</module>
-    <module>lora-codec-semtech</module>
-    <module>lora-codec-axioma</module>
-    <module>lora-codec-atim-th</module>
-    <module>lora-codec-atim-tm2d</module>
-    <module>lora-codec-atim-tmxd</module>
-    <module>lora-codec-acs-switch</module>
-    <module>lora-codec-c8y</module>
-    <module>lora-ns-kerlink</module>
-    <module>lora-ns-objenious</module>
-    <module>lora-ns-orbiwise</module>
-    <module>lora-ns-loriot</module>
-    <module>lora-ns-ttn</module>
-    <module>lora-ns-actility</module>
-    <module>lora-codec-elsys</module>
-    <module>lora-codec-lansitec</module>
-    <module>lora-codec-example</module>
-    <module>lora-ns-generic</module>
-    <module>lora-ns-liveobjects</module>
-    <module>lora-ns-chirpstack</module>
-  </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <c8y.version>1015.0.278</c8y.version>
@@ -115,7 +86,7 @@
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-engine</artifactId>
-        <version>5.9.1</version>
+        <version>5.7.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -169,21 +140,44 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.2</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.junit.platform</groupId>
-              <artifactId>junit-platform-surefire-provider</artifactId>
-              <version>1.3.2</version>
-            </dependency>
-            <dependency>
-              <groupId>org.ow2.asm</groupId>
-              <artifactId>asm</artifactId>
-              <version>9.1</version>
-            </dependency>
-          </dependencies>
+          <version>3.3.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>ci</id>
+      <modules>
+        <module>github-proxy</module>
+        <module>lora-interface</module>
+        <module>lora-codec-ms</module>
+        <module>lora-ns-ms</module>
+        <module>lora-codec-cayennelpp</module>
+        <module>lora-codec-nke</module>
+        <module>lora-codec-pyrescom-classair</module>
+        <module>lora-codec-senlab</module>
+        <module>lora-codec-semtech</module>
+        <module>lora-codec-axioma</module>
+        <module>lora-codec-atim-th</module>
+        <module>lora-codec-atim-tm2d</module>
+        <module>lora-codec-atim-tmxd</module>
+        <module>lora-codec-acs-switch</module>
+        <module>lora-codec-c8y</module>
+        <module>lora-ns-kerlink</module>
+        <module>lora-ns-objenious</module>
+        <module>lora-ns-orbiwise</module>
+        <module>lora-ns-loriot</module>
+        <module>lora-ns-ttn</module>
+        <module>lora-ns-actility</module>
+        <module>lora-codec-elsys</module>
+        <module>lora-codec-lansitec</module>
+        <module>lora-codec-example</module>
+        <module>lora-ns-generic</module>
+        <module>lora-ns-liveobjects</module>
+        <module>lora-ns-chirpstack</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>
