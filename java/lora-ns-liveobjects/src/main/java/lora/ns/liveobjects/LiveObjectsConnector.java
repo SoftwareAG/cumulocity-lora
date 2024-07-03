@@ -157,6 +157,13 @@ public class LiveObjectsConnector extends LNSAbstractConnector {
 	}
 
 	@Override
+	public Optional<String> getCustomRoutingBaseUrl() {
+		return isNotBlank(properties.getProperty("webhook-url")) ?
+				Optional.of(properties.getProperty("webhook-url")) :
+				super.getCustomRoutingBaseUrl();
+	}
+
+	@Override
 	public void removeRoutings() {
 		getProperty("uplinkRouteId").ifPresent(id -> service.deleteActionPolicy(id.toString()));
 		getProperty("downlinkRouteId").ifPresent(id -> service.deleteActionPolicy(id.toString()));

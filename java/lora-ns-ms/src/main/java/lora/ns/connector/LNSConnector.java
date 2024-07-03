@@ -1,6 +1,7 @@
 package lora.ns.connector;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 import lora.codec.downlink.DownlinkData;
@@ -46,5 +47,9 @@ public interface LNSConnector {
 
 	default Properties getInitProperties() {
 		return new Properties();
+	}
+
+	default Optional<String> getCustomRoutingBaseUrl() {
+		return Optional.empty();
 	}
 }

@@ -1,27 +1,18 @@
 package lora.ns.actility;
 
-import java.util.LinkedList;
 import java.util.List;
-
 import lora.ns.connector.LNSConnectorWizardStep;
 import lora.ns.connector.PropertyDescription;
-import lora.ns.connector.PropertyDescription.PropertyType;
 
 public class ConnectorWizardStep1 implements LNSConnectorWizardStep {
 
-	protected LinkedList<PropertyDescription> propertyDescriptions = new LinkedList<>();
-	{
-		propertyDescriptions.add(new PropertyDescription("url", "URL", true, null, null, null, null, null, null, null,
-						PropertyType.TEXT, false));
-		propertyDescriptions.add(new PropertyDescription("username", "Username", true, null, null, null, null, null,
-						null, null, PropertyType.TEXT, false));
-		propertyDescriptions.add(new PropertyDescription("password", "Password", true, null, null, null, null, null,
-						null, null, PropertyType.PASSWORD, true));
-		propertyDescriptions.add(new PropertyDescription("domain", "Domain", false, null, null, null, null, null, null,
-						null, PropertyType.TEXT, false));
-		propertyDescriptions.add(new PropertyDescription("group", "Group", false, null, null, null, null, null, null,
-						null, PropertyType.TEXT, false));
-	}
+	protected List<PropertyDescription> propertyDescriptions = List.of(
+			PropertyDescription.text("url", "URL", true),
+			PropertyDescription.text("username", "Username", true),
+			PropertyDescription.password("password", "Password"),
+			PropertyDescription.text("domain", "Domain", false),
+			PropertyDescription.text("group", "Group", false),
+			PropertyDescription.text("webhook-url", "Webhook URL", false));
 
 	@Override
 	public String getName() {
