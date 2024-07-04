@@ -191,13 +191,22 @@ public abstract class LNSIntegrationService<I extends LNSConnector> {
 		QueryParam queryParam = new QueryParam(() -> "query", URLEncoder.encode(
 							LNS_TYPE + " eq " + this.getType() + " and type eq '" + LNS_CONNECTOR_TYPE + "'", StandardCharsets.UTF_8));
 		for (ManagedObjectRepresentation mor : col.get(queryParam).allPages()) {
-			log.info("Retrieved connector: {} of type {}", mor.getName(), mor.getProperty(LNS_TYPE));
-			LNSConnector instance = getInstance(mor);
-			lnsConnectorManager.addConnector(instance);
-			lnsGatewayManager.upsertGateways(instance);
-			configureRoutings(instance.getId(), event.getCredentials());
+			try {
+				initializeConnector(mor, event.getCredentials());
+			} catch (Exception e) {
+				log.warn("Could not initialize connector {}", mor.getName(), e);
+			}
 		}
 		agentService.registerAgent(this);
+	}
+
+	private void initializeConnector(ManagedObjectRepresentation mor,
+			MicroserviceCredentials credentials) {
+		log.info("Retrieved connector: {} of type {}", mor.getName(), mor.getProperty(LNS_TYPE));
+		LNSConnector instance = getInstance(mor);
+		lnsConnectorManager.addConnector(instance);
+		lnsGatewayManager.upsertGateways(instance);
+		configureRoutings(instance.getId(), credentials);
 	}
 
 	public void mapEventToC8Y(String eventString, String lnsInstanceId) {
