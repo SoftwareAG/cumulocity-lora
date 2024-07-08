@@ -1,6 +1,6 @@
 package lora.ns.actility;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
@@ -238,14 +238,13 @@ public class ActilityConnector extends LNSAbstractConnector {
 	public void configureRoutings(String url, String tenant, String login, String password) {
 		String domain = properties.getProperty("domain");
 		String group = properties.getProperty("group");
+		var routeId = getProperty("routeId");
 		log.info("Configuring routings to: {} with credentials: {}:{} and domain {}:{}", url, login, password, domain,
 						group);
-
-		var appServers = appServerApi.getAppServersByName(tenant + "-" + getId());
-		if (!appServers.getBriefs().isEmpty()) {
+		if (routeId.isPresent()) {
 			// Update appserver
-			var currentAppServer = appServers.getBriefs().iterator().next();
-			this.appServerId = currentAppServer.getID();
+			this.appServerId = routeId.get().toString();
+			var currentAppServer = appServerApi.getAppServer(appServerId);
 			String uid = currentAppServer.getID().split("\\.")[1];
 			var appServer = new AppServerUpdate();
 			appServer.setCustomHttpHeaders(new ArrayList<>());
@@ -268,20 +267,21 @@ public class ActilityConnector extends LNSAbstractConnector {
 															(tenant + "/" + login + ":" + password).getBytes())))
 							.addDestinationsItem(new AppServerHttpLorawanDestination().addAddressesItem(url + "/uplink")
 											.strategy(AppServerStrategy.SEQUENTIAL).ports("*"))
-							.name(tenant + "-" + getId()).downlinkSecurity(new DownlinkSecurity(getAsId(), getAsKey()));
+							.name(getName() + "-" + tenant + "-" + getId())
+							.downlinkSecurity(new DownlinkSecurity(getAsId(), getAsKey()));
 			if (properties.containsKey("domain")) {
 				appServer.addDomainsItem(new Domain().name(properties.getProperty("domain"))
 								.group(new DomainGroup().name(properties.getProperty("group"))));
 			}
 			this.appServerId = appServerApi.createAppServer(appServer).getID();
+			setProperty("routeId", appServerId);
 		}
 	}
 
 	@Override
 	public Optional<String> getCustomRoutingBaseUrl() {
-		return isNotBlank(properties.getProperty("webhook-url")) ?
-				Optional.of(properties.getProperty("webhook-url")) :
-				super.getCustomRoutingBaseUrl();
+		return isNotBlank(properties.getProperty("webhook-url")) ? Optional.of(properties.getProperty("webhook-url"))
+						: super.getCustomRoutingBaseUrl();
 	}
 
 	@Override
