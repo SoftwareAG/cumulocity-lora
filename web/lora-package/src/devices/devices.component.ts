@@ -77,7 +77,11 @@ export class DevicesComponent implements OnInit {
     const { data, res, paging } = await this.inventory.detail(deviceId);
     this.device = data;
     if (this.device.c8y_Configuration && this.device.c8y_Configuration.config) {
-      this.parameterValues = JSON.parse(this.device.c8y_Configuration.config);
+      try {
+        this.parameterValues = JSON.parse(this.device.c8y_Configuration.config);
+      } catch (e) {
+        console.error("Config doesn't contain JSON");
+      }
     }
     this.debugMode = data.debug;
     this.storeLast = data.storeLast;
