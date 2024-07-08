@@ -46,7 +46,7 @@ public class AgentService {
 
 	public void registerAgent(LNSIntegrationService<? extends LNSConnector> lnsIntegrationService) {
 		Optional<ExternalIDRepresentation> extId = c8yUtils.findExternalId(lnsIntegrationService.getType(),
-				LNSIntegrationService.LNS_EXT_ID);
+						LNSIntegrationService.LNS_EXT_ID);
 		ManagedObjectRepresentation agent = null;
 		if (!extId.isPresent()) {
 			agent = new ManagedObjectRepresentation();
@@ -80,11 +80,11 @@ public class AgentService {
 			inventoryApi.update(agent);
 			if (agent.hasProperty(GATEWAY_SCAN_RATE)) {
 				lnsIntegrationService
-						.setGatewayScanRate(Integer.valueOf(agent.getProperty(GATEWAY_SCAN_RATE).toString()));
+								.setGatewayScanRate(Integer.valueOf(agent.getProperty(GATEWAY_SCAN_RATE).toString()));
 			}
 			if (agent.hasProperty(GATEWAY_SCAN_START_DELAY)) {
 				lnsIntegrationService.setGatewayScanStartDelay(
-						Integer.valueOf(agent.getProperty(GATEWAY_SCAN_START_DELAY).toString()));
+								Integer.valueOf(agent.getProperty(GATEWAY_SCAN_START_DELAY).toString()));
 			}
 		}
 		agents.put(subscriptionsService.getTenant(), agent);
@@ -93,7 +93,7 @@ public class AgentService {
 		// (we're polling them anyway)
 		try {
 			deviceControlApi.getNotificationsSubscriber().subscribe(agent.getId(),
-					new OperationDispatcherSubscriptionListener(subscriptionsService.getTenant()));
+							new OperationDispatcherSubscriptionListener(subscriptionsService.getTenant()));
 		} catch (Exception e) {
 			logger.error("Can't subscribe to operation", e);
 		}
@@ -117,8 +117,7 @@ public class AgentService {
 		inventoryApi.update(agent);
 	}
 
-	public class OperationDispatcherSubscriptionListener
-			implements SubscriptionListener<GId, OperationRepresentation> {
+	public class OperationDispatcherSubscriptionListener implements SubscriptionListener<GId, OperationRepresentation> {
 
 		public OperationDispatcherSubscriptionListener(String tenant) {
 			this.tenant = tenant;
