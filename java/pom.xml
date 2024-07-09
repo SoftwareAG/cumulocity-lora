@@ -22,11 +22,6 @@
       <layout>default</layout>
       <url>https://download.cumulocity.com/maven/repository</url>
     </repository>
-    <repository>
-      <id>github</id>
-      <layout>default</layout>
-      <url>https://maven.pkg.github.com/cpoder/c8y-java-sdk</url>
-    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
