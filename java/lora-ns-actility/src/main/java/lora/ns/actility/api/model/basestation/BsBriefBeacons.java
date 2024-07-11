@@ -12,152 +12,22 @@
 
 package lora.ns.actility.api.model.basestation;
 
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * BsBriefBeacons
  */
-@JsonPropertyOrder({ BsBriefBeacons.JSON_PROPERTY_LAST_DELIVERY_CAUSE,
-    BsBriefBeacons.JSON_PROPERTY_LAST_DELIVERY_FAILED_CAUSE,
-    BsBriefBeacons.JSON_PROPERTY_LAST_DELIVERY_FAILED_CAUSE_DATE })
-@JsonTypeName("BsBrief_beacons")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2024-05-31T16:08:44.630492043+02:00[Europe/Paris]", comments = "Generator version: 7.6.0")
+@Data
+@EqualsAndHashCode
 public class BsBriefBeacons {
-  public static final String JSON_PROPERTY_LAST_DELIVERY_CAUSE = "lastDeliveryCause";
   private String lastDeliveryCause;
 
-  public static final String JSON_PROPERTY_LAST_DELIVERY_FAILED_CAUSE = "lastDeliveryFailedCause";
   private String lastDeliveryFailedCause;
 
-  public static final String JSON_PROPERTY_LAST_DELIVERY_FAILED_CAUSE_DATE = "lastDeliveryFailedCauseDate";
   private Long lastDeliveryFailedCauseDate;
 
-  public BsBriefBeacons() {
-  }
+  private Integer totalRequested;
 
-  public BsBriefBeacons lastDeliveryCause(String lastDeliveryCause) {
-
-    this.lastDeliveryCause = lastDeliveryCause;
-    return this;
-  }
-
-  /**
-   * Specify the delivery cause of the last beacon transmission: - 0x: Success -
-   * Ax: Transmission slot busy - Bx: Too late for beacon slot - Dx: DC constraint
-   * on beacon slot
-   * 
-   * @return lastDeliveryCause
-   **/
-  @javax.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_LAST_DELIVERY_CAUSE)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
-  public String getLastDeliveryCause() {
-    return lastDeliveryCause;
-  }
-
-  @JsonProperty(JSON_PROPERTY_LAST_DELIVERY_CAUSE)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setLastDeliveryCause(String lastDeliveryCause) {
-    this.lastDeliveryCause = lastDeliveryCause;
-  }
-
-  public BsBriefBeacons lastDeliveryFailedCause(String lastDeliveryFailedCause) {
-
-    this.lastDeliveryFailedCause = lastDeliveryFailedCause;
-    return this;
-  }
-
-  /**
-   * Specify the delivery cause of the last beacon transmission failure: - 0x:
-   * Success - Ax: Transmission slot busy - Bx: Too late for beacon slot - Dx: DC
-   * constraint on beacon slot
-   * 
-   * @return lastDeliveryFailedCause
-   **/
-  @javax.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_LAST_DELIVERY_FAILED_CAUSE)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
-  public String getLastDeliveryFailedCause() {
-    return lastDeliveryFailedCause;
-  }
-
-  @JsonProperty(JSON_PROPERTY_LAST_DELIVERY_FAILED_CAUSE)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setLastDeliveryFailedCause(String lastDeliveryFailedCause) {
-    this.lastDeliveryFailedCause = lastDeliveryFailedCause;
-  }
-
-  public BsBriefBeacons lastDeliveryFailedCauseDate(Long lastDeliveryFailedCauseDate) {
-
-    this.lastDeliveryFailedCauseDate = lastDeliveryFailedCauseDate;
-    return this;
-  }
-
-  /**
-   * Last beacon transmission failure report date, epoch time in milliseconds.
-   * 
-   * @return lastDeliveryFailedCauseDate
-   **/
-  @javax.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_LAST_DELIVERY_FAILED_CAUSE_DATE)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
-  public Long getLastDeliveryFailedCauseDate() {
-    return lastDeliveryFailedCauseDate;
-  }
-
-  @JsonProperty(JSON_PROPERTY_LAST_DELIVERY_FAILED_CAUSE_DATE)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setLastDeliveryFailedCauseDate(Long lastDeliveryFailedCauseDate) {
-    this.lastDeliveryFailedCauseDate = lastDeliveryFailedCauseDate;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BsBriefBeacons bsBriefBeacons = (BsBriefBeacons) o;
-    return Objects.equals(this.lastDeliveryCause, bsBriefBeacons.lastDeliveryCause)
-            && Objects.equals(this.lastDeliveryFailedCause, bsBriefBeacons.lastDeliveryFailedCause)
-            && Objects.equals(this.lastDeliveryFailedCauseDate, bsBriefBeacons.lastDeliveryFailedCauseDate);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(lastDeliveryCause, lastDeliveryFailedCause, lastDeliveryFailedCauseDate);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class BsBriefBeacons {\n");
-    sb.append("    lastDeliveryCause: ").append(toIndentedString(lastDeliveryCause)).append("\n");
-    sb.append("    lastDeliveryFailedCause: ").append(toIndentedString(lastDeliveryFailedCause)).append("\n");
-    sb.append("    lastDeliveryFailedCauseDate: ").append(toIndentedString(lastDeliveryFailedCauseDate)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
-
+  private Integer totalSent;
 }
