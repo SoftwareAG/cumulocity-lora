@@ -1,6 +1,6 @@
 {
   "name": "lora-package",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "This is the Cumulocity LoRa plugin.",
   "scripts": {
     "start": "c8ycli server --env.extraWebpackConfig=./extra-webpack.config.js -u https://lora-dev.cumulocity.com --shell devicemanagement",

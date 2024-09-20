@@ -62,6 +62,7 @@
               <i class="fa fw dlt-c8y-icon-help-outline text-primary"></i>
             </button>
           </th>
+          <th>Type</th>
           <th>Codec</th>
           <th>Model</th>
           <ng-container *ngIf="properties">
@@ -130,6 +131,12 @@
                   in hex
                   format</c8y-message>
               </c8y-messages>
+            </c8y-form-group>
+          </td>
+          <td>
+            <c8y-form-group class="form-group-sm">
+              <input class="form-control" #type="ngModel" name="type" [(ngModel)]="pdevice.type"
+                aria-describedby="type" (paste)="onPaste($event, index)" />
             </c8y-form-group>
           </td>
           <td>
