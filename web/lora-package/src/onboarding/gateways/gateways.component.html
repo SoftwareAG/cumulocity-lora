@@ -185,6 +185,13 @@
           }}</a>
       </ng-container>
     </c8y-column>
+    <c8y-column name="status">
+      <ng-container *c8yCellRendererDef="let context">
+        <span class="tag tag--{{
+        context.value !== 'AVAILABLE' ? 'danger' : 'success' 
+        }}">{{ context.value }}</span>
+      </ng-container>
+    </c8y-column>
     <c8y-column name="lnstype">
       <ng-container *c8yCellRendererDef="let context">
         {{

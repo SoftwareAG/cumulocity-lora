@@ -5,7 +5,8 @@ import {
     Column,
     ColumnDataRecordClassName,
     Pagination,
-    DataGridComponent, DataSourceModifier, FilteringActionType, ServerSideDataResult, _
+    DataGridComponent, DataSourceModifier, FilteringActionType, ServerSideDataResult, _,
+    DeviceStatusComponent
 } from '@c8y/ngx-components';
 import { Component, EventEmitter, Output, TemplateRef, ViewChild } from '@angular/core';
 import { FetchClient, InventoryService, IdentityService, IManagedObject, QueriesUtil } from '@c8y/client';
@@ -62,6 +63,11 @@ export class LoraGatewaysComponent {
     deleteGatewaysModalRef: BsModalRef;
     queriesUtil: QueriesUtil;
     columns: Column[] = [
+        {
+            name: 'status',
+            header: 'Status',
+            path: 'c8y_Availability.status'
+        },
         { name: 'id', header: 'GW Id', path: 'id' },
         {
             name: 'name',
@@ -74,11 +80,6 @@ export class LoraGatewaysComponent {
             name: 'type',
             header: 'Type',
             path: 'c8y_Hardware.model'
-        },
-        {
-            name: 'status',
-            header: 'Status',
-            path: 'gatewayAvailability'
         },
         { name: 'lnstype', header: 'LNS Type', path: 'lnsConnectorId' },
         { name: 'lnsname', header: 'LNS Name', path: 'lnsConnectorId' }

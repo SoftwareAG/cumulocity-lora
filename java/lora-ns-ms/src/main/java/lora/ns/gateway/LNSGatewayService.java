@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import com.cumulocity.microservice.context.ContextService;
+import com.cumulocity.microservice.context.credentials.MicroserviceCredentials;
 import com.cumulocity.model.event.CumulocityAlarmStatuses;
 import com.cumulocity.rest.representation.alarm.AlarmRepresentation;
 import com.cumulocity.rest.representation.event.EventRepresentation;
@@ -18,6 +20,7 @@ import com.cumulocity.sdk.client.event.EventApi;
 import com.cumulocity.sdk.client.inventory.InventoryApi;
 import com.cumulocity.sdk.client.measurement.MeasurementApi;
 
+import c8y.ConnectionState;
 import c8y.Hardware;
 import c8y.IsDevice;
 import c8y.Position;
@@ -43,7 +46,20 @@ public class LNSGatewayService {
     private final MeasurementApi measurementApi;
     private final LNSConnectorService lnsConnectorManager;
     private final LoraContextService loraContextService;
+	private final ContextService<MicroserviceCredentials> contextService;
     public static final String GATEWAY_ID_TYPE = "LoRa Gateway Id";
+
+	private MicroserviceCredentials createContextWithoutApiKey(MicroserviceCredentials source) {
+		return new MicroserviceCredentials(
+				source.getTenant(),
+				source.getUsername(),
+				source.getPassword(),
+				source.getOAuthAccessToken(),
+				"NOT_EXISTING", // added to replace context, check:
+								// com.cumulocity.microservice.context.annotation.EnableContextSupportConfiguration.contextScopeConfigurer
+				source.getTfaToken(),
+				null);
+	}
 
     public void upsertGateways(LNSConnector connector) {
         List<Gateway> gateways = connector.getGateways();
@@ -73,6 +89,10 @@ public class LNSGatewayService {
             }
             inventoryApi.update(mor);
             loraContextService.log("Processing data for gateway {}", gateway.getName());
+            MicroserviceCredentials noAppKeyContext = createContextWithoutApiKey(contextService.getContext());
+            if (gateway.getStatus() == ConnectionState.AVAILABLE) {
+                contextService.runWithinContext(noAppKeyContext, () -> processData(mor, gateway.getData()));
+            }
             processData(mor, gateway.getData());
         }
     }
