@@ -26,6 +26,7 @@ import c8y.IsDevice;
 import c8y.Position;
 import c8y.RequiredAvailability;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lora.codec.uplink.C8YData;
 import lora.common.C8YUtils;
 import lora.ns.connector.LNSConnector;
@@ -37,6 +38,7 @@ import lora.rest.LoraContextService;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LNSGatewayService {
 
     private final C8YUtils c8yUtils;
@@ -49,7 +51,7 @@ public class LNSGatewayService {
 	private final ContextService<MicroserviceCredentials> contextService;
     public static final String GATEWAY_ID_TYPE = "LoRa Gateway Id";
 
-	private MicroserviceCredentials createContextWithoutApiKey(MicroserviceCredentials source) {
+	private MicroserviceCredentials createContextWithoutAppKey(MicroserviceCredentials source) {
 		return new MicroserviceCredentials(
 				source.getTenant(),
 				source.getUsername(),
@@ -87,12 +89,14 @@ public class LNSGatewayService {
                 locationUpdate.setDateTime(new DateTime());
                 eventApi.create(locationUpdate);
             }
-            inventoryApi.update(mor);
-            loraContextService.log("Processing data for gateway {}", gateway.getName());
-            MicroserviceCredentials noAppKeyContext = createContextWithoutApiKey(contextService.getContext());
             if (gateway.getStatus() == ConnectionState.AVAILABLE) {
-                contextService.runWithinContext(noAppKeyContext, () -> processData(mor, gateway.getData()));
+                MicroserviceCredentials noAppKeyContext = createContextWithoutAppKey(contextService.getContext());
+                log.info("Sending data with no app context -> gateway {} should show as available...", gateway.getGwEUI());
+                contextService.callWithinContext(noAppKeyContext, () -> inventoryApi.update(mor));
+            } else {
+                inventoryApi.update(mor);
             }
+            loraContextService.log("Processing data for gateway {}", gateway.getName());
             processData(mor, gateway.getData());
         }
     }
