@@ -123,7 +123,7 @@ export class DevicesComponent implements OnInit {
   getFieldFromElement(element: DeviceOperationElement): FormlyFieldConfig {
     let field: FormlyFieldConfig = {
       key: element.id,
-      templateOptions: { label: element.name },
+      props: { label: element.name },
     };
     if (element.value) {
       field.defaultValue = element.value;
