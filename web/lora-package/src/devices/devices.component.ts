@@ -61,7 +61,7 @@ export class DevicesComponent implements OnInit {
     private modalService: BsModalService,
     private eventService: EventService
   ) {
-    console.log(route.snapshot.parent.data.contextData.id);
+    console.log(route.snapshot.parent?.data.contextData.id);
   }
 
   async ngOnInit(): Promise<void> {
