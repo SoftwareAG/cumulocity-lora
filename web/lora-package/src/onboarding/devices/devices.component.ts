@@ -549,6 +549,7 @@ export class LoraDevicesComponent {
         this.pdevices[c].devEUI = cells[1];
         this.pdevices[c].appEUI = cells[2];
         this.pdevices[c].appKey = cells[3];
+        this.pdevices[c].type = cells[4];
         if (lines.length - 1 > c - i) {
           this.insertLine(c);
         }
